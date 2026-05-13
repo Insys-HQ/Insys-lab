@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인시스그룹 AI혁신 R&D센터 — 연구노트</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-auth.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-firestore.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'맑은 고딕','Malgun Gothic','Noto Sans KR',sans-serif;background:#EEF2F7;min-height:100vh;font-size:13px}
+input,select,textarea,button{font-family:inherit;font-size:13px}
+input,select,textarea{width:100%;padding:7px 10px;border:1px solid #CED4DA;border-radius:5px;outline:none;background:#fff}
+input:focus,select:focus,textarea:focus{border-color:#2E75B6;box-shadow:0 0 0 2px rgba(46,117,182,.15)}
+textarea{resize:vertical}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+
+/* ── 로그인 화면 ── */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#1F3864 0%,#2E75B6 100%)}
+.login-box{background:#fff;border-radius:12px;padding:36px 40px;width:380px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo-icon{font-size:40px;margin-bottom:8px}
+.login-logo-title{font-size:16px;font-weight:700;color:#1F3864}
+.login-logo-sub{font-size:11px;color:#ADB5BD;margin-top:3px}
+.login-tab{display:flex;border-bottom:2px solid #F0F0F0;margin-bottom:20px}
+.login-tab button{flex:1;background:none;border:none;padding:10px;cursor:pointer;font-size:13px;font-weight:500;color:#ADB5BD;border-bottom:2px solid transparent;margin-bottom:-2px}
+.login-tab button.active{color:#2E75B6;border-bottom:2px solid #2E75B6}
+.login-form-group{margin-bottom:14px}
+.login-form-group label{display:block;font-size:11px;font-weight:600;color:#495057;margin-bottom:5px}
+.login-btn{width:100%;padding:10px;background:#2E75B6;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px}
+.login-btn:hover{background:#1F5A9B}
+.login-err{color:#DC3545;font-size:12px;margin-top:8px;text-align:center;min-height:18px}
+.login-divider{text-align:center;color:#ADB5BD;font-size:11px;margin:14px 0}
+
+/* ── 승인 대기 화면 ── */
+#wait-screen{display:none;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#1F3864,#2E75B6)}
+.wait-box{background:#fff;border-radius:12px;padding:40px;text-align:center;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+
+/* ── 메인 앱 ── */
+#app{display:none;max-width:1100px;margin:0 auto;min-height:100vh;background:#fff;box-shadow:0 0 30px rgba(0,0,0,.1)}
+.hdr{background:linear-gradient(135deg,#1F3864,#2E75B6);padding:11px 20px;display:flex;align-items:center;justify-content:space-between}
+.hdr-logo{display:flex;align-items:center;gap:12px}
+.hdr-icon{background:rgba(255,255,255,.15);border-radius:8px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.hdr-title{color:#fff;font-weight:700;font-size:15px}
+.hdr-sub{color:#B3D4F0;font-size:11px;margin-top:2px}
+.hdr-right{display:flex;align-items:center;gap:12px}
+.user-badge{background:rgba(255,255,255,.15);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:7px}
+.user-avatar{width:24px;height:24px;border-radius:50%;background:#2E75B6;border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.user-name{color:#fff;font-size:12px;font-weight:500}
+.user-role{color:#B3D4F0;font-size:10px}
+.logout-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;padding:4px 10px;border-radius:5px;cursor:pointer;font-size:11px}
+.logout-btn:hover{background:rgba(255,255,255,.25)}
+.tabs{background:#1F3864;display:flex;border-bottom:2px solid #2E75B6;overflow-x:auto}
+.tab-btn{background:transparent;border:none;color:#90B4D0;padding:10px 16px;display:flex;align-items:center;gap:5px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s}
+.tab-btn.active{background:#2E75B6;color:#fff;font-weight:600;border-bottom:2px solid #90CAF9}
+.tab-btn:hover:not(.active){color:#fff}
+.content{padding:18px 20px;background:#EEF2F7;min-height:calc(100vh - 115px)}
+.page{display:none}.page.active{display:block}
+.card{background:#fff;border-radius:8px;border:.5px solid #DEE2E6;padding:14px 16px;margin-bottom:12px}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:7px 14px;border-radius:6px;font-weight:500;font-size:13px;cursor:pointer;transition:all .15s;border:1px solid transparent}
+.btn-p{background:#2E75B6;color:#fff;border-color:#2E75B6}.btn-p:hover{background:#1F5A9B}
+.btn-o{background:#fff;color:#2E75B6;border-color:#2E75B6}.btn-o:hover{background:#EEF4FB}
+.btn-d{background:#fff;color:#DC3545;border-color:#DC3545}.btn-d:hover{background:#FFF5F5}
+.btn-v{background:#6F42C1;color:#fff;border-color:#6F42C1}.btn-v:hover{background:#5A31A8}
+.btn-g{background:#fff;color:#6C757D;border-color:#ADB5BD}.btn-g:hover{background:#F8F9FA}
+.btn-s{background:#198754;color:#fff;border-color:#198754}.btn-s:hover{background:#146C43}
+.btn-sm{padding:3px 9px;font-size:11px}
+.badge{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.b-연구{background:#E8F4FD;color:#0C63A8}.b-실험{background:#EDE7F6;color:#4A148C}
+.b-분석{background:#E8F5E9;color:#1B5E20}.b-회의{background:#FFF3E0;color:#E65100}
+.b-문서작업{background:#F3E5F5;color:#6A1B9A}.b-기타{background:#ECEFF1;color:#37474F}
+.b-진행중{background:#E8F4FD;color:#0C63A8}.b-기획중{background:#FFF3CD;color:#664D03}
+.b-완료{background:#D1E7DD;color:#0A3622}.b-보류{background:#F8D7DA;color:#58151C}
+.b-정상{background:#D1E7DD;color:#0A3622}.b-수리중{background:#FFF3CD;color:#664D03}
+.b-대여중{background:#CCE5FF;color:#004085}.b-폐기{background:#F8D7DA;color:#58151C}
+.b-관리자{background:#FFF3CD;color:#664D03}.b-연구원{background:#E8F4FD;color:#0C63A8}
+.b-승인대기{background:#F8D7DA;color:#58151C}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.ml-auto{margin-left:auto}
+label.lbl{display:block;font-size:11px;font-weight:600;color:#495057;margin-bottom:4px}
+.form-r{display:grid;gap:12px;margin-bottom:12px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:1fr 1fr 1fr}.c4{grid-template-columns:1fr 1fr 1fr 1fr}
+.form-act{display:flex;gap:8px;justify-content:flex-end;padding-top:12px;border-top:1px solid #F0F0F0}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:#F8F9FA;border-bottom:1px solid #DEE2E6}
+th{padding:9px 12px;text-align:left;font-weight:500;color:#495057;white-space:nowrap}
+td{padding:8px 12px;border-bottom:.5px solid #F0F0F0;vertical-align:middle}
+tbody tr:nth-child(even){background:#FAFAFA}
+tbody tr:hover{background:#F0F7FF}
+.tc{text-align:center}.tr-r{text-align:right}
+.mono{font-family:monospace;font-weight:700;color:#1F3864}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.stat-card{background:#fff;border-radius:8px;border:.5px solid #DEE2E6;padding:14px 12px;text-align:center}
+.ni{background:#EEF6FF;border:1px solid #B8D4F5;border-radius:6px;padding:9px 13px;font-size:12px;color:#1F3864;margin-bottom:12px}
+.ng{background:#F0FFF4;border:1px solid #C6F6D5;border-radius:6px;padding:10px 14px;margin-bottom:10px}
+.no{background:#FFF8F0;border:1px solid #FED7AA;border-radius:6px;padding:10px 14px;margin-bottom:10px}
+.nv{background:#F8F0FF;border:1px solid #D8B4FE;border-radius:6px;padding:9px 13px;font-size:12px;color:#6F42C1;margin-top:10px}
+.back-row{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.back-row h3{margin:0;font-size:15px;font-weight:500}
+.hint{font-size:11px;color:#ADB5BD}
+.empty{background:#fff;border-radius:8px;text-align:center;color:#ADB5BD;padding:50px 20px;border:.5px solid #DEE2E6}
+.pre{white-space:pre-wrap;font-size:14px;line-height:1.75;color:#212529}
+.ftr{background:#1F3864;padding:10px 20px;text-align:center;color:#6B8FAF;font-size:11px}
+#overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(31,56,100,.93);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;color:#fff}
+.spin{width:46px;height:46px;border:4px solid rgba(255,255,255,.2);border-top:4px solid #fff;border-radius:50%;animation:sp .8s linear infinite;margin-bottom:14px}
+@keyframes sp{to{transform:rotate(360deg)}}
+#toast{position:fixed;bottom:24px;right:24px;background:#1F3864;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .3s;z-index:9998;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+#toast.show{opacity:1}
+.lbl-card{width:227px;height:151px;border:2px solid #1F3864;border-radius:4px;overflow:hidden;background:#fff;position:relative;box-shadow:3px 3px 8px rgba(0,0,0,.15)}
+.lbl-hdr{background:#1F3864;padding:4px 8px;display:flex;align-items:center;justify-content:space-between}
+.lbl-asset{background:#2E75B6;padding:2px 8px;text-align:center;color:#fff;font-size:11px;font-weight:700;font-family:monospace;letter-spacing:1px}
+.lbl-body{padding:5px 8px}
+.lbl-nm{font-size:12px;font-weight:700;color:#1F3864;margin-bottom:4px;line-height:1.2}
+.lbl-info{display:grid;grid-template-columns:1fr 1fr;gap:1px 6px;font-size:8px}
+.lk{color:#999;margin-right:2px}
+.lbl-qr{position:absolute;bottom:5px;right:6px;width:38px;height:38px;border:1px solid #DEE2E6;border-radius:3px;display:flex;align-items:center;justify-content:center;background:#F8F9FA;font-size:6px;color:#ADB5BD;text-align:center;line-height:1.3;font-weight:600}
+.lbl-ft{position:absolute;bottom:5px;left:8px;font-size:5px;color:#CCC}
+@media(max-width:700px){.c2,.c3,.c4{grid-template-columns:1fr}.stat-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- ══ 로딩 오버레이 ══ -->
+<div id="overlay">
+  <div class="spin"></div>
+  <div style="font-size:15px;font-weight:600;margin-bottom:6px">🔬 인시스그룹 R&D센터</div>
+  <div style="font-size:13px;color:#B3D4F0" id="overlay-msg">초기화 중...</div>
+</div>
+
+<!-- ══ 로그인 화면 ══ -->
+<div id="login-screen" style="display:none">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">🔬</div>
+      <div class="login-logo-title">인시스그룹 AI혁신 R&D센터</div>
+      <div class="login-logo-sub">연구노트 시스템 v1.0</div>
+    </div>
+    <div class="login-tab">
+      <button class="active" onclick="switchTab('login')">로그인</button>
+      <button onclick="switchTab('register')">계정 신청</button>
+    </div>
+
+    <!-- 로그인 폼 -->
+    <div id="tab-login">
+      <div class="login-form-group">
+        <label>이메일</label>
+        <input type="email" id="login-email" placeholder="이메일 주소 입력">
+      </div>
+      <div class="login-form-group">
+        <label>비밀번호</label>
+        <input type="password" id="login-pw" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="login-btn" onclick="doLogin()">로그인</button>
+      <div class="login-err" id="login-err"></div>
+    </div>
+
+    <!-- 계정 신청 폼 -->
+    <div id="tab-register" style="display:none">
+      <div class="ni" style="margin-bottom:14px;font-size:11px">신청 후 관리자(연구소장) 승인이 필요합니다</div>
+      <div class="login-form-group">
+        <label>이름</label>
+        <input type="text" id="reg-name" placeholder="성명 입력">
+      </div>
+      <div class="login-form-group">
+        <label>이메일</label>
+        <input type="email" id="reg-email" placeholder="이메일 주소 입력">
+      </div>
+      <div class="login-form-group">
+        <label>비밀번호</label>
+        <input type="password" id="reg-pw" placeholder="8자 이상">
+      </div>
+      <div class="login-form-group">
+        <label>소속 / 직위</label>
+        <input type="text" id="reg-dept" placeholder="예) AI혁신 R&D센터 / 연구원">
+      </div>
+      <button class="login-btn" style="background:#198754" onclick="doRegister()">계정 신청</button>
+      <div class="login-err" id="reg-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 승인 대기 화면 ══ -->
+<div id="wait-screen">
+  <div class="wait-box">
+    <div style="font-size:48px;margin-bottom:16px">⏳</div>
+    <h3 style="color:#1F3864;margin-bottom:10px">승인 대기 중</h3>
+    <p style="color:#6C757D;font-size:13px;line-height:1.7;margin-bottom:20px">계정 신청이 완료되었습니다.<br>관리자(연구소장) 승인 후 이용 가능합니다.</p>
+    <div id="wait-user-info" style="background:#F8F9FA;border-radius:6px;padding:10px;font-size:12px;color:#495057;margin-bottom:16px"></div>
+    <button class="btn btn-g" onclick="doLogout()" style="width:100%;justify-content:center">로그아웃</button>
+  </div>
+</div>
+
+<!-- ══ 토스트 ══ -->
+<div id="toast"></div>
+
+<!-- ══ 메인 앱 ══ -->
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-logo">
+      <div class="hdr-icon">🔬</div>
+      <div>
+        <div class="hdr-title">인시스그룹 AI혁신 R&D센터</div>
+        <div class="hdr-sub">연구노트 시스템 v1.0 ☁️ Firebase</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="user-badge">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <div>
+          <div class="user-name" id="user-name-display">-</div>
+          <div class="user-role" id="user-role-display">-</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">로그아웃</button>
+    </div>
+  </div>
+  <div class="tabs" id="main-tabs">
+    <button class="tab-btn active" data-tab="dashboard">📊 대시보드</button>
+    <button class="tab-btn" data-tab="notes">📓 연구노트</button>
+    <button class="tab-btn" data-tab="projects">📁 프로젝트</button>
+    <button class="tab-btn" data-tab="equipment">🔬 연구장비</button>
+    <button class="tab-btn" data-tab="labels">🖨️ 라벨출력</button>
+    <button class="tab-btn admin-only" data-tab="users" style="display:none">👥 연구원관리</button>
+  </div>
+  <div class="content">
+    <div id="page-dashboard" class="page active"></div>
+    <div id="page-notes" class="page"></div>
+    <div id="page-projects" class="page"></div>
+    <div id="page-equipment" class="page"></div>
+    <div id="page-labels" class="page"></div>
+    <div id="page-users" class="page"></div>
+  </div>
+  <div class="ftr">인시스그룹 AI혁신 R&D센터 연구노트 시스템 v1.0 | ☁️ Firebase Cloud | © 2026 INSYS Group</div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// FIREBASE 초기화
+// ══════════════════════════════════════
+const FC = {
+  apiKey:"AIzaSyCAIGC4PR49dSXVae9I4IDO1nV1dX5_Auw",
+  authDomain:"insys-lab.firebaseapp.com",
+  projectId:"insys-lab",
+  storageBucket:"insys-lab.firebasestorage.app",
+  messagingSenderId:"710000243038",
+  appId:"1:710000243038:web:2a93f28352a2269f4e1fcf"
+};
+firebase.initializeApp(FC);
+const fdb = firebase.firestore();
+const fauth = firebase.auth();
+// 계정생성용 보조 앱 (관리자가 생성시 로그인 상태 유지)
+const secApp = firebase.initializeApp(FC, 'secondary');
+const secAuth = secApp.auth();
+
+// ── 현재 사용자 ──
+let CU = null; // {uid, email, name, role, dept, approved}
+
+// ── TOAST ──
+function toast(msg,err){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.background=err?'#842029':'#1F3864';
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── OVERLAY ──
+function showOverlay(msg){document.getElementById('overlay-msg').textContent=msg;document.getElementById('overlay').style.display='flex';}
+function hideOverlay(){document.getElementById('overlay').style.display='none';}
+
+// ── SCREEN 전환 ──
+function showScreen(name){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('wait-screen').style.display='none';
+  document.getElementById('app').style.display='none';
+  if(name==='login')document.getElementById('login-screen').style.display='flex';
+  else if(name==='wait'){document.getElementById('wait-screen').style.display='flex';}
+  else if(name==='app')document.getElementById('app').style.display='block';
+}
+
+function switchTab(t){
+  document.getElementById('tab-login').style.display=t==='login'?'block':'none';
+  document.getElementById('tab-register').style.display=t==='register'?'block':'none';
+  document.querySelectorAll('.login-tab button').forEach((b,i)=>b.classList.toggle('active',(t==='login'&&i===0)||(t==='register'&&i===1)));
+}
+
+// ══════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pw=document.getElementById('login-pw').value;
+  const err=document.getElementById('login-err');
+  err.textContent='';
+  if(!email||!pw){err.textContent='이메일과 비밀번호를 입력하세요';return;}
+  try{
+    showOverlay('로그인 중...');
+    await fauth.signInWithEmailAndPassword(email,pw);
+  }catch(e){
+    hideOverlay();
+    err.textContent=e.code==='auth/user-not-found'||e.code==='auth/wrong-password'?'이메일 또는 비밀번호가 올바르지 않습니다':e.message;
+  }
+}
+
+async function doRegister(){
+  const name=document.getElementById('reg-name').value.trim();
+  const email=document.getElementById('reg-email').value.trim();
+  const pw=document.getElementById('reg-pw').value;
+  const dept=document.getElementById('reg-dept').value.trim();
+  const err=document.getElementById('reg-err');
+  err.textContent='';
+  if(!name||!email||!pw){err.textContent='모든 필드를 입력하세요';return;}
+  if(pw.length<8){err.textContent='비밀번호는 8자 이상이어야 합니다';return;}
+  try{
+    showOverlay('계정 신청 중...');
+    const cred=await fauth.createUserWithEmailAndPassword(email,pw);
+    const profile={uid:cred.user.uid,email,name,dept:dept||'',role:'연구원',approved:false,createdAt:new Date().toISOString()};
+    await fdb.collection('users').doc(cred.user.uid).set(profile);
+    hideOverlay();
+  }catch(e){
+    hideOverlay();
+    err.textContent=e.code==='auth/email-already-in-use'?'이미 등록된 이메일입니다':e.message;
+  }
+}
+
+async function doLogout(){
+  if(!confirm('로그아웃 하시겠습니까?'))return;
+  await fauth.signOut();
+}
+
+// ── Auth 상태 감지 ──
+fauth.onAuthStateChanged(async user=>{
+  if(!user){hideOverlay();showScreen('login');CU=null;return;}
+  showOverlay('사용자 정보 확인 중...');
+  try{
+    let doc=await fdb.collection('users').doc(user.uid).get();
+    if(!doc.exists){
+      // 최초 관리자 (첫 번째 유저) 처리
+      const allUsers=await fdb.collection('users').get();
+      const isFirst=allUsers.empty;
+      const profile={uid:user.uid,email:user.email,name:user.displayName||user.email.split('@')[0],dept:'AI혁신 R&D센터',role:isFirst?'관리자':'연구원',approved:isFirst,createdAt:new Date().toISOString()};
+      await fdb.collection('users').doc(user.uid).set(profile);
+      doc=await fdb.collection('users').doc(user.uid).get();
+    }
+    CU={uid:user.uid,...doc.data()};
+    if(!CU.approved){
+      hideOverlay();
+      document.getElementById('wait-user-info').innerHTML=`<strong>${CU.name}</strong> (${CU.email})<br>${CU.dept||''}`;
+      showScreen('wait');return;
+    }
+    await loadApp();
+  }catch(e){hideOverlay();showScreen('login');console.error(e);}
+});
+
+// ══════════════════════════════════════
+// APP INIT
+// ══════════════════════════════════════
+const DEF_PROJ=[
+  {id:'p1',code:'AI-2026-001',name:'AI 데이터 분석 플랫폼',status:'진행중',startDate:'2026-01-15',endDate:'2026-12-31',lead:'연구소장',desc:'AI 기반 사내 데이터 분석 플랫폼 개발'},
+  {id:'p2',code:'VI-2026-001',name:'비전검사 자동화 시스템',status:'진행중',startDate:'2026-02-01',endDate:'2026-12-31',lead:'연구소장',desc:'제조 공정 비전 검사 자동화 기기 연구개발'},
+  {id:'p3',code:'SW-2026-001',name:'IT/SW 기반구축',status:'기획중',startDate:'2026-03-01',endDate:'2026-12-31',lead:'연구소장',desc:'IT/SW 개발 인프라 및 프로세스 수립'},
+];
+let D={notes:[],projects:[],equip:[],users:[]};
+
+async function loadApp(){
+  showOverlay('데이터 불러오는 중...');
+  const [notes,projects,equip,users]=await Promise.all([
+    fdb.collection('notes').get(),
+    fdb.collection('projects').get(),
+    fdb.collection('equip').get(),
+    fdb.collection('users').get()
+  ]);
+  D.notes=notes.docs.map(d=>({id:d.id,...d.data()}));
+  D.equip=equip.docs.map(d=>({id:d.id,...d.data()}));
+  D.users=users.docs.map(d=>({id:d.id,...d.data()}));
+  if(projects.empty){
+    D.projects=DEF_PROJ;
+    await Promise.all(DEF_PROJ.map(p=>fdb.collection('projects').doc(p.id).set(p)));
+  }else{
+    D.projects=projects.docs.map(d=>({id:d.id,...d.data()}));
+  }
+  // 헤더 사용자 표시
+  const initials=CU.name.slice(0,1);
+  document.getElementById('user-avatar').textContent=initials;
+  document.getElementById('user-name-display').textContent=CU.name;
+  document.getElementById('user-role-display').textContent=CU.role+(CU.dept?` · ${CU.dept}`:'');
+  // 관리자 탭
+  if(CU.role==='관리자'){document.querySelectorAll('.admin-only').forEach(e=>e.style.display='flex');}
+  document.getElementById('hdr-date')||null;
+  hideOverlay();
+  showScreen('app');
+  rDash(document.getElementById('page-dashboard'));
+}
+
+// ── UTILS ──
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6).toUpperCase();
+const today=()=>new Date().toISOString().split('T')[0];
+const fmt=d=>d?d.replace(/-/g,'.'):'—';
+const money=n=>n?Number(n).toLocaleString('ko-KR')+'원':'—';
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const badge=s=>`<span class="badge b-${esc(s)}">${esc(s)}</span>`;
+const CATS_N=['연구','실험','분석','회의','문서작업','기타'];
+const CATS_E=['컴퓨터/서버','측정/검사장비','소프트웨어','사무기기','기타'];
+const STAT_P=['기획중','진행중','완료','보류'];
+const STAT_E=['정상','수리중','대여중','폐기'];
+function sOpt(arr,v){return arr.map(a=>`<option value="${esc(a)}"${v===a?' selected':''}>${esc(a)}</option>`).join('');}
+function pOpt(v,ph){return`<option value="">${esc(ph||'선택')}</option>`+D.projects.map(p=>`<option value="${esc(p.id)}"${v===p.id?' selected':''}>${esc(p.name)}</option>`).join('');}
+function nextAsset(){const ns=D.equip.map(e=>{const m=(e.assetNo||'').match(/(\d+)$/);return m?+m[1]:0});const n=ns.length?Math.max(...ns)+1:1;return`INSYS-AI-${new Date().getFullYear()}-${String(n).padStart(3,'0')}`;}
+async function fsPut(col,item){await fdb.collection(col).doc(item.id).set({...item});toast('✅ 저장되었습니다');}
+async function fsDel(col,id){await fdb.collection(col).doc(id).delete();}
+
+// ── ROUTER ──
+let TAB='dashboard';
+function goTab(t){TAB=t;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+t));rp(t);}
+document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>goTab(b.dataset.tab)));
+function rp(t){const el=document.getElementById('page-'+t);if(t==='dashboard')rDash(el);else if(t==='notes')rNotes(el);else if(t==='projects')rProjs(el);else if(t==='equipment')rEquip(el);else if(t==='labels')rLabels(el);else if(t==='users')rUsers(el);}
+
+// ══════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════
+function rDash(el){
+  const tm=new Date().toISOString().slice(0,7);
+  const mn=D.notes.filter(n=>n.date?.startsWith(tm)).length;
+  const ap=D.projects.filter(p=>p.status==='진행중').length;
+  const ne=D.equip.filter(e=>e.status==='정상').length;
+  const tot=D.equip.reduce((s,e)=>s+(+e.price||0),0);
+  const recent=[...D.notes].sort((a,b)=>b.date>a.date?1:-1).slice(0,5);
+  const stats=[{i:'📓',l:'전체 연구노트',v:D.notes.length,c:'#2E75B6'},{i:'📅',l:'이번달 작성',v:mn,c:'#198754'},{i:'📁',l:'진행중 프로젝트',v:ap,c:'#0D6EFD'},{i:'🔬',l:'등록 장비',v:ne,c:'#6F42C1'}];
+  let rH=!recent.length?'<p style="color:#ADB5BD;text-align:center;padding:20px 0">아직 작성된 연구노트가 없습니다</p>':recent.map(n=>{const p=D.projects.find(p=>p.id===n.projectId);return`<div style="border-bottom:.5px solid #F0F0F0;padding:8px 0;display:flex;gap:8px;align-items:flex-start"><span style="font-size:11px;color:#ADB5BD;min-width:72px;padding-top:1px">${fmt(n.date)}</span><div style="flex:1;min-width:0"><div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;color:#1F3864" onclick="openDet('${esc(n.id)}')">${esc(n.title)}</div>${p?`<div style="font-size:11px;color:#ADB5BD">${esc(p.name)}</div>`:''}</div>${badge(n.category)}</div>`;}).join('');
+  let pH=D.projects.map(p=>`<div style="border-bottom:.5px solid #F0F0F0;padding:8px 0"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:500">${esc(p.name)}</span>${badge(p.status)}</div><div style="display:flex;justify-content:space-between;margin-top:3px"><span style="font-size:11px;color:#ADB5BD;font-family:monospace">${esc(p.code)}</span><span style="font-size:11px;color:#ADB5BD">노트 ${D.notes.filter(n=>n.projectId===p.id).length}건</span></div></div>`).join('');
+  el.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div style="font-size:13px;color:#6C757D">${new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'long'})}</div><div style="font-size:12px;color:#ADB5BD">☁️ Firebase 클라우드 저장</div></div>
+  <div class="stat-grid">${stats.map(s=>`<div class="stat-card"><div style="font-size:26px;margin-bottom:6px">${s.i}</div><div style="font-size:24px;font-weight:700;color:${s.c};margin-bottom:2px">${s.v}</div><div style="font-size:11px;color:#6C757D">${s.l}</div></div>`).join('')}</div>
+  <div class="ni">📊 연구개발 장비 총 취득금액: <strong>${tot.toLocaleString('ko-KR')}원</strong></div>
+  <div class="g2">
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;font-size:14px">📝 최근 연구노트</span><button class="btn btn-o btn-sm" onclick="goTab('notes')">전체보기</button></div>${rH}</div>
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;font-size:14px">📁 프로젝트 현황</span><button class="btn btn-o btn-sm" onclick="goTab('projects')">전체보기</button></div>${pH}</div>
+  </div>`;
+}
+
+// ══════════════════════════════════════
+// NOTES
+// ══════════════════════════════════════
+let NV='list',NE=null,NF={proj:'',cat:'',s:''},NDET=null;
+function openDet(id){NDET=id;NV='detail';goTab('notes');}
+function rNotes(el){if(NV==='form')rNoteForm(el);else if(NV==='detail')rNoteDet(el);else rNoteList(el);}
+function rNoteList(el){
+  let rows=[...D.notes].filter(n=>(!NF.proj||n.projectId===NF.proj)&&(!NF.cat||n.category===NF.cat)&&(!NF.s||(n.title||'').includes(NF.s)||(n.content||'').includes(NF.s))).sort((a,b)=>b.date>a.date?1:-1);
+  el.innerHTML=`<div class="toolbar">
+    <input style="width:155px" placeholder="🔍 검색" value="${esc(NF.s)}" oninput="NF.s=this.value;rNotes(document.getElementById('page-notes'))">
+    <select style="width:150px" onchange="NF.proj=this.value;rNotes(document.getElementById('page-notes'))"><option value="">전체 프로젝트</option>${D.projects.map(p=>`<option value="${esc(p.id)}"${NF.proj===p.id?' selected':''}>${esc(p.name)}</option>`).join('')}</select>
+    <select style="width:110px" onchange="NF.cat=this.value;rNotes(document.getElementById('page-notes'))"><option value="">전체 분류</option>${CATS_N.map(c=>`<option value="${c}"${NF.cat===c?' selected':''}>${c}</option>`).join('')}</select>
+    <div class="ml-auto"><button class="btn btn-p" onclick="NE=null;NV='form';rNotes(document.getElementById('page-notes'))">+ 연구노트 작성</button></div>
+  </div>
+  ${rows.length?`<div class="card" style="padding:0"><div class="tbl-wrap"><table>
+    <thead><tr><th>날짜</th><th>제목</th><th>프로젝트</th><th>분류</th><th class="tc">작성자</th><th class="tc">관리</th></tr></thead>
+    <tbody>${rows.map(n=>{const p=D.projects.find(p=>p.id===n.projectId);const canEdit=CU.role==='관리자'||n.authorUid===CU.uid;
+      return`<tr><td style="color:#6C757D;white-space:nowrap">${fmt(n.date)}</td>
+      <td><div style="font-weight:500;cursor:pointer;color:#1F3864" onclick="openDet('${esc(n.id)}')">${esc(n.title)}</div>
+      ${n.content?`<div style="font-size:11px;color:#ADB5BD;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px">${esc((n.content||'').slice(0,55))}</div>`:''}</td>
+      <td style="color:#6C757D">${p?esc(p.name):'—'}</td><td>${badge(n.category)}</td>
+      <td class="tc" style="color:#6C757D;font-size:12px">${esc(n.authorName||n.researcher||'')}</td>
+      <td class="tc"><div style="display:flex;gap:3px;justify-content:center">
+        ${canEdit?`<button class="btn btn-o btn-sm" onclick="NE=D.notes.find(x=>x.id==='${esc(n.id)}');NV='form';rNotes(document.getElementById('page-notes'))">수정</button>
+        <button class="btn btn-d btn-sm" onclick="delNote('${esc(n.id)}')">삭제</button>`:'<span style="font-size:11px;color:#ADB5BD">—</span>'}
+      </div></td></tr>`;}).join('')}
+    </tbody></table></div></div>
+    <div style="font-size:11px;color:#ADB5BD;margin-top:6px">${rows.length}건 / 전체 ${D.notes.length}건</div>`
+  :`<div class="empty">${D.notes.length===0?'연구노트를 작성해보세요':'검색 결과 없음'}</div>`}`;
+}
+async function delNote(id){if(!confirm('삭제?'))return;await fsDel('notes',id);D.notes=D.notes.filter(x=>x.id!==id);toast('🗑 삭제되었습니다');rNotes(document.getElementById('page-notes'));rDash(document.getElementById('page-dashboard'));}
+function rNoteForm(el){
+  const n=NE||{date:today(),projectId:'',category:'연구',title:'',content:'',results:'',nextSteps:'',researcher:CU.name};
+  el.innerHTML=`<div class="back-row"><button class="btn btn-g" onclick="NV='list';rNotes(document.getElementById('page-notes'))">← 목록</button>
+    <h3>${NE?'연구노트 수정':'연구노트 작성'}</h3>${!NE?'<span class="hint">— 과거 날짜로도 소급 입력 가능합니다</span>':''}</div>
+    <div class="card">
+      <div class="form-r c3">
+        <div><label class="lbl">연구일자 ★</label><input type="date" id="nD" value="${esc(n.date)}"></div>
+        <div><label class="lbl">프로젝트 연결</label><select id="nP">${pOpt(n.projectId,'프로젝트 선택 (선택사항)')}</select></div>
+        <div><label class="lbl">분류</label><select id="nC">${sOpt(CATS_N,n.category)}</select></div>
+      </div>
+      <div class="form-r" style="grid-template-columns:1fr"><div><label class="lbl">제목 ★</label><input id="nT" value="${esc(n.title)}" placeholder="연구 제목을 입력하세요"></div></div>
+      <div class="form-r" style="grid-template-columns:1fr"><div><label class="lbl">연구 내용</label><textarea id="nCo" style="height:130px">${esc(n.content)}</textarea></div></div>
+      <div class="form-r c2">
+        <div><label class="lbl">연구 결과 / 발견사항</label><textarea id="nR" style="height:90px">${esc(n.results)}</textarea></div>
+        <div><label class="lbl">향후 계획 / 다음 단계</label><textarea id="nN" style="height:90px">${esc(n.nextSteps)}</textarea></div>
+      </div>
+      <div><label class="lbl">작성자</label><input id="nRes" style="max-width:180px" value="${esc(n.researcher||CU.name)}" ${CU.role!=='관리자'?'readonly style="max-width:180px;background:#F8F9FA"':'style="max-width:180px"'}></div>
+      <div class="form-act"><button class="btn btn-g" onclick="NV='list';rNotes(document.getElementById('page-notes'))">취소</button><button class="btn btn-p" onclick="svNote()">✓ ${NE?'수정 완료':'저장'}</button></div>
+    </div>`;
+}
+async function svNote(){
+  const t=document.getElementById('nT').value.trim(),d=document.getElementById('nD').value;
+  if(!t)return alert('제목을 입력하세요');if(!d)return alert('날짜를 선택하세요');
+  const id=NE?NE.id:uid();
+  const o={id,date:d,title:t,projectId:document.getElementById('nP').value,category:document.getElementById('nC').value,content:document.getElementById('nCo').value,results:document.getElementById('nR').value,nextSteps:document.getElementById('nN').value,researcher:document.getElementById('nRes').value||CU.name,authorUid:NE?NE.authorUid:CU.uid,authorName:NE?NE.authorName:CU.name};
+  await fsPut('notes',o);
+  if(NE){Object.assign(NE,o);}else{D.notes.push(o);}
+  NV='list';rNotes(document.getElementById('page-notes'));rDash(document.getElementById('page-dashboard'));
+}
+function rNoteDet(el){
+  const n=D.notes.find(x=>x.id===NDET);if(!n){NV='list';return rNoteList(el);}
+  const p=D.projects.find(p=>p.id===n.projectId);
+  const canEdit=CU.role==='관리자'||n.authorUid===CU.uid;
+  el.innerHTML=`<div class="back-row"><button class="btn btn-g" onclick="NV='list';rNotes(document.getElementById('page-notes'))">← 목록</button><h3>연구노트 상세</h3>
+    <div class="ml-auto">${canEdit?`<button class="btn btn-o btn-sm" onclick="NE=D.notes.find(x=>x.id==='${esc(n.id)}');NV='form';rNotes(document.getElementById('page-notes'))">수정</button>`:''}
+    </div></div>
+    <div class="card">
+      <div style="border-bottom:1px solid #F0F0F0;padding-bottom:12px;margin-bottom:14px">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap">${badge(n.category)}${p?`<span style="font-size:12px;color:#6C757D;background:#F8F9FA;padding:2px 8px;border-radius:4px">${esc(p.name)}</span>`:''}
+        <span style="font-size:11px;color:#ADB5BD;margin-left:auto">작성일: ${fmt(n.date)} | ${esc(n.authorName||n.researcher||'')}</span></div>
+        <h2 style="font-size:18px;font-weight:700;color:#1F3864">${esc(n.title)}</h2>
+      </div>
+      ${n.content?`<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;color:#6C757D;margin-bottom:6px">연구 내용</div><div class="pre">${esc(n.content)}</div></div>`:''}
+      ${n.results?`<div class="ng"><div style="font-size:11px;font-weight:700;color:#2D6A4F;margin-bottom:5px">✅ 연구 결과</div><div class="pre">${esc(n.results)}</div></div>`:''}
+      ${n.nextSteps?`<div class="no"><div style="font-size:11px;font-weight:700;color:#9A3412;margin-bottom:5px">➡️ 향후 계획</div><div class="pre">${esc(n.nextSteps)}</div></div>`:''}
+    </div>`;
+}
+
+// ══════════════════════════════════════
+// PROJECTS
+// ══════════════════════════════════════
+let PV='list',PE=null;
+function rProjs(el){
+  if(PV==='form')return rProjForm(el);
+  el.innerHTML=`<div class="toolbar"><div class="ml-auto"><button class="btn btn-p" onclick="PE=null;PV='form';rProjs(document.getElementById('page-projects'))">+ 프로젝트 등록</button></div></div>
+  ${D.projects.length?`<div class="card" style="padding:0"><div class="tbl-wrap"><table>
+    <thead><tr><th>코드</th><th>프로젝트명</th><th class="tc">상태</th><th class="tc">시작일</th><th class="tc">종료목표</th><th class="tc">노트수</th><th class="tc">관리</th></tr></thead>
+    <tbody>${D.projects.map(p=>`<tr><td class="mono">${esc(p.code)}</td>
+      <td><div style="font-weight:500">${esc(p.name)}</div><div style="font-size:11px;color:#ADB5BD">${esc(p.desc||'')}</div></td>
+      <td class="tc">${badge(p.status)}</td><td class="tc" style="color:#6C757D;white-space:nowrap">${fmt(p.startDate)}</td>
+      <td class="tc" style="color:#6C757D;white-space:nowrap">${fmt(p.endDate)}</td><td class="tc" style="color:#6C757D">${D.notes.filter(n=>n.projectId===p.id).length}</td>
+      <td class="tc"><div style="display:flex;gap:3px;justify-content:center">
+        <button class="btn btn-o btn-sm" onclick="PE=D.projects.find(x=>x.id==='${esc(p.id)}');PV='form';rProjs(document.getElementById('page-projects'))">수정</button>
+        <button class="btn btn-d btn-sm" onclick="delProj('${esc(p.id)}')">삭제</button>
+      </div></td></tr>`).join('')}
+    </tbody></table></div></div>`:'<div class="empty">등록된 프로젝트가 없습니다</div>'}`;
+}
+async function delProj(id){const c=D.notes.filter(n=>n.projectId===id).length;if(c>0)return alert(`연결된 노트 ${c}건 있습니다`);if(!confirm('삭제?'))return;await fsDel('projects',id);D.projects=D.projects.filter(x=>x.id!==id);toast('🗑 삭제되었습니다');rProjs(document.getElementById('page-projects'));rDash(document.getElementById('page-dashboard'));}
+function rProjForm(el){
+  const p=PE||{code:'',name:'',status:'기획중',startDate:today(),endDate:'',lead:CU.name,desc:''};
+  el.innerHTML=`<div class="back-row"><button class="btn btn-g" onclick="PV='list';rProjs(document.getElementById('page-projects'))">← 목록</button><h3>${PE?'프로젝트 수정':'프로젝트 등록'}</h3></div>
+  <div class="card">
+    <div class="form-r c2"><div><label class="lbl">코드 ★</label><input id="pCd" value="${esc(p.code)}" placeholder="AI-2026-004"></div><div><label class="lbl">상태</label><select id="pSt">${sOpt(STAT_P,p.status)}</select></div></div>
+    <div class="form-r" style="grid-template-columns:1fr"><div><label class="lbl">프로젝트명 ★</label><input id="pNm" value="${esc(p.name)}"></div></div>
+    <div class="form-r c3"><div><label class="lbl">시작일</label><input type="date" id="pSD" value="${esc(p.startDate)}"></div><div><label class="lbl">종료목표</label><input type="date" id="pED" value="${esc(p.endDate)}"></div><div><label class="lbl">책임자</label><input id="pLd" value="${esc(p.lead)}"></div></div>
+    <div class="form-r" style="grid-template-columns:1fr"><div><label class="lbl">설명</label><textarea id="pDs" style="height:70px">${esc(p.desc)}</textarea></div></div>
+    <div class="form-act"><button class="btn btn-g" onclick="PV='list';rProjs(document.getElementById('page-projects'))">취소</button><button class="btn btn-p" onclick="svProj()">✓ ${PE?'수정 완료':'저장'}</button></div>
+  </div>`;
+}
+async function svProj(){
+  const cd=document.getElementById('pCd').value.trim(),nm=document.getElementById('pNm').value.trim();
+  if(!nm||!cd)return alert('코드와 프로젝트명을 입력하세요');
+  const id=PE?PE.id:uid();
+  const o={id,code:cd,name:nm,status:document.getElementById('pSt').value,startDate:document.getElementById('pSD').value,endDate:document.getElementById('pED').value,lead:document.getElementById('pLd').value,desc:document.getElementById('pDs').value};
+  await fsPut('projects',o);if(PE){Object.assign(PE,o);}else{D.projects.push(o);}
+  PV='list';rProjs(document.getElementById('page-projects'));rDash(document.getElementById('page-dashboard'));
+}
+
+// ══════════════════════════════════════
+// EQUIPMENT
+// ══════════════════════════════════════
+let EV='list',EE=null;
+function rEquip(el){
+  if(EV==='form')return rEquipForm(el);
+  const tot=D.equip.reduce((s,e)=>s+(+e.price||0),0);
+  el.innerHTML=`<div class="toolbar"><span style="color:#6C757D">장비 <strong>${D.equip.length}건</strong> | 취득금액 <strong style="color:#1F3864">${tot.toLocaleString('ko-KR')}원</strong></span>
+    <div class="ml-auto"><button class="btn btn-p" onclick="EE=null;EV='form';rEquip(document.getElementById('page-equipment'))">+ 장비 등록</button></div></div>
+  ${D.equip.length?`<div class="card" style="padding:0"><div class="tbl-wrap"><table>
+    <thead><tr><th>자산번호</th><th>장비명</th><th>분류</th><th class="tr-r">구입금액</th><th class="tc">구입일</th><th class="tc">상태</th><th class="tc">관리</th></tr></thead>
+    <tbody>${D.equip.map(e=>{const p=D.projects.find(p=>p.id===e.projectId);return`<tr>
+      <td class="mono" style="font-size:11px">${esc(e.assetNo)}</td>
+      <td><div style="font-weight:500">${esc(e.name)}</div><div style="font-size:11px;color:#ADB5BD">${esc([e.manufacturer,e.model].filter(Boolean).join(' '))}</div>${p?`<div style="font-size:11px;color:#2E75B6">${esc(p.name)}</div>`:''}</td>
+      <td style="color:#6C757D">${esc(e.category)}</td><td class="tr-r" style="font-weight:500">${money(e.price)}</td>
+      <td class="tc" style="color:#6C757D;white-space:nowrap">${fmt(e.purchaseDate)}</td><td class="tc">${badge(e.status)}</td>
+      <td class="tc"><div style="display:flex;gap:3px;justify-content:center">
+        <button class="btn btn-v btn-sm" onclick="window._SE=D.equip.find(x=>x.id==='${esc(e.id)}');goTab('labels')">🖨 라벨</button>
+        <button class="btn btn-o btn-sm" onclick="EE=D.equip.find(x=>x.id==='${esc(e.id)}');EV='form';rEquip(document.getElementById('page-equipment'))">수정</button>
+        <button class="btn btn-d btn-sm" onclick="delEquip('${esc(e.id)}')">삭제</button>
+      </div></td></tr>`;}).join('')}
+    </tbody></table></div></div>`:'<div class="empty">등록된 연구장비가 없습니다</div>'}`;
+}
+async function delEquip(id){if(!confirm('삭제?'))return;await fsDel('equip',id);D.equip=D.equip.filter(x=>x.id!==id);toast('🗑 삭제되었습니다');rEquip(document.getElementById('page-equipment'));rDash(document.getElementById('page-dashboard'));}
+function rEquipForm(el){
+  const e=EE||{assetNo:nextAsset(),name:'',model:'',manufacturer:'',serial:'',category:'컴퓨터/서버',purchaseDate:'',price:'',vendor:'',warranty:'',location:'AI혁신 R&D센터',projectId:'',status:'정상',notes:''};
+  el.innerHTML=`<div class="back-row"><button class="btn btn-g" onclick="EV='list';rEquip(document.getElementById('page-equipment'))">← 목록</button><h3>${EE?'장비 수정':'연구장비 등록'}</h3></div>
+  <div class="card">
+    <div class="ni">💡 자산번호 자동 생성 | 구입일은 과거 날짜 입력 가능</div>
+    <div class="form-r c3"><div><label class="lbl">자산번호</label><input id="eNo" value="${esc(e.assetNo)}" style="background:#F8F9FA;font-family:monospace;font-weight:700;color:#1F3864" readonly></div><div><label class="lbl">분류</label><select id="eCt">${sOpt(CATS_E,e.category)}</select></div><div><label class="lbl">상태</label><select id="eSt">${sOpt(STAT_E,e.status)}</select></div></div>
+    <div class="form-r" style="grid-template-columns:2fr 1fr 1fr"><div><label class="lbl">장비명 ★</label><input id="eNm" value="${esc(e.name)}"></div><div><label class="lbl">제조사</label><input id="eMf" value="${esc(e.manufacturer)}"></div><div><label class="lbl">모델명</label><input id="eMd" value="${esc(e.model)}"></div></div>
+    <div class="form-r c4"><div><label class="lbl">구입일</label><input type="date" id="eDt" value="${esc(e.purchaseDate)}"></div><div><label class="lbl">구입금액(원)</label><input type="number" id="ePr" value="${esc(e.price)}"></div><div><label class="lbl">구입처</label><input id="eVn" value="${esc(e.vendor)}"></div><div><label class="lbl">시리얼번호</label><input id="eSr" value="${esc(e.serial)}"></div></div>
+    <div class="form-r c3"><div><label class="lbl">보증만료일</label><input type="date" id="eWr" value="${esc(e.warranty)}"></div><div><label class="lbl">보관위치</label><input id="eLc" value="${esc(e.location)}"></div><div><label class="lbl">연결 프로젝트</label><select id="ePj">${pOpt(e.projectId,'선택없음')}</select></div></div>
+    <div class="form-r" style="grid-template-columns:1fr"><div><label class="lbl">비고</label><textarea id="eNt" style="height:55px">${esc(e.notes)}</textarea></div></div>
+    <div class="form-act"><button class="btn btn-g" onclick="EV='list';rEquip(document.getElementById('page-equipment'))">취소</button><button class="btn btn-p" onclick="svEquip()">✓ ${EE?'수정 완료':'장비 등록'}</button></div>
+  </div>`;
+}
+async function svEquip(){
+  const nm=document.getElementById('eNm').value.trim();if(!nm)return alert('장비명을 입력하세요');
+  const id=EE?EE.id:uid();
+  const o={id,assetNo:document.getElementById('eNo').value,name:nm,manufacturer:document.getElementById('eMf').value,model:document.getElementById('eMd').value,serial:document.getElementById('eSr').value,category:document.getElementById('eCt').value,purchaseDate:document.getElementById('eDt').value,price:document.getElementById('ePr').value,vendor:document.getElementById('eVn').value,warranty:document.getElementById('eWr').value,location:document.getElementById('eLc').value,projectId:document.getElementById('ePj').value,status:document.getElementById('eSt').value,notes:document.getElementById('eNt').value};
+  await fsPut('equip',o);if(EE){Object.assign(EE,o);}else{D.equip.push(o);}
+  EV='list';rEquip(document.getElementById('page-equipment'));rDash(document.getElementById('page-dashboard'));
+}
+
+// ══════════════════════════════════════
+// LABELS
+// ══════════════════════════════════════
+function rLabels(el){
+  const eq=window._SE||null;let selId=eq?.id||'';
+  el.innerHTML=`<div class="card">
+    <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px"><label class="lbl">장비 선택</label>
+        <select id="lblS" onchange="window._SE=D.equip.find(e=>e.id===this.value)||null;rLabels(document.getElementById('page-labels'))">
+          <option value="">장비를 선택하세요...</option>${D.equip.map(e=>`<option value="${esc(e.id)}"${selId===e.id?' selected':''}>[${esc(e.assetNo)}] ${esc(e.name)}</option>`).join('')}
+        </select></div>
+      <div style="width:70px"><label class="lbl">매수</label><input type="number" id="lblC" min="1" max="10" value="1" style="text-align:center"></div>
+      ${eq?`<button class="btn btn-v" onclick="prtLbl()">🖨️ 라벨 인쇄</button>`:''}
+    </div>
+    ${eq?`<div class="nv">💡 인쇄 설정: 페이지 크기 <strong>60×40mm</strong> / 여백 없음 선택 후 인쇄하세요</div>`:''}
+  </div>
+  ${eq?`<div style="font-size:13px;color:#6C757D;margin-bottom:10px">📋 라벨 미리보기</div>
+    <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">${mkLbl(eq)}
+      <div style="font-size:12px;color:#6C757D;padding-top:8px;line-height:2"><div style="font-weight:600;margin-bottom:4px">자산 정보</div>
+        <div>번호: <strong class="mono" style="font-size:12px">${esc(eq.assetNo)}</strong></div>
+        <div>장비명: ${esc(eq.name)}</div><div>구입일: ${fmt(eq.purchaseDate)}</div>
+        <div>금액: ${money(eq.price)}</div><div>위치: ${esc(eq.location||'—')}</div>
+      </div></div>`:'<div class="empty">위에서 장비를 선택하면 미리보기가 표시됩니다</div>'}`;
+}
+function mkLbl(e){return`<div class="lbl-card"><div class="lbl-hdr"><div><div style="color:#fff;font-size:9px;font-weight:700">인시스 그룹</div><div style="color:#90CAF9;font-size:7px">AI혁신 R&D센터</div></div><div style="color:#90CAF9;font-size:7px">연구개발장비</div></div><div class="lbl-asset">${esc(e.assetNo)}</div><div class="lbl-body"><div class="lbl-nm">${esc(e.name)}</div><div class="lbl-info"><div><span class="lk">모델</span>${esc(e.model||'—')}</div><div><span class="lk">분류</span>${esc(e.category)}</div><div><span class="lk">구입</span>${fmt(e.purchaseDate)}</div><div><span class="lk">위치</span>${esc(e.location||'—')}</div>${e.serial?`<div style="grid-column:span 2"><span class="lk">S/N</span><span style="font-family:monospace">${esc(e.serial)}</span></div>`:''}</div></div><div class="lbl-qr">QR<br>CODE</div><div class="lbl-ft">INSYS-LAB | ${new Date().getFullYear()}</div></div>`;}
+function prtLbl(){const e=window._SE;if(!e)return alert('장비를 선택하세요');const cnt=Math.max(1,Math.min(10,+(document.getElementById('lblC').value)||1));const L=Array(cnt).fill(0).map(()=>`<div class="L"><div class="H"><div><div class="C">인시스 그룹</div><div class="S">AI혁신 R&D센터</div></div><div class="S">연구개발장비</div></div><div class="A">${esc(e.assetNo)}</div><div class="B"><div class="N">${esc(e.name)}</div><div class="I"><div><span class="K">모델</span>${esc(e.model||'—')}</div><div><span class="K">분류</span>${esc(e.category)}</div><div><span class="K">구입</span>${fmt(e.purchaseDate)}</div><div><span class="K">위치</span>${esc(e.location||'—')}</div>${e.serial?`<div style="grid-column:span 2"><span class="K">S/N</span><span style="font-family:monospace">${esc(e.serial)}</span></div>`:''}</div></div><div class="Q">QR<br>CODE</div><div class="F">INSYS Group R&amp;D | ${new Date().getFullYear()}</div></div>`).join('');const w=window.open('','_blank','width=480,height=400');if(!w){alert('팝업 차단을 해제하세요');return;}w.document.write(`<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>라벨-${esc(e.assetNo)}</title><style>@page{size:60mm 40mm;margin:0}@media print{body{margin:0}.L{page-break-after:always}.L:last-child{page-break-after:auto}}body{font-family:'맑은 고딕',sans-serif;background:#fff;margin:0;padding:2mm}.L{width:60mm;height:40mm;border:1px solid #1F3864;border-radius:1mm;overflow:hidden;position:relative;margin-bottom:2mm;display:inline-block}.H{background:#1F3864;padding:1.5mm 2.5mm;display:flex;align-items:center;justify-content:space-between}.C{color:#fff;font-size:6pt;font-weight:700}.S{color:#90CAF9;font-size:4.5pt}.A{background:#2E75B6;padding:1mm 2mm;text-align:center;color:#fff;font-size:7.5pt;font-weight:700;font-family:monospace;letter-spacing:.5mm}.B{padding:1.5mm 2.5mm}.N{font-size:7pt;font-weight:700;color:#1F3864;margin-bottom:1.5mm;line-height:1.2}.I{display:grid;grid-template-columns:1fr 1fr;gap:.5mm 2mm;font-size:4.5pt}.K{color:#999;margin-right:.5mm}.Q{position:absolute;bottom:2mm;right:2mm;width:11mm;height:11mm;border:.5mm solid #ddd;border-radius:.5mm;display:flex;align-items:center;justify-content:center;background:#f8f9fa;font-size:3.5pt;color:#aaa;text-align:center;line-height:1.3;font-weight:600}.F{position:absolute;bottom:1.5mm;left:2.5mm;font-size:3.5pt;color:#ccc}</style></head><body>${L}<script>window.onload=function(){window.print();setTimeout(function(){window.close();},1200);}<\/script></body></html>`);w.document.close();}
+
+// ══════════════════════════════════════
+// 연구원 관리 (관리자 전용)
+// ══════════════════════════════════════
+function rUsers(el){
+  if(CU.role!=='관리자'){el.innerHTML='<div class="empty">관리자만 접근 가능합니다</div>';return;}
+  const pending=D.users.filter(u=>!u.approved);
+  const approved=D.users.filter(u=>u.approved);
+  el.innerHTML=`
+    ${pending.length?`<div class="card" style="border:1px solid #FED7AA">
+      <div style="font-weight:600;font-size:14px;margin-bottom:12px;color:#9A3412">⏳ 승인 대기 (${pending.length}명)</div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>이름</th><th>이메일</th><th>소속/직위</th><th>신청일</th><th class="tc">승인</th></tr></thead>
+        <tbody>${pending.map(u=>`<tr>
+          <td style="font-weight:500">${esc(u.name)}</td><td style="color:#6C757D">${esc(u.email)}</td>
+          <td style="color:#6C757D">${esc(u.dept||'')}</td>
+          <td style="color:#6C757D;font-size:11px">${u.createdAt?u.createdAt.slice(0,10).replace(/-/g,'.'):'—'}</td>
+          <td class="tc"><button class="btn btn-s btn-sm" onclick="approveUser('${esc(u.id)}')">✓ 승인</button></td>
+        </tr>`).join('')}
+        </tbody></table></div></div>`:``}
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="font-weight:600;font-size:14px">👥 연구원 목록 (${approved.length}명)</span>
+        <button class="btn btn-p btn-sm" onclick="showAddUser()">+ 직접 계정 생성</button>
+      </div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>이름</th><th>이메일</th><th>소속/직위</th><th class="tc">역할</th><th class="tc">관리</th></tr></thead>
+        <tbody>${approved.map(u=>`<tr>
+          <td><div style="font-weight:500">${esc(u.name)}</div></td>
+          <td style="color:#6C757D;font-size:12px">${esc(u.email)}</td>
+          <td style="color:#6C757D">${esc(u.dept||'')}</td>
+          <td class="tc">${badge(u.role||'연구원')}</td>
+          <td class="tc"><div style="display:flex;gap:3px;justify-content:center">
+            ${u.uid!==CU.uid?`
+            <button class="btn btn-o btn-sm" onclick="toggleRole('${esc(u.id)}','${esc(u.role)}')">${u.role==='관리자'?'연구원으로':'관리자로'}</button>
+            <button class="btn btn-d btn-sm" onclick="revokeUser('${esc(u.id)}')">비활성</button>`:'<span style="font-size:11px;color:#ADB5BD">(본인)</span>'}
+          </div></td>
+        </tr>`).join('')}
+        </tbody></table></div>
+    </div>
+
+    <div id="add-user-form" style="display:none">
+      <div class="card" style="border:1px solid #B8D4F5">
+        <div style="font-weight:600;font-size:14px;margin-bottom:14px;color:#1F3864">+ 연구원 계정 직접 생성</div>
+        <div class="form-r c2">
+          <div><label class="lbl">이름</label><input id="au-name" placeholder="성명"></div>
+          <div><label class="lbl">소속/직위</label><input id="au-dept" placeholder="AI혁신 R&D센터 / 연구원"></div>
+        </div>
+        <div class="form-r c2">
+          <div><label class="lbl">이메일</label><input type="email" id="au-email" placeholder="이메일 주소"></div>
+          <div><label class="lbl">임시 비밀번호</label><input type="text" id="au-pw" placeholder="8자 이상 (본인이 변경 안내)"></div>
+        </div>
+        <div class="form-act">
+          <button class="btn btn-g" onclick="document.getElementById('add-user-form').style.display='none'">취소</button>
+          <button class="btn btn-p" onclick="createUser()">계정 생성</button>
+        </div>
+        <div id="au-err" style="color:#DC3545;font-size:12px;margin-top:8px"></div>
+      </div>
+    </div>`;
+}
+
+function showAddUser(){document.getElementById('add-user-form').style.display='block';}
+
+async function approveUser(id){
+  if(!confirm('승인하시겠습니까?'))return;
+  await fdb.collection('users').doc(id).update({approved:true});
+  const u=D.users.find(x=>x.id===id);if(u)u.approved=true;
+  toast('✅ 승인되었습니다');rUsers(document.getElementById('page-users'));
+}
+
+async function toggleRole(id,currentRole){
+  const newRole=currentRole==='관리자'?'연구원':'관리자';
+  if(!confirm(`${newRole}(으)로 변경하시겠습니까?`))return;
+  await fdb.collection('users').doc(id).update({role:newRole});
+  const u=D.users.find(x=>x.id===id);if(u)u.role=newRole;
+  toast('✅ 역할이 변경되었습니다');rUsers(document.getElementById('page-users'));
+}
+
+async function revokeUser(id){
+  if(!confirm('비활성화하시겠습니까? (로그인 불가 처리)'))return;
+  await fdb.collection('users').doc(id).update({approved:false});
+  const u=D.users.find(x=>x.id===id);if(u)u.approved=false;
+  toast('비활성화되었습니다');rUsers(document.getElementById('page-users'));
+}
+
+async function createUser(){
+  const name=document.getElementById('au-name').value.trim();
+  const email=document.getElementById('au-email').value.trim();
+  const pw=document.getElementById('au-pw').value;
+  const dept=document.getElementById('au-dept').value.trim();
+  const errEl=document.getElementById('au-err');
+  errEl.textContent='';
+  if(!name||!email||!pw)return(errEl.textContent='모든 필드를 입력하세요');
+  if(pw.length<8)return(errEl.textContent='비밀번호 8자 이상');
+  try{
+    // 보조 앱으로 계정 생성 (관리자 세션 유지)
+    const cred=await secAuth.createUserWithEmailAndPassword(email,pw);
+    const profile={uid:cred.user.uid,email,name,dept,role:'연구원',approved:true,createdAt:new Date().toISOString()};
+    await fdb.collection('users').doc(cred.user.uid).set(profile);
+    await secAuth.signOut();
+    D.users.push({id:cred.user.uid,...profile});
+    toast('✅ 계정이 생성되었습니다');
+    document.getElementById('add-user-form').style.display='none';
+    rUsers(document.getElementById('page-users'));
+  }catch(e){errEl.textContent=e.code==='auth/email-already-in-use'?'이미 등록된 이메일입니다':e.message;}
+}
+</script>
+</body>
+</html>
