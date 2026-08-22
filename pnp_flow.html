@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCB 검사 반송 시뮬레이터</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1E3A5F; --navy-dark:#122540; --text:#2B3648; --text-light:#5B6472;
+    --bg:#F3F5F9; --card-bg:#FFFFFF; --card-header-bg:#E7EFFA; --border:#E1E6ED;
+    --accent:#2D5C99; --success:#16A34A; --danger:#DC2626; --warning:#C2740A; --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.45;}
+  header.cover{background:linear-gradient(135deg,var(--navy),var(--navy-dark));color:#F4F7FB;padding:14px 20px;}
+  header.cover .inner{max-width:1200px;margin:0 auto;text-align:center;}
+  header.cover h1{font-size:21px;font-weight:900;margin:0 0 4px;}
+  header.cover p{margin:0;font-size:12.5px;color:#C7D4E6;}
+  .container{max-width:1200px;margin:0 auto;padding:16px 20px 50px;}
+  .card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 2px rgba(20,40,63,.05);margin-bottom:16px;}
+  .card-header{background:var(--card-header-bg);padding:11px 16px;font-weight:700;color:var(--navy-dark);font-size:14.5px;border-bottom:1px solid var(--border);}
+  .card-body{padding:14px 16px;}
+  .grid2{display:grid;grid-template-columns:1.35fr .65fr;gap:16px;align-items:start;}
+  .left-col{display:flex;flex-direction:column;}
+  @media (max-width:900px){.grid2{grid-template-columns:1fr;}}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  button{font-family:inherit;font-size:13.5px;font-weight:700;padding:10px 15px;border-radius:8px;border:1px solid var(--border);background:#F5F7FA;color:var(--navy-dark);cursor:pointer;}
+  button:hover{background:#EAF0F8;}
+  button:disabled{opacity:.45;cursor:not-allowed;}
+  button.primary{background:var(--navy);color:#fff;border-color:var(--navy);}
+  button.primary:hover{background:var(--navy-dark);}
+  button.sig{background:#FDF3E3;color:#8A5407;border-color:#E6C79A;}
+  button.sig:not(:disabled){background:var(--warning);color:#fff;border-color:var(--warning);animation:sigPulse 1.1s ease-in-out infinite;}
+  @keyframes sigPulse{0%,100%{box-shadow:0 0 0 0 rgba(194,116,10,.5);}50%{box-shadow:0 0 0 6px rgba(194,116,10,0);}}
+  button.danger{background:#FCEBEA;color:var(--danger);border-color:#F4C6C3;}
+  select{font-family:inherit;font-size:13.5px;padding:9px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);}
+  .hint{font-size:12px;color:var(--text-light);margin-top:8px;}
+  svg{width:100%;height:auto;display:block;}
+  .statechips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;}
+  .chip{font-size:11.5px;font-weight:700;padding:5px 9px;border-radius:20px;border:1px solid var(--border);color:var(--text-light);background:#F7F9FC;}
+  .chip b{color:var(--navy-dark);}
+  .chip.on{background:var(--success);color:#fff;border-color:var(--success);}
+  .chip.on b{color:#fff;}
+  .verdict-box{display:flex;gap:14px;align-items:center;margin-bottom:12px;}
+  .verdict-lamp{flex:0 0 auto;width:82px;height:54px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:900;color:#fff;background:#C9CDD3;letter-spacing:1px;}
+  .verdict-lamp.ok{background:var(--success);}
+  .verdict-lamp.ng{background:var(--danger);}
+  .mes-ind{font-size:12.5px;font-weight:700;color:var(--text-light);}
+  .mes-ind.sending{color:var(--accent);}
+  .mes-ind .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#C9CDD3;margin-right:5px;}
+  .mes-ind.sending .dot{background:var(--accent);animation:sigPulse 1s infinite;}
+  .steps{overflow:visible;}
+  .step{display:flex;gap:9px;align-items:flex-start;padding:6px 9px;border-radius:7px;font-size:12px;border:1px solid transparent;}
+  .step .no{flex:0 0 20px;height:20px;border-radius:50%;background:#EDEFF3;color:var(--text-light);font-weight:700;font-size:10.5px;display:flex;align-items:center;justify-content:center;}
+  .step.done .no{background:var(--success);color:#fff;}
+  .step.cur{background:#EAF1FB;border-color:#Bcd3ef;}
+  .step.cur .no{background:var(--navy);color:#fff;}
+  .step.wait.cur{background:#FBF1DF;border-color:#E6C79A;}
+  .step.wait.cur .no{background:var(--warning);color:#fff;}
+  .phase-h{font-size:11.5px;font-weight:900;color:var(--navy-dark);margin:10px 0 4px;padding-left:4px;}
+  .phase-h:first-child{margin-top:0;}
+  .log-card pre{margin:0;max-height:150px;overflow-y:auto;background:#F8F9FB;border:1px solid var(--border);border-radius:8px;padding:10px;font-family:'Noto Sans KR',monospace;font-size:12px;white-space:pre-wrap;word-break:break-all;}
+  input[type=range]{width:200px;}
+  label.ck{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--navy-dark);cursor:pointer;}
+  footer{text-align:center;padding:14px 20px 26px;font-size:12px;color:var(--text-light);}
+  .counter{font-size:13px;font-weight:700;color:var(--navy-dark);}
+</style>
+</head>
+<body>
+
+<header class="cover">
+  <div class="inner">
+    <h1>PCB 검사 반송 시뮬레이터</h1>
+    <p>선회+텔레스코픽 팔 · 컨베이어 · 검사지그 클램프 · NG/OK 판정 · MES · v3.3 (하드웨어 미연결)</p>
+  </div>
+</header>
+
+<main class="container">
+  <div class="grid2">
+    <div class="left-col">
+    <section class="card">
+      <div class="card-header">동작 애니메이션 (실제 배치)</div>
+      <div class="card-body">
+        <div class="statechips">
+          <span class="chip">그리퍼: <b id="gripLabel">열림</b></span>
+          <span class="chip">팔 길이: <b id="armLabel">-</b></span>
+          <span class="chip" id="chipJig">지그 클램프: <b id="jigLabel">열림</b></span>
+          <span class="chip" id="chipS1">투입센서: <b id="s1Label">OFF</b></span>
+          <span class="chip" id="chipS2">지그센서: <b id="s2Label">OFF</b></span>
+        </div>
+
+        <div class="verdict-box">
+          <div class="verdict-lamp" id="verdictLamp">--</div>
+          <div>
+            <div style="font-size:12px;color:var(--text-light);">검사 판정 결과</div>
+            <div class="mes-ind" id="mesInd"><span class="dot"></span>MES 전송: 대기</div>
+          </div>
+          <div style="margin-left:auto;">
+            <div style="font-size:11.5px;color:var(--text-light);margin-bottom:4px;">데모 판정값</div>
+            <select id="verdictSel">
+              <option value="auto">자동(교대)</option>
+              <option value="OK">항상 OK</option>
+              <option value="NG">항상 NG</option>
+            </select>
+          </div>
+        </div>
+
+        <svg viewBox="66 90 570 350" id="scene"></svg>
+        <div class="row" style="margin-top:6px;">
+          <span class="counter">완료 사이클: <span id="cycleCount">0</span></span>
+          <span class="counter" style="color:var(--success);">OK(4번): <span id="okCount">0</span></span>
+          <span class="counter" style="color:var(--danger);">NG(5번): <span id="ngCount">0</span></span>
+        </div>
+        <p class="hint" id="curStateText"></p>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">운전 / 신호 제어</div>
+      <div class="card-body">
+        <div class="row" style="margin-bottom:12px;">
+          <button id="btnRun" class="primary">▶ 자동 운전 시작</button>
+          <button id="btnStop" class="danger">■ 정지</button>
+          <button id="btnReset">↺ 초기화</button>
+          <label class="ck"><input type="checkbox" id="autoSig" checked> 신호 자동 발생(데모)</label>
+        </div>
+        <div class="row">
+          <button id="sigStart" class="sig" disabled>START 신호 (작업자 투입)</button>
+          <button id="sigInspect" class="sig" disabled>검사완료 신호</button>
+        </div>
+        <p class="hint">노란색 깜빡이는 버튼이 현재 대기 중인 신호입니다. 실제 장비에서는 PLC 디지털 입력(작업자 완료·검사기 완료/판정 접점)으로 대체됩니다. 로봇 팔은 각 위치까지 회전하며 관절이 늘어났다 줄었다(텔레스코픽) 합니다.</p>
+      </div>
+    </section>
+    </div><!-- /left-col -->
+
+    <section class="card">
+      <div class="card-header">전체 로직 플로우</div>
+      <div class="card-body"><div class="steps" id="stepList"></div></div>
+    </section>
+  </div>
+
+  <section class="card log-card">
+    <div class="card-header">동작 로그</div>
+    <div class="card-body">
+      <div class="row" style="margin-bottom:10px;"><button id="clearLog">로그 지우기</button></div>
+      <pre id="logBox"></pre>
+    </div>
+  </section>
+</main>
+
+<footer>인시스 AI혁신 연구개발실 · 작성자 ys.kim@in-sys.co.kr · v3.3 · 로직 시뮬레이터(하드웨어 미연결)</footer>
+
+<script>
+  // ===== 좌표 (그림 배치 그대로) =====
+  const BX=350, BY=388, CONV_Y=255, CONV_X0=80, CONV_X1=620, CONV_H=70;
+  const POS = {
+    1:{x:165,y:CONV_Y, name:'투입(작업자)'},
+    2:{x:350,y:CONV_Y, name:'픽업'},
+    3:{x:350,y:135,     name:'검사지그'},
+    4:{x:545,y:CONV_Y, name:'OK 배출'},
+    5:{x:545,y:135,     name:'NG 배출'}
+  };
+  const HOME = {x:350, y:330};       // 팔 최소 신장(대기)
+
+  // ===== 로직 플로우 상태 =====
+  const STATES = [
+    { phase:'대기/투입', type:'wait', signal:'START', label:'START 대기 (작업자 PCB 투입 대기)' },
+    { phase:'대기/투입', type:'appear', label:'작업자가 1번(투입)에 PCB 올림' },
+    { phase:'대기/투입', type:'conveyor', label:'컨베이어 구동 → PCB 1→2 이송' },
+    { phase:'대기/투입', type:'sensor', which:'infeed', on:true, label:'투입센서(2번) 감지 → 컨베이어 정지' },
+    { phase:'투입→검사', type:'arm', to:2, label:'팔: 2번으로 회전+신장' },
+    { phase:'투입→검사', type:'grip', open:false, pick:true, label:'그리퍼 닫기 (2번에서 집기)' },
+    { phase:'투입→검사', type:'sensor', which:'infeed', on:false, label:'투입센서 해제' },
+    { phase:'투입→검사', type:'arm', to:3, label:'팔: 3번(검사지그)으로 이동' },
+    { phase:'투입→검사', type:'grip', open:true, place:true, label:'그리퍼 열기 (지그에 안착)' },
+    { phase:'투입→검사', type:'sensor', which:'jig', on:true, label:'지그센서: PCB 안착 감지' },
+    { phase:'투입→검사', type:'jig', clamp:true, label:'검사지그 클램프 닫힘 (고정)' },
+    { phase:'투입→검사', type:'arm', to:'home', label:'팔: 대기위치 복귀(관절 수축)' },
+    { phase:'검사/판정', type:'wait', signal:'INSPECT', label:'검사완료 신호 대기' },
+    { phase:'검사/판정', type:'verdict', label:'NG/OK 판정 표시 + MES 전송' },
+    { phase:'검사/판정', type:'jig', clamp:false, label:'검사지그 클램프 열림' },
+    { phase:'검사/판정', type:'sensor', which:'jig', on:false, label:'지그센서 해제' },
+    { phase:'분류 배출', type:'arm', to:3, label:'팔: 3번(검사지그)으로 이동' },
+    { phase:'분류 배출', type:'grip', open:false, pick:true, label:'그리퍼 닫기 (지그에서 집기)' },
+    { phase:'분류 배출', type:'arm', toBin:true, label:'팔: 판정에 따라 4(OK)/5(NG)로 이동' },
+    { phase:'분류 배출', type:'grip', open:true, place:true, label:'그리퍼 열기 (배출)' },
+    { phase:'분류 배출', type:'arm', to:'home', label:'팔: 대기위치 복귀 (반복)' }
+  ];
+
+  // ===== 런타임 =====
+  let idx=0, running=false, waitingSignal=null;
+  let tipX=HOME.x, tipY=HOME.y;      // 팔 끝(그리퍼) 현재 위치
+  let gripperOpen=true;
+  let partLoc='none';                // none/pos1/conv/pos2/pos3/pos4/pos5/gripper
+  let convT=0;                       // 컨베이어 PCB 진행(0~1)
+  let jigClamped=false, s_infeed=false, s_jig=false;
+  let verdict=null, verdictBin=null, autoTog=0;
+  let cycleCount=0, okCount=0, ngCount=0;
+  let animToken=0, autoTimer=null;
+
+  const $=id=>document.getElementById(id);
+  const logBox=$('logBox');
+  function addLog(m){const t=new Date().toLocaleTimeString('ko-KR');logBox.textContent+='['+t+'] '+m+'\n';logBox.scrollTop=logBox.scrollHeight;}
+
+  // ===== PCB 도형 (초록 오각형) =====
+  function pcb(x,y){
+    return `<polygon points="${x},${y-13} ${x+11},${y-3} ${x+7},${y+12} ${x-7},${y+12} ${x-11},${y-3}" fill="#3D9142" stroke="#1F5C22" stroke-width="1.5"/>`;
+  }
+  function slot(x,y,stroke){ // 빈 위치 표시
+    return `<circle cx="${x}" cy="${y}" r="17" fill="#FFFFFF" stroke="${stroke||'#9AA6B4'}" stroke-width="1.5" stroke-dasharray="3 3"/>`;
+  }
+
+  const scene=$('scene');
+  function draw(){
+    let s='';
+    // 컨베이어
+    s+=`<rect x="${CONV_X0}" y="${CONV_Y-CONV_H/2}" width="${CONV_X1-CONV_X0}" height="${CONV_H}" rx="8" fill="#DCE3EC" stroke="#9AA6B4"/>`;
+    for(let rx=CONV_X0+16;rx<CONV_X1;rx+=26){ s+=`<line x1="${rx}" y1="${CONV_Y-CONV_H/2}" x2="${rx}" y2="${CONV_Y+CONV_H/2}" stroke="#C2CBD6"/>`; }
+    // 이동방향 화살표(1→2 사이)
+    const ax=262;
+    s+=`<polygon points="${ax-16},${CONV_Y-9} ${ax+6},${CONV_Y-9} ${ax+6},${CONV_Y-16} ${ax+22},${CONV_Y} ${ax+6},${CONV_Y+16} ${ax+6},${CONV_Y+9} ${ax-16},${CONV_Y+9}" fill="#F2C200" stroke="#B99400"/>`;
+
+    // 검사지그(3번, 파란 박스)
+    s+=`<rect x="${POS[3].x-30}" y="${POS[3].y-30}" width="60" height="60" rx="4" fill="#EAF1FB" stroke="#2D5C99" stroke-width="3"/>`;
+    // 지그 클램프 표시
+    { const g=jigClamped?5:13; const p=POS[3];
+      s+=`<rect x="${p.x-g-7}" y="${p.y-10}" width="5" height="20" fill="#C2740A"/>`;
+      s+=`<rect x="${p.x+g+2}" y="${p.y-10}" width="5" height="20" fill="#C2740A"/>`; }
+    // NG(5번, 빨간 박스)
+    s+=`<rect x="${POS[5].x-30}" y="${POS[5].y-30}" width="60" height="60" rx="4" fill="#FCEBEA" stroke="#DC2626" stroke-width="3"/>`;
+
+    // 위치 표시
+    const labels={1:'투입',2:'픽업',3:'검사지그',4:'OK',5:'NG'};
+    for(const k of Object.keys(POS)){
+      const p=POS[k];
+      if(k==='1'||k==='2'||k==='4'){
+        // 세로로 긴 라운드 사각형(스테이션): 내부에 번호(위) + 글자(아래)
+        const w=48,h=66, x=p.x-w/2, y=CONV_Y-h/2;
+        s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="18" fill="#F5F8FC" stroke="#7C8898" stroke-width="1.6"/>`;
+        s+=`<text x="${p.x}" y="${CONV_Y-15}" text-anchor="middle" font-size="13" font-weight="900" fill="#1E3A5F">${k}</text>`;
+        s+=`<text x="${p.x}" y="${CONV_Y+28}" text-anchor="middle" font-size="11" font-weight="700" fill="#3A4657">${labels[k]}</text>`;
+      } else {
+        // 박스(3,5): 번호는 위쪽 바깥, 라벨은 아래
+        s+=`<text x="${p.x}" y="${p.y-36}" text-anchor="middle" font-size="13" font-weight="900" fill="#1E3A5F">${k}</text>`;
+        s+=`<text x="${p.x}" y="${p.y+46}" text-anchor="middle" font-size="10.5" fill="#5B6472">${labels[k]}</text>`;
+      }
+    }
+    // 센서 표시
+    s+=`<circle cx="${POS[2].x+24}" cy="${POS[2].y-16}" r="5" fill="${s_infeed?'#16A34A':'#C9CDD3'}"/>`;
+    s+=`<text x="${POS[2].x+40}" y="${POS[2].y-13}" font-size="9.5" fill="#5B6472">투입센서</text>`;
+    s+=`<circle cx="${POS[3].x+36}" cy="${POS[3].y+20}" r="5" fill="${s_jig?'#16A34A':'#C9CDD3'}"/>`;
+    s+=`<text x="${POS[3].x+44}" y="${POS[3].y+23}" font-size="9.5" fill="#5B6472">지그센서</text>`;
+
+    // 컨베이어 위 PCB (위치별)
+    if(partLoc==='pos1') s+=pcb(POS[1].x,POS[1].y);
+    if(partLoc==='pos2') s+=pcb(POS[2].x,POS[2].y);
+    if(partLoc==='pos3') s+=pcb(POS[3].x,POS[3].y);
+    if(partLoc==='pos4') s+=pcb(POS[4].x,POS[4].y);
+    if(partLoc==='pos5') s+=pcb(POS[5].x,POS[5].y);
+    if(partLoc==='conv'){ const cx=POS[1].x+(POS[2].x-POS[1].x)*convT; s+=pcb(cx,CONV_Y); }
+
+    // ===== 로봇 팔 (텔레스코픽) =====
+    const dx=tipX-BX, dy=tipY-BY; const L=Math.hypot(dx,dy)||1;
+    const ux=dx/L, uy=dy/L;
+    const outer=Math.min(L,64);
+    // 외통(고정 관절)
+    s+=`<line x1="${BX}" y1="${BY}" x2="${BX+ux*outer}" y2="${BY+uy*outer}" stroke="#3C74B5" stroke-width="20" stroke-linecap="round"/>`;
+    // 내봉(늘어나는 관절)
+    if(L>outer){
+      s+=`<line x1="${BX+ux*(outer-6)}" y1="${BY+uy*(outer-6)}" x2="${tipX}" y2="${tipY}" stroke="#7FA8D6" stroke-width="12" stroke-linecap="round"/>`;
+      // 관절 마디 표시(텔레스코픽 눈금)
+      for(let d=outer+18; d<L-10; d+=22){ s+=`<circle cx="${BX+ux*d}" cy="${BY+uy*d}" r="2.5" fill="#2D5C99"/>`; }
+    }
+    // 그리퍼 조
+    const perpx=-uy, perpy=ux; const g=gripperOpen?11:4;
+    s+=`<circle cx="${tipX+perpx*g}" cy="${tipY+perpy*g}" r="5" fill="#122540"/>`;
+    s+=`<circle cx="${tipX-perpx*g}" cy="${tipY-perpy*g}" r="5" fill="#122540"/>`;
+    if(partLoc==='gripper') s+=pcb(tipX,tipY);
+    // 베이스
+    s+=`<rect x="${BX-30}" y="${BY-14}" width="60" height="28" rx="5" fill="#C69A5A" stroke="#8A6A2E" stroke-width="2"/>`;
+    s+=`<circle cx="${BX}" cy="${BY}" r="16" fill="#1E3A5F"/><circle cx="${BX}" cy="${BY}" r="6" fill="#0E1D33"/>`;
+    s+=`<text x="${BX}" y="${BY+40}" text-anchor="middle" font-size="10.5" fill="#5B6472">로봇 베이스(고정)</text>`;
+
+    scene.innerHTML=s;
+    $('gripLabel').textContent=gripperOpen?'열림':'닫힘';
+    $('armLabel').textContent=Math.round(L)+' px';
+    $('jigLabel').textContent=jigClamped?'닫힘(고정)':'열림';
+    $('s1Label').textContent=s_infeed?'ON':'OFF';
+    $('s2Label').textContent=s_jig?'ON':'OFF';
+    $('chipS1').classList.toggle('on',s_infeed);
+    $('chipS2').classList.toggle('on',s_jig);
+    $('chipJig').classList.toggle('on',jigClamped);
+  }
+
+  const stepList=$('stepList');
+  function renderSteps(){
+    let html='',last=null;
+    STATES.forEach((st,i)=>{
+      if(st.phase!==last){html+=`<div class="phase-h">${st.phase}</div>`;last=st.phase;}
+      const cls=(i<idx?'done ':'')+(i===idx?'cur ':'')+(st.type==='wait'?'wait ':'');
+      html+=`<div class="step ${cls}"><span class="no">${i+1}</span><span>${st.label}</span></div>`;
+    });
+    stepList.innerHTML=html;
+    const c=stepList.querySelector('.step.cur'); if(c)c.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+
+  function durs(){const v=parseInt($('speed').value||6,10);return {move:1500-v*115, act:650-v*42};}
+  function tweenTip(tx,ty,done){
+    const my=++animToken, sx=tipX, sy=tipY, dur=durs().move, t0=performance.now();
+    function f(now){ if(my!==animToken)return; let k=Math.min((now-t0)/dur,1); const e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+      tipX=sx+(tx-sx)*e; tipY=sy+(ty-sy)*e; draw();
+      if(k<1)requestAnimationFrame(f); else {tipX=tx;tipY=ty;draw();done&&done();} }
+    requestAnimationFrame(f);
+  }
+  function tweenConv(done){
+    const my=++animToken, dur=durs().move, t0=performance.now(); partLoc='conv';
+    function f(now){ if(my!==animToken)return; convT=Math.min((now-t0)/dur,1); draw();
+      if(convT<1)requestAnimationFrame(f); else {partLoc='pos2';draw();done&&done();} }
+    requestAnimationFrame(f);
+  }
+  function pause(ms,done){const my=++animToken;setTimeout(()=>{if(my===animToken)done&&done();},ms);}
+
+  function runState(){
+    if(!running)return; renderSteps();
+    const st=STATES[idx]; $('curStateText').textContent='진행: '+st.label;
+    if(st.type==='arm'){
+      let tgt = st.to==='home'?HOME : (st.toBin?POS[verdictBin]:POS[st.to]);
+      addLog('[팔] '+st.label+(st.toBin?(' → '+verdictBin+'번('+verdict+')'):''));
+      tweenTip(tgt.x,tgt.y,next);
+    } else if(st.type==='grip'){
+      gripperOpen=st.open;
+      if(st.pick){partLoc='gripper';}
+      if(st.place){partLoc='pos'+nearestPos();}
+      addLog('[그리퍼] '+st.label); draw(); pause(durs().act,next);
+    } else if(st.type==='appear'){
+      partLoc='pos1'; addLog('[투입] '+st.label); draw(); pause(durs().act,next);
+    } else if(st.type==='conveyor'){
+      addLog('[컨베이어] '+st.label); tweenConv(next);
+    } else if(st.type==='sensor'){
+      if(st.which==='infeed') s_infeed=st.on; else s_jig=st.on;
+      addLog('[센서] '+st.label); draw(); pause(durs().act,next);
+    } else if(st.type==='jig'){
+      jigClamped=st.clamp; addLog('[검사지그] '+st.label); draw(); pause(durs().act,next);
+    } else if(st.type==='verdict'){
+      decideVerdict();
+      $('verdictLamp').textContent=verdict; $('verdictLamp').className='verdict-lamp '+(verdict==='OK'?'ok':'ng');
+      addLog('[판정] 결과: '+verdict);
+      $('mesInd').className='mes-ind sending'; $('mesInd').innerHTML='<span class="dot"></span>MES 전송 중... ('+verdict+')'; draw();
+      pause(durs().act+300,()=>{ $('mesInd').className='mes-ind'; $('mesInd').innerHTML='<span class="dot"></span>MES 전송 완료 ('+verdict+')'; addLog('[MES] '+verdict+' 전송 완료'); next(); });
+    } else if(st.type==='wait'){
+      waitingSignal=st.signal; addLog('[대기] '+sigName(st.signal)+' 신호 대기...'); updateSigBtns(); draw();
+      if($('autoSig').checked) autoTimer=setTimeout(()=>fireSignal(st.signal,true),1200);
+    }
+  }
+  function nearestPos(){ // 그리퍼가 놓는 순간 가장 가까운 위치 판정
+    let b='2',bd=1e9; for(const k of Object.keys(POS)){const d=Math.hypot(POS[k].x-tipX,POS[k].y-tipY); if(d<bd){bd=d;b=k;}} return b;
+  }
+  function decideVerdict(){
+    const sel=$('verdictSel').value;
+    if(sel==='OK')verdict='OK'; else if(sel==='NG')verdict='NG'; else {verdict=(autoTog%3===2)?'NG':'OK';autoTog++;}
+    verdictBin = verdict==='OK'?4:5;
+  }
+  function next(){
+    idx++;
+    if(idx>=STATES.length){
+      idx=0; cycleCount++; $('cycleCount').textContent=cycleCount;
+      if(verdict==='OK'){okCount++;$('okCount').textContent=okCount;} else if(verdict==='NG'){ngCount++;$('ngCount').textContent=ngCount;}
+      partLoc='none'; s_infeed=false; s_jig=false; convT=0;
+      addLog('=== 1 사이클 완료 (총 '+cycleCount+'회) ===');
+    }
+    if(running) runState();
+  }
+
+  function sigName(s){return {START:'START',INSPECT:'검사완료'}[s]||s;}
+  function updateSigBtns(){ $('sigStart').disabled=(waitingSignal!=='START'); $('sigInspect').disabled=(waitingSignal!=='INSPECT'); }
+  function fireSignal(sig,auto){ if(waitingSignal!==sig)return; addLog((auto?'[자동신호] ':'[신호입력] ')+sigName(sig)+' 수신 → 진행'); waitingSignal=null; updateSigBtns(); if(autoTimer){clearTimeout(autoTimer);autoTimer=null;} next(); }
+
+  $('btnRun').addEventListener('click',()=>{ if(running)return; running=true; $('btnRun').disabled=true; addLog('▶ 자동 운전 시작'); runState(); });
+  $('btnStop').addEventListener('click',()=>{ running=false; animToken++; if(autoTimer){clearTimeout(autoTimer);autoTimer=null;} $('btnRun').disabled=false; addLog('■ 정지'); });
+  $('btnReset').addEventListener('click',()=>{
+    running=false; animToken++; if(autoTimer){clearTimeout(autoTimer);autoTimer=null;}
+    idx=0; waitingSignal=null; tipX=HOME.x; tipY=HOME.y; gripperOpen=true; partLoc='none';
+    jigClamped=false; s_infeed=false; s_jig=false; verdict=null; verdictBin=null; convT=0;
+    $('verdictLamp').textContent='--'; $('verdictLamp').className='verdict-lamp';
+    $('mesInd').className='mes-ind'; $('mesInd').innerHTML='<span class="dot"></span>MES 전송: 대기';
+    $('btnRun').disabled=false; updateSigBtns(); draw(); renderSteps(); $('curStateText').textContent=''; addLog('↺ 초기화');
+  });
+  $('sigStart').addEventListener('click',()=>fireSignal('START',false));
+  $('sigInspect').addEventListener('click',()=>fireSignal('INSPECT',false));
+  $('clearLog').addEventListener('click',()=>logBox.textContent='');
+  $('autoSig').addEventListener('change',()=>{ if($('autoSig').checked&&running&&waitingSignal) autoTimer=setTimeout(()=>fireSignal(waitingSignal,true),1000); });
+
+  // speed 슬라이더가 없으므로 기본값 처리용 더미
+  if(!$('speed')){ const d=document.createElement('input'); d.type='range'; d.id='speed'; d.min=1;d.max=10;d.value=6; d.style.display='none'; document.body.appendChild(d); }
+
+  draw(); renderSteps(); updateSigBtns();
+  addLog('시뮬레이터 v3.0 준비 완료. "자동 운전 시작"을 누르세요.');
+</script>
+</body>
+</html>

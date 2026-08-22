@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>스텝모터 웹 제어 시스템</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1E3A5F;
+    --navy-dark:#122540;
+    --text:#2B3648;
+    --text-light:#5B6472;
+    --bg:#F3F5F9;
+    --card-bg:#FFFFFF;
+    --card-header-bg:#E7EFFA;
+    --border:#E1E6ED;
+    --accent:#2D5C99;
+    --success:#16A34A;
+    --danger:#DC2626;
+    --warning:#C2740A;
+    --radius:9px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Noto Sans KR', sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    font-size:15px;
+    line-height:1.4;
+  }
+  .banner{
+    background:#FBEFE0;color:#7A4A0A;text-align:center;
+    padding:8px 14px;font-size:14px;font-weight:500;
+    border-bottom:1px solid #EAD3A6;display:none;
+  }
+  .banner.show{display:block;}
+
+  /* 슬림 헤더 바 */
+  header.cover{
+    background:linear-gradient(135deg, var(--navy), var(--navy-dark));
+    color:#F4F7FB;padding:7px 22px;
+  }
+  header.cover .inner{
+    max-width:1720px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  }
+  header.cover h1{font-size:19px;font-weight:900;margin:0;letter-spacing:-0.3px;}
+  header.cover p{margin:0;font-size:12.5px;color:#C7D4E6;font-weight:400;}
+  .hdr-left{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  .hdr-conn{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .hdr-conn #connectBtn{flex:0 0 auto;min-height:36px;padding:6px 20px;font-size:14.5px;}
+  .hdr-status{display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:13px;color:#C7D4E6;}
+  .hdr-status b{color:#fff;font-weight:700;}
+
+  .container{
+    max-width:1720px;margin:0 auto;
+    padding:12px 22px 26px;
+  }
+  .card{
+    background:var(--card-bg);border:1px solid var(--border);
+    border-radius:var(--radius);overflow:hidden;
+    box-shadow:0 1px 2px rgba(20,40,63,0.05);margin-bottom:12px;
+  }
+  .card-header{
+    background:var(--card-header-bg);padding:5px 12px;
+    font-weight:700;color:var(--navy-dark);font-size:14.5px;
+    border-bottom:1px solid var(--border);
+  }
+  .card-body{padding:8px 10px;}
+
+  /* 상단 상태 */
+  .status-top-row{
+    display:grid;grid-template-columns:repeat(3,auto);
+    gap:6px 28px;margin-bottom:10px;justify-content:start;
+  }
+  .status-item .label{font-size:12.5px;color:var(--text-light);margin-bottom:1px;}
+  .status-item .value{font-size:15.5px;font-weight:700;color:var(--navy-dark);}
+  .dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;background:var(--danger);}
+  .dot.on{background:var(--success);}
+  .dot.checking{background:var(--warning);}
+  .dot.lost{background:var(--danger);}
+
+  .mini-motors-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  @media (max-width:820px){ .mini-motors-grid{grid-template-columns:1fr;} }
+  .mini-motor{
+    display:flex;gap:10px;align-items:center;
+    padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:#FAFBFD;
+  }
+  .mini-spinner-wrap{width:44px;height:44px;flex:0 0 auto;border-radius:50%;border:2px solid var(--border);position:relative;background:#fff;}
+  .mini-needle{position:absolute;top:50%;left:50%;width:2.5px;height:19px;background:var(--accent);border-radius:2px;transform-origin:50% 100%;transform:translate(-50%,-100%) rotate(0deg);}
+  .mini-dot{position:absolute;top:50%;left:50%;width:6px;height:6px;background:var(--navy-dark);border-radius:50%;transform:translate(-50%,-50%);}
+  @keyframes spinCW{ from{transform:translate(-50%,-100%) rotate(0deg);} to{transform:translate(-50%,-100%) rotate(360deg);} }
+  @keyframes spinCCW{ from{transform:translate(-50%,-100%) rotate(0deg);} to{transform:translate(-50%,-100%) rotate(-360deg);} }
+  .spin-cw{ animation-name:spinCW; animation-timing-function:linear; animation-iteration-count:infinite; }
+  .spin-ccw{ animation-name:spinCCW; animation-timing-function:linear; animation-iteration-count:infinite; }
+  .mini-info{flex:1;min-width:0;}
+  .mini-info .title{font-size:15px;font-weight:900;color:var(--navy-dark);margin-bottom:3px;}
+  .mini-info .row2{display:flex;gap:12px;font-size:13px;color:var(--text-light);margin-bottom:6px;flex-wrap:wrap;}
+  .mini-info .row2 b{color:var(--navy-dark);}
+  .mini-progress-track{height:7px;background:#EDEFF3;border-radius:6px;overflow:hidden;width:100%;}
+  .mini-progress-fill{height:100%;width:0%;background:var(--accent);transition:width .2s ease;}
+
+  .motor-columns{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  @media (max-width:960px){ .motor-columns{grid-template-columns:1fr;} }
+  .motor-col{display:flex;flex-direction:column;}
+  .motor-col-title{
+    font-weight:900;color:#fff;font-size:15.5px;margin:0 0 6px;
+    background:var(--navy);border-radius:7px;padding:5px 12px;
+  }
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+
+  /* 버튼 (터치용, 균형 크기) */
+  button{
+    font-family:inherit;font-size:13px;font-weight:700;
+    padding:6px 12px;min-height:32px;border-radius:7px;
+    border:1px solid var(--border);background:#EEF2F7;color:var(--navy-dark);
+    cursor:pointer;flex:1 1 auto;
+  }
+  button:hover{background:#E3EAF3;}
+  button:active{transform:translateY(1px);}
+  button:disabled{opacity:.45;cursor:not-allowed;}
+  button.primary{background:var(--navy);color:#fff;border-color:var(--navy);}
+  button.primary:hover{background:var(--navy-dark);}
+  button.danger{background:#FCEBEA;color:var(--danger);border-color:#F4C6C3;}
+  button.danger:hover{background:#F9DAD8;}
+  .card-body > button{width:100%;}
+
+  /* 터치용 입력 */
+  input[type=number], select{
+    font-family:inherit;font-size:15px;padding:6px 8px;min-height:36px;
+    border:1px solid var(--border);border-radius:8px;color:var(--text);background:#fff;width:100%;
+  }
+  input[type=range]{width:100%;height:26px;-webkit-appearance:none;appearance:none;background:transparent;}
+  input[type=range]::-webkit-slider-runnable-track{height:8px;background:#DBE2EC;border-radius:5px;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:28px;height:28px;border-radius:50%;background:var(--navy);border:3px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3);margin-top:-10px;cursor:pointer;}
+  input[type=range]::-moz-range-track{height:8px;background:#DBE2EC;border-radius:5px;}
+  input[type=range]::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:var(--navy);border:3px solid #fff;cursor:pointer;}
+  select:disabled, input:disabled{opacity:.5;cursor:not-allowed;background:#F2F3F5;}
+  label.field-label{font-size:12px;color:var(--text-light);display:block;margin-bottom:3px;}
+  .hint{font-size:12px;color:var(--text-light);margin-top:4px;line-height:1.3;}
+  .speed-value{font-size:17px;font-weight:900;color:var(--navy-dark);min-width:38px;display:inline-block;text-align:right;}
+  .field-col{flex:1 1 0;min-width:56px;}
+
+  /* 시퀀스 */
+  .seq-table{width:100%;border-collapse:collapse;font-size:14px;}
+  .seq-table th{background:var(--card-header-bg);color:var(--navy-dark);font-weight:700;padding:5px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:13px;}
+  .seq-table td{padding:4px 5px;text-align:center;border-bottom:1px solid var(--border);}
+  .seq-table input{width:92px;text-align:center;margin:0 auto;}
+  .timeline-wrap{margin-top:14px;border:1px solid var(--border);border-radius:8px;padding:12px;background:#FAFBFD;}
+  .timeline-axis{display:flex;justify-content:space-between;font-size:12px;color:var(--text-light);margin-bottom:8px;padding-left:58px;}
+  .seq-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-top:8px;padding:10px;border:1px solid var(--border);border-radius:8px;background:#FAFBFD;}
+  .seq-ctrl-group{display:flex;flex-direction:column;}
+  .push-switch{
+    width:84px;height:84px;border-radius:50%;flex:0 0 auto;
+    border:3px solid #9AA6B4;
+    background:radial-gradient(circle at 50% 38%, #E6534A, #B5261D);
+    box-shadow:0 6px 0 #7C1811, 0 8px 12px rgba(0,0,0,0.25);
+    color:#fff;font-weight:900;font-size:15px;letter-spacing:0.5px;
+    cursor:pointer;padding:0;transition:transform .06s ease, box-shadow .06s ease;
+    display:flex;align-items:center;justify-content:center;min-height:0;
+  }
+  .push-switch:hover{background:radial-gradient(circle at 50% 38%, #EC5F55, #C22B21);}
+  .push-switch:active, .push-switch.pressed{transform:translateY(6px);box-shadow:0 1px 0 #7C1811, 0 2px 4px rgba(0,0,0,0.25);}
+  .push-switch:disabled{background:radial-gradient(circle at 50% 38%, #C9CDD3, #A7ADB6);box-shadow:0 6px 0 #7E838B, 0 8px 12px rgba(0,0,0,0.15);cursor:not-allowed;}
+  .push-switch-cap{pointer-events:none;}
+  .timeline-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+  .timeline-label{width:50px;flex:0 0 50px;font-size:13px;font-weight:700;color:var(--navy-dark);}
+  .timeline-track{flex:1;display:flex;height:26px;border-radius:6px;overflow:hidden;background:#EDEFF3;}
+  .timeline-seg{height:100%;}
+  @keyframes pulseSeg{ 0%,100%{opacity:1;} 50%{opacity:.55;} }
+  .timeline-seg.active{ outline:2px solid var(--navy-dark); outline-offset:-2px; animation:pulseSeg 1.2s ease-in-out infinite; }
+  .legend{margin-top:10px;gap:16px;}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-light);}
+  .legend-item i{width:11px;height:11px;border-radius:2px;display:inline-block;}
+
+  .log-card pre{
+    margin:0;max-height:150px;overflow-y:auto;
+    background:#F8F9FB;border:1px solid var(--border);border-radius:8px;padding:10px;
+    font-family:'Noto Sans KR', monospace;font-size:12.5px;color:var(--text);
+    white-space:pre-wrap;word-break:break-all;
+  }
+  footer{text-align:center;padding:10px 20px 16px;font-size:12px;color:var(--text-light);}
+
+  /* ===== 1화면 대시보드 레이아웃 ===== */
+  html,body{height:100%;}
+  body{overflow:hidden;display:flex;flex-direction:column;}
+  header.cover{flex:0 0 auto;}
+  footer{flex:0 0 auto;padding:5px 20px;}
+  .dashboard{
+    flex:1 1 auto;min-height:0;width:100%;max-width:1920px;margin:0 auto;
+    display:grid;grid-template-columns:1.42fr 1fr;gap:8px;
+    padding:6px 12px;overflow:hidden;
+  }
+  .left-panel{grid-column:1;}
+  .right-panel{grid-column:2;}
+  .left-panel,.right-panel{min-height:0;display:flex;flex-direction:column;overflow:auto;}
+  .left-panel .motor-columns{gap:8px;}
+  .left-panel .card, .right-panel .card{margin-bottom:6px;}
+  .right-panel > section:last-child{margin-bottom:0;}
+  /* 우측 로그: 하단 남는 공간 채움 */
+  .right-panel .log-card{flex:1 1 auto;min-height:96px;display:flex;flex-direction:column;}
+  .right-panel .log-card .card-body{flex:1;display:flex;flex-direction:column;min-height:0;padding:8px 12px;}
+  .right-panel .log-card pre{flex:1;max-height:none;margin:0;}
+  /* 좌측: 모터 제어는 자연 높이, 로그가 하단 채움 */
+  .left-panel .motor-columns{flex:0 0 auto;}
+  .left-panel .motor-col{display:flex;flex-direction:column;}
+  .left-panel .motor-col > .card{margin-bottom:8px;}
+  .left-panel .motor-col .card-body{padding:7px 10px;}
+  .left-panel .motor-col .card-header{padding:4px 10px;}
+  .left-panel .motor-col > .card:last-child{margin-bottom:0;}
+  .left-panel .log-card{flex:1 1 auto;min-height:96px;display:flex;flex-direction:column;}
+  .left-panel .log-card .card-body{flex:1;display:flex;flex-direction:column;min-height:0;padding:8px 12px;}
+  .left-panel .log-card pre{flex:1;max-height:none;margin:0;}
+  /* 우측: 모니터링 자연 높이, 시퀀스가 하단 채움 */
+  .right-panel > section{flex:0 0 auto;}
+  .right-panel > section:last-child{flex:1 1 auto;display:flex;flex-direction:column;}
+  .right-panel > section:last-child > .card-body{flex:1;display:flex;flex-direction:column;}
+  .right-panel .timeline-wrap{flex:1;display:flex;flex-direction:column;justify-content:center;}
+  /* 좁은 화면 폴백 */
+  @media (max-width:1120px){
+    body{overflow:auto;}
+    .dashboard{grid-template-columns:1fr;overflow:visible;}
+    .left-panel,.right-panel{overflow:visible;}
+    .left-panel .log-card, .right-panel > section:last-child{flex:0 0 auto;}
+    .left-panel .log-card{min-height:140px;}
+  }
+  /* 시퀀스 타임라인 컴팩트 */
+  .right-panel .timeline-wrap{margin-top:10px;padding:10px;}
+  .right-panel .timeline-row{margin-bottom:5px;}
+  .right-panel .timeline-track{height:20px;}
+</style>
+</head>
+<body>
+
+<div id="banner" class="banner">⚠ 이 브라우저는 Web Serial API를 지원하지 않습니다. Chrome 또는 Edge 최신 버전에서 이 파일을 직접 열어주세요.</div>
+
+<header class="cover">
+  <div class="inner">
+    <div class="hdr-left">
+      <h1>스텝모터 웹 제어 시스템</h1>
+      <p>28BYJ-48 x3 + ULN2003 · Web Serial API · v5.5</p>
+    </div>
+    <div class="hdr-conn">
+      <button id="connectBtn" class="primary">포트 연결</button>
+      <div class="hdr-status">
+        <span><span id="connDot" class="dot off"></span><b id="connText">연결 안됨</b></span>
+        <span id="deviceInfoText">-</span>
+        <span>갱신 <b id="updatedText">-</b></span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="dashboard">
+
+  <!-- 좌측: 모터 제어 3열 + 통신 로그 -->
+  <div class="left-panel">
+    <div class="motor-columns" id="motorColumns"></div>
+
+    <!-- 통신 로그 (좌측 하단, 남는 공간 채움) -->
+    <section class="card log-card">
+      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>통신 로그</span>
+        <span style="display:flex;gap:8px;">
+          <button id="clearLogBtn" style="min-height:28px;padding:2px 12px;font-size:12.5px;flex:0 0 auto;">로그 지우기</button>
+          <button id="resetSettingsBtn" style="min-height:28px;padding:2px 12px;font-size:12.5px;flex:0 0 auto;">저장값 초기화</button>
+        </span>
+      </div>
+      <div class="card-body">
+        <pre id="logBox"></pre>
+      </div>
+    </section>
+  </div>
+
+  <!-- 우측: 모니터링/연결 + 시퀀스 + 로그 -->
+  <div class="right-panel">
+
+    <!-- 실시간 모니터링 -->
+    <section class="card">
+      <div class="card-header">실시간 모니터링</div>
+      <div class="card-body">
+        <div class="mini-motors-grid">
+          <div class="mini-motor">
+            <div class="mini-spinner-wrap"><div id="needle1" class="mini-needle"></div><div class="mini-dot"></div></div>
+            <div class="mini-info">
+              <div class="title">모터 1</div>
+              <div class="row2"><span>모드: <b id="modeText1">정지</b></span><span>속도: <b id="speedText1">-</b></span><span>위치: <b id="posText1">-</b></span></div>
+              <div class="mini-progress-track"><div id="progressFill1" class="mini-progress-fill"></div></div>
+            </div>
+          </div>
+          <div class="mini-motor">
+            <div class="mini-spinner-wrap"><div id="needle2" class="mini-needle"></div><div class="mini-dot"></div></div>
+            <div class="mini-info">
+              <div class="title">모터 2</div>
+              <div class="row2"><span>모드: <b id="modeText2">정지</b></span><span>속도: <b id="speedText2">-</b></span><span>위치: <b id="posText2">-</b></span></div>
+              <div class="mini-progress-track"><div id="progressFill2" class="mini-progress-fill"></div></div>
+            </div>
+          </div>
+          <div class="mini-motor">
+            <div class="mini-spinner-wrap"><div id="needle3" class="mini-needle"></div><div class="mini-dot"></div></div>
+            <div class="mini-info">
+              <div class="title">모터 3</div>
+              <div class="row2"><span>모드: <b id="modeText3">정지</b></span><span>속도: <b id="speedText3">-</b></span><span>위치: <b id="posText3">-</b></span></div>
+              <div class="mini-progress-track"><div id="progressFill3" class="mini-progress-fill"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 시퀀스 프로그램 (PLC 스타일) -->
+    <section class="card">
+      <div class="card-header">시퀀스 프로그램 (PLC 스타일)</div>
+      <div class="card-body">
+        <table class="seq-table">
+          <thead>
+            <tr><th>모터</th><th>시작값(step)</th><th>끝값(step)</th><th>CW→CCW 대기(초)</th><th>시작 지연(초)</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>모터 1<br><span style="font-size:10.5px;color:var(--text-light);">(기준 시작점)</span></td>
+              <td><input type="number" id="seqStart1" value="0" min="0"></td>
+              <td><input type="number" id="seqEnd1" value="512" min="0"></td>
+              <td><input type="number" id="seqWait1" value="2" min="0" step="0.5"></td>
+              <td><input type="number" value="0" disabled title="모터1은 시퀀스의 기준 시작점(0초)입니다"></td>
+            </tr>
+            <tr>
+              <td>모터 2</td>
+              <td><input type="number" id="seqStart2" value="0" min="0"></td>
+              <td><input type="number" id="seqEnd2" value="512" min="0"></td>
+              <td><input type="number" id="seqWait2" value="2" min="0" step="0.5"></td>
+              <td><input type="number" id="seqDelay2" value="3" min="0" step="0.5"></td>
+            </tr>
+            <tr>
+              <td>모터 3</td>
+              <td><input type="number" id="seqStart3" value="0" min="0"></td>
+              <td><input type="number" id="seqEnd3" value="512" min="0"></td>
+              <td><input type="number" id="seqWait3" value="2" min="0" step="0.5"></td>
+              <td><input type="number" id="seqDelay3" value="5" min="0" step="0.5"></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="seq-controls">
+          <div class="seq-ctrl-group">
+            <label class="field-label">구동 방식</label>
+            <select id="driveMode" class="motor-ctrl" style="width:230px;">
+              <option value="seq_roundtrip">순차 왕복 (1→2→3 이동 후 3→2→1 복귀)</option>
+              <option value="seq_oneway">순차 이동 (1→2→3, 이동 후 정지)</option>
+              <option value="parallel">동시 지연 방식 (각자 왕복)</option>
+            </select>
+          </div>
+          <div class="seq-ctrl-group">
+            <label class="field-label">반복 방식</label>
+            <select id="repeatMode" class="motor-ctrl" style="width:130px;">
+              <option value="once">1회만</option>
+              <option value="count">지정 횟수</option>
+              <option value="infinite">무한 반복</option>
+            </select>
+          </div>
+          <div class="seq-ctrl-group">
+            <label class="field-label">반복 횟수</label>
+            <input type="number" id="repeatCount" class="motor-ctrl" min="1" value="5" style="width:100px;" disabled>
+          </div>
+          <div class="seq-ctrl-group">
+            <label class="field-label">&nbsp;</label>
+            <div class="row">
+              <button id="btnSeqRun" class="motor-ctrl primary">▶ 시퀀스 실행</button>
+              <button id="btnSeqStop" class="motor-ctrl danger">■ 시퀀스 중지</button>
+            </div>
+          </div>
+          <div class="seq-ctrl-group" style="text-align:center;">
+            <label class="field-label">수동 1회 실행</label>
+            <button id="pushSwitch" class="push-switch motor-ctrl" title="누를 때마다 시퀀스를 1회 실행합니다">
+              <span class="push-switch-cap">PUSH</span>
+            </button>
+          </div>
+          <div class="seq-ctrl-group" style="flex:1;min-width:160px;">
+            <label class="field-label">진행 상태</label>
+            <div id="cycleStatus" style="font-size:14px;font-weight:700;color:var(--navy-dark);padding-top:6px;">대기 중</div>
+          </div>
+        </div>
+        <p class="hint" id="driveModeHint"></p>
+
+        <div class="timeline-wrap">
+          <div class="timeline-axis" id="timelineAxis"><span>0초</span><span>-</span></div>
+          <div class="timeline-row"><span class="timeline-label">모터1</span><div class="timeline-track" id="track1"></div></div>
+          <div class="timeline-row"><span class="timeline-label">모터2</span><div class="timeline-track" id="track2"></div></div>
+          <div class="timeline-row"><span class="timeline-label">모터3</span><div class="timeline-track" id="track3"></div></div>
+        </div>
+        <div class="legend row">
+          <span class="legend-item"><i style="background:#D8DEE8"></i>대기</span>
+          <span class="legend-item"><i style="background:var(--accent)"></i>CW 회전</span>
+          <span class="legend-item"><i style="background:var(--warning)"></i>대기(CW→CCW)</span>
+          <span class="legend-item"><i style="background:var(--success)"></i>CCW 회전</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+</main>
+
+<footer>
+  인시스 AI혁신 연구개발실 · 작성자 ys.kim@in-sys.co.kr · v5.5 · Web Serial API (Chrome/Edge 전용)
+</footer>
+
+<script>
+  const MOTOR_IDS = [1, 2, 3];
+
+  // ===== 모터별 수동 제어 패널 HTML 동적 생성 =====
+  const motorColumns = document.getElementById('motorColumns');
+  MOTOR_IDS.forEach(id => {
+    motorColumns.insertAdjacentHTML('beforeend', `
+      <div class="motor-col">
+        <div class="motor-col-title">모터 ${id} 제어</div>
+
+        <section class="card">
+          <div class="card-header">연속 회전 (정역 구동)</div>
+          <div class="card-body">
+            <div class="row">
+              <button id="btnCCW${id}" class="motor-ctrl">◀ CCW</button>
+              <button id="btnStop${id}" class="motor-ctrl danger">정지</button>
+              <button id="btnCW${id}" class="motor-ctrl">CW ▶</button>
+            </div>
+            <p class="hint">정지 전까지 계속 회전</p>
+            <div class="row" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+              <button id="btnHome${id}" class="motor-ctrl primary">⌂ 초기 위치로 복귀</button>
+              <button id="btnSetHome${id}" class="motor-ctrl">현재 위치 저장</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">회전 속도</div>
+          <div class="card-body">
+            <div class="row" style="width:100%;">
+              <input type="range" id="speedRange${id}" class="motor-ctrl" min="1" max="100" value="50">
+              <span class="speed-value" id="speedRangeValue${id}">50</span>
+            </div>
+            <p class="hint" id="speedRpmInfo${id}" style="font-weight:700;color:var(--navy-dark);margin-top:6px;">약 1.38 RPM · 94 step/s</p>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <span>지정 값 구동</span>
+            <button id="btnRunValue${id}" class="motor-ctrl primary" style="flex:0 0 auto;width:auto;min-height:28px;padding:3px 12px;font-size:12.5px;">입력한 값만큼 회전</button>
+          </div>
+          <div class="card-body">
+            <div class="row" style="flex-wrap:nowrap;gap:6px;">
+              <div class="field-col">
+                <label class="field-label">단위</label>
+                <select id="unitSelect${id}" class="motor-ctrl">
+                  <option value="STEP" selected>스텝</option>
+                  <option value="ANGLE">각도(°)</option>
+                </select>
+              </div>
+              <div class="field-col">
+                <label class="field-label">값</label>
+                <input type="number" id="valueInput${id}" class="motor-ctrl" min="0" value="512">
+              </div>
+              <div class="field-col">
+                <label class="field-label">방향</label>
+                <select id="dirSelect${id}" class="motor-ctrl">
+                  <option value="CW">CW</option>
+                  <option value="CCW">CCW</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    `);
+  });
+
+  // ===== 상태 변수 =====
+  let port, reader, writer, readableStreamClosed, writableStreamClosed;
+  let keepReading = false;
+  let lineBuffer = '';
+  let isPortOpen = false;
+  let deviceConfirmed = false;
+  let lastRxTime = 0;
+  const HEARTBEAT_TIMEOUT = 2500;
+  let heartbeatIntervalId = null;
+
+  // ===== 시퀀스(PLC) 상태 변수 =====
+  let sequenceRunning = false;
+  let sequenceTimers = [];
+  let sequenceListeners = {};
+  let sequenceDoneCount = 0;
+  // 반복 제어
+  let seqParams = null;        // 현재 실행 중인 시퀀스 파라미터
+  let seqCycleIndex = 0;       // 진행한 회차 (0부터)
+  let seqTotalCycles = 0;      // 목표 회차 (무한이면 Infinity)
+  let seqInfinite = false;
+  let repeatControlsReady = false;
+  let curDriveMode = 'seq_roundtrip';  // seq_roundtrip | seq_oneway | parallel
+  let schedule = [];                   // 순차 방식 실행 스케줄
+  let scheduleIndex = 0;
+
+  // ===== 펌웨어 호환성 감지 =====
+  let fwWarningShown = false;
+
+  // ===== 공용 DOM =====
+  const banner = document.getElementById('banner');
+  const connectBtn = document.getElementById('connectBtn');
+  const connDot = document.getElementById('connDot');
+  const connText = document.getElementById('connText');
+  const deviceInfoText = document.getElementById('deviceInfoText');
+  const updatedText = document.getElementById('updatedText');
+  const logBox = document.getElementById('logBox');
+
+  // ===== 모터별 DOM 참조 =====
+  const panels = {};
+  MOTOR_IDS.forEach(id => {
+    panels[id] = {
+      modeText: document.getElementById('modeText' + id),
+      speedText: document.getElementById('speedText' + id),
+      posText: document.getElementById('posText' + id),
+      progressFill: document.getElementById('progressFill' + id),
+      needle: document.getElementById('needle' + id)
+    };
+  });
+
+  const controlEls = Array.from(document.querySelectorAll('.motor-ctrl'));
+  function setControlsEnabled(on) {
+    controlEls.forEach(el => { if (el) el.disabled = !on; });
+    if (repeatControlsReady) syncRepeatCountState();
+  }
+  setControlsEnabled(false);
+
+  // ===== 브라우저 지원 확인 =====
+  if (!('serial' in navigator)) {
+    banner.classList.add('show');
+    connectBtn.disabled = true;
+  } else {
+    navigator.serial.addEventListener('disconnect', (e) => {
+      if (port && e.target === port) {
+        addLog('[USB 분리 감지] 장치 연결이 끊어졌습니다');
+        forceDisconnectedState();
+      }
+    });
+  }
+
+  // ===== 연결 =====
+  async function connectSerial() {
+    try {
+      port = await navigator.serial.requestPort();
+      await port.open({ baudRate: 9600 });
+      isPortOpen = true;
+      deviceConfirmed = false;
+      fwWarningShown = false;
+
+      try {
+        await port.setSignals({ dataTerminalReady: false, requestToSend: false });
+      } catch (e) {
+        // 신호 제어 미지원 환경은 무시
+      }
+
+      const textDecoder = new TextDecoderStream();
+      readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+      reader = textDecoder.readable.getReader();
+
+      const textEncoder = new TextEncoderStream();
+      writableStreamClosed = textEncoder.readable.pipeTo(port.writable);
+      writer = textEncoder.writable.getWriter();
+
+      keepReading = true;
+      readLoop();
+      startHeartbeatWatch();
+
+      setStatusChecking();
+      addLog('[포트 열림] 아두이노 응답 확인 중...');
+      connectBtn.textContent = '연결 해제';
+
+      setTimeout(() => { if (!deviceConfirmed) sendRaw('1:STOP'); }, 500);
+      setTimeout(() => { if (!deviceConfirmed) sendRaw('1:STOP'); }, 2500);
+
+      setTimeout(() => {
+        if (!deviceConfirmed) {
+          addLog('[경고] 5초간 응답이 없습니다. ① 아두이노 전원 ON ② step_motor.ino v3.0 이상 업로드 여부 ③ Arduino IDE 시리얼 모니터 등 다른 프로그램이 포트를 사용 중인지 확인하세요.');
+        }
+      }, 5000);
+    } catch (err) {
+      addLog('[연결 실패] ' + err.message);
+    }
+  }
+
+  async function disconnectSerial() {
+    keepReading = false;
+    try {
+      if (reader) {
+        await reader.cancel();
+        await readableStreamClosed.catch(() => {});
+      }
+      if (writer) {
+        await writer.close();
+        await writableStreamClosed.catch(() => {});
+      }
+      if (port) await port.close();
+    } catch (e) {
+      addLog('[해제 오류] ' + e.message);
+    }
+    forceDisconnectedState();
+    addLog('[연결 해제됨]');
+  }
+
+  function forceDisconnectedState() {
+    keepReading = false;
+    isPortOpen = false;
+    deviceConfirmed = false;
+    stopHeartbeatWatch();
+    setControlsEnabled(false);
+    setStatusOff();
+    connectBtn.textContent = '포트 연결';
+    MOTOR_IDS.forEach(id => {
+      panels[id].needle.classList.remove('spin-cw', 'spin-ccw');
+      panels[id].progressFill.style.width = '0%';
+    });
+    if (sequenceRunning) cancelSequence('연결이 끊겨 시퀀스가 취소되었습니다');
+  }
+
+  connectBtn.addEventListener('click', () => {
+    if (isPortOpen) { disconnectSerial(); } else { connectSerial(); }
+  });
+
+  // ===== 연결 상태 표시 =====
+  function setStatusOff() {
+    connDot.className = 'dot off';
+    connText.textContent = '연결 안됨';
+    deviceInfoText.textContent = '-';
+  }
+  function setStatusChecking() {
+    connDot.className = 'dot checking';
+    connText.textContent = '연결됨 · 확인 중...';
+  }
+  function setStatusAlive(info) {
+    connDot.className = 'dot on';
+    connText.textContent = '정상 연결됨 (이 PC에서만 제어 가능)';
+    deviceInfoText.textContent = info || '아두이노 응답 확인됨';
+  }
+  function setStatusLost() {
+    connDot.className = 'dot lost';
+    connText.textContent = '응답 없음 (연결 끊김 의심)';
+  }
+  function setStatusFirmwareMismatch() {
+    connDot.className = 'dot lost';
+    connText.textContent = '펌웨어 불일치 (구버전 감지)';
+    deviceInfoText.textContent = 'step_motor.ino v3.0 이상 재업로드 필요';
+  }
+
+  // ===== 하트비트 =====
+  function startHeartbeatWatch() {
+    lastRxTime = Date.now();
+    heartbeatIntervalId = setInterval(() => {
+      if (!isPortOpen) return;
+      const idle = Date.now() - lastRxTime;
+      if (idle > HEARTBEAT_TIMEOUT && deviceConfirmed) {
+        deviceConfirmed = false;
+        setControlsEnabled(false);
+        setStatusLost();
+        addLog('[경고] 응답이 끊겼습니다. 케이블/전원을 확인하세요.');
+        if (sequenceRunning) cancelSequence('응답이 끊겨 시퀀스가 취소되었습니다');
+      }
+    }, 1000);
+  }
+  function stopHeartbeatWatch() {
+    if (heartbeatIntervalId) clearInterval(heartbeatIntervalId);
+    heartbeatIntervalId = null;
+  }
+
+  // ===== 읽기 루프 =====
+  async function readLoop() {
+    try {
+      while (keepReading) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        if (value) {
+          lineBuffer += value;
+          let idx;
+          while ((idx = lineBuffer.indexOf('\n')) >= 0) {
+            const line = lineBuffer.slice(0, idx).trim();
+            lineBuffer = lineBuffer.slice(idx + 1);
+            if (line) handleLine(line);
+          }
+        }
+      }
+    } catch (err) {
+      addLog('[읽기 오류] ' + err.message);
+    }
+  }
+
+  // 새 프로토콜(모터번호 포함)과 호환되는 응답인지 판별
+  function isMultiMotorLine(line) {
+    if (line.startsWith('STAT:')) return line.split(':').length >= 7;
+    if (line.startsWith('READY,')) return line.indexOf('MULTI') !== -1;
+    if (line.startsWith('OK,')) return /^OK,\d+,/.test(line);
+    return false;
+  }
+  // 구버전(단일모터, 모터번호 없음) 펌웨어의 특징적인 응답인지 판별
+  function isOldFirmwareLine(line) {
+    if (line.startsWith('STAT:')) {
+      const n = line.split(':').length;
+      return n >= 4 && n < 7;
+    }
+    if (line.startsWith('READY,STEP_MOTOR_v')) return true;
+    if (line.startsWith('OK,') && !/^OK,\d+,/.test(line)) return true;
+    if (line.startsWith('ERR,UNKNOWN_CMD,')) {
+      const rejected = line.substring('ERR,UNKNOWN_CMD,'.length);
+      if (/^\d+:/.test(rejected)) return true; // "1:STOP" 같은 모터번호 프리픽스 명령 자체를 못 알아듣는 구버전
+    }
+    return false;
+  }
+
+  function handleFirmwareMismatch() {
+    setControlsEnabled(false);
+    deviceConfirmed = false;
+    setStatusFirmwareMismatch();
+    if (!fwWarningShown) {
+      fwWarningShown = true;
+      addLog('[오류] 구버전(단일모터) 펌웨어가 감지되었습니다. step_motor.ino를 v3.0 이상으로 다시 업로드하세요.');
+    }
+  }
+
+  function handleLine(line) {
+    addLog('<< ' + line);
+    lastRxTime = Date.now();
+
+    if (isOldFirmwareLine(line)) {
+      handleFirmwareMismatch();
+      return;
+    }
+
+    if (!deviceConfirmed && isMultiMotorLine(line)) {
+      deviceConfirmed = true;
+      setControlsEnabled(true);
+      const info = (port && typeof port.getInfo === 'function') ? port.getInfo() : null;
+      const infoStr = (info && (info.usbVendorId || info.usbProductId))
+        ? ('USB 장치 확인됨 (VID:' + (info.usbVendorId || '-') + ' PID:' + (info.usbProductId || '-') + ')')
+        : '아두이노 응답 확인됨';
+      setStatusAlive(infoStr);
+    }
+
+    if (line.startsWith('STAT:')) {
+      const parts = line.split(':');
+      // STAT:모터번호:MODE:SPEED:REMAINING:TOTAL:DIR:POSITION
+      if (parts.length >= 7) {
+        const motorId = parseInt(parts[1], 10);
+        const position = parts.length >= 8 ? parseInt(parts[7], 10) : null;
+        updateMotorStatus(
+          motorId, parts[2],
+          parseInt(parts[3], 10), parseInt(parts[4], 10),
+          parseInt(parts[5], 10), parseInt(parts[6], 10),
+          position
+        );
+      }
+      return;
+    }
+
+    // 시퀀스 진행용: "OK,<모터번호>,DONE" 완료 신호 감지
+    const doneMatch = line.match(/^OK,(\d+),DONE$/);
+    if (doneMatch) {
+      const mId = parseInt(doneMatch[1], 10);
+      if (sequenceListeners[mId]) {
+        const cb = sequenceListeners[mId];
+        delete sequenceListeners[mId];
+        cb();
+      }
+    }
+  }
+
+  const modeLabels = {
+    STOPPED: '정지',
+    RUN_CW: '정방향 연속 회전',
+    RUN_CCW: '역방향 연속 회전',
+    FIXED_CW: '정방향 지정 회전 중',
+    FIXED_CCW: '역방향 지정 회전 중',
+    HOMING: '초기 위치로 복귀 중'
+  };
+
+  function updateMotorStatus(motorId, mode, speed, remaining, total, direction, position) {
+    const p = panels[motorId];
+    if (!p) return;
+
+    p.modeText.textContent = modeLabels[mode] || mode;
+    p.speedText.textContent = (isNaN(speed) ? '-' : speed) + ' / 100';
+    if (position !== null && position !== undefined && !isNaN(position)) {
+      p.posText.textContent = position + ' step';
+    }
+    updatedText.textContent = new Date().toLocaleTimeString('ko-KR');
+
+    let pct = 0;
+    if (total > 0) pct = Math.round(((total - remaining) / total) * 100);
+    const isFixedStyle = (mode === 'FIXED_CW' || mode === 'FIXED_CCW' || mode === 'HOMING');
+    p.progressFill.style.width = isFixedStyle ? pct + '%' : '0%';
+
+    p.needle.classList.remove('spin-cw', 'spin-ccw');
+    if (mode !== 'STOPPED') {
+      p.needle.classList.add(direction >= 0 ? 'spin-cw' : 'spin-ccw');
+      p.needle.style.animationDuration = mapRange(speed, 1, 100, 4, 0.4) + 's';
+    }
+  }
+
+  function mapRange(v, inMin, inMax, outMin, outMax) {
+    const t = (v - inMin) / (inMax - inMin);
+    return +(outMin + (outMax - outMin) * t).toFixed(2);
+  }
+
+  // 속도(1~100) -> 실제 stepDelay(ms)는 아두이노 SPD 처리와 동일한 매핑(20ms~1ms)을 사용
+  const MOTOR_STEPS_PER_REV = 4096; // 하프스텝 기준 1회전 근사 스텝수
+  function speedToLabel(speed) {
+    const delayMs = mapRange(speed, 1, 100, 20, 1);
+    const stepsPerSec = 1000 / delayMs;
+    const rpm = stepsPerSec / MOTOR_STEPS_PER_REV * 60;
+    return '약 ' + rpm.toFixed(2) + ' RPM · ' + Math.round(stepsPerSec) + ' step/s';
+  }
+
+  // ===== 명령 전송 =====
+  async function sendRaw(cmd) {
+    if (!writer) return;
+    try {
+      await writer.write(cmd + '\n');
+      addLog('>> ' + cmd + ' (연결 확인용)');
+    } catch (err) {
+      addLog('[전송 오류] ' + err.message);
+    }
+  }
+
+  async function sendCmd(motorId, cmd) {
+    if (!writer || !deviceConfirmed) { addLog('[경고] 아두이노 연결이 확인되지 않았습니다'); return; }
+    const full = motorId + ':' + cmd;
+    try {
+      await writer.write(full + '\n');
+      addLog('>> ' + full);
+    } catch (err) {
+      addLog('[전송 오류] ' + err.message);
+    }
+  }
+
+  MOTOR_IDS.forEach(id => {
+    document.getElementById('btnCW' + id).addEventListener('click', () => sendCmd(id, 'CW'));
+    document.getElementById('btnCCW' + id).addEventListener('click', () => sendCmd(id, 'CCW'));
+    document.getElementById('btnStop' + id).addEventListener('click', () => sendCmd(id, 'STOP'));
+    document.getElementById('btnHome' + id).addEventListener('click', () => sendCmd(id, 'HOME'));
+    document.getElementById('btnSetHome' + id).addEventListener('click', () => sendCmd(id, 'SET_HOME'));
+
+    const range = document.getElementById('speedRange' + id);
+    const rangeVal = document.getElementById('speedRangeValue' + id);
+    const rpmInfo = document.getElementById('speedRpmInfo' + id);
+    rpmInfo.textContent = speedToLabel(parseInt(range.value, 10));
+    range.addEventListener('input', () => {
+      rangeVal.textContent = range.value;
+      rpmInfo.textContent = speedToLabel(parseInt(range.value, 10));
+    });
+    range.addEventListener('change', () => { sendCmd(id, 'SPD:' + range.value); });
+
+    document.getElementById('btnRunValue' + id).addEventListener('click', () => {
+      const unit = document.getElementById('unitSelect' + id).value;
+      const dir = document.getElementById('dirSelect' + id).value;
+      const val = document.getElementById('valueInput' + id).value;
+      if (val === '' || isNaN(val) || Number(val) < 0) {
+        addLog('[경고] 값을 올바르게 입력하세요 (모터' + id + ')');
+        return;
+      }
+      sendCmd(id, unit + ':' + dir + ':' + val);
+    });
+  });
+
+  document.getElementById('clearLogBtn').addEventListener('click', () => {
+    logBox.textContent = '';
+  });
+
+  function addLog(msg) {
+    const time = new Date().toLocaleTimeString('ko-KR');
+    logBox.textContent += '[' + time + '] ' + msg + '\n';
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  // =========================================================
+  // 시퀀스 프로그램 (PLC 스타일)
+  // =========================================================
+
+  function estimateSeconds(motorId, amountSteps) {
+    const speedEl = document.getElementById('speedRange' + motorId);
+    const speed = speedEl ? parseInt(speedEl.value, 10) : 50;
+    const stepDelayMs = mapRange(speed, 1, 100, 20, 1);
+    const steps = Math.abs(amountSteps);
+    return Math.max(steps * stepDelayMs / 1000, 0.05);
+  }
+
+  function phaseLabel(phase) {
+    return { WAITING_START: '대기중', CW: 'CW 회전', WAIT: '대기(CW→CCW)', CCW: 'CCW 회전', DONE: '완료', NONE: '중단됨' }[phase] || phase;
+  }
+
+  function updatePhase(motorId, phase) {
+    const track = document.getElementById('track' + motorId);
+    if (!track) return;
+    track.querySelectorAll('.timeline-seg').forEach(seg => {
+      seg.classList.toggle('active', seg.dataset.phase === phase);
+    });
+    addLog('[시퀀스] 모터' + motorId + ' → ' + phaseLabel(phase));
+  }
+
+  function drawTimeline(params) {
+    const axis = document.getElementById('timelineAxis');
+    const durations = {};
+    let maxTotal = 0;
+
+    MOTOR_IDS.forEach(id => {
+      const p = params[id];
+      const cwSec = estimateSeconds(id, p.amount);
+      const ccwSec = cwSec;
+      durations[id] = { delay: p.delay, cw: cwSec, wait: p.wait, ccw: ccwSec };
+      const total = p.delay + cwSec + p.wait + ccwSec;
+      if (total > maxTotal) maxTotal = total;
+    });
+    maxTotal = Math.max(maxTotal, 1);
+
+    axis.innerHTML = '<span>0초</span><span>약 ' + maxTotal.toFixed(1) + '초 (예상, 실제 속도에 따라 다를 수 있음)</span>';
+
+    MOTOR_IDS.forEach(id => {
+      const track = document.getElementById('track' + id);
+      const d = durations[id];
+      const tailGrow = Math.max(maxTotal - (d.delay + d.cw + d.wait + d.ccw), 0);
+      track.innerHTML =
+        '<div class="timeline-seg" data-phase="WAITING_START" style="flex-grow:' + (d.delay || 0.0001) + ';background:#D8DEE8;" title="대기 ' + d.delay + '초"></div>' +
+        '<div class="timeline-seg" data-phase="CW" style="flex-grow:' + d.cw + ';background:var(--accent);" title="CW 회전 약 ' + d.cw.toFixed(1) + '초"></div>' +
+        '<div class="timeline-seg" data-phase="WAIT" style="flex-grow:' + (d.wait || 0.0001) + ';background:var(--warning);" title="대기 ' + d.wait + '초"></div>' +
+        '<div class="timeline-seg" data-phase="CCW" style="flex-grow:' + d.ccw + ';background:var(--success);" title="CCW 회전 약 ' + d.ccw.toFixed(1) + '초"></div>' +
+        '<div class="timeline-seg" data-phase="DONE" style="flex-grow:' + (tailGrow || 0.0001) + ';background:transparent;"></div>';
+    });
+  }
+
+  function readSequenceParams() {
+    const params = {};
+    let valid = true;
+    MOTOR_IDS.forEach(id => {
+      const start = parseFloat(document.getElementById('seqStart' + id).value);
+      const end = parseFloat(document.getElementById('seqEnd' + id).value);
+      const wait = parseFloat(document.getElementById('seqWait' + id).value);
+      const delay = id === 1 ? 0 : parseFloat(document.getElementById('seqDelay' + id).value);
+      if ([start, end, wait, delay].some(v => isNaN(v) || v < 0)) valid = false;
+      params[id] = { start: start, end: end, wait: wait, delay: delay, amount: Math.round(Math.abs(end - start)) };
+    });
+    return valid ? params : null;
+  }
+
+  // 한 모터의 1레그(CW→대기→CCW) 실행. 완료되면 onLegDone 호출
+  function startMotorLeg(motorId, p, onLegDone) {
+    updatePhase(motorId, 'CW');
+    sendCmd(motorId, 'STEP:CW:' + p.amount);
+    sequenceListeners[motorId] = () => {
+      updatePhase(motorId, 'WAIT');
+      const t = setTimeout(() => {
+        updatePhase(motorId, 'CCW');
+        sendCmd(motorId, 'STEP:CCW:' + p.amount);
+        sequenceListeners[motorId] = () => {
+          updatePhase(motorId, 'DONE');
+          onLegDone();
+        };
+      }, p.wait * 1000);
+      sequenceTimers.push(t);
+    };
+  }
+
+  // 회차 순서에 따른 각 모터의 시작 지연 계산
+  // 정방향(forward): 모터1이 리더(0초), 모터2/3은 입력 지연
+  // 역방향(reverse): 모터3이 리더(0초), 순서를 뒤집어 배정
+  function computeDelays(forward) {
+    // 리더 순서대로의 지연값 목록 (position 0=리더=0초)
+    const orderedDelays = [0, seqParams[2].delay, seqParams[3].delay];
+    const order = forward ? [1, 2, 3] : [3, 2, 1];
+    const delayByMotor = {};
+    order.forEach((motorId, pos) => { delayByMotor[motorId] = orderedDelays[pos]; });
+    return delayByMotor;
+  }
+
+  function runOneCycle() {
+    const forward = (seqCycleIndex % 2 === 0); // 홀수회차(0,2,..)=정방향, 짝수회차(1,3,..)=역방향
+    const delays = computeDelays(forward);
+    const orderText = forward ? '정방향(모터1→2→3)' : '역방향(모터3→2→1)';
+    const cycleNo = seqCycleIndex + 1;
+    const totalText = seqInfinite ? '∞' : seqTotalCycles;
+    document.getElementById('cycleStatus').textContent = cycleNo + ' / ' + totalText + ' 회차 · ' + orderText;
+    addLog('[시퀀스] ' + cycleNo + '회차 시작 (' + orderText + ')');
+
+    sequenceDoneCount = 0;
+    MOTOR_IDS.forEach(id => {
+      updatePhase(id, 'WAITING_START');
+      const t = setTimeout(() => {
+        startMotorLeg(id, seqParams[id], onMotorLegDone);
+      }, delays[id] * 1000);
+      sequenceTimers.push(t);
+    });
+  }
+
+  function onMotorLegDone() {
+    sequenceDoneCount++;
+    if (sequenceDoneCount < MOTOR_IDS.length) return;
+
+    // 이번 회차 완료 → 다음 회차 진행 여부 판단
+    seqCycleIndex++;
+    const moreToGo = seqInfinite || (seqCycleIndex < seqTotalCycles);
+    if (moreToGo && sequenceRunning) {
+      runOneCycle();
+    } else {
+      finishSequence();
+    }
+  }
+
+  function finishSequence() {
+    sequenceRunning = false;
+    seqParams = null;
+    document.getElementById('btnSeqRun').disabled = !deviceConfirmed;
+    document.getElementById('pushSwitch').disabled = !deviceConfirmed;
+    document.getElementById('cycleStatus').textContent = '완료 (' + seqCycleIndex + '회차 실행됨)';
+    addLog('[시퀀스 완료] 총 ' + seqCycleIndex + '회차 실행됨');
+  }
+
+  // ===== 순차 방식 (1→2→3 이동, 3→2→1 복귀) =====
+  // 스케줄: [{motorId, dir, amount, dwellAfter, order}] 를 한 스텝씩 완료 신호 기반으로 순차 실행
+  function buildSchedule(mode) {
+    const fwd = [1, 2, 3], rev = [3, 2, 1];
+    const steps = [];
+    fwd.forEach(id => steps.push({ motorId: id, dir: 'CW', amount: seqParams[id].amount, dwellAfter: seqParams[id].wait }));
+    if (mode === 'seq_roundtrip') {
+      rev.forEach(id => steps.push({ motorId: id, dir: 'CCW', amount: seqParams[id].amount, dwellAfter: seqParams[id].wait }));
+    }
+    return steps;
+  }
+
+  function runScheduleStep() {
+    if (!sequenceRunning) return;
+    if (scheduleIndex >= schedule.length) { onScheduleCycleDone(); return; }
+
+    const step = schedule[scheduleIndex];
+    const cycleNo = seqCycleIndex + 1;
+    const totalText = seqInfinite ? '∞' : seqTotalCycles;
+    const dirText = step.dir === 'CW' ? '정방향' : '역방향(복귀)';
+    document.getElementById('cycleStatus').textContent =
+      cycleNo + ' / ' + totalText + ' 회차 · 모터' + step.motorId + ' ' + dirText + ' (' + (scheduleIndex + 1) + '/' + schedule.length + ')';
+
+    // 이번에 움직이는 모터만 하이라이트, 나머지는 대기 표시
+    MOTOR_IDS.forEach(id => updatePhaseSilent(id, id === step.motorId ? step.dir : 'WAITING_START'));
+    addLog('[순차] 모터' + step.motorId + ' ' + step.dir + ' ' + step.amount + ' step');
+
+    sendCmd(step.motorId, 'STEP:' + step.dir + ':' + step.amount);
+    sequenceListeners[step.motorId] = () => {
+      updatePhaseSilent(step.motorId, 'DONE');
+      const t = setTimeout(() => {
+        scheduleIndex++;
+        runScheduleStep();
+      }, step.dwellAfter * 1000);
+      sequenceTimers.push(t);
+    };
+  }
+
+  function onScheduleCycleDone() {
+    seqCycleIndex++;
+    const moreToGo = seqInfinite || (seqCycleIndex < seqTotalCycles);
+    if (moreToGo && sequenceRunning) {
+      scheduleIndex = 0;
+      runScheduleStep();
+    } else {
+      finishSequence();
+    }
+  }
+
+  // 로그를 남기지 않는 위상 갱신 (순차 방식은 스텝마다 별도 로그를 남기므로 중복 방지)
+  function updatePhaseSilent(motorId, phase) {
+    const track = document.getElementById('track' + motorId);
+    if (!track) return;
+    track.querySelectorAll('.timeline-seg').forEach(seg => {
+      seg.classList.toggle('active', seg.dataset.phase === phase);
+    });
+  }
+
+  function drawScheduleTimeline(mode) {
+    const axis = document.getElementById('timelineAxis');
+    axis.innerHTML = (mode === 'seq_roundtrip')
+      ? '<span>정방향 1→2→3</span><span>역방향 3→2→1 (복귀)</span>'
+      : '<span>정방향 1→2→3</span><span>이동 후 정지</span>';
+
+    // 각 모터 행에 CW(정방향) 블록, 왕복이면 CCW(복귀) 블록도 표시
+    MOTOR_IDS.forEach(id => {
+      const track = document.getElementById('track' + id);
+      const amt = seqParams[id].amount;
+      let html = '<div class="timeline-seg" data-phase="WAITING_START" style="flex-grow:0.15;background:#D8DEE8;"></div>' +
+                 '<div class="timeline-seg" data-phase="CW" style="flex-grow:1;background:var(--accent);" title="정방향 ' + amt + ' step"></div>';
+      if (mode === 'seq_roundtrip') {
+        html += '<div class="timeline-seg" data-phase="CCW" style="flex-grow:1;background:var(--success);" title="복귀 ' + amt + ' step"></div>';
+      }
+      track.innerHTML = html;
+    });
+  }
+
+  // mode: 'once' | 'count' | 'infinite' | 'push'
+  function runSequence(mode) {
+    if (!deviceConfirmed) { addLog('[경고] 먼저 아두이노에 연결하세요'); return; }
+    if (sequenceRunning) { addLog('[안내] 이미 시퀀스가 실행 중입니다'); return; }
+
+    const params = readSequenceParams();
+    if (!params) { addLog('[경고] 시퀀스 값을 올바르게 입력하세요 (0 이상 숫자)'); return; }
+
+    seqParams = params;
+    seqCycleIndex = 0;
+    curDriveMode = document.getElementById('driveMode').value;
+
+    if (mode === 'infinite') {
+      seqInfinite = true; seqTotalCycles = Infinity;
+    } else if (mode === 'count') {
+      seqInfinite = false;
+      seqTotalCycles = Math.max(1, Math.round(parseFloat(document.getElementById('repeatCount').value) || 1));
+    } else {
+      // once, push → 1회
+      seqInfinite = false; seqTotalCycles = 1;
+    }
+
+    sequenceRunning = true;
+    document.getElementById('btnSeqRun').disabled = true;
+    document.getElementById('pushSwitch').disabled = true;
+
+    const driveText = { seq_roundtrip: '순차 왕복(1→2→3→3→2→1)', seq_oneway: '순차 이동(1→2→3)', parallel: '동시 지연' }[curDriveMode];
+    addLog('[시퀀스 시작] 구동:' + driveText + ' / 반복:' + (seqInfinite ? '무한' : seqTotalCycles + '회'));
+
+    if (curDriveMode === 'parallel') {
+      drawTimeline(params);
+      runOneCycle();
+    } else {
+      schedule = buildSchedule(curDriveMode);
+      scheduleIndex = 0;
+      drawScheduleTimeline(curDriveMode);
+      runScheduleStep();
+    }
+  }
+
+  function cancelSequence(reason) {
+    sequenceTimers.forEach(t => clearTimeout(t));
+    sequenceTimers = [];
+    sequenceListeners = {};
+    sequenceRunning = false;
+    sequenceDoneCount = 0;
+    seqParams = null;
+    schedule = [];
+    scheduleIndex = 0;
+    document.getElementById('btnSeqRun').disabled = !deviceConfirmed;
+    document.getElementById('pushSwitch').disabled = !deviceConfirmed;
+    document.getElementById('cycleStatus').textContent = '중단됨';
+    MOTOR_IDS.forEach(id => updatePhase(id, 'NONE'));
+    addLog('[시퀀스 중단] ' + reason);
+  }
+
+  function stopSequence() {
+    if (!sequenceRunning) { addLog('[안내] 실행 중인 시퀀스가 없습니다'); return; }
+    MOTOR_IDS.forEach(id => sendCmd(id, 'STOP'));
+    cancelSequence('사용자가 중단했습니다');
+  }
+
+  // 반복 방식 선택 시 횟수 입력창 활성/비활성
+  const repeatModeSel = document.getElementById('repeatMode');
+  const repeatCountInput = document.getElementById('repeatCount');
+  function syncRepeatCountState() {
+    repeatCountInput.disabled = (repeatModeSel.value !== 'count') || !deviceConfirmed;
+  }
+  repeatModeSel.addEventListener('change', syncRepeatCountState);
+  repeatControlsReady = true;
+  syncRepeatCountState();
+
+  // 구동 방식 선택 시 안내문구 갱신
+  const driveModeSel = document.getElementById('driveMode');
+  const driveModeHint = document.getElementById('driveModeHint');
+  function syncDriveModeHint() {
+    const v = driveModeSel.value;
+    let msg;
+    if (v === 'seq_roundtrip') {
+      msg = '순차 왕복: 1→2→3 순서로 이동 후 3→2→1 역순 복귀. "대기(초)"=다음 모터까지 간격. "시작 지연" 미사용.';
+    } else if (v === 'seq_oneway') {
+      msg = '순차 이동: 1→2→3 순서로 이동 후 정지(복귀 없음). "대기(초)"=다음 모터까지 간격.';
+    } else {
+      msg = '동시 지연: 모터1 기준, 모터2·3은 "시작 지연" 뒤 동시 왕복. 반복 시 정/역 순서 교대.';
+    }
+    driveModeHint.textContent = msg + ' (4096 step ≈ 1회전)';
+  }
+  driveModeSel.addEventListener('change', syncDriveModeHint);
+  syncDriveModeHint();
+
+  document.getElementById('btnSeqRun').addEventListener('click', () => {
+    runSequence(repeatModeSel.value);
+  });
+  document.getElementById('btnSeqStop').addEventListener('click', stopSequence);
+
+  // 누름 스위치: 누를 때마다 1회 실행
+  const pushSwitch = document.getElementById('pushSwitch');
+  pushSwitch.addEventListener('click', () => {
+    pushSwitch.classList.add('pressed');
+    setTimeout(() => pushSwitch.classList.remove('pressed'), 120);
+    runSequence('push');
+  });
+
+  // =========================================================
+  // 입력값 자동 저장/복원 (브라우저 localStorage)
+  //  - 마지막 입력값을 저장하고, 파일을 다시 열면 자동 복원
+  //  - 같은 PC의 같은 브라우저 기준. file:// 저장 제한 시 자동 무시(무해)
+  // =========================================================
+  const STORAGE_KEY = 'insys_motor_web_settings_v1';
+
+  function getPersistEls() {
+    return Array.from(document.querySelectorAll('input[id], select[id]'))
+      .filter(el => el.type !== 'button');
+  }
+
+  function saveSettings() {
+    try {
+      const data = {};
+      getPersistEls().forEach(el => { data[el.id] = el.value; });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {
+      // file:// 등에서 저장이 막힌 경우 조용히 무시
+    }
+  }
+
+  function refreshDerivedDisplays() {
+    // 속도 슬라이더 → 숫자/RPM 표시 갱신
+    MOTOR_IDS.forEach(id => {
+      const r = document.getElementById('speedRange' + id);
+      const rv = document.getElementById('speedRangeValue' + id);
+      const ri = document.getElementById('speedRpmInfo' + id);
+      if (r && rv && ri) {
+        rv.textContent = r.value;
+        ri.textContent = speedToLabel(parseInt(r.value, 10));
+      }
+    });
+    syncRepeatCountState();
+    syncDriveModeHint();
+  }
+
+  function loadSettings() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) { refreshDerivedDisplays(); return false; }
+      const data = JSON.parse(raw);
+      getPersistEls().forEach(el => {
+        if (Object.prototype.hasOwnProperty.call(data, el.id) && data[el.id] !== null && data[el.id] !== undefined) {
+          el.value = data[el.id];
+        }
+      });
+      refreshDerivedDisplays();
+      addLog('[설정 복원] 마지막 저장값을 불러왔습니다');
+      return true;
+    } catch (e) {
+      refreshDerivedDisplays();
+      return false;
+    }
+  }
+
+  // 값 변경 시 자동 저장 (약간의 디바운스로 과도한 쓰기 방지)
+  let saveTimer = null;
+  function scheduleSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveSettings, 300);
+  }
+  document.addEventListener('change', (e) => {
+    if (e.target && (e.target.matches('input[id]') || e.target.matches('select[id]'))) scheduleSave();
+  });
+  document.addEventListener('input', (e) => {
+    if (e.target && (e.target.matches('input[id]') || e.target.matches('select[id]'))) scheduleSave();
+  });
+
+  // 저장값 초기화 버튼
+  document.getElementById('resetSettingsBtn').addEventListener('click', () => {
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    addLog('[설정 초기화] 저장값을 지웠습니다. 새로고침(F5) 시 기본값으로 시작됩니다.');
+  });
+
+  // 페이지 로드 시 마지막 저장값 복원
+  loadSettings();
+
+</script>
+
+</body>
+</html>
