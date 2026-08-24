@@ -309,12 +309,19 @@ td b{color:var(--navy)}
    INSYS AI혁신 연구개발실
    ========================================================== */
 var APP_VERSION = "v1.2";
-var APP_BUILD   = "2026-08-24-01";
+var APP_BUILD   = "2026-08-24-02";
 
 /* ---------- 저장소 (Firebase 우선, 미설정 시 메모리) ---------- */
 /* Firebase 설정: 아래 객체에 firebaseConfig를 넣으면 모든 방문자에게 자동 적용됩니다.
    null로 두면 화면의 [Firebase 설정] 버튼으로 브라우저별 설정을 쓸 수 있습니다. */
-var FIREBASE_CONFIG = null;
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA76HI8Ho7YL7FrMXSIMhrbfaYbC5gKHY8",
+  authDomain: "insys-wash.firebaseapp.com",
+  projectId: "insys-wash",
+  storageBucket: "insys-wash.firebasestorage.app",
+  messagingSenderId: "418727674936",
+  appId: "1:418727674936:web:1d2da6e7eaaa1d205a12cd"
+};
 var FB_KEY = "wash_fb_cfg_v1";
 var STATE_DOC = "current";
 
