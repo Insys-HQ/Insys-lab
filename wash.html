@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척기 시뮬레이터 v1.2</title>
+<title>트레이 세척기 시뮬레이터 v1.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -100,7 +100,7 @@ td b{color:var(--navy)}
   <h1>트레이 세척 건조기 시뮬레이터</h1>
   <div class="sub">1단계 — 세척존 + 헹굼존 사양 산출 · 목표 처리량 800~1,200 매/hr</div>
   <div class="meta">
-    <span class="badge v">v1.2</span>
+    <span class="badge v">v1.3</span>
     <span class="badge">2채널 · 세워서 투입</span>
     <span class="badge">세척 1~2조 + 헹굼 1조</span>
     <span class="badge" id="today">—</span>
@@ -155,7 +155,7 @@ td b{color:var(--navy)}
           <button class="mini" onclick="reloadState()">불러오기</button>
         </div>
         <div class="fbpanel" id="fbPanel">
-          <div class="hint">Firebase 콘솔 → 프로젝트 설정 → 웹 앱의 <b>firebaseConfig</b> 객체를 그대로 붙여넣고 [연결]을 누르세요.<br>설정은 이 브라우저에만 저장되며, Firestore에 <code>wash_state/current</code> 문서와 <code>trays</code> 컴렉션이 생성됩니다.</div>
+          <div class="hint">Firebase 콘솔 → 프로젝트 설정 → 웹 앱의 <b>firebaseConfig</b> 객체를 그대로 붙여넣고 [연결]을 누르세요.<br>설정은 이 브라우저에만 저장되며, 입력값은 익명 로그인 uid별로 <code>wash_users/{uid}</code> 에 따로 저장되어, 다른 방문자와 섞이지 않습니다.</div>
           <textarea id="fbCfgTxt" spellcheck="false" placeholder='{ "apiKey": "…", "authDomain": "….firebaseapp.com", "projectId": "…", "storageBucket": "…", "messagingSenderId": "…", "appId": "…" }'></textarea>
           <div class="btnrow">
             <button class="btn ghost" onclick="applyFbCfg()">연결</button>
@@ -296,7 +296,7 @@ td b{color:var(--navy)}
   </div>
 
   <div class="foot">
-    트레이 세척 건조기 시뮬레이터 v1.2 · 1단계 세척+헹굼 구간<br>
+    트레이 세척 건조기 시뮬레이터 v1.3 · 1단계 세척+헹굼 구간<br>
     인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr<br>
     다음 단계: 2단계 에어나이프 탈수 구간 → 3단계 열풍 건조 구간
   </div>
@@ -304,14 +304,14 @@ td b{color:var(--navy)}
 
 <script>
 /* ==========================================================
-   트레이 세척기 시뮬레이터  v1.2
+   트레이 세척기 시뮬레이터  v1.3
    세척존 + 헹굼존 / 목표 처리량 800~1200 매/hr 기준
    INSYS AI혁신 연구개발실
    ========================================================== */
-var APP_VERSION = "v1.2";
-var APP_BUILD   = "2026-08-24-02";
+var APP_VERSION = "v1.3";
+var APP_BUILD   = "2026-08-24-03";
 
-/* ---------- 저장소 (Firebase 우선, 미설정 시 메모리) ---------- */
+/* ---------- 저장소 (Firebase 익명 로그인 · 방문자별 개인 저장) ---------- */
 /* Firebase 설정: 아래 객체에 firebaseConfig를 넣으면 모든 방문자에게 자동 적용됩니다.
    null로 두면 화면의 [Firebase 설정] 버튼으로 브라우저별 설정을 쓸 수 있습니다. */
 var FIREBASE_CONFIG = {
@@ -323,7 +323,7 @@ var FIREBASE_CONFIG = {
   appId: "1:418727674936:web:1d2da6e7eaaa1d205a12cd"
 };
 var FB_KEY = "wash_fb_cfg_v1";
-var STATE_DOC = "current";
+var FB_SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
 
 function fbCfg(){
   if(FIREBASE_CONFIG && FIREBASE_CONFIG.projectId) return FIREBASE_CONFIG;
@@ -339,29 +339,50 @@ function fbStatus(state, text){
   if(m){ m.textContent=text; m.className='fbstat '+(state==='on'?'on':(state==='wait'?'wait':'off')); }
 }
 
+/* 방문자별 개인 저장.
+   익명 로그인으로 받은 uid로 wash_users/{uid} 문서에만 읽고 씁니다.
+   다른 방문자의 값을 보거나 덮어쓸 수 없습니다. */
 var STORE = {
-  mode:"memory", mem:[], db:null, fs:null,
+  mode:"memory", mem:[], db:null, fs:null, uid:null,
+  meDoc(){ return this.fs.doc(this.db,"wash_users",this.uid); },
+  trayCol(){ return this.fs.collection(this.db,"wash_users",this.uid,"trays"); },
+  trayDoc(id){ return this.fs.doc(this.db,"wash_users",this.uid,"trays",id); },
   async init(){
     var cfg = fbCfg();
     if(!cfg){ fbStatus('off','Firebase 미설정 — 로컬 메모리'); return; }
     fbStatus('wait','Firebase 연결 중…');
+    var stage='SDK 로드';
     try{
-      var app = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-      var fs  = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-      var a = app.initializeApp(cfg);
-      this.db = fs.getFirestore(a); this.fs = fs;
-      await fs.getDoc(fs.doc(this.db,"wash_state",STATE_DOC));   // 실제 통신 확인
+      var appM  = await import(FB_SDK+"firebase-app.js");
+      var authM = await import(FB_SDK+"firebase-auth.js");
+      var fsM   = await import(FB_SDK+"firebase-firestore.js");
+      var a = appM.initializeApp(cfg);
+
+      stage='익명 로그인';
+      var cred = await authM.signInAnonymously(authM.getAuth(a));
+      this.uid = cred.user.uid;
+
+      stage='Firestore 접근';
+      this.db = fsM.getFirestore(a); this.fs = fsM;
+      await fsM.getDoc(this.meDoc());              // 실제 통신 확인
       this.mode = "firebase";
-      fbStatus('on','Firebase 연결됨 · '+(cfg.projectId||''));
+      fbStatus('on','Firebase 연결됨 · 개인 저장 ('+this.uid.slice(0,6)+'…)');
     }catch(e){
-      this.mode = "memory";
-      fbStatus('off','Firebase 연결 실패 — 로컬 메모리');
+      this.mode = "memory"; this.uid = null;
+      var code = (e && e.code) ? String(e.code) : '';
+      var why;
+      if(code.indexOf('operation-not-allowed')>=0 || code.indexOf('admin-restricted')>=0)
+        why = 'Firebase 콘솔에서 익명 로그인을 켜주세요';
+      else if(code.indexOf('permission-denied')>=0) why = '보안 규칙이 차단함';
+      else if(code.indexOf('unavailable')>=0) why = 'Firestore 미생성 또는 네트워크 차단';
+      else why = stage+' 실패';
+      fbStatus('off','Firebase 연결 안 됨 — '+why);
     }
   },
   async list(){
     if(this.mode==="firebase"){
       try{
-        var snap = await this.fs.getDocs(this.fs.collection(this.db,"trays"));
+        var snap = await this.fs.getDocs(this.trayCol());
         var out=[]; snap.forEach(function(d){ var o=d.data(); o._id=d.id; out.push(o); });
         return out;
       }catch(e){ fbStatus('off','Firebase 읽기 실패'); return this.mem; }
@@ -369,27 +390,28 @@ var STORE = {
     return this.mem;
   },
   async add(o){
-    if(this.mode==="firebase"){ try{ await this.fs.addDoc(this.fs.collection(this.db,"trays"),o); return; }catch(e){ fbStatus('off','Firebase 쓰기 실패'); } }
+    if(this.mode==="firebase"){ try{ await this.fs.addDoc(this.trayCol(),o); return; }catch(e){ fbStatus('off','Firebase 쓰기 실패'); } }
     o._id="m"+Date.now()+Math.floor(Math.random()*1000); this.mem.push(o);
   },
   async del(id){
-    if(this.mode==="firebase"){ try{ await this.fs.deleteDoc(this.fs.doc(this.db,"trays",id)); return; }catch(e){ fbStatus('off','Firebase 삭제 실패'); } }
+    if(this.mode==="firebase"){ try{ await this.fs.deleteDoc(this.trayDoc(id)); return; }catch(e){ fbStatus('off','Firebase 삭제 실패'); } }
     this.mem = this.mem.filter(function(x){ return x._id!==id; });
   },
-  /* 입력값 전체 상태 */
+  /* 입력값 전체 상태 — 본인 문서에만 */
   async getState(){
     if(this.mode!=="firebase") return null;
     try{
-      var d = await this.fs.getDoc(this.fs.doc(this.db,"wash_state",STATE_DOC));
+      var d = await this.fs.getDoc(this.meDoc());
       return d.exists() ? d.data() : null;
     }catch(e){ fbStatus('off','Firebase 읽기 실패'); return null; }
   },
   async putState(o){
     if(this.mode!=="firebase") return false;
-    try{ await this.fs.setDoc(this.fs.doc(this.db,"wash_state",STATE_DOC), o); return true; }
+    try{ await this.fs.setDoc(this.meDoc(), o); return true; }
     catch(e){ fbStatus('off','Firebase 저장 실패'); return false; }
   }
 };
+
 
 /* ---------- 입력값 자동 저장 / 복원 ---------- */
 function collectState(){
