@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>트레이 세척기 시뮬레이터 v1.1</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>트레이 세척기 시뮬레이터 v1.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -74,6 +77,17 @@ td b{color:var(--navy)}
 .lib .mini.del{color:var(--bad);border-color:#e6bcbc}
 .empty{padding:14px;text-align:center;color:var(--ink-l);font-size:11px}
 .store{font-size:10px;color:var(--ink-l);margin-top:6px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;vertical-align:middle;background:#d13438;box-shadow:0 0 0 2px rgba(255,255,255,.28);flex:0 0 auto}
+.dot.on{background:#2ecc71;box-shadow:0 0 0 2px rgba(46,204,113,.30)}
+.dot.wait{background:#e0a400;box-shadow:0 0 0 2px rgba(224,164,0,.30)}
+.badge.stat{display:inline-flex;align-items:center;gap:6px}
+.fbrow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:9px;padding-top:9px;border-top:1px solid var(--line)}
+.fbstat{font-size:11px;font-weight:700}
+.fbstat.on{color:var(--ok)}
+.fbstat.off{color:var(--bad)}
+.fbstat.wait{color:var(--warn)}
+.fbpanel{display:none;margin-top:9px;background:var(--steel-l);border:1px solid var(--line);border-radius:6px;padding:10px}
+.fbpanel textarea{width:100%;height:130px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;border:1px solid var(--line);border-radius:5px;padding:8px;resize:vertical;color:var(--ink)}
 .foot{margin-top:20px;text-align:center;font-size:11px;color:var(--ink-l);line-height:1.7}
 @media(max-width:820px){.grid{grid-template-columns:1fr}.hud{grid-template-columns:repeat(2,1fr);gap:6px}.hud .h{border-right:none;border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:4px}.cover h1{font-size:20px}}
 @media print{.hud,.btnrow,.rec,.cover{display:none}}
@@ -86,10 +100,12 @@ td b{color:var(--navy)}
   <h1>트레이 세척 건조기 시뮬레이터</h1>
   <div class="sub">1단계 — 세척존 + 헹굼존 사양 산출 · 목표 처리량 800~1,200 매/hr</div>
   <div class="meta">
-    <span class="badge v">v1.1</span>
+    <span class="badge v">v1.2</span>
     <span class="badge">2채널 · 세워서 투입</span>
     <span class="badge">세척 1~2조 + 헹굼 1조</span>
     <span class="badge" id="today">—</span>
+    <span class="badge stat" id="fbBadge"><i class="dot" id="fbDot"></i><span id="fbBadgeTxt">Firebase 확인 중…</span></span>
+    <span class="badge">build <span id="buildTxt">—</span></span>
   </div>
 </div>
 
@@ -131,7 +147,21 @@ td b{color:var(--navy)}
           <input id="impFile" type="file" accept=".json" style="display:none" onchange="importLib(event)">
         </div>
         <div class="lib" id="lib"><div class="empty">저장된 트레이가 없습니다.</div></div>
-        <div class="store" id="storeMsg">저장소: 로컬 메모리 (Firebase 미설정 — 내보내기로 백업하세요)</div>
+        <div class="fbrow">
+          <i class="dot" id="fbDot2"></i>
+          <span class="fbstat off" id="storeMsg">Firebase 확인 중…</span>
+          <button class="mini" onclick="toggleFbPanel()">Firebase 설정</button>
+          <button class="mini" onclick="saveStateNow(false)">입력값 저장</button>
+          <button class="mini" onclick="reloadState()">불러오기</button>
+        </div>
+        <div class="fbpanel" id="fbPanel">
+          <div class="hint">Firebase 콘솔 → 프로젝트 설정 → 웹 앱의 <b>firebaseConfig</b> 객체를 그대로 붙여넣고 [연결]을 누르세요.<br>설정은 이 브라우저에만 저장되며, Firestore에 <code>wash_state/current</code> 문서와 <code>trays</code> 컴렉션이 생성됩니다.</div>
+          <textarea id="fbCfgTxt" spellcheck="false" placeholder='{ "apiKey": "…", "authDomain": "….firebaseapp.com", "projectId": "…", "storageBucket": "…", "messagingSenderId": "…", "appId": "…" }'></textarea>
+          <div class="btnrow">
+            <button class="btn ghost" onclick="applyFbCfg()">연결</button>
+            <button class="btn ghost" onclick="clearFbCfg()">설정 삭제</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -266,7 +296,7 @@ td b{color:var(--navy)}
   </div>
 
   <div class="foot">
-    트레이 세척 건조기 시뮬레이터 v1.1 · 1단계 세척+헹굼 구간<br>
+    트레이 세척 건조기 시뮬레이터 v1.2 · 1단계 세척+헹굼 구간<br>
     인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr<br>
     다음 단계: 2단계 에어나이프 탈수 구간 → 3단계 열풍 건조 구간
   </div>
@@ -274,25 +304,52 @@ td b{color:var(--navy)}
 
 <script>
 /* ==========================================================
-   트레이 세척기 시뮬레이터  v1.1
+   트레이 세척기 시뮬레이터  v1.2
    세척존 + 헹굼존 / 목표 처리량 800~1200 매/hr 기준
    INSYS AI혁신 연구개발실
    ========================================================== */
-var APP_VERSION = "v1.1";
+var APP_VERSION = "v1.2";
+var APP_BUILD   = "2026-08-24-01";
 
 /* ---------- 저장소 (Firebase 우선, 미설정 시 메모리) ---------- */
-var FIREBASE_CONFIG = null; // 콘솔에서 받은 6줄을 여기에 넣으면 자동 연결
+/* Firebase 설정: 아래 객체에 firebaseConfig를 넣으면 모든 방문자에게 자동 적용됩니다.
+   null로 두면 화면의 [Firebase 설정] 버튼으로 브라우저별 설정을 쓸 수 있습니다. */
+var FIREBASE_CONFIG = null;
+var FB_KEY = "wash_fb_cfg_v1";
+var STATE_DOC = "current";
+
+function fbCfg(){
+  if(FIREBASE_CONFIG && FIREBASE_CONFIG.projectId) return FIREBASE_CONFIG;
+  try{ var t=localStorage.getItem(FB_KEY); return t? JSON.parse(t) : null; }catch(e){ return null; }
+}
+
+/* 연결 상태 표시 — 연결 될 때 녹색, 안 될 때 적색 */
+function fbStatus(state, text){
+  var cls = (state==='on') ? 'on' : (state==='wait' ? 'wait' : '');
+  ['fbDot','fbDot2'].forEach(function(id){ var d=el(id); if(d) d.className='dot'+(cls?' '+cls:''); });
+  var b=el('fbBadgeTxt'); if(b) b.textContent=text;
+  var m=el('storeMsg');
+  if(m){ m.textContent=text; m.className='fbstat '+(state==='on'?'on':(state==='wait'?'wait':'off')); }
+}
+
 var STORE = {
   mode:"memory", mem:[], db:null, fs:null,
   async init(){
-    if(!FIREBASE_CONFIG) return;
+    var cfg = fbCfg();
+    if(!cfg){ fbStatus('off','Firebase 미설정 — 로컬 메모리'); return; }
+    fbStatus('wait','Firebase 연결 중…');
     try{
       var app = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
       var fs  = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-      var a = app.initializeApp(FIREBASE_CONFIG);
-      this.db = fs.getFirestore(a); this.fs = fs; this.mode = "firebase";
-      el("storeMsg").textContent = "저장소: Firebase Firestore 연결됨";
-    }catch(e){ el("storeMsg").textContent = "저장소: 로컬 메모리 (Firebase 연결 실패)"; }
+      var a = app.initializeApp(cfg);
+      this.db = fs.getFirestore(a); this.fs = fs;
+      await fs.getDoc(fs.doc(this.db,"wash_state",STATE_DOC));   // 실제 통신 확인
+      this.mode = "firebase";
+      fbStatus('on','Firebase 연결됨 · '+(cfg.projectId||''));
+    }catch(e){
+      this.mode = "memory";
+      fbStatus('off','Firebase 연결 실패 — 로컬 메모리');
+    }
   },
   async list(){
     if(this.mode==="firebase"){
@@ -300,19 +357,122 @@ var STORE = {
         var snap = await this.fs.getDocs(this.fs.collection(this.db,"trays"));
         var out=[]; snap.forEach(function(d){ var o=d.data(); o._id=d.id; out.push(o); });
         return out;
-      }catch(e){ return this.mem; }
+      }catch(e){ fbStatus('off','Firebase 읽기 실패'); return this.mem; }
     }
     return this.mem;
   },
   async add(o){
-    if(this.mode==="firebase"){ try{ await this.fs.addDoc(this.fs.collection(this.db,"trays"),o); return; }catch(e){} }
+    if(this.mode==="firebase"){ try{ await this.fs.addDoc(this.fs.collection(this.db,"trays"),o); return; }catch(e){ fbStatus('off','Firebase 쓰기 실패'); } }
     o._id="m"+Date.now()+Math.floor(Math.random()*1000); this.mem.push(o);
   },
   async del(id){
-    if(this.mode==="firebase"){ try{ await this.fs.deleteDoc(this.fs.doc(this.db,"trays",id)); return; }catch(e){} }
+    if(this.mode==="firebase"){ try{ await this.fs.deleteDoc(this.fs.doc(this.db,"trays",id)); return; }catch(e){ fbStatus('off','Firebase 삭제 실패'); } }
     this.mem = this.mem.filter(function(x){ return x._id!==id; });
+  },
+  /* 입력값 전체 상태 */
+  async getState(){
+    if(this.mode!=="firebase") return null;
+    try{
+      var d = await this.fs.getDoc(this.fs.doc(this.db,"wash_state",STATE_DOC));
+      return d.exists() ? d.data() : null;
+    }catch(e){ fbStatus('off','Firebase 읽기 실패'); return null; }
+  },
+  async putState(o){
+    if(this.mode!=="firebase") return false;
+    try{ await this.fs.setDoc(this.fs.doc(this.db,"wash_state",STATE_DOC), o); return true; }
+    catch(e){ fbStatus('off','Firebase 저장 실패'); return false; }
   }
 };
+
+/* ---------- 입력값 자동 저장 / 복원 ---------- */
+function collectState(){
+  var o={};
+  for(var k in DEFAULTS){ if(el(k)) o[k]=el(k).value; }
+  o._savedAt = new Date().toISOString();
+  o._build = APP_BUILD;
+  return o;
+}
+function applyState(o){
+  if(!o) return 0;
+  var n=0;
+  for(var k in DEFAULTS){
+    if(el(k) && o[k]!==undefined && o[k]!==null && o[k]!==''){ el(k).value=o[k]; n++; }
+  }
+  return n;
+}
+var _saveTimer=null;
+function queueSave(){
+  if(STORE.mode!=="firebase") return;
+  clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(function(){ saveStateNow(true); }, 900);
+}
+async function saveStateNow(quiet){
+  if(STORE.mode!=="firebase"){
+    fbStatus('off','Firebase 미연결 — 저장할 수 없음');
+    if(!quiet) alert('Firebase가 연결되지 않았습니다. [Firebase 설정]에서 firebaseConfig를 등록하세요.');
+    return false;
+  }
+  var ok = await STORE.putState(collectState());
+  if(ok) fbStatus('on','Firebase 저장됨 · '+new Date().toLocaleTimeString('ko-KR'));
+  return ok;
+}
+async function reloadState(){
+  var st = await STORE.getState();
+  if(!st){ fbStatus(STORE.mode==="firebase"?'on':'off', STORE.mode==="firebase"?'Firebase — 저장된 입력값 없음':'Firebase 미연결'); return; }
+  applyState(st); render();
+  fbStatus('on','Firebase 불러옴 · '+(st._savedAt? new Date(st._savedAt).toLocaleString('ko-KR') : ''));
+}
+
+/* ---------- Firebase 설정 패널 ---------- */
+function toggleFbPanel(){
+  var p=el('fbPanel');
+  var open = (p.style.display==='block');
+  p.style.display = open ? 'none' : 'block';
+  if(!open){ var c=fbCfg(); if(c) el('fbCfgTxt').value=JSON.stringify(c,null,2); }
+}
+function parseCfg(t){
+  t=t.trim();
+  var m=t.match(/\{[\s\S]*\}/); if(m) t=m[0];
+  try{ return JSON.parse(t); }catch(e){}
+  var j=t.replace(/([{,]\s*)([A-Za-z_$][\w$]*)\s*:/g,'$1"$2":')
+         .replace(/'/g,'"')
+         .replace(/,(\s*[}\]])/g,'$1');
+  try{ return JSON.parse(j); }catch(e){ return null; }
+}
+function applyFbCfg(){
+  var cfg=parseCfg(el('fbCfgTxt').value||'');
+  if(!cfg || !cfg.apiKey || !cfg.projectId){
+    alert('firebaseConfig를 읽을 수 없습니다. apiKey와 projectId가 포함된 객체를 그대로 붙여넣으세요.');
+    return;
+  }
+  try{ localStorage.setItem(FB_KEY, JSON.stringify(cfg)); }
+  catch(e){ alert('브라우저에 설정을 저장할 수 없습니다.'); return; }
+  location.reload();
+}
+function clearFbCfg(){
+  try{ localStorage.removeItem(FB_KEY); }catch(e){}
+  location.reload();
+}
+
+/* ---------- 버전 감시: 새 빌드가 올라오면 자동으로 새 버전을 열어준다 ---------- */
+function watchVersion(){
+  function check(){
+    fetch(location.pathname+'?_ck='+Date.now(), {cache:'no-store'})
+      .then(function(r){ return r.ok ? r.text() : null; })
+      .then(function(t){
+        if(!t) return;
+        var m=t.match(/APP_BUILD\s*=\s*"([^"]+)"/);
+        if(!m || m[1]===APP_BUILD) return;
+        try{ if(sessionStorage.getItem('wash_seen_build')===m[1]) return;
+             sessionStorage.setItem('wash_seen_build', m[1]); }catch(e){}
+        location.replace(location.pathname+'?v='+encodeURIComponent(m[1]));
+      })
+      .catch(function(){});
+  }
+  check();
+  setInterval(check, 60000);
+}
+
 
 /* ---------- 계수 ---------- */
 var K_SOIL={light:1.00,medium:1.40,heavy:1.90};
@@ -718,16 +878,25 @@ function downloadSpec(){
 
 /* ---------- 초기화 ---------- */
 document.addEventListener('input', function(e){
-  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') render();
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT'){ render(); queueSave(); }
 });
 document.addEventListener('change', function(e){
-  if(e.target.tagName==='SELECT') render();
+  if(e.target.tagName==='SELECT'){ render(); queueSave(); }
 });
 (function(){
   var d=new Date();
   el('today').textContent=d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0');
-  STORE.init().then(renderLib);
+  el('buildTxt').textContent=APP_BUILD;
   render();
+  watchVersion();
+  STORE.init().then(async function(){
+    await renderLib();
+    var st = await STORE.getState();
+    if(st && applyState(st)>0){
+      render();
+      fbStatus('on','Firebase \ubd88\ub7ec\uc634 \u00b7 '+(st._savedAt? new Date(st._savedAt).toLocaleString('ko-KR') : ''));
+    }
+  });
 })();
 </script>
 </body>
