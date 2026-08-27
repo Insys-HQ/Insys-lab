@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>인텍코리아 안산공장 세척설비 기획 보고서 (대외비)</title>
+<style>
+    @page {
+        size: A4;
+        margin: 14mm 12mm;
+        background-color: #ffffff;
+        @bottom-right {
+            content: counter(page) " / " counter(pages);
+            font-size: 8pt;
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            color: #718096;
+        }
+        @bottom-left {
+            content: "[대외비] 인텍코리아 안산공장 신축 | 세척설비(트레이 2CH / 8시간 기준) 유틸리티 설계 보고서 (V4.0)";
+            font-size: 8pt;
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            color: #718096;
+        }
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+        color: #2d3748;
+        line-height: 1.45;
+        font-size: 8.8pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Header Banner */
+    .header-banner {
+        background: linear-gradient(135deg, #0d233a 0%, #1a4971 100%);
+        color: #ffffff;
+        padding: 15px 16px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+    }
+    .header-banner h1 {
+        margin: 0 0 4px 0;
+        font-size: 15pt;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: #ffffff;
+    }
+    .header-banner .subtitle {
+        margin: 0;
+        font-size: 9.5pt;
+        color: #bee3f8;
+        font-weight: 500;
+    }
+    .header-banner .meta-info {
+        margin-top: 8px;
+        font-size: 8pt;
+        color: #e2e8f0;
+        border-top: 1px solid rgba(255,255,255,0.2);
+        padding-top: 6px;
+    }
+
+    h2 {
+        color: #0d233a;
+        font-size: 11pt;
+        font-weight: 700;
+        margin-top: 14px;
+        margin-bottom: 6px;
+        padding-bottom: 3px;
+        border-bottom: 2px solid #2b6cb0;
+        page-break-after: avoid;
+    }
+
+    h3 {
+        color: #1a4971;
+        font-size: 9.2pt;
+        font-weight: 700;
+        margin-top: 8px;
+        margin-bottom: 4px;
+        page-break-after: avoid;
+    }
+
+    p { margin: 0 0 5px 0; }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10px;
+        font-size: 8pt;
+    }
+
+    th, td {
+        border: 1px solid #cbd5e0;
+        padding: 5px 6px;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    th {
+        background-color: #ebf8ff;
+        color: #1a4971;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    tr:nth-child(even) td { background-color: #f8fafc; }
+
+    .center { text-align: center; }
+    .right { text-align: right; }
+
+    .highlight-red { color: #c53030; font-weight: 700; }
+    .highlight-blue { color: #2b6cb0; font-weight: 700; }
+    .highlight-green { color: #276749; font-weight: 700; }
+
+    .callout-box {
+        background-color: #f7fafc;
+        border-left: 4px solid #3182ce;
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        border-radius: 0 4px 4px 0;
+        font-size: 8.3pt;
+    }
+
+    .callout-box-alert {
+        background-color: #fff5f5;
+        border-left: 4px solid #e53e3e;
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        border-radius: 0 4px 4px 0;
+        font-size: 8.3pt;
+    }
+
+    .callout-title {
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 2px;
+    }
+
+    .card-grid {
+        display: table;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    .card-col {
+        display: table-cell;
+        width: 33.33%;
+        padding: 0 3px;
+    }
+    .card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-top: 3px solid #2b6cb0;
+        border-radius: 4px;
+        padding: 6px 8px;
+        height: 100%;
+    }
+    .card h4 {
+        margin: 0 0 4px 0;
+        color: #1a4971;
+        font-size: 8.6pt;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 1px 5px;
+        font-size: 6.8pt;
+        font-weight: 700;
+        border-radius: 3px;
+    }
+    .badge-danger { background: #fed7d7; color: #9b2c2c; }
+    .badge-success { background: #c6f6d5; color: #22543d; }
+    .badge-warning { background: #feebc8; color: #7b341e; }
+    .badge-info { background: #bee3f8; color: #2c5282; }
+
+    .step-item {
+        background: #edf2f7;
+        border-radius: 4px;
+        padding: 5px 8px;
+        margin-bottom: 4px;
+        font-size: 8.2pt;
+    }
+    .step-num {
+        display: inline-block;
+        background: #2b6cb0;
+        color: #fff;
+        font-weight: bold;
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        text-align: center;
+        border-radius: 50%;
+        margin-right: 4px;
+        font-size: 7pt;
+    }
+
+    /* 대외비 표기 */
+    .confidential-badge {
+        display: inline-block;
+        background: #c53030;
+        color: #ffffff;
+        font-size: 8pt;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 4px;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+    .confidential-notice {
+        background: #fff5f5;
+        border: 1px solid #feb2b2;
+        border-left: 4px solid #c53030;
+        color: #742a2a;
+        font-size: 8pt;
+        padding: 6px 10px;
+        border-radius: 4px;
+        margin-bottom: 12px;
+    }
+    .version-tag {
+        position: fixed;
+        bottom: 8px;
+        right: 10px;
+        background: #1a4971;
+        color: #ffffff;
+        font-size: 7.5pt;
+        padding: 2px 8px;
+        border-radius: 10px;
+        opacity: 0.85;
+        z-index: 100;
+    }
+    @media print {
+        .version-tag, #opinion-section { display: none; }
+    }
+
+    /* 6. 의견 입력 섹션 */
+    #opinion-section {
+        margin-top: 16px;
+    }
+    .opinion-form {
+        background: #f7fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+    .opinion-form input[type="text"],
+    .opinion-form textarea {
+        width: 100%;
+        box-sizing: border-box;
+        font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+        font-size: 9pt;
+        color: #2d3748;
+        border: 1px solid #cbd5e0;
+        border-radius: 4px;
+        padding: 6px 8px;
+        margin-bottom: 8px;
+    }
+    .opinion-form textarea { min-height: 60px; resize: vertical; }
+    .opinion-form button {
+        background: #2b6cb0;
+        color: #ffffff;
+        border: none;
+        border-radius: 4px;
+        padding: 7px 16px;
+        font-size: 9pt;
+        font-weight: 700;
+        cursor: pointer;
+    }
+    .opinion-form button:disabled { background: #a0aec0; cursor: default; }
+    .opinion-status { font-size: 8pt; color: #718096; margin-left: 8px; }
+    .opinion-list { display: flex; flex-direction: column; gap: 8px; }
+    .opinion-item {
+        border: 1px solid #e2e8f0;
+        border-left: 3px solid #2b6cb0;
+        border-radius: 4px;
+        padding: 8px 10px;
+        font-size: 8.8pt;
+    }
+    .opinion-item .opinion-meta {
+        color: #718096;
+        font-size: 7.8pt;
+        margin-bottom: 3px;
+    }
+    .opinion-item .opinion-author { font-weight: 700; color: #1a4971; }
+    .opinion-empty { color: #a0aec0; font-size: 8.5pt; padding: 6px 2px; }
+</style>
+</head>
+<body>
+
+<div class="confidential-badge">🔒 대외비 (CONFIDENTIAL)</div>
+<div class="confidential-notice">
+    본 문서는 인시스 AI혁신 연구개발실이 작성한 <strong>대외비 자료</strong>입니다. 사내 검토 목적 외 외부 공유·배포를 금지합니다.
+</div>
+
+<div class="header-banner">
+    <h1>인텍코리아 안산공장 세척설비(트레이 2CH / 8시간 기준) 기획 보고서</h1>
+    <div class="subtitle">트레이 2채널(2CH) · 1일 8시간 가동 기준 전력/수도/가스/에어/공조/폐수 유틸리티 확정안</div>
+    <div class="meta-info">
+        <strong>사업위치:</strong> 경기도 안산시 단원구 성곡동 727-9 (반월국가산업단지) | <strong>근로기준:</strong> 주간 1교대 (1일 실가동 8시간) | <strong>건물구조:</strong> 1층 생산동(유효층고 약 7.5~8m OPEN) + 중2층 사무실(40평)
+    </div>
+</div>
+
+<h2>1. 세척기 3종 사양 및 8시간 가동 CAPA 분석</h2>
+
+<div class="card-grid">
+    <div class="card-col">
+        <div class="card">
+            <h4>1. 트레이 세척기 (2CH 더블 레인)</h4>
+            <p><strong>대상 규격(mm):</strong><br>· 대형: 430 × 330 × 150(45)<br>· 소형: 320 × 210 × 50</p>
+            <p><strong>8시간 생산 능력 (2CH):</strong><br>· 성수기(24,000개/일): <strong>3,000 개/hr</strong> (CH당 1,500)<br>· 비수기(8,000개/일): <strong>1,000 개/hr</strong> (CH당 500)<br>· 기본 목표속도: <strong>1,400 개/hr</strong> (CH당 700)</p>
+            <p><strong>탈수/건조 목표:</strong> <span class="badge badge-danger">95 ~ 99% (초고건조)</span></p>
+        </div>
+    </div>
+    <div class="card-col">
+        <div class="card">
+            <h4>2. 박스 세척기 (단일 레인)</h4>
+            <p><strong>대상 규격(mm):</strong><br>· 대형: 500 × 780 × 200<br>· 소형: 380 × 240 × 100</p>
+            <p><strong>8시간 생산 능력:</strong><br>· 일일 처리량: <strong>1,500 개/일</strong><br>· 요구 속도: <strong>약 190 ~ 200 개/hr</strong> (8h 기준)<br>· 설비 설계: 200~250 개/hr 규격</p>
+            <p><strong>탈수/건조 목표:</strong> <span class="badge badge-warning">80% (표면 탈수)</span></p>
+        </div>
+    </div>
+    <div class="card-col">
+        <div class="card">
+            <h4>3. 파렛트 세척기 (고압형)</h4>
+            <p><strong>대상 규격(mm):</strong><br>· 표준 11형/12형 플라스틱 파렛트 (1100×1100, 1200×1000)</p>
+            <p><strong>8시간 생산 능력:</strong><br>· 일일 처리량: <strong>100 장/일</strong><br>· 요구 속도: <strong>약 12.5 ~ 15 장/hr</strong> (8h 기준)<br>· 설비 설계: 15~20 장/hr 규격</p>
+            <p><strong>탈수/건조 목표:</strong> <span class="badge badge-info">자연 건조 및 에어 블로잉</span></p>
+        </div>
+    </div>
+</div>
+
+<div class="callout-box">
+    <div class="callout-title">■ 트레이 2CH(2채널) 도입에 따른 8시간 가동 효율성 검토 결과</div>
+    · <strong>성수기 60만개 완벽 소화:</strong> 기존 단일 레인(700개/h)은 34시간이 걸려 불가능했으나, <strong>2CH(2열) 가변 고속 모드(최대 3,000개/h)</strong>를 적용함으로써 <strong>1일 8시간 단일 근무 내에 24,000개(월 60만개) 전량 처리가 가능</strong>해졌습니다.<br>
+    · <strong>유틸리티 집중 부하 발생:</strong> 8시간 내에 대량 세척이 집중되므로 <strong>급수 인입량, 보일러 승온 능력, 배기 풍량, 전기 수전용량</strong>이 단일 라인 대비 약 1.4~1.6배 집중됩니다.
+</div>
+
+<h2>2. 트레이 99% 초고건조 및 박스 80% 탈수 설계 사양</h2>
+<table>
+    <thead>
+        <tr>
+            <th>구분</th>
+            <th>트레이 세척기 (2CH 독립 / 탈수율 95~99%)</th>
+            <th>박스 세척기 (탈수율 80%)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="font-bold"><strong>탈수 메커니즘</strong></td>
+            <td><strong>2CH 전용 3단 탈수:</strong> 65℃ 고온수 린스(자열건조) $ightarrow$ <strong>2CH 전용 4면 입체 터보 에어나이프</strong> $ightarrow$ 온풍 건조 터널</td>
+            <td><strong>2단 탈수:</strong> 에어 털이 노즐 $ightarrow$ 상/하 2면 에어나이프</td>
+        </tr>
+        <tr>
+            <td class="font-bold"><strong>블로워 모터</strong></td>
+            <td><strong>고효율 터보 블로워 (Turbo Blower) 20 ~ 25 HP (15~18.5 kW)</strong><br>· 풍압 3,000~3,500 mmAq, 대풍량 집중 토출</td>
+            <td><strong>링 블로워 / 시로코 블로워 7.5 ~ 10 HP (5.5~7.5 kW)</strong><br>· 풍압 1,500~2,000 mmAq</td>
+        </tr>
+        <tr>
+            <td class="font-bold"><strong>엔지니어링 요건</strong></td>
+            <td>트레이 접이부/리브(Rib) 홈 잔류수를 날리기 위한 <strong>노즐 각도(45° 사선 대향) 튜닝</strong> 필수</td>
+            <td>상단/하단 표면 수막 파쇄 및 물방울 제거</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>3. 8시간 집중 가동 기준 공종별 유틸리티 확정 산정표</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>유틸리티 구분</th>
+            <th>산출 근거 및 스펙 (트레이 2CH + 박스 + 파렛트 / 8시간 기준)</th>
+            <th>기존 도면 (AS-IS)</th>
+            <th>수정 확정 요구안 (TO-BE)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="font-bold"><strong>급수 유량 (신수)</strong></td>
+            <td>· 트레이 2CH(1400~3000개): 2.2~3.2 ㎥/h<br>· 박스(200개): 0.8 ㎥/h, 파렛트: 0.5 ㎥/h $ightarrow$ <strong>합산 3.5~4.5 ㎥/h</strong></td>
+            <td class="center highlight-red">화장실용 25A (1.5 ㎥/h)</td>
+            <td class="highlight-blue"><strong>상수도 인입 50A (최소 6.0~8.0 ㎥/h 확보)</strong></td>
+        </tr>
+        <tr>
+            <td class="font-bold"><strong>급수 버퍼탱크</strong></td>
+            <td>8시간 집중 세척 시 수압 저하 및 단수 완충용 (3~4시간 완충)</td>
+            <td class="center highlight-red">전무 (직결)</td>
+            <td class="highlight-blue"><strong>SUS 304 또는 보온 SMC 20 ~ 25 톤 (㎥)</strong></td>
+        </tr>
+        <tr>
+            <td class="font-bold"><strong>가압 부스터펌프</strong></td>
+            <td>세척기 3종 동시 분사용 인버터 정압 부스터 펌프 유닛</td>
+            <td class="center highlight-red">전무</td>
+            <td class="highlight-blue"><strong>Dual 타입 5.5 kW (토출량 200~250 L/min, 5 bar)</strong></td>
+        </tr>
+        <tr>
+            <td class="font-bold"><strong>세척수 열원 (가열)</strong></td>
+            <td>신수 4.5 ㎥/h 승온(15℃ $ightarrow$ 65℃, $\Delta T=50℃$, 27만 kcal/h)</td>
+            <td class="center highlight-red">전기온수기 2.5kW</td>
+            <td class="highlight-green"><strong>관류형 가스보일러 0.5 톤/hr (30만 kcal/h, LNG)</strong></td>
+        </tr>
+        <tr>
+            <td class="font-bold"><strong>전기 수전용량</strong></td>
+            <td>동력합산 107kW + 부대부하 25kW = 132kW (가스보일러 기준)</td>
+            <td class="center highlight-red">71.1 kVA (MCCB 125A)</td>
+            <td class="highlight-blue"><strong>175 ~ 200 kVA 증설 (메인 차단기 4P 300A급)</strong></td>
+        </tr>
+        <tr>
+            <td class="font-bold"><strong>압축공기 (Air)</strong></td>
+            <td>2CH 공압 실린더 및 털이 노즐 소모량 (약 1,800 N-L/min)</td>
+            <td class="center highlight-red">전무</td>
+            <td class="highlight-blue"><strong>스크류 콤프레샤 30 ~ 50 HP + 탱크 1.5㎥ + 드라이어</strong></td>
+        </tr>
+        <tr>
+            <td class="font-bold"><strong>증기 배기 공조</strong></td>
+            <td>2CH 트레이(60CMM) + 박스(45CMM) + 파렛트(75CMM) = 180 CMM</td>
+            <td class="center highlight-red">소형 환풍기 210 CMH</td>
+            <td class="highlight-blue"><strong>SUS 304 배기덕트(Ø500) + 루프팬 200 CMM (5.5kW)</strong></td>
+        </tr>
+        <tr>
+            <td class="font-bold"><strong>폐수 발생량</strong></td>
+            <td>성수기 8시간 가동 시 1일 <strong>약 20 ~ 28 ㎥/일</strong> 배출</td>
+            <td class="center highlight-red">하수관 직결 (위반)</td>
+            <td class="highlight-blue"><strong>폐수배출시설 설치신고 + 3단계 전처리 패키지</strong></td>
+        </tr>
+        <tr>
+            <td class="font-bold"><strong>바닥 및 배수</strong></td>
+            <td>2CH 낙수 대응 광폭 배수 트렌치 및 고온 열수 방수</td>
+            <td class="center highlight-red">콘크리트 폴리싱</td>
+            <td class="highlight-blue"><strong>SUS 304 트렌치(폭 300) + 우레탄 크리트(5~6mm)</strong></td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>4. 안산 성곡동 공장 구조 기반 설비 레이아웃 가이드</h2>
+<div class="callout-box">
+    <div class="callout-title">■ 1층 OPEN 공간(층고 8m) 및 2층 하부 구획 최적 배치안</div>
+    · <strong>메인 생산 구역 (1층 오픈 층고 8m):</strong><br>
+      - 트레이 2CH 세척기(길이 약 8~10m) 및 박스/파렛트 세척기를 병렬 배치.<br>
+      - 증기 배기 덕트는 천장 높이를 감안하여 <strong>외벽(THK 150 판넬)을 수평 관통하여 외부 옥상으로 직립 배관</strong>.<br>
+    · <strong>유틸리티 집약 룸 (중2층 사무실 하부 층고 4m 구역):</strong><br>
+      - <strong>0.5톤 가스보일러, 30~50HP 콤프레샤, 가압 부스터펌프 룸</strong>을 집중 배치하여 배관 최단거리화 및 소음 격리.
+</div>
+
+<h2>5. 착공 전 확정 및 실행 프로세스</h2>
+<div class="step-container">
+    <div class="step-item">
+        <span class="step-num">1</span><strong>[제작사 최종 승인]</strong> 트레이 2CH(가변 1,400~3,000개/h) 및 터보블로워(18.5kW) 외형도/유틸리티 인입도 수령
+    </div>
+    <div class="step-item">
+        <span class="step-num">2</span><strong>[도면 설계 변경]</strong> 전기 수전 200kVA 증설, 도시가스 0.5t 보일러관, 상수도 50A 인입관 도면 반영
+    </div>
+    <div class="step-item">
+        <span class="step-num">3</span><strong>[토목 선시공]</strong> 500mm 매트 기초 배근 시 2CH 광폭 SUS 트렌치(폭 300mm) 및 耐열 배수관 선매립
+    </div>
+    <div class="step-item">
+        <span class="step-num">4</span><strong>[바닥 마감]</strong> 1/60 물매 타설 및 28일 양생 후 고내열/논슬립 우레탄 크리트 5~6mm 시공
+    </div>
+    <div class="step-item">
+        <span class="step-num">5</span><strong>[환경 인허가]</strong> 일일 폐수 25톤 기준 안산시청 폐수배출시설 설치신고 및 전처리 설비(18㎡) 발주
+    </div>
+</div>
+
+<h2 id="opinion-section">6. 의견 입력</h2>
+<div class="opinion-form">
+    <input type="text" id="opinion-name" placeholder="이름 / 부서">
+    <textarea id="opinion-text" placeholder="이 보고서에 대한 의견을 입력하세요."></textarea>
+    <button id="opinion-submit" onclick="submitOpinion()">의견 등록</button>
+    <span class="opinion-status" id="opinion-status"></span>
+</div>
+<div class="opinion-list" id="opinion-list">
+    <div class="opinion-empty">의견을 불러오는 중...</div>
+</div>
+
+<div class="version-tag">v4.0</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+    // 인시스 그룹 공용 Firebase 설정 (insys-work 프로젝트)
+    const firebaseConfig = {
+        apiKey: "AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",
+        authDomain: "insys-work.firebaseapp.com",
+        projectId: "insys-work",
+        storageBucket: "insys-work.firebasestorage.app",
+        messagingSenderId: "225275784859",
+        appId: "1:225275784859:web:bd12815c6dc47c0c49e03e"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const OPINION_COLLECTION = "washing_report_opinions";
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function renderOpinions(snapshot) {
+        const list = document.getElementById('opinion-list');
+        if (snapshot.empty) {
+            list.innerHTML = '<div class="opinion-empty">등록된 의견이 없습니다. 첫 의견을 남겨보세요.</div>';
+            return;
+        }
+        let html = '';
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            const name = escapeHtml(d.name || '익명');
+            const text = escapeHtml(d.text || '');
+            let dateStr = '';
+            if (d.createdAt && d.createdAt.toDate) {
+                const dt = d.createdAt.toDate();
+                dateStr = dt.getFullYear() + '.' + String(dt.getMonth() + 1).padStart(2, '0') + '.' + String(dt.getDate()).padStart(2, '0') + ' ' + String(dt.getHours()).padStart(2, '0') + ':' + String(dt.getMinutes()).padStart(2, '0');
+            }
+            html += '<div class="opinion-item"><div class="opinion-meta"><span class="opinion-author">' + name + '</span>' + (dateStr ? ' · ' + dateStr : '') + '</div><div>' + text.replace(/\n/g, '<br>') + '</div></div>';
+        });
+        list.innerHTML = html;
+    }
+
+    db.collection(OPINION_COLLECTION).orderBy('createdAt', 'desc').onSnapshot(renderOpinions, err => {
+        document.getElementById('opinion-list').innerHTML = '<div class="opinion-empty">의견을 불러오지 못했습니다.</div>';
+        console.error(err);
+    });
+
+    function submitOpinion() {
+        const nameEl = document.getElementById('opinion-name');
+        const textEl = document.getElementById('opinion-text');
+        const statusEl = document.getElementById('opinion-status');
+        const btn = document.getElementById('opinion-submit');
+        const name = nameEl.value.trim();
+        const text = textEl.value.trim();
+        if (!text) {
+            statusEl.textContent = '의견 내용을 입력해주세요.';
+            return;
+        }
+        btn.disabled = true;
+        statusEl.textContent = '등록 중...';
+        db.collection(OPINION_COLLECTION).add({
+            name: name || '익명',
+            text: text,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+            nameEl.value = '';
+            textEl.value = '';
+            statusEl.textContent = '등록되었습니다.';
+            btn.disabled = false;
+            setTimeout(() => { statusEl.textContent = ''; }, 2000);
+        }).catch(err => {
+            statusEl.textContent = '등록 실패: ' + err.message;
+            btn.disabled = false;
+            console.error(err);
+        });
+    }
+</script>
+
+</body>
+</html>
