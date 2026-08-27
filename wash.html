@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척기 시뮬레이터 v1.3</title>
+<title>트레이 세척기 시뮬레이터 v1.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -16,129 +16,133 @@
   --teal:#1f6f78;--teal-l:#e7f2f3;
   --line:#d7dfe7;--ink:#26333f;--ink-l:#5a6b7a;--bg:#f2f5f8;
   --ok:#1d6f4a;--ok-bg:#e6f3ec;--warn:#8a5a10;--warn-bg:#fdf3e2;--bad:#8c2f2f;--bad-bg:#fbeaea;
+  --maxw:1100px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1100px;margin:0 auto;padding:0 14px 60px}
-.cover{max-width:1100px;margin:0 auto 18px;background:linear-gradient(135deg,var(--navy-d) 0%,var(--navy) 55%,var(--steel) 140%);color:#fff;border-radius:0 0 10px 10px;padding:22px 26px 20px}
-.cover .eyebrow{font-size:11px;letter-spacing:.14em;font-weight:500;color:#a9c7e0}
-.cover h1{font-size:25px;font-weight:900;letter-spacing:-.02em;margin:6px 0 4px}
-.cover .sub{font-size:12px;color:#c8dcec;font-weight:300}
-.cover .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
-.badge{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:4px;padding:4px 9px;font-size:11px;font-weight:500}
+.cover{max-width:var(--maxw);margin:0 auto 8px;background:linear-gradient(135deg,var(--navy-d) 0%,var(--navy) 55%,var(--steel) 140%);color:#fff;border-radius:0 0 8px 8px;padding:12px 14px}
+.cover .eyebrow{font-size:10px;letter-spacing:.14em;font-weight:500;color:#a9c7e0}
+.cover h1{font-size:21px;font-weight:900;letter-spacing:-.02em;margin:3px 0 2px}
+.cover .sub{font-size:11px;color:#c8dcec;font-weight:300}
+.cover .meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.badge{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:4px;padding:3px 8px;font-size:10px;font-weight:500}
 .badge.v{background:#fff;color:var(--navy);border-color:#fff;font-weight:700}
-.hud{position:sticky;top:0;z-index:30;background:var(--navy-d);color:#fff;border-radius:8px;padding:9px 12px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;box-shadow:0 3px 10px rgba(18,40,63,.22)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 10px 30px;transition:max-width .18s}
+body.mobile .wrap,body.mobile .cover,body.mobile .viewbar{max-width:430px}
+.viewbar{max-width:var(--maxw);margin:0 auto 8px;padding:0 10px;display:flex;align-items:center;gap:6px}
+.viewbar .lb{font-size:10px;color:var(--ink-l);font-weight:500}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;background:#fff}
+.seg button{font-family:inherit;font-size:11px;font-weight:700;padding:4px 12px;border:0;background:#fff;color:var(--ink-l);cursor:pointer}
+.seg button.on{background:var(--navy);color:#fff}
+.hud{position:sticky;top:0;z-index:30;background:var(--navy-d);color:#fff;border-radius:6px;padding:8px 10px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:8px;box-shadow:0 2px 8px rgba(18,40,63,.22)}
+body.mobile .hud{grid-template-columns:repeat(2,1fr)}
 .hud .h{text-align:center;border-right:1px solid rgba(255,255,255,.14)}
 .hud .h:last-child{border-right:none}
+body.mobile .hud .h{border-right:none}
 .hud .hl{font-size:10px;color:#a9c7e0}
-.hud .hv{font-size:15px;font-weight:700;margin-top:1px;line-height:1.25}
+.hud .hv{font-size:14px;font-weight:700;margin-top:1px;line-height:1.25}
 .hud .hv small{font-size:10px;font-weight:400;color:#c8dcec}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.card{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.hud .hv.ok{color:#7ee0a8}.hud .hv.bad{color:#ff9d9d}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+body.mobile .grid{grid-template-columns:1fr}
+.card{background:#fff;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:0}
 .card.full{grid-column:1/-1}
-.card h2{font-size:13px;font-weight:700;color:#fff;background:var(--navy);padding:8px 12px;display:flex;align-items:center;justify-content:space-between}
+body.mobile .card.full{grid-column:auto}
+.card h2{font-size:12px;font-weight:700;color:#fff;background:var(--navy);padding:6px 10px;display:flex;align-items:center;justify-content:space-between}
 .card.rinse h2{background:var(--teal)}
+.card.out h2{background:var(--steel)}
 .card h2 span.n{font-size:10px;font-weight:400;color:#bcd5e4;letter-spacing:.08em}
-.card .body{padding:12px}
-.hint{font-size:11px;color:var(--ink-l);margin-bottom:8px;line-height:1.45}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
-.f{margin-bottom:8px}
-.f label{display:block;font-size:11px;font-weight:500;color:var(--ink-l);margin-bottom:3px}
-.f .ig{display:flex;align-items:stretch;gap:4px}
-input,select{font-family:inherit;font-size:12px;color:var(--ink);width:100%;border:1px solid var(--line);border-radius:5px;padding:6px 8px;background:#fff}
-input[readonly]{background:#f7f9fb;color:var(--navy);font-weight:500}
-input:focus,select:focus{outline:2px solid #9dc2de;border-color:var(--steel)}
-.unit{font-size:11px;color:var(--ink-l);align-self:center;white-space:nowrap;min-width:34px}
-.rec{font-size:10px;color:var(--steel);background:var(--steel-l);border:1px solid #cfe2ef;border-radius:4px;padding:2px 6px;cursor:pointer;white-space:nowrap;font-family:inherit;font-weight:500}
-.rinse .rec{color:var(--teal);background:var(--teal-l);border-color:#c9e0e2}
-.rec:hover{filter:brightness(.96)}
-button{font-family:inherit;cursor:pointer}
-.btn{background:var(--navy);color:#fff;border:none;border-radius:5px;padding:8px 14px;font-size:12px;font-weight:500}
-.btn:hover{background:var(--navy-d)}
-.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--navy)}
+.card .body{padding:10px}
+.hint{font-size:10px;color:var(--ink-l);margin-bottom:6px;line-height:1.45}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+body.mobile .row{grid-template-columns:1fr}
+.f{display:flex;flex-direction:column;gap:2px}
+.f label{font-size:10px;color:var(--ink-l);font-weight:500}
+.ig{display:flex;align-items:center;gap:3px}
+input,select{font-family:inherit;font-size:12px;color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:4px 6px;width:100%;background:#fff}
+input:focus,select:focus{outline:2px solid var(--steel-l);border-color:var(--steel)}
+input[readonly]{background:var(--steel-l);font-weight:700;color:var(--navy)}
+.unit{font-size:10px;color:var(--ink-l);white-space:nowrap;min-width:32px}
+.rec{font-family:inherit;font-size:10px;font-weight:700;border:1px solid var(--steel);color:var(--steel);background:#fff;border-radius:4px;padding:3px 5px;cursor:pointer;white-space:nowrap}
+.rec:hover{background:var(--steel);color:#fff}
+.btnrow{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.btn{font-family:inherit;font-size:11px;font-weight:700;border-radius:4px;padding:6px 12px;cursor:pointer;border:1px solid var(--navy);background:var(--navy);color:#fff}
+.btn.ghost{background:#fff;color:var(--navy)}
 .btn.ghost:hover{background:var(--steel-l)}
-.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:middle}
-th{background:#eef3f7;color:var(--navy);font-weight:700;font-size:11px}
-td.k{background:#f7f9fb;color:var(--ink-l);font-weight:500;width:38%}
-td b{color:var(--navy)}
-.tag{display:inline-block;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:700}
-.tag.ok{background:var(--ok-bg);color:var(--ok)}
-.tag.warn{background:var(--warn-bg);color:var(--warn)}
-.tag.bad{background:var(--bad-bg);color:var(--bad)}
-.msg{border-radius:5px;padding:7px 10px;font-size:11px;margin-bottom:6px;line-height:1.5}
-.msg.ok{background:var(--ok-bg);color:var(--ok);border-left:3px solid var(--ok)}
-.msg.warn{background:var(--warn-bg);color:var(--warn);border-left:3px solid var(--warn)}
-.msg.bad{background:var(--bad-bg);color:var(--bad);border-left:3px solid var(--bad)}
-.lib{max-height:150px;overflow:auto;border:1px solid var(--line);border-radius:5px;margin-top:8px}
-.lib table{font-size:11px}.lib td{padding:4px 6px}
-.lib .mini{font-size:10px;padding:2px 6px;border-radius:3px;border:1px solid var(--line);background:#fff;color:var(--navy);margin-right:3px}
-.lib .mini.del{color:var(--bad);border-color:#e6bcbc}
-.empty{padding:14px;text-align:center;color:var(--ink-l);font-size:11px}
-.store{font-size:10px;color:var(--ink-l);margin-top:6px}
-.dot{display:inline-block;width:9px;height:9px;border-radius:50%;vertical-align:middle;background:#d13438;box-shadow:0 0 0 2px rgba(255,255,255,.28);flex:0 0 auto}
-.dot.on{background:#2ecc71;box-shadow:0 0 0 2px rgba(46,204,113,.30)}
-.dot.wait{background:#e0a400;box-shadow:0 0 0 2px rgba(224,164,0,.30)}
-.badge.stat{display:inline-flex;align-items:center;gap:6px}
-.fbrow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:9px;padding-top:9px;border-top:1px solid var(--line)}
-.fbstat{font-size:11px;font-weight:700}
-.fbstat.on{color:var(--ok)}
-.fbstat.off{color:var(--bad)}
-.fbstat.wait{color:var(--warn)}
-.fbpanel{display:none;margin-top:9px;background:var(--steel-l);border:1px solid var(--line);border-radius:6px;padding:10px}
-.fbpanel textarea{width:100%;height:130px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;border:1px solid var(--line);border-radius:5px;padding:8px;resize:vertical;color:var(--ink)}
-.foot{margin-top:20px;text-align:center;font-size:11px;color:var(--ink-l);line-height:1.7}
-@media(max-width:820px){.grid{grid-template-columns:1fr}.hud{grid-template-columns:repeat(2,1fr);gap:6px}.hud .h{border-right:none;border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:4px}.cover h1{font-size:20px}}
-@media print{.hud,.btnrow,.rec,.cover{display:none}}
+.mini{font-family:inherit;font-size:10px;border:1px solid var(--line);background:#fff;color:var(--ink-l);border-radius:3px;padding:2px 6px;cursor:pointer;margin-left:3px}
+.mini.del{color:var(--bad);border-color:#e9c4c4}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th,td{border:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top}
+th{background:var(--steel-l);color:var(--navy);font-weight:700;font-size:10px}
+td.k{background:#f7fafc;color:var(--ink-l);font-weight:500;width:34%}
+.lib{margin-top:6px;max-height:150px;overflow:auto;border:1px solid var(--line);border-radius:4px}
+.lib .empty{font-size:10px;color:var(--ink-l);padding:8px;text-align:center}
+.msg{font-size:11px;border-radius:4px;padding:5px 8px;margin-bottom:4px;font-weight:500;line-height:1.4}
+.msg.ok{background:var(--ok-bg);color:var(--ok)}
+.msg.warn{background:var(--warn-bg);color:var(--warn)}
+.msg.bad{background:var(--bad-bg);color:var(--bad)}
+.verdict{border-radius:5px;padding:8px 10px;margin-bottom:6px;text-align:center}
+.verdict.ok{background:var(--ok-bg);border:1px solid #b7ddc7}
+.verdict.bad{background:var(--bad-bg);border:1px solid #eec3c3}
+.verdict .vt{font-size:17px;font-weight:900;letter-spacing:-.01em}
+.verdict.ok .vt{color:var(--ok)}.verdict.bad .vt{color:var(--bad)}
+.verdict .vs{font-size:10px;color:var(--ink-l);margin-top:2px}
+.store{font-size:10px;color:var(--ink-l);margin-top:4px}
+.foot{max-width:var(--maxw);margin:8px auto 0;padding:8px 10px;font-size:10px;color:var(--ink-l);text-align:center;line-height:1.6}
+body.mobile .foot{max-width:430px}
+.foot b{color:var(--navy)}
 </style>
 </head>
-<body>
+<body class="mobile">
 
 <div class="cover">
   <div class="eyebrow">INSYS · AI혁신 연구개발실</div>
-  <h1>트레이 세척 건조기 시뮬레이터</h1>
-  <div class="sub">1단계 — 세척존 + 헹굼존 사양 산출 · 목표 처리량 800~1,200 매/hr</div>
+  <h1>트레이 세척기 시뮬레이터</h1>
+  <div class="sub">2채널 병렬 · 세척존 + 헹굼존 · 목표 처리량 800~1,200 매/hr</div>
   <div class="meta">
-    <span class="badge v">v1.3</span>
+    <span class="badge v">v1.1</span>
     <span class="badge">2채널 · 세워서 투입</span>
     <span class="badge">세척 1~2조 + 헹굼 1조</span>
     <span class="badge" id="today">—</span>
-    <span class="badge stat" id="fbBadge"><i class="dot" id="fbDot"></i><span id="fbBadgeTxt">Firebase 확인 중…</span></span>
-    <span class="badge">build <span id="buildTxt">—</span></span>
   </div>
+</div>
+
+<div class="viewbar">
+  <span class="lb">화면</span>
+  <span class="seg">
+    <button id="vMo" class="on" onclick="setView('mobile')">모바일</button>
+    <button id="vPc" onclick="setView('pc')">PC</button>
+  </span>
 </div>
 
 <div class="wrap">
 
   <div class="hud">
-    <div class="h"><div class="hl">처리량</div><div class="hv" id="hudCap">—<small> 매/hr</small></div></div>
-    <div class="h"><div class="hl">구성</div><div class="hv" id="hudCfg">—</div></div>
-    <div class="h"><div class="hl">컨베이어 속도</div><div class="hv" id="hudSpd">—<small> m/min</small></div></div>
-    <div class="h"><div class="hl">총 소비전력</div><div class="hv" id="hudPow">—<small> kW</small></div></div>
-    <div class="h"><div class="hl">적합성</div><div class="hv" id="hudJudge">—</div></div>
+    <div class="h"><div class="hl">처리량</div><div class="hv" id="hCap">—<small> 매/hr</small></div></div>
+    <div class="h"><div class="hl">컨베이어 속도</div><div class="hv" id="hSpd">—<small> m/min</small></div></div>
+    <div class="h"><div class="hl">세척 판정</div><div class="hv" id="hJudge">—</div></div>
+    <div class="h"><div class="hl">순환유량</div><div class="hv" id="hFlow">—<small> L/min</small></div></div>
+    <div class="h"><div class="hl">월 운영비</div><div class="hv" id="hCost">—<small> 만원</small></div></div>
   </div>
 
   <div class="grid">
 
-    <!-- STEP 1 -->
+    <!-- STEP 1 트레이 -->
     <div class="card">
       <h2>트레이 사양 <span class="n">STEP 1</span></h2>
       <div class="body">
-        <div class="hint">세척 대상물 정보. 오염 조건이 필요 세척시간·압력·온도·조 수를 결정합니다.</div>
+        <div class="hint">세워서 투입합니다. 진행 방향 치수는 높이(두께) H, 수직 방향은 세로 L, 채널 폭 방향은 가로 W 입니다.</div>
         <div class="row">
-          <div class="f"><label>트레이명</label><input id="trayName" type="text" value="표준 600×400"></div>
-          <div class="f"><label>세움 자세</label>
-            <select id="stance"><option value="B" selected>세로(L) 폭방향 / 가로(W) 수직</option><option value="A">가로(W) 폭방향 / 세로(L) 수직</option></select>
-          </div>
-          <div class="f"><label>가로 W</label><div class="ig"><input id="trayW" type="number" value="600"><span class="unit">mm</span></div></div>
-          <div class="f"><label>세로 L</label><div class="ig"><input id="trayL" type="number" value="400"><span class="unit">mm</span></div></div>
-          <div class="f"><label>높이 H (두께)</label><div class="ig"><input id="trayH" type="number" value="80"><span class="unit">mm</span></div></div>
+          <div class="f"><label>트레이 명칭</label><input id="trayName" type="text" value="표준 600×400"></div>
+          <div class="f"><label>가로 W (채널 폭 방향)</label><div class="ig"><input id="trayW" type="number" value="600"><span class="unit">mm</span></div></div>
+          <div class="f"><label>세로 L (수직 방향)</label><div class="ig"><input id="trayL" type="number" value="400"><span class="unit">mm</span></div></div>
+          <div class="f"><label>높이 H (두께 · 진행 방향)</label><div class="ig"><input id="trayH" type="number" value="80"><span class="unit">mm</span></div></div>
           <div class="f"><label>포켓 수</label><div class="ig"><input id="pockets" type="number" value="15"><span class="unit">EA</span></div></div>
           <div class="f"><label>오염 수준</label><select id="soilLv"><option value="light">경(輕) · 분진/가루</option><option value="medium" selected>중(中) · 일반 잔류물</option><option value="heavy">고(高) · 고착/건조</option></select></div>
           <div class="f"><label>오염 종류</label><select id="soilTp"><option value="starch">전분/분체</option><option value="oil">유지/기름</option><option value="protein">단백질</option><option value="sugar">당류/점착</option><option value="mixed" selected>혼합</option></select></div>
           <div class="f"><label>재질</label><select id="mat"><option value="PP" selected>PP</option><option value="PE">PE</option><option value="PC">PC</option><option value="STS">STS</option><option value="AL">알루미늄</option></select></div>
-          <div class="f"><label>유효 표면적</label><div class="ig"><input id="areaOut" type="text" readonly value="—"><span class="unit">m²</span></div></div>
+          <div class="f"><label>유효 표면적</label><div class="ig"><input id="oArea" type="text" readonly value="—"><span class="unit">m²</span></div></div>
+          <div class="f"><label>필요 채널 폭</label><div class="ig"><input id="oChW" type="text" readonly value="—"><span class="unit">mm</span></div></div>
         </div>
         <div class="btnrow">
           <button class="btn ghost" onclick="saveTray()">트레이 저장</button>
@@ -147,542 +151,293 @@ td b{color:var(--navy)}
           <input id="impFile" type="file" accept=".json" style="display:none" onchange="importLib(event)">
         </div>
         <div class="lib" id="lib"><div class="empty">저장된 트레이가 없습니다.</div></div>
-        <div class="fbrow">
-          <i class="dot" id="fbDot2"></i>
-          <span class="fbstat off" id="storeMsg">Firebase 확인 중…</span>
-          <button class="mini" onclick="toggleFbPanel()">Firebase 설정</button>
-          <button class="mini" onclick="saveStateNow(false)">입력값 저장</button>
-          <button class="mini" onclick="reloadState()">불러오기</button>
-        </div>
-        <div class="fbpanel" id="fbPanel">
-          <div class="hint">Firebase 콘솔 → 프로젝트 설정 → 웹 앱의 <b>firebaseConfig</b> 객체를 그대로 붙여넣고 [연결]을 누르세요.<br>설정은 이 브라우저에만 저장되며, 입력값은 익명 로그인 uid별로 <code>wash_users/{uid}</code> 에 따로 저장되어, 다른 방문자와 섞이지 않습니다.</div>
-          <textarea id="fbCfgTxt" spellcheck="false" placeholder='{ "apiKey": "…", "authDomain": "….firebaseapp.com", "projectId": "…", "storageBucket": "…", "messagingSenderId": "…", "appId": "…" }'></textarea>
-          <div class="btnrow">
-            <button class="btn ghost" onclick="applyFbCfg()">연결</button>
-            <button class="btn ghost" onclick="clearFbCfg()">설정 삭제</button>
-          </div>
-        </div>
+        <div class="store" id="storeMsg">저장소: 브라우저 로컬 저장 (내보내기로 백업하세요)</div>
       </div>
     </div>
 
-    <!-- STEP 2 -->
+    <!-- STEP 2 반송 -->
     <div class="card">
       <h2>구성 · 반송 · 처리량 <span class="n">STEP 2</span></h2>
       <div class="body">
-        <div class="hint">목표 처리량을 입력하면 컨베이어 속도를 역산합니다. 목표 범위 800~1,200 매/hr.</div>
+        <div class="hint">목표 처리량을 입력하면 컨베이어 속도를 역산합니다. 피치 = 트레이 높이 + 간격. 목표 범위 800~1,200 매/hr.</div>
         <div class="row">
-          <div class="f"><label>구성 형식</label><div class="ig">
-            <select id="cfgType"><option value="A" selected>A형 · 세척 1조 + 헹굼 1조</option><option value="B">B형 · 세척 2조 + 헹굼 1조</option></select>
-            <button class="rec" id="rcCfg" onclick="applyRec('cfgType','recCfg')">추천</button></div></div>
-          <div class="f"><label>산출 기준</label>
-            <select id="calcMode"><option value="cap" selected>목표 처리량 기준 (속도 자동)</option><option value="spd">컨베이어 속도 기준 (처리량 자동)</option></select></div>
+          <div class="f"><label>구성 형식</label>
+            <select id="cfgType"><option value="A" selected>A형 · 세척 1조 + 헹굼 1조</option><option value="B">B형 · 세척 2조 + 헹굼 1조</option></select></div>
+          <div class="f"><label>채널 수 (병렬)</label><div class="ig"><input id="chN" type="number" value="2"><span class="unit">CH</span></div></div>
           <div class="f"><label>목표 처리량</label><div class="ig"><input id="tgtCap" type="number" value="1000"><span class="unit">매/hr</span></div></div>
-          <div class="f"><label>컨베이어 속도</label><div class="ig"><input id="vSpd" type="number" step="0.01" value="1.08"><span class="unit">m/min</span></div></div>
           <div class="f"><label>트레이 간 간격</label><div class="ig"><input id="gap" type="number" value="50"><span class="unit">mm</span></div></div>
-          <div class="f"><label>채널 수</label><div class="ig"><input id="chN" type="number" value="2"><span class="unit">CH</span></div></div>
-          <div class="f"><label>전체 높이</label><div class="ig"><input id="mH" type="number" value="1900"><span class="unit">mm</span></div></div>
-          <div class="f"><label>채널당 폭</label><div class="ig"><input id="chW" type="number" value="520"><span class="unit">mm</span><button class="rec" id="rcChW" onclick="applyRec('chW','recChW')">추천</button></div></div>
-          <div class="f"><label>내부 높이</label><div class="ig"><input id="inH" type="number" value="750"><span class="unit">mm</span><button class="rec" id="rcInH" onclick="applyRec('inH','recInH')">추천</button></div></div>
-          <div class="f"><label>하단 프레임 높이</label><div class="ig"><input id="frH" type="number" value="850"><span class="unit">mm</span></div></div>
+          <div class="f"><label>반송 피치</label><div class="ig"><input id="oPitch" type="text" readonly value="—"><span class="unit">mm</span></div></div>
+          <div class="f"><label>컨베이어 속도 (역산)</label><div class="ig"><input id="oSpd" type="text" readonly value="—"><span class="unit">m/min</span></div></div>
         </div>
       </div>
     </div>
 
-    <!-- STEP 3 세척존 -->
-    <div class="card">
-      <h2>세척존 (WASH) <span class="n">STEP 3</span></h2>
-      <div class="body">
-        <div class="hint">순환수 세척. 헹굼조 오버플로우가 캐스케이드로 유입됩니다.</div>
-        <div class="row">
-          <div class="f"><label>분사 압력</label><div class="ig"><input id="zwPress" type="number" step="0.1" value="2.5"><span class="unit">bar</span><button class="rec" id="rcZwPress" onclick="applyRec('zwPress','recPressW')">추천</button></div></div>
-          <div class="f"><label>노즐~트레이 이격</label><div class="ig"><input id="zwDist" type="number" value="150"><span class="unit">mm</span></div></div>
-          <div class="f"><label>상하 노즐 간격</label><div class="ig"><input id="zwSpV" type="number" value="130"><span class="unit">mm</span><button class="rec" id="rcZwSpV" onclick="applyRec('zwSpV','recSpVW')">추천</button></div></div>
-          <div class="f"><label>진행방향 열 간격</label><div class="ig"><input id="zwSpH" type="number" value="150"><span class="unit">mm</span><button class="rec" id="rcZwSpH" onclick="applyRec('zwSpH','recSpH')">추천</button></div></div>
-          <div class="f"><label>조당 노즐 열 수</label><div class="ig"><input id="zwRows" type="number" value="3"><span class="unit">열</span><button class="rec" id="rcZwRows" onclick="applyRec('zwRows','recRowsW')">추천</button></div></div>
-          <div class="f"><label>세척수 온도</label><div class="ig"><input id="zwTemp" type="number" value="65"><span class="unit">℃</span><button class="rec" id="rcZwTemp" onclick="applyRec('zwTemp','recTempW')">추천</button></div></div>
-          <div class="f"><label>물탱크 용량</label><div class="ig"><input id="zwTankV" type="number" value="550"><span class="unit">L</span><button class="rec" id="rcZwTankV" onclick="applyRec('zwTankV','recTankW')">추천</button></div></div>
-          <div class="f"><label>펌프 용량</label><div class="ig"><input id="zwPumpHP" type="number" step="0.5" value="5"><span class="unit">HP</span><button class="rec" id="rcZwPumpHP" onclick="applyRec('zwPumpHP','recHPW')">추천</button></div></div>
-          <div class="f"><label>히터 용량</label><div class="ig"><input id="zwHeatKW" type="number" step="0.5" value="36"><span class="unit">kW</span><button class="rec" id="rcZwHeatKW" onclick="applyRec('zwHeatKW','recHeatW')">추천</button></div></div>
-          <div class="f"><label>노즐 종류(추천)</label><input id="zwNzType" type="text" readonly value="—"></div>
-          <div class="f"><label>노즐 수 (상하 / 총)</label><div class="ig"><input id="zwNz" type="text" readonly value="—"><span class="unit">EA</span></div></div>
-          <div class="f"><label>순환유량 / 전양정</label><div class="ig"><input id="zwFlow" type="text" readonly value="—"><span class="unit">L/min·m</span></div></div>
-          <div class="f"><label>주배관 / 헤더관</label><div class="ig"><input id="zwPipe" type="text" readonly value="—"><span class="unit">A</span></div></div>
-          <div class="f"><label>체류시간 (필요/실제)</label><div class="ig"><input id="zwTime" type="text" readonly value="—"><span class="unit">초</span></div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 4 헹굼존 -->
-    <div class="card rinse">
-      <h2>헹굼존 (RINSE) <span class="n">STEP 4</span></h2>
-      <div class="body">
-        <div class="hint">신수 보충 + 오버플로우 캐스케이드. 세척존보다 낮은 압력·높은 온도로 운전합니다.</div>
-        <div class="row">
-          <div class="f"><label>분사 압력</label><div class="ig"><input id="zrPress" type="number" step="0.1" value="2.0"><span class="unit">bar</span><button class="rec" id="rcZrPress" onclick="applyRec('zrPress','recPressR')">추천</button></div></div>
-          <div class="f"><label>노즐~트레이 이격</label><div class="ig"><input id="zrDist" type="number" value="150"><span class="unit">mm</span></div></div>
-          <div class="f"><label>상하 노즐 간격</label><div class="ig"><input id="zrSpV" type="number" value="130"><span class="unit">mm</span><button class="rec" id="rcZrSpV" onclick="applyRec('zrSpV','recSpVR')">추천</button></div></div>
-          <div class="f"><label>진행방향 열 간격</label><div class="ig"><input id="zrSpH" type="number" value="150"><span class="unit">mm</span><button class="rec" id="rcZrSpH" onclick="applyRec('zrSpH','recSpH')">추천</button></div></div>
-          <div class="f"><label>노즐 열 수</label><div class="ig"><input id="zrRows" type="number" value="2"><span class="unit">열</span><button class="rec" id="rcZrRows" onclick="applyRec('zrRows','recRowsR')">추천</button></div></div>
-          <div class="f"><label>헹굼수 온도</label><div class="ig"><input id="zrTemp" type="number" value="70"><span class="unit">℃</span><button class="rec" id="rcZrTemp" onclick="applyRec('zrTemp','recTempR')">추천</button></div></div>
-          <div class="f"><label>물탱크 용량</label><div class="ig"><input id="zrTankV" type="number" value="350"><span class="unit">L</span><button class="rec" id="rcZrTankV" onclick="applyRec('zrTankV','recTankR')">추천</button></div></div>
-          <div class="f"><label>펌프 용량</label><div class="ig"><input id="zrPumpHP" type="number" step="0.5" value="3"><span class="unit">HP</span><button class="rec" id="rcZrPumpHP" onclick="applyRec('zrPumpHP','recHPR')">추천</button></div></div>
-          <div class="f"><label>히터 용량</label><div class="ig"><input id="zrHeatKW" type="number" step="0.5" value="24"><span class="unit">kW</span><button class="rec" id="rcZrHeatKW" onclick="applyRec('zrHeatKW','recHeatR')">추천</button></div></div>
-          <div class="f"><label>트레이당 신수량</label><div class="ig"><input id="fresh" type="number" step="0.01" value="0.08"><span class="unit">L/매</span></div></div>
-          <div class="f"><label>노즐 수 (상하 / 총)</label><div class="ig"><input id="zrNz" type="text" readonly value="—"><span class="unit">EA</span></div></div>
-          <div class="f"><label>순환유량 / 전양정</label><div class="ig"><input id="zrFlow" type="text" readonly value="—"><span class="unit">L/min·m</span></div></div>
-          <div class="f"><label>주배관 / 헤더관</label><div class="ig"><input id="zrPipe" type="text" readonly value="—"><span class="unit">A</span></div></div>
-          <div class="f"><label>체류시간 (필요/실제)</label><div class="ig"><input id="zrTime" type="text" readonly value="—"><span class="unit">초</span></div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 5 -->
+    <!-- STEP 3 노즐 -->
     <div class="card full">
-      <h2>운전 조건 · 단가 <span class="n">STEP 5</span></h2>
+      <h2>노즐 설계 <span class="n">STEP 3</span></h2>
       <div class="body">
-        <div class="row" style="grid-template-columns:repeat(5,1fr)">
+        <div class="hint">상하 간격은 분사각 65°, 중첩 30% 기준으로 추천합니다. 분사폭 = 2 × 분사거리 × tan(32.5°), 상하간격 = 분사폭 × 0.7. 노즐 유량 = 5.5 L/min × √(압력 ÷ 3).</div>
+        <div class="row">
+          <div class="f"><label>분사 거리 (노즐~트레이)</label><div class="ig"><input id="sprayD" type="number" value="150"><span class="unit">mm</span></div></div>
+          <div class="f"><label>분사각</label><div class="ig"><input id="sprayA" type="number" value="65" readonly><span class="unit">°</span></div></div>
+          <div class="f"><label>중첩률</label><div class="ig"><input id="ovl" type="number" value="30" readonly><span class="unit">%</span></div></div>
+          <div class="f"><label>상하 간격 (추천)</label><div class="ig"><input id="oVp" type="text" readonly value="—"><span class="unit">mm</span></div></div>
+          <div class="f"><label>좌우 열간격</label><div class="ig"><input id="colGap" type="number" value="135"><span class="unit">mm</span><button class="rec" onclick="applyRec('colGap','hp')">추천</button></div></div>
+          <div class="f"><label>노즐 종류 (추천)</label><div class="ig"><input id="oNzType" type="text" readonly value="—"></div></div>
+          <div class="f"><label>세척 분사압력</label><div class="ig"><input id="pW" type="number" step="0.1" value="2.5"><span class="unit">bar</span><button class="rec" onclick="applyRec('pW','pw')">추천</button></div></div>
+          <div class="f"><label>헹굼 분사압력</label><div class="ig"><input id="pR" type="number" step="0.1" value="2.0"><span class="unit">bar</span><button class="rec" onclick="applyRec('pR','pr')">추천</button></div></div>
+          <div class="f"><label>세척존 노즐 열수 (조당)</label><div class="ig"><input id="rowW" type="number" value="4"><span class="unit">열</span><button class="rec" onclick="applyRec('rowW','rw')">추천</button></div></div>
+          <div class="f"><label>헹굼존 노즐 열수</label><div class="ig"><input id="rowR" type="number" value="2"><span class="unit">열</span></div></div>
+          <div class="f"><label>노즐 1개 유량 (세척)</label><div class="ig"><input id="oQw" type="text" readonly value="—"><span class="unit">L/min</span></div></div>
+          <div class="f"><label>노즐 1개 유량 (헹굼)</label><div class="ig"><input id="oQr" type="text" readonly value="—"><span class="unit">L/min</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4 세척존 -->
+    <div class="card">
+      <h2>세척존 (WASH) <span class="n">STEP 4</span></h2>
+      <div class="body">
+        <div class="hint">순환수 세척. 헹굼조 오버플로우가 캐스케이드로 유입됩니다. 추천값 미만이면 경고가 표시됩니다.</div>
+        <div class="row">
+          <div class="f"><label>세척 수온</label><div class="ig"><input id="tW" type="number" value="65"><span class="unit">℃</span></div></div>
+          <div class="f"><label>존 길이 (산출)</label><div class="ig"><input id="oLw" type="text" readonly value="—"><span class="unit">mm</span></div></div>
+          <div class="f"><label>노즐 수량 (산출)</label><div class="ig"><input id="oNw" type="text" readonly value="—"><span class="unit">EA</span></div></div>
+          <div class="f"><label>순환유량 (산출)</label><div class="ig"><input id="oFw" type="text" readonly value="—"><span class="unit">L/min</span></div></div>
+          <div class="f"><label>펌프 용량</label><div class="ig"><input id="hpW" type="number" step="0.5" value="5"><span class="unit">HP</span><button class="rec" onclick="applyRec('hpW','hpw')">추천</button></div></div>
+          <div class="f"><label>배관 직경</label><div class="ig"><input id="dW" type="number" value="65"><span class="unit">A</span><button class="rec" onclick="applyRec('dW','dw')">추천</button></div></div>
+          <div class="f"><label>물탱크 용량</label><div class="ig"><input id="vW" type="number" value="1000"><span class="unit">L</span><button class="rec" onclick="applyRec('vW','vw')">추천</button></div></div>
+          <div class="f"><label>히터 용량</label><div class="ig"><input id="kwW" type="number" value="72"><span class="unit">kW</span><button class="rec" onclick="applyRec('kwW','kww')">추천</button></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5 헹굼존 -->
+    <div class="card rinse">
+      <h2>헹굼존 (RINSE) <span class="n">STEP 5</span></h2>
+      <div class="body">
+        <div class="hint">신수(新水)가 헹굼조로 공급되고, 오버플로우가 세척조로 캐스케이드됩니다.</div>
+        <div class="row">
+          <div class="f"><label>헹굼 수온</label><div class="ig"><input id="tR" type="number" value="70"><span class="unit">℃</span></div></div>
+          <div class="f"><label>존 길이 (산출)</label><div class="ig"><input id="oLr" type="text" readonly value="—"><span class="unit">mm</span></div></div>
+          <div class="f"><label>노즐 수량 (산출)</label><div class="ig"><input id="oNr" type="text" readonly value="—"><span class="unit">EA</span></div></div>
+          <div class="f"><label>순환유량 (산출)</label><div class="ig"><input id="oFr" type="text" readonly value="—"><span class="unit">L/min</span></div></div>
+          <div class="f"><label>펌프 용량</label><div class="ig"><input id="hpR" type="number" step="0.5" value="3"><span class="unit">HP</span><button class="rec" onclick="applyRec('hpR','hpr')">추천</button></div></div>
+          <div class="f"><label>배관 직경</label><div class="ig"><input id="dR" type="number" value="40"><span class="unit">A</span><button class="rec" onclick="applyRec('dR','dr')">추천</button></div></div>
+          <div class="f"><label>물탱크 용량</label><div class="ig"><input id="vR" type="number" value="450"><span class="unit">L</span><button class="rec" onclick="applyRec('vR','vr')">추천</button></div></div>
+          <div class="f"><label>히터 용량</label><div class="ig"><input id="kwR" type="number" value="30"><span class="unit">kW</span><button class="rec" onclick="applyRec('kwR','kwr')">추천</button></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 6 급수/비용 -->
+    <div class="card full">
+      <h2>급수 · 전력 · 운영비 <span class="n">STEP 6</span></h2>
+      <div class="body">
+        <div class="hint">캐스케이드 방식이므로 신수는 헹굼조에만 투입됩니다. 히터는 가동률을 반영해 전력량을 산출합니다.</div>
+        <div class="row">
+          <div class="f"><label>트레이당 신수량</label><div class="ig"><input id="fresh" type="number" step="0.01" value="0.08"><span class="unit">L/매</span></div></div>
           <div class="f"><label>급수 원수 온도</label><div class="ig"><input id="tIn" type="number" value="15"><span class="unit">℃</span></div></div>
-          <div class="f"><label>승온 목표 시간</label><div class="ig"><input id="heatMin" type="number" value="60"><span class="unit">분</span></div></div>
+          <div class="f"><label>초기 승온 시간</label><div class="ig"><input id="heatMin" type="number" value="60"><span class="unit">min</span></div></div>
           <div class="f"><label>펌프 효율</label><div class="ig"><input id="eff" type="number" step="0.01" value="0.65"><span class="unit">—</span></div></div>
-          <div class="f"><label>1일 가동시간</label><div class="ig"><input id="opH" type="number" value="8"><span class="unit">hr</span></div></div>
-          <div class="f"><label>월 가동일수</label><div class="ig"><input id="opD" type="number" value="22"><span class="unit">일</span></div></div>
+          <div class="f"><label>히터 가동률</label><div class="ig"><input id="duty" type="number" step="0.05" value="0.40"><span class="unit">—</span></div></div>
+          <div class="f"><label>일 운전 시간</label><div class="ig"><input id="opH" type="number" value="8"><span class="unit">hr</span></div></div>
+          <div class="f"><label>월 운전 일수</label><div class="ig"><input id="opD" type="number" value="22"><span class="unit">일</span></div></div>
           <div class="f"><label>수도 단가</label><div class="ig"><input id="wPrice" type="number" value="1200"><span class="unit">원/㎥</span></div></div>
           <div class="f"><label>전기 단가</label><div class="ig"><input id="ePrice" type="number" value="130"><span class="unit">원/kWh</span></div></div>
-          <div class="f"><label>히터 가동률</label><div class="ig"><input id="duty" type="number" step="0.05" value="0.40"><span class="unit">—</span></div></div>
-          <div class="f"><label>급수 배관 직경</label><div class="ig"><input id="feedPipe" type="text" readonly value="—"><span class="unit">A</span></div></div>
-          <div class="f"><label>시간당 신수 보충</label><div class="ig"><input id="makeup" type="text" readonly value="—"><span class="unit">L/hr</span></div></div>
         </div>
       </div>
     </div>
 
-    <!-- STEP 6 -->
-    <div class="card full">
-      <h2>시뮬레이션 결과 <span class="n">RESULT</span></h2>
+    <!-- 결과 -->
+    <div class="card full out">
+      <h2>산출 결과 · 판정 <span class="n">RESULT</span></h2>
       <div class="body">
+        <div id="verdict"></div>
         <div id="msgs"></div>
-        <div class="row" style="gap:14px">
-          <div>
-            <table>
-              <tr><th colspan="2">세척 성능</th></tr>
-              <tr><td class="k">시간당 처리량</td><td id="oCap">—</td></tr>
-              <tr><td class="k">컨베이어 속도 / 피치</td><td id="oSpd">—</td></tr>
-              <tr><td class="k">세척 필요 / 실제 체류</td><td id="oTimeW">—</td></tr>
-              <tr><td class="k">헹굼 필요 / 실제 체류</td><td id="oTimeR">—</td></tr>
-              <tr><td class="k">세척+헹굼부 유효 길이</td><td id="oLen">—</td></tr>
-              <tr><td class="k">총 노즐 수</td><td id="oNz">—</td></tr>
-            </table>
-          </div>
-          <div>
-            <table>
-              <tr><th colspan="2">유틸리티 · 운전비</th></tr>
-              <tr><td class="k">총 순환유량</td><td id="oFlowT">—</td></tr>
-              <tr><td class="k">총 소비전력</td><td id="oPowT">—</td></tr>
-              <tr><td class="k">일 급수량 / 비용</td><td id="oWaterD">—</td></tr>
-              <tr><td class="k">월 급수량 / 비용</td><td id="oWaterM">—</td></tr>
-              <tr><td class="k">일 전력량 / 비용</td><td id="oPowD">—</td></tr>
-              <tr><td class="k">월 운전비 합계</td><td id="oCostM">—</td></tr>
-            </table>
-          </div>
-        </div>
+        <table id="resTbl"></table>
         <div class="btnrow">
-          <button class="btn" onclick="downloadSpec()">사양서 다운로드 (HTML)</button>
-          <button class="btn ghost" onclick="window.print()">인쇄 / PDF 저장</button>
-          <button class="btn ghost" onclick="applyAllRec()">전체 추천값 일괄 적용</button>
-          <button class="btn ghost" onclick="resetAll()">초기값 복원</button>
+          <button class="btn" onclick="downloadSpec()">사양서 HTML 다운로드</button>
+          <button class="btn ghost" onclick="applyAllRec()">추천값 일괄 적용</button>
+          <button class="btn ghost" onclick="resetAll()">초기화</button>
         </div>
       </div>
     </div>
 
   </div>
+</div>
 
-  <div class="foot">
-    트레이 세척 건조기 시뮬레이터 v1.3 · 1단계 세척+헹굼 구간<br>
-    인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr<br>
-    다음 단계: 2단계 에어나이프 탈수 구간 → 3단계 열풍 건조 구간
-  </div>
+<div class="foot">
+  트레이 세척 건조기 시뮬레이터 <b>v1.1</b> · 1단계 세척 + 헹굼 구간<br>
+  인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr<br>
+  다음 단계: 2단계 에어나이프 탈수 구간 → 3단계 열풍 건조 구간
 </div>
 
 <script>
 /* ==========================================================
-   트레이 세척기 시뮬레이터  v1.3
-   세척존 + 헹굼존 / 목표 처리량 800~1200 매/hr 기준
-   INSYS AI혁신 연구개발실
+   트레이 세척기 시뮬레이터  v1.1
+   2채널 병렬 / 세척존 + 헹굼존 / 목표 처리량 800~1200 매/hr
+   INSYS AI혁신 연구개발실 · 2026
    ========================================================== */
-var APP_VERSION = "v1.3";
-var APP_BUILD   = "2026-08-24-03";
-
-/* ---------- 저장소 (Firebase 익명 로그인 · 방문자별 개인 저장) ---------- */
-/* Firebase 설정: 아래 객체에 firebaseConfig를 넣으면 모든 방문자에게 자동 적용됩니다.
-   null로 두면 화면의 [Firebase 설정] 버튼으로 브라우저별 설정을 쓸 수 있습니다. */
-var FIREBASE_CONFIG = {
-  apiKey: "AIzaSyA76HI8Ho7YL7FrMXSIMhrbfaYbC5gKHY8",
-  authDomain: "insys-wash.firebaseapp.com",
-  projectId: "insys-wash",
-  storageBucket: "insys-wash.firebasestorage.app",
-  messagingSenderId: "418727674936",
-  appId: "1:418727674936:web:1d2da6e7eaaa1d205a12cd"
-};
-var FB_KEY = "wash_fb_cfg_v1";
-var FB_SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
-
-function fbCfg(){
-  if(FIREBASE_CONFIG && FIREBASE_CONFIG.projectId) return FIREBASE_CONFIG;
-  try{ var t=localStorage.getItem(FB_KEY); return t? JSON.parse(t) : null; }catch(e){ return null; }
-}
-
-/* 연결 상태 표시 — 연결 될 때 녹색, 안 될 때 적색 */
-function fbStatus(state, text){
-  var cls = (state==='on') ? 'on' : (state==='wait' ? 'wait' : '');
-  ['fbDot','fbDot2'].forEach(function(id){ var d=el(id); if(d) d.className='dot'+(cls?' '+cls:''); });
-  var b=el('fbBadgeTxt'); if(b) b.textContent=text;
-  var m=el('storeMsg');
-  if(m){ m.textContent=text; m.className='fbstat '+(state==='on'?'on':(state==='wait'?'wait':'off')); }
-}
-
-/* 방문자별 개인 저장.
-   익명 로그인으로 받은 uid로 wash_users/{uid} 문서에만 읽고 씁니다.
-   다른 방문자의 값을 보거나 덮어쓸 수 없습니다. */
-var STORE = {
-  mode:"memory", mem:[], db:null, fs:null, uid:null,
-  meDoc(){ return this.fs.doc(this.db,"wash_users",this.uid); },
-  trayCol(){ return this.fs.collection(this.db,"wash_users",this.uid,"trays"); },
-  trayDoc(id){ return this.fs.doc(this.db,"wash_users",this.uid,"trays",id); },
-  async init(){
-    var cfg = fbCfg();
-    if(!cfg){ fbStatus('off','Firebase 미설정 — 로컬 메모리'); return; }
-    fbStatus('wait','Firebase 연결 중…');
-    var stage='SDK 로드';
-    try{
-      var appM  = await import(FB_SDK+"firebase-app.js");
-      var authM = await import(FB_SDK+"firebase-auth.js");
-      var fsM   = await import(FB_SDK+"firebase-firestore.js");
-      var a = appM.initializeApp(cfg);
-
-      stage='익명 로그인';
-      var cred = await authM.signInAnonymously(authM.getAuth(a));
-      this.uid = cred.user.uid;
-
-      stage='Firestore 접근';
-      this.db = fsM.getFirestore(a); this.fs = fsM;
-      await fsM.getDoc(this.meDoc());              // 실제 통신 확인
-      this.mode = "firebase";
-      fbStatus('on','Firebase 연결됨 · 개인 저장 ('+this.uid.slice(0,6)+'…)');
-    }catch(e){
-      this.mode = "memory"; this.uid = null;
-      var code = (e && e.code) ? String(e.code) : '';
-      var why;
-      if(code.indexOf('operation-not-allowed')>=0 || code.indexOf('admin-restricted')>=0)
-        why = 'Firebase 콘솔에서 익명 로그인을 켜주세요';
-      else if(code.indexOf('permission-denied')>=0) why = '보안 규칙이 차단함';
-      else if(code.indexOf('unavailable')>=0) why = 'Firestore 미생성 또는 네트워크 차단';
-      else why = stage+' 실패';
-      fbStatus('off','Firebase 연결 안 됨 — '+why);
-    }
-  },
-  async list(){
-    if(this.mode==="firebase"){
-      try{
-        var snap = await this.fs.getDocs(this.trayCol());
-        var out=[]; snap.forEach(function(d){ var o=d.data(); o._id=d.id; out.push(o); });
-        return out;
-      }catch(e){ fbStatus('off','Firebase 읽기 실패'); return this.mem; }
-    }
-    return this.mem;
-  },
-  async add(o){
-    if(this.mode==="firebase"){ try{ await this.fs.addDoc(this.trayCol(),o); return; }catch(e){ fbStatus('off','Firebase 쓰기 실패'); } }
-    o._id="m"+Date.now()+Math.floor(Math.random()*1000); this.mem.push(o);
-  },
-  async del(id){
-    if(this.mode==="firebase"){ try{ await this.fs.deleteDoc(this.trayDoc(id)); return; }catch(e){ fbStatus('off','Firebase 삭제 실패'); } }
-    this.mem = this.mem.filter(function(x){ return x._id!==id; });
-  },
-  /* 입력값 전체 상태 — 본인 문서에만 */
-  async getState(){
-    if(this.mode!=="firebase") return null;
-    try{
-      var d = await this.fs.getDoc(this.meDoc());
-      return d.exists() ? d.data() : null;
-    }catch(e){ fbStatus('off','Firebase 읽기 실패'); return null; }
-  },
-  async putState(o){
-    if(this.mode!=="firebase") return false;
-    try{ await this.fs.setDoc(this.meDoc(), o); return true; }
-    catch(e){ fbStatus('off','Firebase 저장 실패'); return false; }
-  }
-};
-
-
-/* ---------- 입력값 자동 저장 / 복원 ---------- */
-function collectState(){
-  var o={};
-  for(var k in DEFAULTS){ if(el(k)) o[k]=el(k).value; }
-  o._savedAt = new Date().toISOString();
-  o._build = APP_BUILD;
-  return o;
-}
-function applyState(o){
-  if(!o) return 0;
-  var n=0;
-  for(var k in DEFAULTS){
-    if(el(k) && o[k]!==undefined && o[k]!==null && o[k]!==''){ el(k).value=o[k]; n++; }
-  }
-  return n;
-}
-var _saveTimer=null;
-function queueSave(){
-  if(STORE.mode!=="firebase") return;
-  clearTimeout(_saveTimer);
-  _saveTimer=setTimeout(function(){ saveStateNow(true); }, 900);
-}
-async function saveStateNow(quiet){
-  if(STORE.mode!=="firebase"){
-    fbStatus('off','Firebase 미연결 — 저장할 수 없음');
-    if(!quiet) alert('Firebase가 연결되지 않았습니다. [Firebase 설정]에서 firebaseConfig를 등록하세요.');
-    return false;
-  }
-  var ok = await STORE.putState(collectState());
-  if(ok) fbStatus('on','Firebase 저장됨 · '+new Date().toLocaleTimeString('ko-KR'));
-  return ok;
-}
-async function reloadState(){
-  var st = await STORE.getState();
-  if(!st){ fbStatus(STORE.mode==="firebase"?'on':'off', STORE.mode==="firebase"?'Firebase — 저장된 입력값 없음':'Firebase 미연결'); return; }
-  applyState(st); render();
-  fbStatus('on','Firebase 불러옴 · '+(st._savedAt? new Date(st._savedAt).toLocaleString('ko-KR') : ''));
-}
-
-/* ---------- Firebase 설정 패널 ---------- */
-function toggleFbPanel(){
-  var p=el('fbPanel');
-  var open = (p.style.display==='block');
-  p.style.display = open ? 'none' : 'block';
-  if(!open){ var c=fbCfg(); if(c) el('fbCfgTxt').value=JSON.stringify(c,null,2); }
-}
-function parseCfg(t){
-  t=t.trim();
-  var m=t.match(/\{[\s\S]*\}/); if(m) t=m[0];
-  try{ return JSON.parse(t); }catch(e){}
-  var j=t.replace(/([{,]\s*)([A-Za-z_$][\w$]*)\s*:/g,'$1"$2":')
-         .replace(/'/g,'"')
-         .replace(/,(\s*[}\]])/g,'$1');
-  try{ return JSON.parse(j); }catch(e){ return null; }
-}
-function applyFbCfg(){
-  var cfg=parseCfg(el('fbCfgTxt').value||'');
-  if(!cfg || !cfg.apiKey || !cfg.projectId){
-    alert('firebaseConfig를 읽을 수 없습니다. apiKey와 projectId가 포함된 객체를 그대로 붙여넣으세요.');
-    return;
-  }
-  try{ localStorage.setItem(FB_KEY, JSON.stringify(cfg)); }
-  catch(e){ alert('브라우저에 설정을 저장할 수 없습니다.'); return; }
-  location.reload();
-}
-function clearFbCfg(){
-  try{ localStorage.removeItem(FB_KEY); }catch(e){}
-  location.reload();
-}
-
-/* ---------- 버전 감시: 새 빌드가 올라오면 자동으로 새 버전을 열어준다 ---------- */
-function watchVersion(){
-  function check(){
-    fetch(location.pathname+'?_ck='+Date.now(), {cache:'no-store'})
-      .then(function(r){ return r.ok ? r.text() : null; })
-      .then(function(t){
-        if(!t) return;
-        var m=t.match(/APP_BUILD\s*=\s*"([^"]+)"/);
-        if(!m || m[1]===APP_BUILD) return;
-        try{ if(sessionStorage.getItem('wash_seen_build')===m[1]) return;
-             sessionStorage.setItem('wash_seen_build', m[1]); }catch(e){}
-        location.replace(location.pathname+'?v='+encodeURIComponent(m[1]));
-      })
-      .catch(function(){});
-  }
-  check();
-  setInterval(check, 60000);
-}
-
+var APP_VERSION = "v1.1";
 
 /* ---------- 계수 ---------- */
 var K_SOIL={light:1.00,medium:1.40,heavy:1.90};
 var K_TYPE={starch:1.00,oil:1.35,protein:1.25,sugar:1.15,mixed:1.50};
 var K_MAT ={PP:1.10,PE:1.12,PC:1.00,STS:0.90,AL:1.05};
-var T_TYPE={starch:60,oil:68,protein:55,sugar:62,mixed:65};
-var T_MAT ={PP:80,PE:60,PC:70,STS:95,AL:85};
 var NAME_SOIL={light:"경(輕)",medium:"중(中)",heavy:"고(高)"};
 var NAME_TYPE={starch:"전분/분체",oil:"유지/기름",protein:"단백질",sugar:"당류/점착",mixed:"혼합"};
 var PIPE=[15,20,25,32,40,50,65,80,100,125,150];
-var HP=[0.5,1,2,3,5,7.5,10,15,20,25,30];
-var KWH=[6,9,12,15,18,24,30,36,45,54,72];
+var HPS=[0.5,1,2,3,5,7.5,10,15,20,25,30];
+var KWS=[6,9,12,15,18,24,30,36,45,54,72];
 var CAP_MIN=800, CAP_MAX=1200;
+var BASE_SEC=10;          /* 기준 세척시간 10초 */
+var SPRAY_ANGLE=65, OVERLAP=0.30, PIPE_VEL=2.0, TANK_TURN=3;
 
 var DEFAULTS={
-  trayName:"표준 600×400",stance:"B",trayW:600,trayL:400,trayH:80,pockets:15,
+  trayName:"표준 600×400",trayW:600,trayL:400,trayH:80,pockets:15,
   soilLv:"medium",soilTp:"mixed",mat:"PP",
-  cfgType:"A",calcMode:"cap",tgtCap:1000,vSpd:1.08,gap:50,chN:2,mH:1900,chW:520,inH:750,frH:850,
-  zwPress:2.5,zwDist:150,zwSpV:130,zwSpH:150,zwRows:3,zwTemp:65,zwTankV:550,zwPumpHP:5,zwHeatKW:36,
-  zrPress:2.0,zrDist:150,zrSpV:130,zrSpH:150,zrRows:2,zrTemp:70,zrTankV:350,zrPumpHP:3,zrHeatKW:24,
-  fresh:0.08,tIn:15,heatMin:60,eff:0.65,opH:8,opD:22,wPrice:1200,ePrice:130,duty:0.40
+  cfgType:"A",chN:2,tgtCap:1000,gap:50,
+  sprayD:150,colGap:135,pW:2.5,pR:2.0,rowW:4,rowR:2,
+  tW:65,hpW:5,dW:65,vW:1000,kwW:72,
+  tR:70,hpR:3,dR:40,vR:450,kwR:30,
+  fresh:0.08,tIn:15,heatMin:60,eff:0.65,duty:0.40,opH:8,opD:22,wPrice:1200,ePrice:130
 };
 
 /* ---------- 유틸 ---------- */
 function el(id){ return document.getElementById(id); }
 function num(id){ var v=parseFloat(el(id).value); return isNaN(v)?0:v; }
 function val(id){ return el(id).value; }
-function set(id,v){ el(id).value=v; }
-function snap(a,v){ for(var i=0;i<a.length;i++){ if(a[i]>=v) return a[i]; } return a[a.length-1]; }
+function set(id,v){ if(el(id)) el(id).value=v; }
+function snapUp(a,v){ for(var i=0;i<a.length;i++){ if(a[i]>=v) return a[i]; } return a[a.length-1]; }
 function fx(v,d){ d=(d===undefined)?1:d; if(!isFinite(v)) v=0; return v.toLocaleString('ko-KR',{minimumFractionDigits:d,maximumFractionDigits:d}); }
 function n0(v){ if(!isFinite(v)) v=0; return Math.round(v).toLocaleString('ko-KR'); }
-function dia(Q,vel){ return Math.sqrt(4*(Q/60000)/(Math.PI*vel))*1000; }
+function rad(d){ return d*Math.PI/180; }
 
-/* ---------- 존(zone) 계산 ---------- */
-function zone(pfx, tanks, spanV, chN, eff, tIn, heatMin){
-  var z={};
-  z.press = Math.max(0.3,num(pfx+'Press'));
-  z.dist  = num(pfx+'Dist');
-  z.spV   = Math.max(30,num(pfx+'SpV'));
-  z.spH   = Math.max(30,num(pfx+'SpH'));
-  z.rows  = Math.max(1,num(pfx+'Rows'));
-  z.temp  = num(pfx+'Temp');
-  z.tankV = Math.max(1,num(pfx+'TankV'));
-  z.tanks = tanks;
-
-  z.recSpV = Math.max(60, Math.round((2*z.dist*Math.tan(32.5*Math.PI/180)*0.70)/10)*10);
-  z.nzV = Math.ceil(spanV/z.spV)+1;
-  z.nzPerTank = z.nzV*z.rows*2*chN;
-  z.nzTot = z.nzPerTank*tanks;
-  z.qN = 5.5*Math.sqrt(z.press/3);
-  z.flowTank = z.nzPerTank*z.qN;
-  z.flowTot = z.flowTank*tanks;
-  z.head = z.press*10.2*1.25+3;
-  z.pumpKW = 1000*9.81*(z.flowTank/60000)*z.head/eff/1000;
-  z.recHP = snap(HP, z.pumpKW/0.746*1.15);
-  z.pipeMain = snap(PIPE, dia(z.flowTank,2.5));
-  z.pipeHdr  = snap(PIPE, dia(z.flowTank/(2*chN),2.0));
-  z.recTank = Math.ceil((z.flowTank*1.5)/50)*50;
-  z.turn = z.tankV/z.flowTank;
-  z.dT = z.temp - tIn;
-  z.kwHeatUp = z.tankV*4.186*z.dT/(Math.max(5,heatMin)*60);
-  return z;
+/* ---------- 화면 전환 (모바일 / PC) ---------- */
+function setView(m){
+  document.body.className = (m==='mobile') ? 'mobile' : '';
+  el('vMo').className = (m==='mobile') ? 'on' : '';
+  el('vPc').className = (m==='mobile') ? '' : 'on';
+  try{ localStorage.setItem('wash_view', m); }catch(e){}
 }
 
-/* ---------- 전체 계산 ---------- */
+/* ---------- 계산 ---------- */
 function calc(){
-  var r={};
-  var W=num('trayW'),L=num('trayL'),H=num('trayH'),P=num('pockets'),st=val('stance');
-  r.spanW=(st==='A')?W:L;
-  r.spanV=(st==='A')?L:W;
-  r.pf=1+0.12*Math.sqrt(Math.max(P,0));
-  r.area=2*(W*L)/1e6*r.pf;
-  r.ks=K_SOIL[val('soilLv')]; r.kt=K_TYPE[val('soilTp')]; r.km=K_MAT[val('mat')];
-  r.reqW=10*r.ks*r.kt*r.km;
-  r.reqR=Math.max(6, 0.35*r.reqW);
+  var r={ msgs:[] };
 
-  var mm=val('mat');
-  var pr=(val('soilLv')==='light')?1.5:(val('soilLv')==='medium')?2.5:3.5;
-  if(val('soilTp')==='oil'||val('soilTp')==='sugar') pr+=0.5;
-  if(mm==='PP'||mm==='PE') pr=Math.min(pr,4.0);
-  r.recPressW=Math.round(Math.min(Math.max(pr,1.0),6.0)*10)/10;
-  r.recPressR=Math.round(Math.max(1.2, r.recPressW*0.8)*10)/10;
+  /* 트레이 */
+  r.W=num('trayW'); r.L=num('trayL'); r.H=num('trayH'); r.pockets=num('pockets');
+  r.soilLv=val('soilLv'); r.soilTp=val('soilTp'); r.mat=val('mat');
+  r.area = (2*r.W*r.L + 2*(r.W+r.L)*r.H)/1e6 + r.pockets*0.006;
+  r.needChW = r.W + 100;
 
-  var tr=T_TYPE[val('soilTp')]+(val('soilLv')==='heavy'?3:0);
-  r.recTempW=Math.min(tr, T_MAT[mm]-5);
-  r.recTempR=Math.min(r.recTempW+5, T_MAT[mm]-5);
+  /* 반송 */
+  r.chN=Math.max(1,num('chN')); r.cap=num('tgtCap'); r.gap=num('gap');
+  r.pitch = r.H + r.gap;
+  r.v = (r.chN>0) ? (r.pitch * r.cap) / (r.chN*60*1000) : 0;   /* m/min */
 
-  r.recChW=Math.ceil((r.spanW+120)/10)*10;
-  r.recInH=Math.ceil((r.spanV+150)/10)*10;
-  r.recSpH=150;
+  /* 노즐 기하 */
+  r.sprayD=num('sprayD');
+  r.sprayW = 2 * r.sprayD * Math.tan(rad(SPRAY_ANGLE/2));      /* 분사폭 mm */
+  r.vPitch = r.sprayW * (1-OVERLAP);                            /* 상하 간격 mm */
+  r.recColGap = Math.round(r.vPitch/5)*5;
+  r.colGap = num('colGap');
 
-  var chN=Math.max(1,num('chN')), gap=num('gap');
-  r.pitch=H+gap;
-  r.mode=val('calcMode');
-  r.tgt=num('tgtCap');
-  if(r.mode==='cap'){
-    r.cap=r.tgt;
-    r.v=(r.pitch>0&&chN>0)? r.cap*r.pitch/(60*1000*chN) : 0;
-  }else{
-    r.v=num('vSpd');
-    r.cap=(r.pitch>0)? (r.v*1000/r.pitch)*60*chN : 0;
-  }
+  /* 노즐 종류 · 압력 추천 */
+  if(r.soilLv==='heavy' || r.soilTp==='oil') r.nzType='충격제트형 (Solid/V-Jet)';
+  else if(r.soilLv==='medium') r.nzType='평면팬형 (Flat Fan '+SPRAY_ANGLE+'°)';
+  else r.nzType='평면팬 저압형 (Flat Fan '+SPRAY_ANGLE+'°)';
+  var pBase = (r.soilLv==='heavy')?3.5:(r.soilLv==='medium'?2.5:1.5);
+  if(r.soilTp==='oil') pBase += 0.5;
+  r.recPw = Math.round(pBase*10)/10;
+  r.recPr = Math.round((pBase*0.8)*10)/10;
 
-  r.washTanks=(val('cfgType')==='B')?2:1;
-  r.rinseTanks=1;
-  r.totTanks=r.washTanks+r.rinseTanks;
+  r.pW=num('pW'); r.pR=num('pR');
+  r.qW = 5.5*Math.sqrt(Math.max(r.pW,0)/3);   /* 노즐 1개 유량 L/min */
+  r.qR = 5.5*Math.sqrt(Math.max(r.pR,0)/3);
 
-  var eff=Math.min(Math.max(num('eff'),0.3),0.85), tIn=num('tIn'), hm=num('heatMin');
-  r.W=zone('zw', r.washTanks, r.spanV, chN, eff, tIn, hm);
-  r.R=zone('zr', r.rinseTanks, r.spanV, chN, eff, tIn, hm);
-  r.recSpVW=r.W.recSpV; r.recSpVR=r.R.recSpV;
-  r.recHPW=r.W.recHP;   r.recHPR=r.R.recHP;
-  r.recTankW=r.W.recTank; r.recTankR=r.R.recTank;
+  /* 존 구성 */
+  r.cfg = val('cfgType');
+  r.washTanks = (r.cfg==='B') ? 2 : 1;
+  r.rowW=Math.max(1,num('rowW')); r.rowR=Math.max(1,num('rowR'));
+  r.Lw = r.rowW * r.colGap * r.washTanks;
+  r.Lr = r.rowR * r.colGap;
 
-  function sec(tk,rw,sp){ return (r.v>0)? (tk*rw*sp/1000)/(r.v/60) : 0; }
-  r.actW=sec(r.washTanks, r.W.rows, r.W.spH);
-  r.actR=sec(r.rinseTanks, r.R.rows, r.R.spH);
+  /* 세척시간 판정 */
+  r.kS=K_SOIL[r.soilLv]||1; r.kT=K_TYPE[r.soilTp]||1; r.kM=K_MAT[r.mat]||1;
+  r.tReq = BASE_SEC * r.kS * r.kT * r.kM;
+  r.tActW = (r.v>0) ? (r.Lw/1000)/(r.v/60) : 0;
+  r.tActR = (r.v>0) ? (r.Lr/1000)/(r.v/60) : 0;
+  r.pass = r.tActW >= r.tReq;
+  /* 적합해지는 최소 열수 */
+  r.rowNeed = (r.colGap>0 && r.washTanks>0)
+    ? Math.ceil( (r.tReq*(r.v/60)*1000) / (r.colGap*r.washTanks) ) : 0;
 
-  // 추천 열수 / 구성
-  r.recRowsW=2; var okW=false;
-  for(var rw=2; rw<=6; rw++){ if(sec(r.washTanks,rw,r.W.spH)>=r.reqW){ r.recRowsW=rw; okW=true; break; } }
-  if(!okW) r.recRowsW=6;
-  r.recRowsR=2;
-  for(var rr=2; rr<=4; rr++){ if(sec(1,rr,r.R.spH)>=r.reqR){ r.recRowsR=rr; break; } }
-  r.recCfg = (sec(1,6,r.W.spH)>=r.reqW) ? 'A' : 'B';
+  /* 노즐 수량 : 유효 분사 높이 = 세로 L + 여유 100, 좌우 양면 */
+  r.hEff = r.L + 100;
+  r.nV = (r.vPitch>0) ? Math.ceil(r.hEff/r.vPitch) : 0;
+  r.nzW = r.nV * r.rowW * 2 * r.chN * r.washTanks;
+  r.nzR = r.nV * r.rowR * 2 * r.chN;
+  r.flowW = r.nzW * r.qW;
+  r.flowR = r.nzR * r.qR;
+  r.flowT = r.flowW + r.flowR;
 
-  r.washLen = r.washTanks*(r.W.rows*r.W.spH) + r.rinseTanks*(r.R.rows*r.R.spH) + (r.totTanks-1)*250 + 500;
-  r.nzTotAll = r.W.nzTot + r.R.nzTot;
-  r.flowTotAll = r.W.flowTot + r.R.flowTot;
+  /* 기기 역산 */
+  r.eff=Math.max(0.1,num('eff'));
+  function pumpHP(Q,P){ var kw = Q*P*1.5/(600*r.eff); return { kw:kw, hp:kw/0.746 }; }
+  var pw=pumpHP(r.flowW,r.pW), pr=pumpHP(r.flowR,r.pR);
+  r.recHpW=snapUp(HPS,pw.hp); r.recHpR=snapUp(HPS,pr.hp);
+  r.kwPumpW=r.recHpW*0.746; r.kwPumpR=r.recHpR*0.746;
 
-  // 급수 (헹굼조 신수 → 오버플로우 → 세척조 캐스케이드)
-  r.carry = r.area*0.15;
-  r.freshT = num('fresh');
-  r.makeupH = r.cap*(r.carry+r.freshT);
+  function pipeD(Q){ return Math.sqrt(4*(Q/60000)/(Math.PI*PIPE_VEL))*1000; }
+  r.recDw=snapUp(PIPE,pipeD(r.flowW)); r.recDr=snapUp(PIPE,pipeD(r.flowR));
 
-  // 히터 부하
-  var radR = 2.2*(r.R.dT/45), radW = 2.2*(r.W.dT/45);
-  r.holdR = radR + r.makeupH*4.186*(r.R.temp-tIn)/3600;
-  var casc = Math.max(0, r.W.temp - r.R.temp);
-  r.holdW = radW + (r.makeupH*4.186*casc/3600)/Math.max(1,r.washTanks)
-            + (r.cap*r.carry*4.186*Math.max(0,r.W.temp-tIn)/3600)*0.15;
-  r.recHeatR = snap(KWH, Math.max(r.R.kwHeatUp, r.holdR*1.5));
-  r.recHeatW = snap(KWH, Math.max(r.W.kwHeatUp, r.holdW*1.5));
+  r.recVw=Math.ceil(r.flowW*TANK_TURN/50)*50; r.recVr=Math.ceil(r.flowR*TANK_TURN/50)*50;
 
-  r.feedPipe = snap(PIPE, dia(r.makeupH/60, 1.5));
+  r.tIn=num('tIn'); r.heatMin=Math.max(1,num('heatMin'));
+  r.tWt=num('tW'); r.tRt=num('tR');
+  function heatKW(V,T){ return V*4.186*Math.max(0,T-r.tIn)/(r.heatMin*60); }
+  r.recKwW=snapUp(KWS,heatKW(r.recVw,r.tWt)); r.recKwR=snapUp(KWS,heatKW(r.recVr,r.tRt));
 
-  // 전력 · 비용
-  var opH=num('opH'), opD=num('opD'), duty=Math.min(Math.max(num('duty'),0.1),1);
-  r.pumpTotKW = (num('zwPumpHP')*r.washTanks + num('zrPumpHP')*r.rinseTanks)*0.746*0.90;
-  r.heatTotKW = (num('zwHeatKW')*r.washTanks + num('zrHeatKW')*r.rinseTanks)*duty;
-  r.powTot = r.pumpTotKW + r.heatTotKW;
-  r.powD = r.powTot*opH; r.powM = r.powD*opD;
-  r.waterD = (r.W.tankV*r.washTanks + r.R.tankV + r.makeupH*opH)/1000;
-  r.waterM = ((r.W.tankV*r.washTanks + r.R.tankV) + r.makeupH*opH*opD)/1000;
-  r.costWD=r.waterD*num('wPrice'); r.costWM=r.waterM*num('wPrice');
-  r.costED=r.powD*num('ePrice');   r.costEM=r.powM*num('ePrice');
-  r.costM=r.costWM+r.costEM;
+  /* 입력값 */
+  r.hpW=num('hpW'); r.hpR=num('hpR'); r.dW=num('dW'); r.dR=num('dR');
+  r.vW=num('vW'); r.vR=num('vR'); r.kwW=num('kwW'); r.kwR=num('kwR');
 
-  /* ---------- 판정 ---------- */
-  r.msgs=[]; var bad=false;
-  if(r.actW>=r.reqW) r.msgs.push(["ok","세척 체류시간 충족 — 필요 "+fx(r.reqW)+"초 / 실제 "+fx(r.actW)+"초 (여유 "+fx((r.actW/r.reqW-1)*100,0)+"%)"]);
-  else{ bad=true; r.msgs.push(["bad","세척 체류시간 부족 — 필요 "+fx(r.reqW)+"초 / 실제 "+fx(r.actW)+"초. "+(r.recCfg==='B'?"B형(세척 2조)":"세척 "+r.recRowsW+"열")+"로 변경하십시오."]); }
-  if(r.actR>=r.reqR) r.msgs.push(["ok","헹굼 체류시간 충족 — 필요 "+fx(r.reqR)+"초 / 실제 "+fx(r.actR)+"초"]);
-  else{ bad=true; r.msgs.push(["bad","헹굼 체류시간 부족 — 필요 "+fx(r.reqR)+"초 / 실제 "+fx(r.actR)+"초. 헹굼 "+r.recRowsR+"열 권장"]); }
+  /* 급수 · 전력 · 비용 */
+  r.fresh=num('fresh'); r.opH=num('opH'); r.opD=num('opD');
+  r.duty=num('duty'); r.wPrice=num('wPrice'); r.ePrice=num('ePrice');
+  r.waterDay = r.fresh * r.cap * r.opH / 1000;          /* m³/일 */
+  r.waterMon = r.waterDay * r.opD;
+  r.kwTotal = (r.hpW+r.hpR)*0.746 + (r.kwW+r.kwR)*r.duty;
+  r.elecDay = r.kwTotal * r.opH;                         /* kWh/일 */
+  r.elecMon = r.elecDay * r.opD;
+  r.costDay = r.waterDay*r.wPrice + r.elecDay*r.ePrice;
+  r.costMon = r.costDay * r.opD;
+
+  /* 판정 메시지 */
   if(r.cap<CAP_MIN) r.msgs.push(["warn","처리량 "+n0(r.cap)+"매/hr — 목표 하한 "+n0(CAP_MIN)+"매/hr 미달"]);
-  else if(r.cap>CAP_MAX) r.msgs.push(["warn","처리량 "+n0(r.cap)+"매/hr — 목표 상한 "+n0(CAP_MAX)+"매/hr 초과, 세척 여유시간 확인 필요"]);
+  else if(r.cap>CAP_MAX) r.msgs.push(["warn","처리량 "+n0(r.cap)+"매/hr — 목표 상한 "+n0(CAP_MAX)+"매/hr 초과"]);
   else r.msgs.push(["ok","처리량 "+n0(r.cap)+"매/hr — 목표 범위("+n0(CAP_MIN)+"~"+n0(CAP_MAX)+") 내"]);
-  if(num('chW')<r.spanW+80){ bad=true; r.msgs.push(["bad","채널 폭 부족 — 트레이 폭방향 "+n0(r.spanW)+"mm, 최소 "+n0(r.recChW)+"mm 필요"]); }
-  if(num('inH')<r.spanV+100){ bad=true; r.msgs.push(["bad","내부 높이 부족 — 트레이 수직 "+n0(r.spanV)+"mm, 최소 "+n0(r.recInH)+"mm 필요"]); }
-  if(num('mH')<num('inH')+num('frH')+150) r.msgs.push(["warn","전체 높이 재검토 — 내부높이+프레임+상부덕트(150mm) 여유 부족"]);
-  if(num('zwPumpHP')<r.W.pumpKW/0.746){ bad=true; r.msgs.push(["bad","세척 펌프 부족 — 소요축동력 "+fx(r.W.pumpKW,2)+"kW, 권장 "+r.W.recHP+"HP"]); }
-  if(num('zrPumpHP')<r.R.pumpKW/0.746){ bad=true; r.msgs.push(["bad","헹굼 펌프 부족 — 소요축동력 "+fx(r.R.pumpKW,2)+"kW, 권장 "+r.R.recHP+"HP"]); }
-  if(num('zwHeatKW')<r.holdW*1.2){ bad=true; r.msgs.push(["bad","세척 히터 부족 — 유지열량 "+fx(r.holdW,1)+"kW, 권장 "+r.recHeatW+"kW"]); }
-  if(num('zrHeatKW')<r.holdR*1.2){ bad=true; r.msgs.push(["bad","헹굼 히터 부족 — 유지열량 "+fx(r.holdR,1)+"kW, 권장 "+r.recHeatR+"kW"]); }
-  if(r.W.turn<1.0) r.msgs.push(["warn","세척 탱크 과소 — 회전주기 "+fx(r.W.turn,2)+"분(권장 1.5분↑), 권장 "+n0(r.W.recTank)+"L"]);
-  if(r.R.turn<1.0) r.msgs.push(["warn","헹굼 탱크 과소 — 회전주기 "+fx(r.R.turn,2)+"분(권장 1.5분↑), 권장 "+n0(r.R.recTank)+"L"]);
-  if(r.W.temp>T_MAT[mm]-5||r.R.temp>T_MAT[mm]-5){ bad=true; r.msgs.push(["bad","설정 온도가 재질("+mm+", 내열 "+T_MAT[mm]+"℃) 한계 근접 — 세척 "+r.recTempW+"℃ / 헹굼 "+r.recTempR+"℃ 이하 권장"]); }
-  if(r.R.temp<r.W.temp) r.msgs.push(["warn","헹굼 온도가 세척 온도보다 낮음 — 건조 효율 저하, 헹굼 "+r.recTempR+"℃ 권장"]);
-  if(Math.abs(r.W.press-r.recPressW)>1.0) r.msgs.push(["warn","세척 압력 재검토 — 오염 조건 기준 권장 "+fx(r.recPressW)+" bar"]);
 
-  r.judge = bad ? "부적합" : (r.msgs.some(function(m){return m[0]==="warn";}) ? "조건부" : "적합");
+  if(r.pass) r.msgs.push(["ok","세척 체류시간 "+fx(r.tActW)+"초 ≥ 필요 "+fx(r.tReq)+"초 — 적합"]);
+  else r.msgs.push(["bad","세척 체류시간 "+fx(r.tActW)+"초 < 필요 "+fx(r.tReq)+"초 — 부적합. 노즐 열수를 "+r.rowNeed+"열 이상으로 늘리거나 처리량을 낮추세요"]);
+
+  if(Math.abs(r.colGap-r.recColGap)>10)
+    r.msgs.push(["warn","좌우 열간격 "+n0(r.colGap)+"mm — 추천 "+n0(r.recColGap)+"mm (분사각 "+SPRAY_ANGLE+"°·중첩 "+(OVERLAP*100)+"% 기준)"]);
+
+  function chk(label,now,rec,unit){
+    if(now < rec) r.msgs.push(["bad",label+" "+fx(now,now%1?1:0)+unit+" — 추천 "+fx(rec,rec%1?1:0)+unit+" 미달"]);
+  }
+  chk("세척 펌프",r.hpW,r.recHpW,"HP");
+  chk("헹굼 펌프",r.hpR,r.recHpR,"HP");
+  chk("세척 배관",r.dW,r.recDw,"A");
+  chk("헹굼 배관",r.dR,r.recDr,"A");
+  chk("세척 탱크",r.vW,r.recVw,"L");
+  chk("헹굼 탱크",r.vR,r.recVr,"L");
+  chk("세척 히터",r.kwW,r.recKwW,"kW");
+  chk("헹굼 히터",r.kwR,r.recKwR,"kW");
+
   return r;
 }
 
@@ -691,138 +446,119 @@ var R=null;
 function render(){
   var r=calc(); R=r;
 
-  if(r.mode==='cap'){ set('vSpd', fx(r.v,2)); el('vSpd').readOnly=true; el('tgtCap').readOnly=false; }
-  else{ el('vSpd').readOnly=false; el('tgtCap').readOnly=true; }
+  set('oArea',fx(r.area,2)); set('oChW',n0(r.needChW));
+  set('oPitch',n0(r.pitch)); set('oSpd',fx(r.v,2));
+  set('oVp',n0(r.vPitch)); set('oNzType',r.nzType);
+  set('oQw',fx(r.qW,2)); set('oQr',fx(r.qR,2));
+  set('oLw',n0(r.Lw)); set('oNw',n0(r.nzW)); set('oFw',n0(r.flowW));
+  set('oLr',n0(r.Lr)); set('oNr',n0(r.nzR)); set('oFr',n0(r.flowR));
 
-  set('areaOut', fx(r.area,3));
-  set('zwNzType', nzType(r,'W'));
-  set('zwNz', r.W.nzV+' / '+n0(r.W.nzTot));
-  set('zwFlow', n0(r.W.flowTank)+' L/min · '+fx(r.W.head,1)+' m');
-  set('zwPipe', r.W.pipeMain+'A / '+r.W.pipeHdr+'A');
-  set('zwTime', fx(r.reqW)+' / '+fx(r.actW));
-  set('zrNz', r.R.nzV+' / '+n0(r.R.nzTot));
-  set('zrFlow', n0(r.R.flowTank)+' L/min · '+fx(r.R.head,1)+' m');
-  set('zrPipe', r.R.pipeMain+'A / '+r.R.pipeHdr+'A');
-  set('zrTime', fx(r.reqR)+' / '+fx(r.actR));
-  set('feedPipe', r.feedPipe);
-  set('makeup', n0(r.makeupH));
+  el('hCap').innerHTML=n0(r.cap)+'<small> 매/hr</small>';
+  el('hSpd').innerHTML=fx(r.v,2)+'<small> m/min</small>';
+  el('hJudge').className='hv '+(r.pass?'ok':'bad');
+  el('hJudge').textContent=r.pass?'적합':'부적합';
+  el('hFlow').innerHTML=n0(r.flowT)+'<small> L/min</small>';
+  el('hCost').innerHTML=fx(r.costMon/10000,0)+'<small> 만원</small>';
 
-  el('rcCfg').textContent='추천 '+r.recCfg+'형';
-  el('rcChW').textContent='추천 '+n0(r.recChW);
-  el('rcInH').textContent='추천 '+n0(r.recInH);
-  el('rcZwPress').textContent='추천 '+fx(r.recPressW);
-  el('rcZwSpV').textContent='추천 '+n0(r.recSpVW);
-  el('rcZwSpH').textContent='추천 '+n0(r.recSpH);
-  el('rcZwRows').textContent='추천 '+r.recRowsW;
-  el('rcZwTemp').textContent='추천 '+r.recTempW;
-  el('rcZwTankV').textContent='추천 '+n0(r.recTankW);
-  el('rcZwPumpHP').textContent='추천 '+r.recHPW;
-  el('rcZwHeatKW').textContent='추천 '+r.recHeatW;
-  el('rcZrPress').textContent='추천 '+fx(r.recPressR);
-  el('rcZrSpV').textContent='추천 '+n0(r.recSpVR);
-  el('rcZrSpH').textContent='추천 '+n0(r.recSpH);
-  el('rcZrRows').textContent='추천 '+r.recRowsR;
-  el('rcZrTemp').textContent='추천 '+r.recTempR;
-  el('rcZrTankV').textContent='추천 '+n0(r.recTankR);
-  el('rcZrPumpHP').textContent='추천 '+r.recHPR;
-  el('rcZrHeatKW').textContent='추천 '+r.recHeatR;
+  el('verdict').innerHTML='<div class="verdict '+(r.pass?'ok':'bad')+'">'
+    +'<div class="vt">'+(r.pass?'세척 조건 적합':'세척 조건 부적합')+'</div>'
+    +'<div class="vs">필요 세척시간 '+fx(r.tReq)+'초 = 10초 × '+fx(r.kS,2)+'(오염수준) × '+fx(r.kT,2)+'(오염종류) × '+fx(r.kM,2)+'(재질)'
+    +' &nbsp;|&nbsp; 실제 체류시간 '+fx(r.tActW)+'초</div></div>';
 
-  el('hudCap').innerHTML=n0(r.cap)+'<small> 매/hr</small>';
-  el('hudCfg').innerHTML=val('cfgType')+'형<small> 세척'+r.washTanks+'+헹굼1</small>';
-  el('hudSpd').innerHTML=fx(r.v,2)+'<small> m/min</small>';
-  el('hudPow').innerHTML=fx(r.powTot,1)+'<small> kW</small>';
-  var jc=(r.judge==="적합")?"ok":(r.judge==="조건부")?"warn":"bad";
-  el('hudJudge').innerHTML='<span class="tag '+jc+'">'+r.judge+'</span>';
+  el('msgs').innerHTML = r.msgs.map(function(m){ return '<div class="msg '+m[0]+'">'+m[1]+'</div>'; }).join('');
 
-  el('oCap').innerHTML='<b>'+n0(r.cap)+'</b> 매/hr (채널 '+num('chN')+' · 목표 '+n0(CAP_MIN)+'~'+n0(CAP_MAX)+')';
-  el('oSpd').innerHTML='<b>'+fx(r.v,2)+'</b> m/min · 피치 '+n0(r.pitch)+' mm';
-  el('oTimeW').innerHTML='<b>'+fx(r.reqW)+'</b> / '+fx(r.actW)+' 초 (계수 '+fx(r.ks,2)+'×'+fx(r.kt,2)+'×'+fx(r.km,2)+')';
-  el('oTimeR').innerHTML='<b>'+fx(r.reqR)+'</b> / '+fx(r.actR)+' 초';
-  el('oLen').innerHTML='<b>'+n0(r.washLen)+'</b> mm ('+r.totTanks+'조)';
-  el('oNz').innerHTML='<b>'+n0(r.nzTotAll)+'</b> EA (세척 '+n0(r.W.nzTot)+' / 헹굼 '+n0(r.R.nzTot)+')';
-  el('oFlowT').innerHTML='<b>'+n0(r.flowTotAll)+'</b> L/min (세척 '+n0(r.W.flowTot)+' / 헹굼 '+n0(r.R.flowTot)+')';
-  el('oPowT').innerHTML='<b>'+fx(r.powTot,1)+'</b> kW (펌프 '+fx(r.pumpTotKW,1)+' + 히터 '+fx(r.heatTotKW,1)+')';
-  el('oWaterD').innerHTML=fx(r.waterD,2)+' ㎥/일 · <b>'+n0(r.costWD)+'</b> 원';
-  el('oWaterM').innerHTML=fx(r.waterM,1)+' ㎥/월 · <b>'+n0(r.costWM)+'</b> 원';
-  el('oPowD').innerHTML=n0(r.powD)+' kWh/일 · <b>'+n0(r.costED)+'</b> 원';
-  el('oCostM').innerHTML='<b>'+n0(r.costM)+'</b> 원/월 (수도 '+n0(r.costWM)+' + 전기 '+n0(r.costEM)+')';
-
-  var h=''; for(var i=0;i<r.msgs.length;i++){ h+='<div class="msg '+r.msgs[i][0]+'">'+r.msgs[i][1]+'</div>'; }
-  el('msgs').innerHTML=h;
+  el('resTbl').innerHTML =
+     '<tr><th>항목</th><th>세척존 (WASH)</th><th>헹굼존 (RINSE)</th></tr>'
+    +tr3('조 수', r.washTanks+' 조', '1 조')
+    +tr3('노즐 열수', r.rowW+' 열/조', r.rowR+' 열')
+    +tr3('존 길이', n0(r.Lw)+' mm', n0(r.Lr)+' mm')
+    +tr3('체류시간', fx(r.tActW)+' 초', fx(r.tActR)+' 초')
+    +tr3('분사압력', fx(r.pW)+' bar (추천 '+fx(r.recPw)+')', fx(r.pR)+' bar (추천 '+fx(r.recPr)+')')
+    +tr3('노즐 1개 유량', fx(r.qW,2)+' L/min', fx(r.qR,2)+' L/min')
+    +tr3('노즐 수량', n0(r.nzW)+' EA', n0(r.nzR)+' EA')
+    +tr3('순환유량', n0(r.flowW)+' L/min', n0(r.flowR)+' L/min')
+    +tr3('펌프', fx(r.hpW)+' HP (추천 '+fx(r.recHpW)+')', fx(r.hpR)+' HP (추천 '+fx(r.recHpR)+')')
+    +tr3('배관 직경', n0(r.dW)+' A (추천 '+n0(r.recDw)+')', n0(r.dR)+' A (추천 '+n0(r.recDr)+')')
+    +tr3('물탱크', n0(r.vW)+' L (추천 '+n0(r.recVw)+')', n0(r.vR)+' L (추천 '+n0(r.recVr)+')')
+    +tr3('히터', n0(r.kwW)+' kW (추천 '+n0(r.recKwW)+')', n0(r.kwR)+' kW (추천 '+n0(r.recKwR)+')')
+    +tr3('수온', n0(r.tWt)+' ℃', n0(r.tRt)+' ℃')
+    +'<tr><th>공통</th><th colspan="2">산출값</th></tr>'
+    +tr2('반송 피치 / 속도', n0(r.pitch)+' mm / <b>'+fx(r.v,2)+' m/min</b> ('+r.chN+'채널 병렬)')
+    +tr2('상하 노즐 간격', n0(r.vPitch)+' mm (분사폭 '+n0(r.sprayW)+'mm × 중첩 '+(OVERLAP*100)+'%), 단수 '+r.nV+'단')
+    +tr2('노즐 종류', r.nzType)
+    +tr2('유효 표면적 / 필요 채널 폭', fx(r.area,2)+' m² / '+n0(r.needChW)+' mm')
+    +tr2('일 급수량 / 월 급수량', fx(r.waterDay,2)+' ㎥ / <b>'+fx(r.waterMon,1)+' ㎥</b>')
+    +tr2('일 전력량 / 월 전력량', n0(r.elecDay)+' kWh / <b>'+n0(r.elecMon)+' kWh</b>')
+    +tr2('일 운영비 / 월 운영비', n0(r.costDay)+' 원 / <b>'+n0(r.costMon)+' 원</b>');
 }
-function nzType(r,which){
-  var st=val('soilTp'), sl=val('soilLv'), P=num('pockets');
-  if(which==='R') return "평면팬 65° 저압형 · SUS304";
-  if(sl==='heavy') return "고압 평면팬 65°(VeeJet형) · SUS304";
-  if(st==='oil'||st==='sugar') return "평면팬 65° 대유량형 · SUS304";
-  if(P>=20) return "풀콘 60°(포켓 침투형) · SUS304";
-  return "평면팬 65° 표준형 · SUS304";
-}
+function tr3(k,a,b){ return '<tr><td class="k">'+k+'</td><td>'+a+'</td><td>'+b+'</td></tr>'; }
+function tr2(k,v){ return '<tr><td class="k">'+k+'</td><td colspan="2">'+v+'</td></tr>'; }
 
 /* ---------- 추천 적용 ---------- */
-function applyRec(id,key){
-  var r=calc();
-  if(r[key]!==undefined){ set(id,r[key]); render(); }
-}
-var REC_SEQ=[
-  ['chW','recChW'],['inH','recInH'],['cfgType','recCfg'],
-  ['zwPress','recPressW'],['zwSpV','recSpVW'],['zwSpH','recSpH'],['zwRows','recRowsW'],['zwTemp','recTempW'],
-  ['zrPress','recPressR'],['zrSpV','recSpVR'],['zrSpH','recSpH'],['zrRows','recRowsR'],['zrTemp','recTempR'],
-  ['zwTankV','recTankW'],['zrTankV','recTankR'],
-  ['zwPumpHP','recHPW'],['zrPumpHP','recHPR'],
-  ['zwHeatKW','recHeatW'],['zrHeatKW','recHeatR']
-];
+var REC={
+  hp:function(r){ return r.recColGap; },
+  pw:function(r){ return r.recPw; },  pr:function(r){ return r.recPr; },
+  rw:function(r){ return Math.max(r.rowNeed,1); },
+  hpw:function(r){ return r.recHpW; }, hpr:function(r){ return r.recHpR; },
+  dw:function(r){ return r.recDw; },   dr:function(r){ return r.recDr; },
+  vw:function(r){ return r.recVw; },   vr:function(r){ return r.recVr; },
+  kww:function(r){ return r.recKwW; }, kwr:function(r){ return r.recKwR; }
+};
+function applyRec(id,key){ if(!R) render(); set(id, REC[key](R)); render(); }
 function applyAllRec(){
-  for(var p=0;p<2;p++){
-    for(var i=0;i<REC_SEQ.length;i++){
-      var r=calc(), id=REC_SEQ[i][0], k=REC_SEQ[i][1];
-      if(r[k]!==undefined) set(id,r[k]);
-    }
-  }
+  var seq=[['colGap','hp'],['pW','pw'],['pR','pr'],['rowW','rw'],
+           ['hpW','hpw'],['hpR','hpr'],['dW','dw'],['dR','dr'],
+           ['vW','vw'],['vR','vr'],['kwW','kww'],['kwR','kwr']];
+  for(var i=0;i<seq.length;i++){ render(); set(seq[i][0], REC[seq[i][1]](R)); }
   render();
 }
-function resetAll(){ for(var k in DEFAULTS){ if(el(k)) el(k).value=DEFAULTS[k]; } render(); }
+function resetAll(){ for(var k in DEFAULTS){ set(k,DEFAULTS[k]); } render(); }
 
-/* ---------- 트레이 라이브러리 ---------- */
-var TRAY_FIELDS=['trayName','stance','trayW','trayL','trayH','pockets','soilLv','soilTp','mat'];
-async function saveTray(){
+/* ---------- 트레이 라이브러리 (브라우저 로컬 저장) ---------- */
+var LIB_KEY='wash_tray_lib_v1';
+var TRAY_FIELDS=['trayName','trayW','trayL','trayH','pockets','soilLv','soilTp','mat'];
+function libRead(){ try{ return JSON.parse(localStorage.getItem(LIB_KEY)||'[]'); }catch(e){ return []; } }
+function libWrite(a){ try{ localStorage.setItem(LIB_KEY, JSON.stringify(a)); }catch(e){ alert('브라우저 저장 공간에 쓸 수 없습니다.'); } }
+function saveTray(){
   var o={}; TRAY_FIELDS.forEach(function(f){ o[f]=val(f); });
-  o.savedAt=new Date().toISOString();
-  await STORE.add(o); await renderLib();
+  o._id='t'+Date.now(); o.savedAt=new Date().toISOString();
+  var a=libRead(); a.push(o); libWrite(a); renderLib();
 }
-async function renderLib(){
-  var arr=await STORE.list(), box=el('lib');
-  if(!arr.length){ box.innerHTML='<div class="empty">저장된 트레이가 없습니다.</div>'; return; }
+function renderLib(){
+  var a=libRead(), box=el('lib');
+  if(!a.length){ box.innerHTML='<div class="empty">저장된 트레이가 없습니다.</div>'; return; }
   var h='<table><tr><th>명칭</th><th>W×L×H</th><th>포켓</th><th>오염</th><th>재질</th><th></th></tr>';
-  arr.forEach(function(t){
+  a.forEach(function(t){
     h+='<tr><td>'+t.trayName+'</td><td>'+t.trayW+'×'+t.trayL+'×'+t.trayH+'</td><td>'+t.pockets+'</td>'
-     +'<td>'+NAME_SOIL[t.soilLv]+'/'+NAME_TYPE[t.soilTp]+'</td><td>'+t.mat+'</td>'
+     +'<td>'+(NAME_SOIL[t.soilLv]||'')+'/'+(NAME_TYPE[t.soilTp]||'')+'</td><td>'+t.mat+'</td>'
      +'<td style="white-space:nowrap"><button class="mini" onclick="loadTray(\''+t._id+'\')">불러오기</button>'
      +'<button class="mini del" onclick="delTray(\''+t._id+'\')">삭제</button></td></tr>';
   });
   box.innerHTML=h+'</table>';
 }
-async function loadTray(id){
-  var arr=await STORE.list(), t=arr.filter(function(x){return x._id===id;})[0];
+function loadTray(id){
+  var t=libRead().filter(function(x){ return x._id===id; })[0];
   if(!t) return;
   TRAY_FIELDS.forEach(function(f){ if(t[f]!==undefined) set(f,t[f]); });
   render();
 }
-async function delTray(id){ await STORE.del(id); await renderLib(); }
-async function exportLib(){ var a=await STORE.list(); dl('trays.json', JSON.stringify(a,null,2),'application/json'); }
+function delTray(id){ libWrite(libRead().filter(function(x){ return x._id!==id; })); renderLib(); }
+function exportLib(){ dl('trays.json', JSON.stringify(libRead(),null,2), 'application/json'); }
 function importLib(ev){
   var f=ev.target.files[0]; if(!f) return;
   var rd=new FileReader();
-  rd.onload=async function(){
-    try{ var arr=JSON.parse(rd.result);
-      for(var i=0;i<arr.length;i++){ delete arr[i]._id; await STORE.add(arr[i]); }
-      await renderLib();
+  rd.onload=function(){
+    try{
+      var arr=JSON.parse(rd.result); if(!Array.isArray(arr)) throw 0;
+      var a=libRead();
+      arr.forEach(function(o){ o._id='t'+Date.now()+Math.floor(Math.random()*1000); a.push(o); });
+      libWrite(a); renderLib();
     }catch(e){ alert('JSON 형식을 읽을 수 없습니다.'); }
   };
   rd.readAsText(f); ev.target.value='';
 }
 
-/* ---------- 사양서 ---------- */
+/* ---------- 사양서 다운로드 ---------- */
 function dl(name,text,mime){
   var b=new Blob([text],{type:mime+';charset=utf-8'});
   var a=document.createElement('a');
@@ -830,102 +566,85 @@ function dl(name,text,mime){
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(function(){ URL.revokeObjectURL(a.href); },1000);
 }
-function tr3(k,a,b){ return '<tr><td class="k">'+k+'</td><td>'+a+'</td><td>'+b+'</td></tr>'; }
-function tr2(k,v){ return '<tr><td class="k">'+k+'</td><td colspan="2">'+v+'</td></tr>'; }
 function downloadSpec(){
-  var r=calc(), d=new Date();
-  var ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-  var s='<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>트레이 세척기 사양서</title>'
-  +'<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">'
-  +'<style>body{font-family:"Noto Sans KR",sans-serif;font-size:12px;color:#26333f;max-width:900px;margin:0 auto;padding:24px}'
-  +'h1{font-size:20px;color:#12283f;margin:0 0 4px}h2{font-size:13px;color:#fff;background:#1b3a5c;padding:6px 10px;margin:16px 0 0}'
-  +'.sub{font-size:11px;color:#5a6b7a;margin-bottom:10px}table{width:100%;border-collapse:collapse}'
-  +'td,th{border:1px solid #d7dfe7;padding:5px 8px}td.k{background:#f7f9fb;color:#5a6b7a;width:32%;font-weight:500}'
-  +'th{background:#eef3f7;color:#1b3a5c;text-align:left}.ft{margin-top:18px;font-size:11px;color:#5a6b7a;text-align:center}'
-  +'</style></head><body>'
-  +'<h1>트레이 세척기 사양서 <span style="font-size:12px;color:#2f6f9e">'+APP_VERSION+'</span></h1>'
-  +'<div class="sub">인시스 AI혁신 연구개발실 · 작성일 '+ds+' · 대상 '+val('trayName')+' · 구성 '+val('cfgType')+'형(세척 '+r.washTanks+'조 + 헹굼 1조) · 판정 '+r.judge+'</div>'
-  +'<h2>1. 세척 대상물</h2><table>'
-  +tr2('트레이 규격 (W×L×H)', n0(num('trayW'))+' × '+n0(num('trayL'))+' × '+n0(num('trayH'))+' mm')
-  +tr2('포켓 수 / 재질', n0(num('pockets'))+' EA / '+val('mat')+' (내열 '+T_MAT[val('mat')]+'℃)')
-  +tr2('오염 수준 / 종류', NAME_SOIL[val('soilLv')]+' / '+NAME_TYPE[val('soilTp')])
-  +tr2('유효 세척 표면적', fx(r.area,3)+' m²/매')
-  +tr2('투입 자세', (val('stance')==='A'?'가로 폭방향':'세로 폭방향')+' · 폭 '+n0(r.spanW)+' / 수직 '+n0(r.spanV)+' mm')
-  +'</table>'
-  +'<h2>2. 기계 구조 · 반송</h2><table>'
-  +tr2('전체 높이 / 하단 프레임', n0(num('mH'))+' / '+n0(num('frH'))+' mm')
-  +tr2('채널 구성', num('chN')+' 채널 · 채널당 폭 '+n0(num('chW'))+' mm · 내부높이 '+n0(num('inH'))+' mm')
-  +tr2('조 구성', val('cfgType')+'형 — 세척 '+r.washTanks+'조 + 헹굼 '+r.rinseTanks+'조 (총 '+r.totTanks+'조)')
-  +tr2('세척+헹굼부 유효 길이', n0(r.washLen)+' mm')
-  +tr2('컨베이어 속도 / 피치', fx(r.v,2)+' m/min / '+n0(r.pitch)+' mm')
-  +tr2('시간당 처리량', '<b>'+n0(r.cap)+' 매/hr</b> (목표 '+n0(CAP_MIN)+'~'+n0(CAP_MAX)+')')
-  +'</table>'
-  +'<h2>3. 존별 사양</h2><table>'
-  +'<tr><th>항목</th><th>세척존 (WASH)</th><th>헹굼존 (RINSE)</th></tr>'
-  +tr3('조 수', r.washTanks+' 조', r.rinseTanks+' 조')
-  +tr3('노즐 종류', nzType(r,'W'), nzType(r,'R'))
-  +tr3('분사 압력', fx(r.W.press)+' bar', fx(r.R.press)+' bar')
-  +tr3('노즐 간격 (상하/좌우)', n0(r.W.spV)+' / '+n0(r.W.spH)+' mm', n0(r.R.spV)+' / '+n0(r.R.spH)+' mm')
-  +tr3('노즐 배열 (상하×열)', r.W.nzV+' × '+r.W.rows+' 열', r.R.nzV+' × '+r.R.rows+' 열')
-  +tr3('총 노즐 수', n0(r.W.nzTot)+' EA', n0(r.R.nzTot)+' EA')
-  +tr3('노즐 단위 유량', fx(r.W.qN,2)+' L/min', fx(r.R.qN,2)+' L/min')
-  +tr3('조당 순환 유량', n0(r.W.flowTank)+' L/min', n0(r.R.flowTank)+' L/min')
-  +tr3('펌프 전양정', fx(r.W.head,1)+' m', fx(r.R.head,1)+' m')
-  +tr3('펌프 용량 (조당)', '<b>'+num('zwPumpHP')+' HP</b> (권장 '+r.W.recHP+')', '<b>'+num('zrPumpHP')+' HP</b> (권장 '+r.R.recHP+')')
-  +tr3('주배관 / 헤더관', r.W.pipeMain+'A / '+r.W.pipeHdr+'A', r.R.pipeMain+'A / '+r.R.pipeHdr+'A')
-  +tr3('물탱크 용량', n0(r.W.tankV)+' L (권장 '+n0(r.W.recTank)+')', n0(r.R.tankV)+' L (권장 '+n0(r.R.recTank)+')')
-  +tr3('탱크 회전주기', fx(r.W.turn,2)+' 분', fx(r.R.turn,2)+' 분')
-  +tr3('설정 온도', num('zwTemp')+' ℃ (권장 '+r.recTempW+')', num('zrTemp')+' ℃ (권장 '+r.recTempR+')')
-  +tr3('히터 용량', '<b>'+num('zwHeatKW')+' kW</b> (권장 '+r.recHeatW+')', '<b>'+num('zrHeatKW')+' kW</b> (권장 '+r.recHeatR+')')
-  +tr3('승온 / 유지 열량', fx(r.W.kwHeatUp,1)+' / '+fx(r.holdW,1)+' kW', fx(r.R.kwHeatUp,1)+' / '+fx(r.holdR,1)+' kW')
-  +tr3('필요 / 실제 체류시간', fx(r.reqW)+' / '+fx(r.actW)+' 초', fx(r.reqR)+' / '+fx(r.actR)+' 초')
-  +'</table>'
-  +'<h2>4. 급수 · 유틸리티</h2><table>'
-  +tr2('급수 방식', '헹굼조 신수 공급 → 오버플로우 캐스케이드 → 세척조 → 배수')
-  +tr2('트레이당 캐리오버 / 신수', fx(r.carry,3)+' / '+fx(r.freshT,2)+' L/매')
-  +tr2('시간당 신수 보충', n0(r.makeupH)+' L/hr')
-  +tr2('급수 배관 직경', r.feedPipe+'A')
-  +tr2('총 순환 유량', n0(r.flowTotAll)+' L/min')
-  +tr2('총 소비전력', fx(r.powTot,1)+' kW (펌프 '+fx(r.pumpTotKW,1)+' + 히터 '+fx(r.heatTotKW,1)+', 가동률 '+fx(num('duty')*100,0)+'%)')
-  +'</table>'
-  +'<h2>5. 운전비</h2><table>'
-  +'<tr><th>구분</th><th>일 ('+num('opH')+'hr)</th><th>월 ('+num('opD')+'일)</th></tr>'
-  +tr3('급수량', fx(r.waterD,2)+' ㎥', fx(r.waterM,1)+' ㎥')
-  +tr3('급수 비용', n0(r.costWD)+' 원', n0(r.costWM)+' 원')
-  +tr3('전력량', n0(r.powD)+' kWh', n0(r.powM)+' kWh')
-  +tr3('전력 비용', n0(r.costED)+' 원', n0(r.costEM)+' 원')
-  +tr3('합계', '<b>'+n0(r.costWD+r.costED)+' 원</b>', '<b>'+n0(r.costM)+' 원</b>')
-  +'</table>'
-  +'<h2>6. 검토 의견</h2><table>';
-  for(var i=0;i<r.msgs.length;i++){
-    var lb=r.msgs[i][0]==='ok'?'적합':(r.msgs[i][0]==='warn'?'검토':'조치');
-    s+='<tr><td class="k">'+lb+'</td><td colspan="2">'+r.msgs[i][1]+'</td></tr>';
+  var r=R||calc();
+  var d=new Date();
+  var day=d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0');
+  var s='<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">'
+   +'<title>트레이 세척기 사양서 '+APP_VERSION+'</title>'
+   +'<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">'
+   +'<style>body{font-family:"Noto Sans KR",sans-serif;font-size:11px;color:#26333f;max-width:900px;margin:0 auto;padding:14px}'
+   +'h1{font-size:19px;color:#12283f;margin-bottom:2px}h2{font-size:12px;color:#fff;background:#1b3a5c;padding:5px 8px;margin:10px 0 5px}'
+   +'table{width:100%;border-collapse:collapse;font-size:11px}th,td{border:1px solid #d7dfe7;padding:4px 6px;text-align:left}'
+   +'th{background:#eaf2f8;color:#1b3a5c;font-size:10px}td.k{background:#f7fafc;color:#5a6b7a;width:34%}'
+   +'.ft{margin-top:12px;font-size:10px;color:#5a6b7a;text-align:center}'
+   +'.vd{padding:7px;text-align:center;font-weight:900;font-size:15px;border-radius:4px;margin-bottom:8px}'
+   +'.vd.ok{background:#e6f3ec;color:#1d6f4a}.vd.bad{background:#fbeaea;color:#8c2f2f}</style></head><body>'
+   +'<h1>트레이 세척기 사양서 <span style="font-size:12px;color:#2f6f9e">'+APP_VERSION+'</span></h1>'
+   +'<div style="font-size:10px;color:#5a6b7a">작성 '+day+' · 인시스 AI혁신 연구개발실 · 2채널 병렬 / 세척존 + 헹굼존</div>'
+   +'<div class="vd '+(r.pass?'ok':'bad')+'">'+(r.pass?'세척 조건 적합':'세척 조건 부적합')
+   +' &nbsp;(필요 '+fx(r.tReq)+'초 / 실제 '+fx(r.tActW)+'초)</div>'
+   +'<h2>1. 트레이 사양</h2><table>'
+   +tr2('명칭', val('trayName'))
+   +tr2('치수 W×L×H', n0(r.W)+' × '+n0(r.L)+' × '+n0(r.H)+' mm (세워서 투입)')
+   +tr2('포켓 수 / 유효 표면적', n0(r.pockets)+' EA / '+fx(r.area,2)+' m²')
+   +tr2('오염 수준 / 종류 / 재질', NAME_SOIL[r.soilLv]+' / '+NAME_TYPE[r.soilTp]+' / '+r.mat)
+   +tr2('세척시간 계수', '10초 × '+fx(r.kS,2)+' × '+fx(r.kT,2)+' × '+fx(r.kM,2)+' = <b>'+fx(r.tReq)+'초</b>')
+   +'</table><h2>2. 반송 · 처리량</h2><table>'
+   +tr2('구성 형식', (r.cfg==='B'?'B형 · 세척 2조 + 헹굼 1조':'A형 · 세척 1조 + 헹굼 1조'))
+   +tr2('채널 수 / 목표 처리량', r.chN+' CH / '+n0(r.cap)+' 매/hr (목표 '+n0(CAP_MIN)+'~'+n0(CAP_MAX)+')')
+   +tr2('반송 피치', n0(r.H)+' + '+n0(r.gap)+' = <b>'+n0(r.pitch)+' mm</b>')
+   +tr2('컨베이어 속도 (역산)', '<b>'+fx(r.v,2)+' m/min</b>')
+   +tr2('필요 채널 폭', n0(r.needChW)+' mm')
+   +'</table><h2>3. 노즐 설계</h2><table>'
+   +tr2('분사각 / 중첩률 / 분사거리', SPRAY_ANGLE+'° / '+(OVERLAP*100)+'% / '+n0(r.sprayD)+' mm')
+   +tr2('분사폭 / 상하 간격', n0(r.sprayW)+' mm / <b>'+n0(r.vPitch)+' mm</b> ('+r.nV+'단)')
+   +tr2('좌우 열간격', n0(r.colGap)+' mm (추천 '+n0(r.recColGap)+' mm)')
+   +tr2('노즐 종류', r.nzType)
+   +tr2('노즐 유량식', '5.5 L/min × √(압력 ÷ 3)')
+   +'</table><h2>4. 존별 사양</h2><table>'
+   +'<tr><th>항목</th><th>세척존 (WASH)</th><th>헹굼존 (RINSE)</th></tr>'
+   +tr3('조 수 / 노즐 열수', r.washTanks+' 조 / '+r.rowW+' 열', '1 조 / '+r.rowR+' 열')
+   +tr3('존 길이 / 체류시간', n0(r.Lw)+' mm / '+fx(r.tActW)+' 초', n0(r.Lr)+' mm / '+fx(r.tActR)+' 초')
+   +tr3('분사압력 / 노즐 유량', fx(r.pW)+' bar / '+fx(r.qW,2)+' L/min', fx(r.pR)+' bar / '+fx(r.qR,2)+' L/min')
+   +tr3('노즐 수량 / 순환유량', n0(r.nzW)+' EA / '+n0(r.flowW)+' L/min', n0(r.nzR)+' EA / '+n0(r.flowR)+' L/min')
+   +tr3('펌프', fx(r.hpW)+' HP (추천 '+fx(r.recHpW)+')', fx(r.hpR)+' HP (추천 '+fx(r.recHpR)+')')
+   +tr3('배관 직경', n0(r.dW)+' A (추천 '+n0(r.recDw)+')', n0(r.dR)+' A (추천 '+n0(r.recDr)+')')
+   +tr3('물탱크', n0(r.vW)+' L (추천 '+n0(r.recVw)+')', n0(r.vR)+' L (추천 '+n0(r.recVr)+')')
+   +tr3('히터 / 수온', n0(r.kwW)+' kW / '+n0(r.tWt)+' ℃', n0(r.kwR)+' kW / '+n0(r.tRt)+' ℃')
+   +'</table><h2>5. 급수 · 전력 · 운영비</h2><table>'
+   +tr2('급수 방식', '헹굼조 신수 → 오버플로우 캐스케이드 → 세척조')
+   +tr2('트레이당 신수량', fx(r.fresh,2)+' L/매')
+   +tr2('일 / 월 급수량', fx(r.waterDay,2)+' ㎥ / <b>'+fx(r.waterMon,1)+' ㎥</b>')
+   +tr2('일 / 월 전력량', n0(r.elecDay)+' kWh / <b>'+n0(r.elecMon)+' kWh</b>')
+   +tr2('일 / 월 운영비', n0(r.costDay)+' 원 / <b>'+n0(r.costMon)+' 원</b>')
+   +tr2('운전 조건', n0(r.opH)+' hr/일 × '+n0(r.opD)+' 일/월 · 히터 가동률 '+fx(r.duty*100,0)+'%')
+   +'</table>';
+  if(r.msgs.length){
+    s+='<h2>6. 검토 의견</h2><table>';
+    r.msgs.forEach(function(m){ s+=tr2(m[0]==='ok'?'적합':(m[0]==='warn'?'주의':'조치 필요'), m[1]); });
+    s+='</table>';
   }
-  s+='</table><div class="ft">트레이 세척 건조기 시뮬레이터 '+APP_VERSION+' · 인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr</div></body></html>';
-  dl('spec.html', s, 'text/html');
+  s+='<div class="ft">트레이 세척 건조기 시뮬레이터 '+APP_VERSION+' · 인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr</div></body></html>';
+  dl('wash_spec_'+day.replace(/\./g,'')+'.html', s, 'text/html');
 }
 
-/* ---------- 초기화 ---------- */
+/* ---------- 이벤트 ---------- */
 document.addEventListener('input', function(e){
-  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT'){ render(); queueSave(); }
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') render();
 });
 document.addEventListener('change', function(e){
-  if(e.target.tagName==='SELECT'){ render(); queueSave(); }
+  if(e.target.tagName==='SELECT') render();
 });
+
 (function(){
   var d=new Date();
   el('today').textContent=d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0');
-  el('buildTxt').textContent=APP_BUILD;
+  var v='mobile';
+  try{ v=localStorage.getItem('wash_view')||'mobile'; }catch(e){}
+  setView(v);
+  renderLib();
   render();
-  watchVersion();
-  STORE.init().then(async function(){
-    await renderLib();
-    var st = await STORE.getState();
-    if(st && applyState(st)>0){
-      render();
-      fbStatus('on','Firebase \ubd88\ub7ec\uc634 \u00b7 '+(st._savedAt? new Date(st._savedAt).toLocaleString('ko-KR') : ''));
-    }
-  });
 })();
 </script>
 </body>
