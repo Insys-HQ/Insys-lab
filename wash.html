@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척기 시뮬레이터 v1.2</title>
+<title>트레이 세척기 시뮬레이터 v1.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -87,7 +87,14 @@ td.k{background:#f7fafc;color:var(--ink-l);font-weight:500;width:34%}
 .verdict .vt{font-size:17px;font-weight:900;letter-spacing:-.01em}
 .verdict.ok .vt{color:var(--ok)}.verdict.bad .vt{color:var(--bad)}
 .verdict .vs{font-size:10px;color:var(--ink-l);margin-top:2px}
-.store{font-size:10px;color:var(--ink-l);margin-top:4px}
+.store{font-size:10px;color:var(--ink-l);margin-top:4px;display:flex;align-items:center;gap:5px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex:0 0 auto;background:#d13438}
+.dot.on{background:#2ecc71}
+.dot.wait{background:#e0a400}
+.badge.stat{display:inline-flex;align-items:center;gap:5px}
+.st.on{color:var(--ok);font-weight:700}
+.st.off{color:var(--bad);font-weight:700}
+.st.wait{color:var(--warn);font-weight:700}
 .foot{max-width:var(--maxw);margin:8px auto 0;padding:8px 10px;font-size:10px;color:var(--ink-l);text-align:center;line-height:1.6}
 body.mobile .foot{max-width:430px}
 .foot b{color:var(--navy)}
@@ -100,10 +107,11 @@ body.mobile .foot{max-width:430px}
   <h1>트레이 세척기 시뮬레이터</h1>
   <div class="sub">2채널 병렬 · 세척존 + 헹굼존 · 목표 처리량 800~1,200 매/hr</div>
   <div class="meta">
-    <span class="badge v">v1.2</span>
+    <span class="badge v">v1.3</span>
     <span class="badge">2채널 · 세워서 투입</span>
     <span class="badge">세척 1~2조 + 헹굼 1조</span>
     <span class="badge" id="today">—</span>
+    <span class="badge stat"><i class="dot" id="fbDot"></i><span id="fbTxt">Firebase 확인 중…</span></span>
   </div>
 </div>
 
@@ -151,7 +159,7 @@ body.mobile .foot{max-width:430px}
           <input id="impFile" type="file" accept=".json" style="display:none" onchange="importLib(event)">
         </div>
         <div class="lib" id="lib"><div class="empty">저장된 트레이가 없습니다.</div></div>
-        <div class="store" id="storeMsg">저장소: 브라우저 로컬 저장 (내보내기로 백업하세요)</div>
+        <div class="store"><i class="dot" id="fbDot2"></i><span class="st" id="storeMsg">Firebase 확인 중…</span></div>
       </div>
     </div>
 
@@ -253,7 +261,7 @@ body.mobile .foot{max-width:430px}
     <div class="card full">
       <h2>사양 저장소 <span class="n">SAVE</span></h2>
       <div class="body">
-        <div class="hint">STEP 1~6의 모든 입력값을 이름 붙여 저장합니다. 목록에서 불러오거나 삭제할 수 있으며, JSON으로 내보내 다른 PC에서 복원할 수 있습니다.</div>
+        <div class="hint">STEP 1~6의 모든 입력값을 이름 붙여 저장합니다. 목록에서 불러오거나 삭제할 수 있으며, Firebase에 저장되므로 어느 PC·휴대폰에서 열어도 같은 목록이 보입니다.</div>
         <div class="row">
           <div class="f"><label>사양 명칭</label><input id="specName" type="text" placeholder="예: A라인 표준 600×400"></div>
           <div class="f"><label>비고</label><input id="specMemo" type="text" placeholder="선택 입력"></div>
@@ -266,7 +274,7 @@ body.mobile .foot{max-width:430px}
           <input id="specFile" type="file" accept=".json" style="display:none" onchange="importSpecs(event)">
         </div>
         <div class="lib" id="specLib"><div class="empty">저장된 사양이 없습니다.</div></div>
-        <div class="store" id="specMsg">저장소: 브라우저 로컬 저장 (내보내기로 백업하세요)</div>
+        <div class="store"><i class="dot" id="fbDot3"></i><span class="st" id="specMsg">Firebase 확인 중…</span></div>
       </div>
     </div>
 
@@ -289,18 +297,20 @@ body.mobile .foot{max-width:430px}
 </div>
 
 <div class="foot">
-  트레이 세척 건조기 시뮬레이터 <b>v1.2</b> · 1단계 세척 + 헹굼 구간<br>
+  트레이 세척 건조기 시뮬레이터 <b>v1.3</b> · 1단계 세척 + 헹굼 구간<br>
   인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr<br>
   다음 단계: 2단계 에어나이프 탈수 구간 → 3단계 열풍 건조 구간
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
 /* ==========================================================
-   트레이 세척기 시뮬레이터  v1.2
+   트레이 세척기 시뮬레이터  v1.3
    2채널 병렬 / 세척존 + 헹굼존 / 목표 처리량 800~1200 매/hr
    INSYS AI혁신 연구개발실 · 2026
    ========================================================== */
-var APP_VERSION = "v1.2";
+var APP_VERSION = "v1.3";
 
 /* ---------- 계수 ---------- */
 var K_SOIL={light:1.00,medium:1.40,heavy:1.90};
@@ -535,45 +545,124 @@ function applyAllRec(){
 }
 function resetAll(){ for(var k in DEFAULTS){ set(k,DEFAULTS[k]); } render(); }
 
-/* ---------- 트레이 라이브러리 (브라우저 로컬 저장) ---------- */
-var LIB_KEY='wash_tray_lib_v1';
+/* ---------- Firebase 저장소 (인시스 그룹 공용 insys-work 프로젝트) ---------- */
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",
+  authDomain: "insys-work.firebaseapp.com",
+  projectId: "insys-work",
+  storageBucket: "insys-work.firebasestorage.app",
+  messagingSenderId: "225275784859",
+  appId: "1:225275784859:web:bd12815c6dc47c0c49e03e"
+};
+var COL_SPEC = "wash_specs";     /* 입력값 전체 사양 */
+var COL_TRAY = "wash_trays";     /* 트레이 라이브러리 */
+var FB_OK=false, db=null, SPECS=[], TRAYS=[];
+
+function esc(t){ var d=document.createElement('div'); d.textContent=(t===undefined||t===null)?'':String(t); return d.innerHTML; }
+
+/* 연결 상태 — 연결되면 녹색, 안 되면 적색 */
+function fbStatus(state, text){
+  var cls=(state==='on')?'on':(state==='wait'?'wait':'');
+  ['fbDot','fbDot2','fbDot3'].forEach(function(id){ var e=el(id); if(e) e.className='dot'+(cls?' '+cls:''); });
+  var t=el('fbTxt'); if(t) t.textContent=text;
+  ['storeMsg','specMsg'].forEach(function(id){
+    var e=el(id); if(e){ e.textContent=text; e.className='st '+(state==='on'?'on':(state==='wait'?'wait':'off')); }
+  });
+}
+function fbNote(text){ ['storeMsg','specMsg'].forEach(function(id){ var e=el(id); if(e) e.textContent=text; }); }
+function stamp(){ return firebase.firestore.FieldValue.serverTimestamp(); }
+function whenTxt(v){
+  if(!v || !v.toDate) return '—';
+  var d=v.toDate();
+  return String(d.getFullYear()).slice(2)+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0')
+       +' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+
+function fbInit(){
+  try{
+    if(typeof firebase==='undefined') throw new Error('SDK 로드 실패');
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db=firebase.firestore(); FB_OK=true;
+    fbStatus('wait','Firebase 연결 중…');
+    db.collection(COL_SPEC).orderBy('createdAt','desc').onSnapshot(function(snap){
+      SPECS=[]; snap.forEach(function(d){ var o=d.data(); o.id=d.id; SPECS.push(o); });
+      FB_OK=true;
+      fbStatus('on','Firebase 연결됨 · insys-work (사양 '+SPECS.length+'건)');
+      renderSpecs();
+    }, function(e){ FB_OK=false; fbStatus('off','Firebase 읽기 실패 — '+(e.code||e.message)); renderSpecs(); });
+    db.collection(COL_TRAY).orderBy('createdAt','desc').onSnapshot(function(snap){
+      TRAYS=[]; snap.forEach(function(d){ var o=d.data(); o.id=d.id; TRAYS.push(o); });
+      renderLib();
+    }, function(e){ renderLib(); });
+  }catch(e){
+    FB_OK=false; fbStatus('off','Firebase 연결 안 됨 — '+e.message);
+    renderSpecs(); renderLib();
+  }
+}
+function needFB(){
+  if(FB_OK) return true;
+  alert('Firebase에 연결되지 않아 처리할 수 없습니다. 네트워크 상태를 확인하세요.');
+  return false;
+}
+
+/* ---------- 트레이 라이브러리 (Firestore: wash_trays) ---------- */
 var TRAY_FIELDS=['trayName','trayW','trayL','trayH','pockets','soilLv','soilTp','mat'];
-function libRead(){ try{ return JSON.parse(localStorage.getItem(LIB_KEY)||'[]'); }catch(e){ return []; } }
-function libWrite(a){ try{ localStorage.setItem(LIB_KEY, JSON.stringify(a)); }catch(e){ alert('브라우저 저장 공간에 쓸 수 없습니다.'); } }
 function saveTray(){
+  if(!needFB()) return;
   var o={}; TRAY_FIELDS.forEach(function(f){ o[f]=val(f); });
-  o._id='t'+Date.now(); o.savedAt=new Date().toISOString();
-  var a=libRead(); a.push(o); libWrite(a); renderLib();
+  o.createdAt=stamp(); o.ver=APP_VERSION;
+  db.collection(COL_TRAY).add(o)
+    .then(function(){ fbNote('트레이 저장됨: '+o.trayName); })
+    .catch(function(e){ fbStatus('off','트레이 저장 실패 — '+(e.code||e.message)); });
 }
 function renderLib(){
-  var a=libRead(), box=el('lib');
-  if(!a.length){ box.innerHTML='<div class="empty">저장된 트레이가 없습니다.</div>'; return; }
+  var box=el('lib');
+  if(!TRAYS.length){ box.innerHTML='<div class="empty">'+(FB_OK?'저장된 트레이가 없습니다.':'Firebase 미연결 — 목록을 불러올 수 없습니다.')+'</div>'; return; }
   var h='<table><tr><th>명칭</th><th>W×L×H</th><th>포켓</th><th>오염</th><th>재질</th><th></th></tr>';
-  a.forEach(function(t){
-    h+='<tr><td>'+t.trayName+'</td><td>'+t.trayW+'×'+t.trayL+'×'+t.trayH+'</td><td>'+t.pockets+'</td>'
-     +'<td>'+(NAME_SOIL[t.soilLv]||'')+'/'+(NAME_TYPE[t.soilTp]||'')+'</td><td>'+t.mat+'</td>'
-     +'<td style="white-space:nowrap"><button class="mini" onclick="loadTray(\''+t._id+'\')">불러오기</button>'
-     +'<button class="mini del" onclick="delTray(\''+t._id+'\')">삭제</button></td></tr>';
+  TRAYS.forEach(function(t){
+    h+='<tr><td>'+esc(t.trayName)+'</td><td>'+esc(t.trayW)+'×'+esc(t.trayL)+'×'+esc(t.trayH)+'</td><td>'+esc(t.pockets)+'</td>'
+     +'<td>'+(NAME_SOIL[t.soilLv]||'')+'/'+(NAME_TYPE[t.soilTp]||'')+'</td><td>'+esc(t.mat)+'</td>'
+     +'<td style="white-space:nowrap"><button class="mini" onclick="loadTray(\''+t.id+'\')">불러오기</button>'
+     +'<button class="mini del" onclick="delTray(\''+t.id+'\')">삭제</button></td></tr>';
   });
   box.innerHTML=h+'</table>';
 }
 function loadTray(id){
-  var t=libRead().filter(function(x){ return x._id===id; })[0];
+  var t=TRAYS.filter(function(x){ return x.id===id; })[0];
   if(!t) return;
   TRAY_FIELDS.forEach(function(f){ if(t[f]!==undefined) set(f,t[f]); });
-  render();
+  render(); fbNote('트레이 불러옴: '+t.trayName);
 }
-function delTray(id){ libWrite(libRead().filter(function(x){ return x._id!==id; })); renderLib(); }
-function exportLib(){ dl('trays.json', JSON.stringify(libRead(),null,2), 'application/json'); }
+function delTray(id){
+  if(!needFB()) return;
+  var t=TRAYS.filter(function(x){ return x.id===id; })[0]; if(!t) return;
+  if(!confirm('삭제할까요?\n\n'+t.trayName)) return;
+  db.collection(COL_TRAY).doc(id).delete()
+    .then(function(){ fbNote('트레이 삭제됨: '+t.trayName); })
+    .catch(function(e){ fbStatus('off','트레이 삭제 실패 — '+(e.code||e.message)); });
+}
+function exportLib(){
+  if(!TRAYS.length){ alert('저장된 트레이가 없습니다.'); return; }
+  dl('wash_trays.json', JSON.stringify(TRAYS,null,2), 'application/json');
+}
 function importLib(ev){
   var f=ev.target.files[0]; if(!f) return;
   var rd=new FileReader();
   rd.onload=function(){
+    if(!needFB()){ ev.target.value=''; return; }
     try{
       var arr=JSON.parse(rd.result); if(!Array.isArray(arr)) throw 0;
-      var a=libRead();
-      arr.forEach(function(o){ o._id='t'+Date.now()+Math.floor(Math.random()*1000); a.push(o); });
-      libWrite(a); renderLib();
+      var n=0, batch=db.batch();
+      arr.forEach(function(o){
+        if(!o) return;
+        var d={}; TRAY_FIELDS.forEach(function(kk){ if(o[kk]!==undefined) d[kk]=o[kk]; });
+        if(!d.trayName) return;
+        d.createdAt=stamp(); d.ver=APP_VERSION;
+        batch.set(db.collection(COL_TRAY).doc(), d); n++;
+      });
+      if(!n){ alert('불러올 트레이가 없습니다.'); return; }
+      batch.commit().then(function(){ fbNote(n+'건 불러옴'); })
+                    .catch(function(e){ fbStatus('off','불러오기 실패 — '+(e.code||e.message)); });
     }catch(e){ alert('JSON 형식을 읽을 수 없습니다.'); }
   };
   rd.readAsText(f); ev.target.value='';
@@ -650,86 +739,89 @@ function downloadSpec(){
   dl('wash_spec_'+day.replace(/\./g,'')+'.html', s, 'text/html');
 }
 
-/* ---------- 사양 저장소 (입력값 전체 저장/불러오기/삭제) ---------- */
-var SPEC_KEY='wash_spec_lib_v1';
-function specRead(){ try{ var a=JSON.parse(localStorage.getItem(SPEC_KEY)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
-function specWrite(a){
-  try{ localStorage.setItem(SPEC_KEY, JSON.stringify(a)); return true; }
-  catch(e){ alert('브라우저 저장 공간에 쓸 수 없습니다. 내보내기로 백업하세요.'); return false; }
-}
+/* ---------- 사양 저장소 (Firestore: wash_specs) ---------- */
 function collectSpec(){
   var o={};
   for(var k in DEFAULTS){ if(el(k)) o[k]=val(k); }
   return o;
 }
 function saveSpec(){
+  if(!needFB()) return;
   var name=(val('specName')||'').trim();
   if(!name){ alert('사양 명칭을 입력하세요.'); el('specName').focus(); return; }
-  var a=specRead();
-  var dup=a.filter(function(x){ return x._name===name; })[0];
-  if(dup && !confirm('같은 이름의 사양이 있습니다. 덮어쓸까요?\n\n' + name)) return;
+  var ex=SPECS.filter(function(x){ return x.name===name; })[0];
+  if(ex && !confirm('같은 이름의 사양이 있습니다. 덮어쓸까요?\n\n'+name)) return;
   var r=R||calc();
-  var o={ _id:'s'+Date.now()+Math.floor(Math.random()*1000), _name:name,
-          _memo:(val('specMemo')||'').trim(), _at:new Date().toISOString(),
-          _ver:APP_VERSION, _cap:Math.round(r.cap), _pass:!!r.pass, data:collectSpec() };
-  if(dup) a[a.indexOf(dup)]=o; else a.push(o);
-  if(specWrite(a)){ renderSpecs(); el('specMsg').textContent='저장됨: '+name+' · '+new Date().toLocaleString('ko-KR'); }
+  var o={ name:name, memo:(val('specMemo')||'').trim(), cap:Math.round(r.cap),
+          pass:!!r.pass, ver:APP_VERSION, data:collectSpec(), createdAt:stamp() };
+  var pr = ex ? db.collection(COL_SPEC).doc(ex.id).set(o) : db.collection(COL_SPEC).add(o);
+  pr.then(function(){ fbNote((ex?'덮어썼습니다: ':'저장됨: ')+name); })
+    .catch(function(e){ fbStatus('off','사양 저장 실패 — '+(e.code||e.message)); });
 }
 function renderSpecs(){
-  var a=specRead(), box=el('specLib');
-  if(!a.length){ box.innerHTML='<div class="empty">저장된 사양이 없습니다.</div>'; return; }
-  a.sort(function(x,y){ return (y._at||'').localeCompare(x._at||''); });
+  var box=el('specLib');
+  if(!SPECS.length){ box.innerHTML='<div class="empty">'+(FB_OK?'저장된 사양이 없습니다.':'Firebase 미연결 — 목록을 불러올 수 없습니다.')+'</div>'; return; }
   var h='<table><tr><th>사양 명칭</th><th>처리량</th><th>판정</th><th>저장 일시</th><th>비고</th><th></th></tr>';
-  a.forEach(function(t){
-    var when = t._at ? new Date(t._at).toLocaleString('ko-KR',{year:'2-digit',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
-    h+='<tr><td>'+esc(t._name)+'</td><td>'+n0(t._cap||0)+' 매/hr</td>'
-     +'<td style="color:'+(t._pass?'#1d6f4a':'#8c2f2f')+';font-weight:700">'+(t._pass?'적합':'부적합')+'</td>'
-     +'<td>'+when+'</td><td>'+esc(t._memo||'')+'</td>'
-     +'<td style="white-space:nowrap"><button class="mini" onclick="loadSpec(\''+t._id+'\')">불러오기</button>'
-     +'<button class="mini del" onclick="delSpec(\''+t._id+'\')">삭제</button></td></tr>';
+  SPECS.forEach(function(t){
+    h+='<tr><td>'+esc(t.name)+'</td><td>'+n0(t.cap||0)+' 매/hr</td>'
+     +'<td style="color:'+(t.pass?'#1d6f4a':'#8c2f2f')+';font-weight:700">'+(t.pass?'적합':'부적합')+'</td>'
+     +'<td>'+whenTxt(t.createdAt)+'</td><td>'+esc(t.memo)+'</td>'
+     +'<td style="white-space:nowrap"><button class="mini" onclick="loadSpec(\''+t.id+'\')">불러오기</button>'
+     +'<button class="mini del" onclick="delSpec(\''+t.id+'\')">삭제</button></td></tr>';
   });
   box.innerHTML=h+'</table>';
 }
-function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function loadSpec(id){
-  var t=specRead().filter(function(x){ return x._id===id; })[0];
+  var t=SPECS.filter(function(x){ return x.id===id; })[0];
   if(!t || !t.data){ alert('사양을 찾을 수 없습니다.'); return; }
   var n=0;
   for(var k in DEFAULTS){ if(el(k) && t.data[k]!==undefined && t.data[k]!==null){ set(k,t.data[k]); n++; } }
-  set('specName',t._name||''); set('specMemo',t._memo||'');
-  render();
-  el('specMsg').textContent='불러옴: '+t._name+' (입력값 '+n+'개 복원)';
+  set('specName',t.name||''); set('specMemo',t.memo||'');
+  render(); fbNote('불러옴: '+t.name+' (입력값 '+n+'개 복원)');
 }
 function delSpec(id){
-  var a=specRead(), t=a.filter(function(x){ return x._id===id; })[0];
-  if(!t) return;
-  if(!confirm('삭제할까요?\n\n' + t._name)) return;
-  if(specWrite(a.filter(function(x){ return x._id!==id; }))){ renderSpecs(); el('specMsg').textContent='삭제됨: '+t._name; }
+  if(!needFB()) return;
+  var t=SPECS.filter(function(x){ return x.id===id; })[0]; if(!t) return;
+  if(!confirm('삭제할까요?\n\n'+t.name)) return;
+  db.collection(COL_SPEC).doc(id).delete()
+    .then(function(){ fbNote('삭제됨: '+t.name); })
+    .catch(function(e){ fbStatus('off','사양 삭제 실패 — '+(e.code||e.message)); });
 }
 function clearSpecs(){
-  var a=specRead();
-  if(!a.length){ alert('저장된 사양이 없습니다.'); return; }
-  if(!confirm('저장된 사양 '+a.length+'건을 모두 삭제할까요? 되돌릴 수 없습니다.')) return;
-  if(specWrite([])){ renderSpecs(); el('specMsg').textContent='전체 삭제됨'; }
+  if(!needFB()) return;
+  if(!SPECS.length){ alert('저장된 사양이 없습니다.'); return; }
+  if(!confirm('저장된 사양 '+SPECS.length+'건을 모두 삭제할까요? 되돌릴 수 없습니다.')) return;
+  var batch=db.batch();
+  SPECS.forEach(function(t){ batch.delete(db.collection(COL_SPEC).doc(t.id)); });
+  batch.commit().then(function(){ fbNote('전체 삭제됨'); })
+                .catch(function(e){ fbStatus('off','전체 삭제 실패 — '+(e.code||e.message)); });
 }
 function exportSpecs(){
-  var a=specRead();
-  if(!a.length){ alert('저장된 사양이 없습니다.'); return; }
-  dl('wash_specs.json', JSON.stringify(a,null,2), 'application/json');
+  if(!SPECS.length){ alert('저장된 사양이 없습니다.'); return; }
+  var out=SPECS.map(function(t){
+    return { name:t.name, memo:t.memo, cap:t.cap, pass:t.pass, ver:t.ver,
+             savedAt:(t.createdAt&&t.createdAt.toDate)?t.createdAt.toDate().toISOString():null, data:t.data };
+  });
+  dl('wash_specs.json', JSON.stringify(out,null,2), 'application/json');
 }
 function importSpecs(ev){
   var f=ev.target.files[0]; if(!f) return;
   var rd=new FileReader();
   rd.onload=function(){
+    if(!needFB()){ ev.target.value=''; return; }
     try{
       var arr=JSON.parse(rd.result); if(!Array.isArray(arr)) throw 0;
-      var a=specRead(), n=0;
+      var n=0, batch=db.batch();
       arr.forEach(function(o){
         if(!o || !o.data) return;
-        o._id='s'+Date.now()+Math.floor(Math.random()*10000); a.push(o); n++;
+        batch.set(db.collection(COL_SPEC).doc(), {
+          name:o.name||('가져온 사양 '+(n+1)), memo:o.memo||'', cap:o.cap||0,
+          pass:!!o.pass, ver:o.ver||APP_VERSION, data:o.data, createdAt:stamp() });
+        n++;
       });
       if(!n){ alert('불러올 사양이 없습니다.'); return; }
-      if(specWrite(a)){ renderSpecs(); el('specMsg').textContent=n+'건 불러옴'; }
+      batch.commit().then(function(){ fbNote(n+'건 불러옴'); })
+                    .catch(function(e){ fbStatus('off','불러오기 실패 — '+(e.code||e.message)); });
     }catch(e){ alert('JSON 형식을 읽을 수 없습니다.'); }
   };
   rd.readAsText(f); ev.target.value='';
@@ -749,9 +841,8 @@ document.addEventListener('change', function(e){
   var v='mobile';
   try{ v=localStorage.getItem('wash_view')||'mobile'; }catch(e){}
   setView(v);
-  renderLib();
-  renderSpecs();
   render();
+  fbInit();
 })();
 </script>
 </body>
