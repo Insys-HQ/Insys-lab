@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척기 시뮬레이터 v1.3</title>
+<title>트레이 세척기 시뮬레이터 v1.4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -31,6 +31,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 body.mobile .wrap,body.mobile .cover,body.mobile .viewbar{max-width:430px}
 .viewbar{max-width:var(--maxw);margin:0 auto 8px;padding:0 10px;display:flex;align-items:center;gap:6px}
 .viewbar .lb{font-size:10px;color:var(--ink-l);font-weight:500}
+.fbbar{margin-left:auto;display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);border-radius:5px;padding:4px 10px;font-size:11px;font-weight:700}
+.fbbar .dot{width:10px;height:10px}
+.fbbar.on{border-color:#9ad9b6;background:var(--ok-bg);color:var(--ok)}
+.fbbar.off{border-color:#eec3c3;background:var(--bad-bg);color:var(--bad)}
+.fbbar.wait{border-color:#e8d3a4;background:var(--warn-bg);color:var(--warn)}
+body.mobile .fbbar{margin-left:0;width:100%;justify-content:center;margin-top:5px}
+body.mobile .viewbar{flex-wrap:wrap}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;background:#fff}
 .seg button{font-family:inherit;font-size:11px;font-weight:700;padding:4px 12px;border:0;background:#fff;color:var(--ink-l);cursor:pointer}
 .seg button.on{background:var(--navy);color:#fff}
@@ -107,7 +114,7 @@ body.mobile .foot{max-width:430px}
   <h1>트레이 세척기 시뮬레이터</h1>
   <div class="sub">2채널 병렬 · 세척존 + 헹굼존 · 목표 처리량 800~1,200 매/hr</div>
   <div class="meta">
-    <span class="badge v">v1.3</span>
+    <span class="badge v">v1.4</span>
     <span class="badge">2채널 · 세워서 투입</span>
     <span class="badge">세척 1~2조 + 헹굼 1조</span>
     <span class="badge" id="today">—</span>
@@ -121,6 +128,7 @@ body.mobile .foot{max-width:430px}
     <button id="vMo" class="on" onclick="setView('mobile')">모바일</button>
     <button id="vPc" onclick="setView('pc')">PC</button>
   </span>
+  <span class="fbbar" id="fbBar"><i class="dot" id="fbDot0"></i><span id="fbTxt0">Firebase 확인 중…</span></span>
 </div>
 
 <div class="wrap">
@@ -297,7 +305,7 @@ body.mobile .foot{max-width:430px}
 </div>
 
 <div class="foot">
-  트레이 세척 건조기 시뮬레이터 <b>v1.3</b> · 1단계 세척 + 헹굼 구간<br>
+  트레이 세척 건조기 시뮬레이터 <b>v1.4</b> · 1단계 세척 + 헹굼 구간<br>
   인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr<br>
   다음 단계: 2단계 에어나이프 탈수 구간 → 3단계 열풍 건조 구간
 </div>
@@ -306,11 +314,11 @@ body.mobile .foot{max-width:430px}
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
 /* ==========================================================
-   트레이 세척기 시뮬레이터  v1.3
+   트레이 세척기 시뮬레이터  v1.4
    2채널 병렬 / 세척존 + 헹굼존 / 목표 처리량 800~1200 매/hr
    INSYS AI혁신 연구개발실 · 2026
    ========================================================== */
-var APP_VERSION = "v1.3";
+var APP_VERSION = "v1.4";
 
 /* ---------- 계수 ---------- */
 var K_SOIL={light:1.00,medium:1.40,heavy:1.90};
@@ -563,13 +571,14 @@ function esc(t){ var d=document.createElement('div'); d.textContent=(t===undefin
 /* 연결 상태 — 연결되면 녹색, 안 되면 적색 */
 function fbStatus(state, text){
   var cls=(state==='on')?'on':(state==='wait'?'wait':'');
-  ['fbDot','fbDot2','fbDot3'].forEach(function(id){ var e=el(id); if(e) e.className='dot'+(cls?' '+cls:''); });
-  var t=el('fbTxt'); if(t) t.textContent=text;
+  ['fbDot','fbDot0','fbDot2','fbDot3'].forEach(function(id){ var e=el(id); if(e) e.className='dot'+(cls?' '+cls:''); });
+  ['fbTxt','fbTxt0'].forEach(function(id){ var e=el(id); if(e) e.textContent=text; });
+  var bar=el('fbBar'); if(bar) bar.className='fbbar '+(state==='on'?'on':(state==='wait'?'wait':'off'));
   ['storeMsg','specMsg'].forEach(function(id){
     var e=el(id); if(e){ e.textContent=text; e.className='st '+(state==='on'?'on':(state==='wait'?'wait':'off')); }
   });
 }
-function fbNote(text){ ['storeMsg','specMsg'].forEach(function(id){ var e=el(id); if(e) e.textContent=text; }); }
+function fbNote(text){ ['storeMsg','specMsg','fbTxt0','fbTxt'].forEach(function(id){ var e=el(id); if(e) e.textContent=text; }); }
 function stamp(){ return firebase.firestore.FieldValue.serverTimestamp(); }
 function whenTxt(v){
   if(!v || !v.toDate) return '—';
