@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척기 시뮬레이터 v1.1</title>
+<title>트레이 세척기 시뮬레이터 v1.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -100,7 +100,7 @@ body.mobile .foot{max-width:430px}
   <h1>트레이 세척기 시뮬레이터</h1>
   <div class="sub">2채널 병렬 · 세척존 + 헹굼존 · 목표 처리량 800~1,200 매/hr</div>
   <div class="meta">
-    <span class="badge v">v1.1</span>
+    <span class="badge v">v1.2</span>
     <span class="badge">2채널 · 세워서 투입</span>
     <span class="badge">세척 1~2조 + 헹굼 1조</span>
     <span class="badge" id="today">—</span>
@@ -146,8 +146,8 @@ body.mobile .foot{max-width:430px}
         </div>
         <div class="btnrow">
           <button class="btn ghost" onclick="saveTray()">트레이 저장</button>
-          <button class="btn ghost" onclick="exportLib()">내보내기</button>
-          <button class="btn ghost" onclick="document.getElementById('impFile').click()">불러오기</button>
+          <button class="btn ghost" onclick="exportLib()">트레이 내보내기</button>
+          <button class="btn ghost" onclick="document.getElementById('impFile').click()">트레이 불러오기</button>
           <input id="impFile" type="file" accept=".json" style="display:none" onchange="importLib(event)">
         </div>
         <div class="lib" id="lib"><div class="empty">저장된 트레이가 없습니다.</div></div>
@@ -249,6 +249,27 @@ body.mobile .foot{max-width:430px}
       </div>
     </div>
 
+    <!-- 사양 저장소 -->
+    <div class="card full">
+      <h2>사양 저장소 <span class="n">SAVE</span></h2>
+      <div class="body">
+        <div class="hint">STEP 1~6의 모든 입력값을 이름 붙여 저장합니다. 목록에서 불러오거나 삭제할 수 있으며, JSON으로 내보내 다른 PC에서 복원할 수 있습니다.</div>
+        <div class="row">
+          <div class="f"><label>사양 명칭</label><input id="specName" type="text" placeholder="예: A라인 표준 600×400"></div>
+          <div class="f"><label>비고</label><input id="specMemo" type="text" placeholder="선택 입력"></div>
+        </div>
+        <div class="btnrow">
+          <button class="btn" onclick="saveSpec()">현재 입력값 저장</button>
+          <button class="btn ghost" onclick="exportSpecs()">사양 내보내기</button>
+          <button class="btn ghost" onclick="document.getElementById('specFile').click()">사양 불러오기</button>
+          <button class="btn ghost" onclick="clearSpecs()">전체 삭제</button>
+          <input id="specFile" type="file" accept=".json" style="display:none" onchange="importSpecs(event)">
+        </div>
+        <div class="lib" id="specLib"><div class="empty">저장된 사양이 없습니다.</div></div>
+        <div class="store" id="specMsg">저장소: 브라우저 로컬 저장 (내보내기로 백업하세요)</div>
+      </div>
+    </div>
+
     <!-- 결과 -->
     <div class="card full out">
       <h2>산출 결과 · 판정 <span class="n">RESULT</span></h2>
@@ -268,18 +289,18 @@ body.mobile .foot{max-width:430px}
 </div>
 
 <div class="foot">
-  트레이 세척 건조기 시뮬레이터 <b>v1.1</b> · 1단계 세척 + 헹굼 구간<br>
+  트레이 세척 건조기 시뮬레이터 <b>v1.2</b> · 1단계 세척 + 헹굼 구간<br>
   인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr<br>
   다음 단계: 2단계 에어나이프 탈수 구간 → 3단계 열풍 건조 구간
 </div>
 
 <script>
 /* ==========================================================
-   트레이 세척기 시뮬레이터  v1.1
+   트레이 세척기 시뮬레이터  v1.2
    2채널 병렬 / 세척존 + 헹굼존 / 목표 처리량 800~1200 매/hr
    INSYS AI혁신 연구개발실 · 2026
    ========================================================== */
-var APP_VERSION = "v1.1";
+var APP_VERSION = "v1.2";
 
 /* ---------- 계수 ---------- */
 var K_SOIL={light:1.00,medium:1.40,heavy:1.90};
@@ -629,6 +650,91 @@ function downloadSpec(){
   dl('wash_spec_'+day.replace(/\./g,'')+'.html', s, 'text/html');
 }
 
+/* ---------- 사양 저장소 (입력값 전체 저장/불러오기/삭제) ---------- */
+var SPEC_KEY='wash_spec_lib_v1';
+function specRead(){ try{ var a=JSON.parse(localStorage.getItem(SPEC_KEY)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+function specWrite(a){
+  try{ localStorage.setItem(SPEC_KEY, JSON.stringify(a)); return true; }
+  catch(e){ alert('브라우저 저장 공간에 쓸 수 없습니다. 내보내기로 백업하세요.'); return false; }
+}
+function collectSpec(){
+  var o={};
+  for(var k in DEFAULTS){ if(el(k)) o[k]=val(k); }
+  return o;
+}
+function saveSpec(){
+  var name=(val('specName')||'').trim();
+  if(!name){ alert('사양 명칭을 입력하세요.'); el('specName').focus(); return; }
+  var a=specRead();
+  var dup=a.filter(function(x){ return x._name===name; })[0];
+  if(dup && !confirm('같은 이름의 사양이 있습니다. 덮어쓸까요?\n\n' + name)) return;
+  var r=R||calc();
+  var o={ _id:'s'+Date.now()+Math.floor(Math.random()*1000), _name:name,
+          _memo:(val('specMemo')||'').trim(), _at:new Date().toISOString(),
+          _ver:APP_VERSION, _cap:Math.round(r.cap), _pass:!!r.pass, data:collectSpec() };
+  if(dup) a[a.indexOf(dup)]=o; else a.push(o);
+  if(specWrite(a)){ renderSpecs(); el('specMsg').textContent='저장됨: '+name+' · '+new Date().toLocaleString('ko-KR'); }
+}
+function renderSpecs(){
+  var a=specRead(), box=el('specLib');
+  if(!a.length){ box.innerHTML='<div class="empty">저장된 사양이 없습니다.</div>'; return; }
+  a.sort(function(x,y){ return (y._at||'').localeCompare(x._at||''); });
+  var h='<table><tr><th>사양 명칭</th><th>처리량</th><th>판정</th><th>저장 일시</th><th>비고</th><th></th></tr>';
+  a.forEach(function(t){
+    var when = t._at ? new Date(t._at).toLocaleString('ko-KR',{year:'2-digit',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
+    h+='<tr><td>'+esc(t._name)+'</td><td>'+n0(t._cap||0)+' 매/hr</td>'
+     +'<td style="color:'+(t._pass?'#1d6f4a':'#8c2f2f')+';font-weight:700">'+(t._pass?'적합':'부적합')+'</td>'
+     +'<td>'+when+'</td><td>'+esc(t._memo||'')+'</td>'
+     +'<td style="white-space:nowrap"><button class="mini" onclick="loadSpec(\''+t._id+'\')">불러오기</button>'
+     +'<button class="mini del" onclick="delSpec(\''+t._id+'\')">삭제</button></td></tr>';
+  });
+  box.innerHTML=h+'</table>';
+}
+function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function loadSpec(id){
+  var t=specRead().filter(function(x){ return x._id===id; })[0];
+  if(!t || !t.data){ alert('사양을 찾을 수 없습니다.'); return; }
+  var n=0;
+  for(var k in DEFAULTS){ if(el(k) && t.data[k]!==undefined && t.data[k]!==null){ set(k,t.data[k]); n++; } }
+  set('specName',t._name||''); set('specMemo',t._memo||'');
+  render();
+  el('specMsg').textContent='불러옴: '+t._name+' (입력값 '+n+'개 복원)';
+}
+function delSpec(id){
+  var a=specRead(), t=a.filter(function(x){ return x._id===id; })[0];
+  if(!t) return;
+  if(!confirm('삭제할까요?\n\n' + t._name)) return;
+  if(specWrite(a.filter(function(x){ return x._id!==id; }))){ renderSpecs(); el('specMsg').textContent='삭제됨: '+t._name; }
+}
+function clearSpecs(){
+  var a=specRead();
+  if(!a.length){ alert('저장된 사양이 없습니다.'); return; }
+  if(!confirm('저장된 사양 '+a.length+'건을 모두 삭제할까요? 되돌릴 수 없습니다.')) return;
+  if(specWrite([])){ renderSpecs(); el('specMsg').textContent='전체 삭제됨'; }
+}
+function exportSpecs(){
+  var a=specRead();
+  if(!a.length){ alert('저장된 사양이 없습니다.'); return; }
+  dl('wash_specs.json', JSON.stringify(a,null,2), 'application/json');
+}
+function importSpecs(ev){
+  var f=ev.target.files[0]; if(!f) return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    try{
+      var arr=JSON.parse(rd.result); if(!Array.isArray(arr)) throw 0;
+      var a=specRead(), n=0;
+      arr.forEach(function(o){
+        if(!o || !o.data) return;
+        o._id='s'+Date.now()+Math.floor(Math.random()*10000); a.push(o); n++;
+      });
+      if(!n){ alert('불러올 사양이 없습니다.'); return; }
+      if(specWrite(a)){ renderSpecs(); el('specMsg').textContent=n+'건 불러옴'; }
+    }catch(e){ alert('JSON 형식을 읽을 수 없습니다.'); }
+  };
+  rd.readAsText(f); ev.target.value='';
+}
+
 /* ---------- 이벤트 ---------- */
 document.addEventListener('input', function(e){
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') render();
@@ -644,6 +750,7 @@ document.addEventListener('change', function(e){
   try{ v=localStorage.getItem('wash_view')||'mobile'; }catch(e){}
   setView(v);
   renderLib();
+  renderSpecs();
   render();
 })();
 </script>
