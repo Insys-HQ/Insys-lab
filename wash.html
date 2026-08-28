@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척기 시뮬레이터 v1.4</title>
+<title>트레이 세척기 시뮬레이터 v1.5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -102,6 +102,32 @@ td.k{background:#f7fafc;color:var(--ink-l);font-weight:500;width:34%}
 .st.on{color:var(--ok);font-weight:700}
 .st.off{color:var(--bad);font-weight:700}
 .st.wait{color:var(--warn);font-weight:700}
+/* ---- 민감도 분석 ---- */
+.anz{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--good:#0ca30c;--crit:#d03b3b}
+.segwrap{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.segwrap button{font-family:inherit;font-size:11px;font-weight:700;border:1px solid var(--line);
+  background:#fff;color:var(--ink-l);border-radius:14px;padding:5px 12px;cursor:pointer;transition:all .15s}
+.segwrap button:hover{border-color:var(--steel);color:var(--steel)}
+.segwrap button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.optbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--steel-l);
+  border:1px solid #c5daea;border-radius:6px;padding:8px 10px;margin-bottom:8px}
+.optbar .ol{font-size:10px;color:var(--ink-l);font-weight:500}
+.optbar .ov{font-size:17px;font-weight:900;color:var(--navy);letter-spacing:-.01em}
+.optbar .ou{font-size:11px;font-weight:500;color:var(--ink-l)}
+.optbar .owhy{font-size:10px;color:var(--ink-l);flex:1 1 160px;line-height:1.35}
+.optbar.none{background:var(--bad-bg);border-color:#eec3c3}
+.optbar.none .ov{color:var(--bad)}
+.chartbox{position:relative;width:100%}
+.chartbox svg{width:100%;height:auto;display:block;overflow:visible}
+.chartbox .tip{position:absolute;pointer-events:none;opacity:0;transition:opacity .12s;
+  background:var(--navy-d);color:#fff;border-radius:5px;padding:6px 9px;font-size:10px;line-height:1.5;
+  white-space:nowrap;box-shadow:0 3px 10px rgba(18,40,63,.3);z-index:5;transform:translate(-50%,-100%)}
+.chartbox .tip b{font-size:11px}
+.chartbox .tip i{font-style:normal;display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}
+.lg{display:flex;flex-wrap:wrap;gap:10px;font-size:10px;color:var(--ink-l);margin-top:5px}
+.lg span{display:inline-flex;align-items:center;gap:4px}
+.lg i{width:14px;height:0;border-top:2px solid;display:inline-block}
+.lg i.dash{border-top-style:dashed}
 .foot{max-width:var(--maxw);margin:8px auto 0;padding:8px 10px;font-size:10px;color:var(--ink-l);text-align:center;line-height:1.6}
 body.mobile .foot{max-width:430px}
 .foot b{color:var(--navy)}
@@ -114,7 +140,7 @@ body.mobile .foot{max-width:430px}
   <h1>트레이 세척기 시뮬레이터</h1>
   <div class="sub">2채널 병렬 · 세척존 + 헹굼존 · 목표 처리량 800~1,200 매/hr</div>
   <div class="meta">
-    <span class="badge v">v1.4</span>
+    <span class="badge v">v1.5</span>
     <span class="badge">2채널 · 세워서 투입</span>
     <span class="badge">세척 1~2조 + 헹굼 1조</span>
     <span class="badge" id="today">—</span>
@@ -265,6 +291,27 @@ body.mobile .foot{max-width:430px}
       </div>
     </div>
 
+    <!-- 민감도 분석 -->
+    <div class="card full anz">
+      <h2>민감도 분석 · 최적값 <span class="n">ANALYSIS</span></h2>
+      <div class="body">
+        <div class="hint">변수 하나를 훑으면서 나머지 값이 어떻게 따라 움직이는지 보여줍니다. 세로 실선이 <b>현재 값</b>, 파선이 <b>최적값</b>입니다. 입력값을 바꾸면 그래프와 최적값이 즉시 다시 계산됩니다.</div>
+        <div class="segwrap" id="anzTabs"></div>
+        <div class="optbar" id="optBar"></div>
+        <div class="chartbox" id="chartBox">
+          <div class="tip" id="anzTip"></div>
+        </div>
+        <div class="lg">
+          <span><i style="border-color:#2a78d6"></i>세척 여유율</span>
+          <span><i style="border-color:#eb6834"></i>세척 강도</span>
+          <span><i style="border-color:#1baf7a"></i>월 운영비</span>
+          <span><i class="dash" style="border-color:#d03b3b"></i>기준선</span>
+          <span><i style="border-color:#12283f"></i>현재 값</span>
+          <span><i class="dash" style="border-color:#12283f"></i>최적값</span>
+        </div>
+      </div>
+    </div>
+
     <!-- 사양 저장소 -->
     <div class="card full">
       <h2>사양 저장소 <span class="n">SAVE</span></h2>
@@ -305,7 +352,7 @@ body.mobile .foot{max-width:430px}
 </div>
 
 <div class="foot">
-  트레이 세척 건조기 시뮬레이터 <b>v1.4</b> · 1단계 세척 + 헹굼 구간<br>
+  트레이 세척 건조기 시뮬레이터 <b>v1.5</b> · 1단계 세척 + 헹굼 구간<br>
   인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr<br>
   다음 단계: 2단계 에어나이프 탈수 구간 → 3단계 열풍 건조 구간
 </div>
@@ -314,11 +361,11 @@ body.mobile .foot{max-width:430px}
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
 /* ==========================================================
-   트레이 세척기 시뮬레이터  v1.4
+   트레이 세척기 시뮬레이터  v1.5
    2채널 병렬 / 세척존 + 헹굼존 / 목표 처리량 800~1200 매/hr
    INSYS AI혁신 연구개발실 · 2026
    ========================================================== */
-var APP_VERSION = "v1.4";
+var APP_VERSION = "v1.5";
 
 /* ---------- 계수 ---------- */
 var K_SOIL={light:1.00,medium:1.40,heavy:1.90};
@@ -359,6 +406,7 @@ function setView(m){
   el('vMo').className = (m==='mobile') ? 'on' : '';
   el('vPc').className = (m==='mobile') ? '' : 'on';
   try{ localStorage.setItem('wash_view', m); }catch(e){}
+  if(typeof SDATA!=='undefined' && SDATA.length) drawSweep();
 }
 
 /* ---------- 계산 ---------- */
@@ -453,6 +501,19 @@ function calc(){
   r.elecMon = r.elecDay * r.opD;
   r.costDay = r.waterDay*r.wPrice + r.elecDay*r.ePrice;
   r.costMon = r.costDay * r.opD;
+  /* 추천 기기 기준 — 설계(노즐 열수/압력/거리)가 바뀌면 소요 동력도 따라 변한다 */
+  r.kwRec   = (r.recHpW+r.recHpR)*0.746 + (r.recKwW+r.recKwR)*r.duty;
+  r.elecDayRec = r.kwRec * r.opH;
+  r.elecMonRec = r.elecDayRec * r.opD;
+  r.costDayRec = r.waterDay*r.wPrice + r.elecDayRec*r.ePrice;
+  r.costMonRec = r.costDayRec * r.opD;
+
+  /* 세척 여유율 · 세척 강도 지수 */
+  r.marginPct = (r.tReq>0) ? (r.tActW/r.tReq - 1)*100 : 0;
+  var Aeff = r.area * r.chN;
+  r.powerIdx = (Aeff>0) ? (r.flowW * r.pW * r.tActW)/(60*Aeff) : 0;   /* L·bar/m² */
+  r.powerReq = 100 * r.kS * r.kT * r.kM;
+  r.powerOk  = r.powerIdx >= r.powerReq;
 
   /* 판정 메시지 */
   if(r.cap<CAP_MIN) r.msgs.push(["warn","처리량 "+n0(r.cap)+"매/hr — 목표 하한 "+n0(CAP_MIN)+"매/hr 미달"]);
@@ -461,6 +522,9 @@ function calc(){
 
   if(r.pass) r.msgs.push(["ok","세척 체류시간 "+fx(r.tActW)+"초 ≥ 필요 "+fx(r.tReq)+"초 — 적합"]);
   else r.msgs.push(["bad","세척 체류시간 "+fx(r.tActW)+"초 < 필요 "+fx(r.tReq)+"초 — 부적합. 노즐 열수를 "+r.rowNeed+"열 이상으로 늘리거나 처리량을 낮추세요"]);
+
+  if(r.powerOk) r.msgs.push(["ok","세척 강도 "+n0(r.powerIdx)+" \u2265 필요 "+n0(r.powerReq)+" L\u00b7bar/m\u00b2 \u2014 분사 에너지 충분"]);
+  else r.msgs.push(["warn","세척 강도 "+n0(r.powerIdx)+" < 필요 "+n0(r.powerReq)+" L\u00b7bar/m\u00b2 \u2014 분사압력을 높이거나 분사거리를 줄이세요"]);
 
   if(Math.abs(r.colGap-r.recColGap)>10)
     r.msgs.push(["warn","좌우 열간격 "+n0(r.colGap)+"mm — 추천 "+n0(r.recColGap)+"mm (분사각 "+SPRAY_ANGLE+"°·중첩 "+(OVERLAP*100)+"% 기준)"]);
@@ -506,6 +570,7 @@ function render(){
 
   el('msgs').innerHTML = r.msgs.map(function(m){ return '<div class="msg '+m[0]+'">'+m[1]+'</div>'; }).join('');
 
+  if(typeof queueSweep==='function') queueSweep();
   el('resTbl').innerHTML =
      '<tr><th>항목</th><th>세척존 (WASH)</th><th>헹굼존 (RINSE)</th></tr>'
     +tr3('조 수', r.washTanks+' 조', '1 조')
@@ -523,12 +588,15 @@ function render(){
     +tr3('수온', n0(r.tWt)+' ℃', n0(r.tRt)+' ℃')
     +'<tr><th>공통</th><th colspan="2">산출값</th></tr>'
     +tr2('반송 피치 / 속도', n0(r.pitch)+' mm / <b>'+fx(r.v,2)+' m/min</b> ('+r.chN+'채널 병렬)')
+    +tr2('세척 여유율', '<b>'+fx(r.marginPct,0)+' %</b> (실제 '+fx(r.tActW)+'초 \u00f7 필요 '+fx(r.tReq)+'초)')
+    +tr2('세척 강도 지수', n0(r.powerIdx)+' L\u00b7bar/m\u00b2 (필요 '+n0(r.powerReq)+') \u2014 '+(r.powerOk?'충분':'부족'))
     +tr2('상하 노즐 간격', n0(r.vPitch)+' mm (분사폭 '+n0(r.sprayW)+'mm × 중첩 '+(OVERLAP*100)+'%), 단수 '+r.nV+'단')
     +tr2('노즐 종류', r.nzType)
     +tr2('유효 표면적 / 필요 채널 폭', fx(r.area,2)+' m² / '+n0(r.needChW)+' mm')
     +tr2('일 급수량 / 월 급수량', fx(r.waterDay,2)+' ㎥ / <b>'+fx(r.waterMon,1)+' ㎥</b>')
     +tr2('일 전력량 / 월 전력량', n0(r.elecDay)+' kWh / <b>'+n0(r.elecMon)+' kWh</b>')
-    +tr2('일 운영비 / 월 운영비', n0(r.costDay)+' 원 / <b>'+n0(r.costMon)+' 원</b>');
+    +tr2('일 운영비 / 월 운영비 <small>(선정 기기)</small>', n0(r.costDay)+' 원 / <b>'+n0(r.costMon)+' 원</b>')
+    +tr2('월 운영비 <small>(추천 기기 기준)</small>', '<b>'+n0(r.costMonRec)+' 원</b> — 소요 동력 '+fx(r.kwRec,1)+' kW');
 }
 function tr3(k,a,b){ return '<tr><td class="k">'+k+'</td><td>'+a+'</td><td>'+b+'</td></tr>'; }
 function tr2(k,v){ return '<tr><td class="k">'+k+'</td><td colspan="2">'+v+'</td></tr>'; }
@@ -736,7 +804,8 @@ function downloadSpec(){
    +tr2('트레이당 신수량', fx(r.fresh,2)+' L/매')
    +tr2('일 / 월 급수량', fx(r.waterDay,2)+' ㎥ / <b>'+fx(r.waterMon,1)+' ㎥</b>')
    +tr2('일 / 월 전력량', n0(r.elecDay)+' kWh / <b>'+n0(r.elecMon)+' kWh</b>')
-   +tr2('일 / 월 운영비', n0(r.costDay)+' 원 / <b>'+n0(r.costMon)+' 원</b>')
+   +tr2('일 / 월 운영비 (선정 기기)', n0(r.costDay)+' 원 / <b>'+n0(r.costMon)+' 원</b>')
+   +tr2('월 운영비 (추천 기기 기준)', '<b>'+n0(r.costMonRec)+' 원</b> (소요 동력 '+fx(r.kwRec,1)+' kW)')
    +tr2('운전 조건', n0(r.opH)+' hr/일 × '+n0(r.opD)+' 일/월 · 히터 가동률 '+fx(r.duty*100,0)+'%')
    +'</table>';
   if(r.msgs.length){
@@ -836,6 +905,246 @@ function importSpecs(ev){
   rd.readAsText(f); ev.target.value='';
 }
 
+/* ---------- 민감도 분석 · 최적값 ---------- */
+var SWEEP={
+  tgtCap:{label:'목표 처리량', unit:'매/hr', min:600,  max:1600, step:25,  dec:0, dir:'max',
+          why:'적합·강도를 만족하는 가장 높은 생산성'},
+  rowW:  {label:'세척 노즐 열수', unit:'열', min:1,    max:12,   step:1,   dec:0, dir:'cost',
+          why:'적합·강도를 만족하는 최소 비용 (열이 늘면 노즐·유량·전력이 함께 증가)'},
+  pW:    {label:'세척 분사압력', unit:'bar', min:1.0,  max:5.0,  step:0.1, dec:1, dir:'cost',
+          why:'필요 세척강도를 만족하는 최소 압력 (압력↑ → 유량·펌프동력 증가)'},
+  sprayD:{label:'분사 거리', unit:'mm',      min:80,   max:300,  step:5,   dec:0, dir:'cost',
+          why:'거리가 멀수록 노즐 수는 줄지만 분사 에너지가 약해짐'},
+  gap:   {label:'트레이 간격', unit:'mm',    min:0,    max:150,  step:5,   dec:0, dir:'max',
+          why:'적합을 유지하면서 확보 가능한 최대 간격 (투입·배출 여유)'}
+};
+var SVAR='tgtCap', SDATA=[], SOPT=null, sweepTimer=null;
+
+var PANELS=[
+  {k:'margin', t:'세척 여유율',  u:'%',          c:'#2a78d6', dec:0, ref:'zero'},
+  {k:'power',  t:'세척 강도',    u:'L\u00b7bar/m\u00b2', c:'#eb6834', dec:0, ref:'req'},
+  {k:'cost',   t:'월 운영비 (추천 기기 기준)', u:'만원', c:'#1baf7a', dec:0, ref:null}
+];
+var CH={W:760, PH:88, GAP:30, TOP:16, L:56, R:16, XA:30, FS:10, FT:10.5};
+function chGeom(){
+  var mo = (document.body.className.indexOf('mobile')>=0);
+  var g = mo ? {W:400, PH:74, GAP:26, TOP:15, L:40, R:10, XA:28, FS:10, FT:10.5}
+             : {W:760, PH:88, GAP:30, TOP:16, L:56, R:16, XA:30, FS:10, FT:10.5};
+  for(var k in g) CH[k]=g[k];
+}
+
+function buildTabs(){
+  var h='';
+  for(var k in SWEEP) h+='<button data-v="'+k+'" onclick="setSweep(\''+k+'\')">'+SWEEP[k].label+'</button>';
+  el('anzTabs').innerHTML=h;
+}
+function setSweep(k){ SVAR=k; syncTabs(); runSweep(); }
+
+/* 변수 하나를 훑으며 전체 모델을 다시 계산 */
+function runSweep(){
+  var cfg=SWEEP[SVAR], id=SVAR, orig=el(id).value, out=[];
+  for(var x=cfg.min; x<=cfg.max+1e-9; x+=cfg.step){
+    var xv=(cfg.dec?parseFloat(x.toFixed(cfg.dec)):Math.round(x));
+    el(id).value=String(xv);
+    var r=calc();
+    out.push({ x:xv, margin:r.marginPct, power:r.powerIdx, powerReq:r.powerReq,
+               cost:r.costMonRec/10000, ok:(r.marginPct>=0 && r.powerIdx>=r.powerReq) });
+  }
+  el(id).value=orig;
+  SDATA=out;
+  SOPT=findOpt(out, cfg.dir);
+  drawSweep();
+}
+function findOpt(data, dir){
+  var ok=data.filter(function(d){ return d.ok; });
+  if(!ok.length) return null;
+  if(dir==='max') return ok.reduce(function(a,b){ return b.x>a.x?b:a; });
+  return ok.reduce(function(a,b){
+    if(b.cost < a.cost-1e-9) return b;
+    if(b.cost > a.cost+1e-9) return a;
+    return (b.x<a.x)?b:a;
+  });
+}
+function applyOpt(){
+  if(!SOPT) return;
+  set(SVAR, SOPT.x); render();
+}
+
+function drawSweep(){
+  chGeom();
+  if(!SDATA.length) return;
+  var cfg=SWEEP[SVAR], now=num(SVAR);
+  /* 최적값 바 */
+  var ob=el('optBar');
+  if(SOPT){
+    ob.className='optbar';
+    ob.innerHTML='<span class="ol">최적값</span>'
+      +'<span class="ov">'+fx(SOPT.x,cfg.dec)+'</span><span class="ou">'+cfg.unit+'</span>'
+      +'<span class="owhy">'+cfg.why+'<br>월 운영비 '+fx(SOPT.cost,0)+'만원 · 여유율 '+fx(SOPT.margin,0)+'% · 강도 '+n0(SOPT.power)+'</span>'
+      +'<button class="btn" onclick="applyOpt()">최적값 적용</button>';
+  }else{
+    ob.className='optbar none';
+    ob.innerHTML='<span class="ol">최적값</span><span class="ov">없음</span>'
+      +'<span class="owhy">'+cfg.label+' 범위 전체에서 적합 조건을 만족하지 못합니다. 노즐 열수를 늘리거나 처리량을 낮추세요.</span>';
+  }
+
+  var W=CH.W, H=CH.TOP+PANELS.length*CH.PH+(PANELS.length-1)*CH.GAP+CH.XA;
+  var x0=CH.L, x1=W-CH.R;
+  var xmin=cfg.min, xmax=cfg.max;
+  var X=function(v){ return x0+(v-xmin)/(xmax-xmin||1)*(x1-x0); };
+  var g='';
+
+  /* 적합 구간 음영 (연속 구간 단위) */
+  var bands=[], st=null;
+  SDATA.forEach(function(d,i){
+    if(d.ok && st===null) st=d.x;
+    if((!d.ok||i===SDATA.length-1) && st!==null){ bands.push([st, d.ok?d.x:SDATA[i-1].x]); st=null; }
+  });
+
+  PANELS.forEach(function(pn,pi){
+    var yTop=CH.TOP+pi*(CH.PH+CH.GAP), yBot=yTop+CH.PH;
+    var vals=SDATA.map(function(d){ return d[pn.k]; });
+    var refv = pn.ref==='zero' ? 0 : (pn.ref==='req' ? (SDATA[0]?SDATA[0].powerReq:0) : null);
+    var lo=Math.min.apply(null,vals), hi=Math.max.apply(null,vals);
+    if(refv!==null){ lo=Math.min(lo,refv); hi=Math.max(hi,refv); }
+    var pad=(hi-lo)*0.18 || Math.abs(hi)*0.2 || 1;
+    lo-=pad; hi+=pad;
+    if(pn.k!=='margin') lo=Math.max(0,lo);   /* 강도·비용은 음수가 될 수 없다 */
+    var Y=function(v){ return yBot-(v-lo)/(hi-lo||1)*CH.PH; };
+
+    /* 패널 배경 + 적합 음영 */
+    g+='<rect x="'+x0+'" y="'+yTop+'" width="'+(x1-x0)+'" height="'+CH.PH+'" fill="#fbfcfd" stroke="#e6ecf2"/>';
+    bands.forEach(function(b){
+      g+='<rect x="'+X(b[0]).toFixed(1)+'" y="'+yTop+'" width="'+Math.max(1,(X(b[1])-X(b[0]))).toFixed(1)
+        +'" height="'+CH.PH+'" fill="#0ca30c" opacity="0.08"/>';
+    });
+    /* y 눈금 3개 */
+    [lo+(hi-lo)*0.1, (lo+hi)/2, hi-(hi-lo)*0.1].forEach(function(v){
+      var y=Y(v);
+      g+='<line x1="'+x0+'" y1="'+y.toFixed(1)+'" x2="'+x1+'" y2="'+y.toFixed(1)+'" stroke="#eef2f6"/>';
+      g+='<text x="'+(x0-6)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" font-size="'+CH.FS+'" fill="#8a99a8">'+fx(v,pn.dec)+'</text>';
+    });
+    /* 기준선 */
+    if(refv!==null){
+      g+='<line x1="'+x0+'" y1="'+Y(refv).toFixed(1)+'" x2="'+x1+'" y2="'+Y(refv).toFixed(1)
+        +'" stroke="#d03b3b" stroke-width="1.5" stroke-dasharray="5 3"/>';
+      g+='<text x="'+(x1-3)+'" y="'+(Y(refv)-4).toFixed(1)+'" text-anchor="end" font-size="'+CH.FS+'" font-weight="700" fill="#d03b3b">'
+        +(pn.ref==='zero'?'적합 경계':'필요 '+n0(refv))+'</text>';
+    }
+    /* 면적 + 선 */
+    var dd='', aa='';
+    SDATA.forEach(function(d,i){
+      var px=X(d.x).toFixed(1), py=Y(d[pn.k]).toFixed(1);
+      dd+=(i?'L':'M')+px+' '+py+' ';
+    });
+    aa='M'+X(SDATA[0].x).toFixed(1)+' '+yBot+' '+dd.replace(/^M/,'L')+'L'+X(SDATA[SDATA.length-1].x).toFixed(1)+' '+yBot+' Z';
+    g+='<path d="'+aa+'" fill="url(#gr'+pi+')" opacity="0.5"/>';
+    g+='<path d="'+dd+'" fill="none" stroke="'+pn.c+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+
+    /* 패널 제목 */
+    var dmin=Math.min.apply(null,vals), dmax=Math.max.apply(null,vals);
+    g+='<text x="'+x0+'" y="'+(yTop-6)+'" font-size="'+CH.FT+'" font-weight="700" fill="#26333f">'+pn.t
+      +' <tspan font-size="'+CH.FS+'" font-weight="400" fill="#8a99a8">'+pn.u
+      +'  \u00b7  범위 '+fx(dmin,pn.dec)+'\u2013'+fx(dmax,pn.dec)+'</tspan></text>';
+
+    /* 최적값 표시 */
+    if(SOPT){
+      var ox=X(SOPT.x);
+      g+='<line x1="'+ox.toFixed(1)+'" y1="'+yTop+'" x2="'+ox.toFixed(1)+'" y2="'+yBot
+        +'" stroke="#12283f" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.75"/>';
+      g+='<circle cx="'+ox.toFixed(1)+'" cy="'+Y(SOPT[pn.k]).toFixed(1)+'" r="4" fill="#12283f" stroke="#fff" stroke-width="2"/>';
+    }
+    /* 현재값 표시 + 직접 라벨 */
+    var cur=nearest(now);
+    if(cur){
+      var cx=X(cur.x), cy=Y(cur[pn.k]);
+      g+='<line x1="'+cx.toFixed(1)+'" y1="'+yTop+'" x2="'+cx.toFixed(1)+'" y2="'+yBot+'" stroke="#12283f" stroke-width="1.5"/>';
+      g+='<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="4.5" fill="'+pn.c+'" stroke="#fff" stroke-width="2"/>';
+      var anc=(cx>x1-70)?'end':'start', dxl=(anc==='end'?-8:8);
+      g+='<text x="'+(cx+dxl).toFixed(1)+'" y="'+(cy-8).toFixed(1)+'" text-anchor="'+anc
+        +'" font-size="'+CH.FT+'" font-weight="700" fill="'+pn.c+'">'+fx(cur[pn.k],pn.dec)+'</text>';
+    }
+    /* 호버 크로스헤어 (패널마다 점) */
+    g+='<circle class="hvd" data-p="'+pi+'" cx="-99" cy="-99" r="4" fill="#fff" stroke="'+pn.c+'" stroke-width="2.5"/>';
+  });
+
+  /* x축 */
+  var yAx=CH.TOP+PANELS.length*CH.PH+(PANELS.length-1)*CH.GAP;
+  g+='<line x1="'+x0+'" y1="'+yAx+'" x2="'+x1+'" y2="'+yAx+'" stroke="#c9d4de"/>';
+  for(var t=0;t<=4;t++){
+    var v=xmin+(xmax-xmin)*t/4, px=X(v);
+    g+='<line x1="'+px.toFixed(1)+'" y1="'+yAx+'" x2="'+px.toFixed(1)+'" y2="'+(yAx+4)+'" stroke="#c9d4de"/>';
+    g+='<text x="'+px.toFixed(1)+'" y="'+(yAx+16)+'" text-anchor="middle" font-size="'+CH.FS+'" fill="#5a6b7a">'+fx(v,cfg.dec)+'</text>';
+  }
+  g+='<text x="'+x1+'" y="'+(yAx+27)+'" text-anchor="end" font-size="'+CH.FS+'" font-weight="700" fill="#26333f">'
+    +cfg.label+' ('+cfg.unit+')</text>';
+  g+='<line class="hvl" x1="-99" y1="'+CH.TOP+'" x2="-99" y2="'+yAx+'" stroke="#12283f" stroke-width="1" opacity="0" stroke-dasharray="2 2"/>';
+
+  var defs='<defs>';
+  PANELS.forEach(function(pn,i){
+    defs+='<linearGradient id="gr'+i+'" x1="0" y1="0" x2="0" y2="1">'
+      +'<stop offset="0%" stop-color="'+pn.c+'" stop-opacity="0.30"/>'
+      +'<stop offset="100%" stop-color="'+pn.c+'" stop-opacity="0.02"/></linearGradient>';
+  });
+  defs+='</defs>';
+
+  var box=el('chartBox');
+  var tip=el('anzTip');
+  box.innerHTML='<svg id="anzSvg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+cfg.label+' 민감도 그래프">'+defs+g+'</svg>';
+  box.appendChild(tip);
+  bindHover(W,H,x0,x1,xmin,xmax);
+}
+function nearest(v){
+  if(!SDATA.length) return null;
+  var best=SDATA[0], bd=Math.abs(SDATA[0].x-v);
+  SDATA.forEach(function(d){ var e=Math.abs(d.x-v); if(e<bd){ bd=e; best=d; } });
+  return best;
+}
+function bindHover(W,H,x0,x1,xmin,xmax){
+  var svg=el('anzSvg'), tip=el('anzTip'), box=el('chartBox'), cfg=SWEEP[SVAR];
+  var line=svg.querySelector('.hvl'), dots=svg.querySelectorAll('.hvd');
+  function move(ev){
+    var rect=svg.getBoundingClientRect();
+    var cx=ev.clientX!==undefined?ev.clientX:(ev.touches&&ev.touches[0].clientX);
+    var sx=(cx-rect.left)/rect.width*W;
+    if(sx<x0||sx>x1){ leave(); return; }
+    var v=xmin+(sx-x0)/(x1-x0)*(xmax-xmin);
+    var d=nearest(v); if(!d) return;
+    var px=x0+(d.x-xmin)/(xmax-xmin||1)*(x1-x0);
+    line.setAttribute('x1',px); line.setAttribute('x2',px); line.setAttribute('opacity','0.5');
+    PANELS.forEach(function(pn,pi){
+      var yTop=CH.TOP+pi*(CH.PH+CH.GAP), yBot=yTop+CH.PH;
+      var vals=SDATA.map(function(q){ return q[pn.k]; });
+      var refv = pn.ref==='zero'?0:(pn.ref==='req'?(SDATA[0]?SDATA[0].powerReq:0):null);
+      var lo=Math.min.apply(null,vals), hi=Math.max.apply(null,vals);
+      if(refv!==null){ lo=Math.min(lo,refv); hi=Math.max(hi,refv); }
+      var pad=(hi-lo)*0.18||Math.abs(hi)*0.2||1; lo-=pad; hi+=pad;
+      if(pn.k!=='margin') lo=Math.max(0,lo);
+      var y=yBot-(d[pn.k]-lo)/(hi-lo||1)*CH.PH;
+      dots[pi].setAttribute('cx',px); dots[pi].setAttribute('cy',y);
+    });
+    tip.style.opacity='1';
+    tip.style.left=(px/W*rect.width)+'px';
+    tip.style.top=(CH.TOP/H*rect.height-8)+'px';
+    tip.innerHTML='<b>'+cfg.label+' '+fx(d.x,cfg.dec)+' '+cfg.unit+'</b><br>'
+      +'<i style="background:#2a78d6"></i>여유율 '+fx(d.margin,0)+'%<br>'
+      +'<i style="background:#eb6834"></i>강도 '+n0(d.power)+' / 필요 '+n0(d.powerReq)+'<br>'
+      +'<i style="background:#1baf7a"></i>월 '+fx(d.cost,0)+'만원<br>'
+      +(d.ok?'✓ 적합':'✕ 부적합');
+  }
+  function leave(){ tip.style.opacity='0'; line.setAttribute('opacity','0');
+    dots.forEach(function(dt){ dt.setAttribute('cx',-99); dt.setAttribute('cy',-99); }); }
+  svg.addEventListener('mousemove',move);
+  svg.addEventListener('mouseleave',leave);
+  svg.addEventListener('touchmove',function(e){ move(e); e.preventDefault(); },{passive:false});
+  svg.addEventListener('touchend',leave);
+}
+function syncTabs(){
+  var bs=el('anzTabs').querySelectorAll('button');
+  for(var i=0;i<bs.length;i++) bs[i].className=(bs[i].getAttribute('data-v')===SVAR)?'on':'';
+}
+function queueSweep(){ clearTimeout(sweepTimer); sweepTimer=setTimeout(function(){ syncTabs(); runSweep(); },140); }
+
 /* ---------- 이벤트 ---------- */
 document.addEventListener('input', function(e){
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') render();
@@ -850,7 +1159,10 @@ document.addEventListener('change', function(e){
   var v='mobile';
   try{ v=localStorage.getItem('wash_view')||'mobile'; }catch(e){}
   setView(v);
+  buildTabs();
   render();
+  syncTabs();
+  runSweep();
   fbInit();
 })();
 </script>
