@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v2.7 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v2.8 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -153,7 +153,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v2.7</span>
+    <span class="vb">v2.8</span>
   </div>
 </div>
 </div>
@@ -196,13 +196,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v2.7 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v2.8 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v2.7
+// 트레이 세척·탈수·건조 시뮬레이터 v2.8
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='2.7';
+const VER='2.8';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -826,16 +826,27 @@ function renderLeft(){
   if(_tab==='balance' && gi('balanceChart')) setTimeout(drawBalanceChart,30);
   L.querySelectorAll('.sv-n').forEach(el=>{updateSlider(el.id);bindSlider(el.id);});
   L.querySelectorAll('input:not(.sv-n):not(.sv-range),select').forEach(el=>{
+    // 텍스트/숫자 입력 필드: input 중에는 재렌더 금지(커서 유지), 우측 결과만 갱신
+    const isTextNum = (el.tagName==='INPUT' && (el.type==='number'||el.type==='text'));
     el.addEventListener('input',()=>{
-      // 단계별 세척 입력이면 재렌더(펌프출력·유량 갱신)
-      if(el.id&&el.id.startsWith('stg')){ syncState(); renderLeft(); renderRight(); return; }
-      // 모듈 길이·피치·처리량 변경 시 재렌더(총길이·속도·CAPA 즉시 연동)
-      if(['washDryLen','dewatLen','dryLen','ioLen','moduleGap','trayPitch','qty'].indexOf(el.id)>=0||(el.id&&el.id.startsWith('stgTank'))){ syncState(); calcAll(); renderLeft(); renderRight(); return; }
+      if(isTextNum){
+        // 입력 중에는 좌측 패널 재렌더 안 함 → 커서·입력 유지
+        syncState(); calcAll(); renderRight();
+        return;
+      }
       onChange(el.id);
     });
     el.addEventListener('change',()=>{
-      if(el.id==='boilerType'||el.id==='containerType'||el.id==='supplyMode'||el.id==='aux1st'||el.id==='meshFilter'||el.id==='sludgeFilter'||el.id==='pumpStrainer'||el.id==='stageCombo'||el.id==='drainMode'||el.id==='stgTankMode'||(el.id&&el.id.startsWith('stgType'))||el.id==='wZones'){ syncState(); calcAll(); renderLeft(); }
-      onChange(el.id);
+      // 입력 완료(포커스 아웃/엔터) 시 재렌더 — 연동 필드 최신화
+      const needRerender =
+        el.id==='boilerType'||el.id==='containerType'||el.id==='supplyMode'||el.id==='aux1st'
+        ||el.id==='meshFilter'||el.id==='sludgeFilter'||el.id==='pumpStrainer'
+        ||el.id==='stageCombo'||el.id==='drainMode'||el.id==='stgTankMode'
+        ||(el.id&&el.id.startsWith('stgType'))||el.id==='wZones'
+        ||['washDryLen','dewatLen','dryLen','ioLen','moduleGap','trayPitch','qty'].indexOf(el.id)>=0
+        ||(el.id&&el.id.startsWith('stg'));
+      if(needRerender){ syncState(); calcAll(); renderLeft(); renderRight(); }
+      else onChange(el.id);
     });
   });
 }
