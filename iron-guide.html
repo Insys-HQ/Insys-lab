@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>아이언 정타 · 다운블로우 마스터 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8;
+    --card:#ffffff;
+    --text:#1f2933;
+    --sub:#52606d;
+    --accent:#1a5276;
+    --accent-light:#eaf2f8;
+    --line:#e1e6ea;
+    --good:#1e8449;
+    --max-w:1100px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Noto Sans KR',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    font-size:14px;
+    line-height:1.6;
+    -webkit-text-size-adjust:100%;
+  }
+  @media (min-width:768px){
+    body{font-size:16px;}
+  }
+  a{color:var(--accent);}
+
+  /* Header */
+  header.top{
+    background:var(--accent);
+    width:100%;
+  }
+  .nav-inner{
+    max-width:var(--max-w);
+    margin:0 auto;
+    padding:12px 16px 10px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .brand-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .brand{
+    color:#fff;
+    font-weight:700;
+    font-size:1.05em;
+    letter-spacing:-0.3px;
+  }
+  .brand small{
+    display:block;
+    font-weight:400;
+    color:#cfe3f0;
+    font-size:0.72em;
+    margin-top:2px;
+  }
+  .view-toggle{
+    display:flex;
+    background:rgba(255,255,255,0.15);
+    border-radius:20px;
+    padding:3px;
+  }
+  .view-toggle button{
+    border:none;
+    background:transparent;
+    color:#eaf2f8;
+    padding:6px 12px;
+    border-radius:16px;
+    font-family:inherit;
+    font-size:0.78em;
+    cursor:pointer;
+  }
+  .view-toggle button.active{
+    background:#fff;
+    color:var(--accent);
+    font-weight:700;
+  }
+
+  /* Section tab menu */
+  .tabbar{
+    display:flex;
+    overflow-x:auto;
+    gap:6px;
+    padding:8px 16px 8px 16px;
+    max-width:var(--max-w);
+    margin:0 auto;
+    scrollbar-width:none;
+  }
+  .tabbar::-webkit-scrollbar{display:none;}
+  .tabbar button{
+    flex:0 0 auto;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--sub);
+    padding:8px 12px;
+    border-radius:18px;
+    font-family:inherit;
+    font-size:0.78em;
+    font-weight:500;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .tabbar button.active{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+    font-weight:700;
+  }
+
+  /* Body */
+  main{
+    max-width:var(--max-w);
+    margin:0 auto;
+    padding:10px 16px 90px 16px;
+  }
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:10px;
+  }
+  .card h2{
+    margin:0 0 8px 0;
+    font-size:1.05em;
+    color:var(--accent);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .card h3{
+    margin:12px 0 6px 0;
+    font-size:0.95em;
+    color:var(--text);
+  }
+  .card p{
+    margin:0 0 8px 0;
+    color:var(--text);
+  }
+  .quote{
+    background:var(--accent-light);
+    border-left:4px solid var(--accent);
+    padding:10px 12px;
+    margin:8px 0;
+    color:var(--accent);
+    font-weight:500;
+    font-size:0.92em;
+    border-radius:0 8px 8px 0;
+  }
+  .tip{
+    background:#fef9e7;
+    border-left:4px solid #d4ac0d;
+    padding:10px 12px;
+    margin:8px 0;
+    border-radius:0 8px 8px 0;
+    font-size:0.92em;
+    color:#7d6608;
+  }
+
+  /* Mechanism table -> cards on mobile */
+  .mech{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:10px 12px;
+    margin-bottom:8px;
+    background:#fbfcfd;
+  }
+  .mech .mech-title{
+    font-weight:700;
+    color:var(--accent);
+    font-size:0.95em;
+    margin-bottom:4px;
+  }
+  .mech .mech-sub{
+    color:var(--sub);
+    font-size:0.85em;
+    margin-bottom:6px;
+  }
+  .mech ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .mech li{
+    margin-bottom:3px;
+    font-size:0.88em;
+  }
+
+  table.desktop-table{
+    display:none;
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.85em;
+  }
+  table.desktop-table th, table.desktop-table td{
+    border:1px solid var(--line);
+    padding:8px 10px;
+    text-align:left;
+    vertical-align:top;
+  }
+  table.desktop-table th{
+    background:var(--accent-light);
+    color:var(--accent);
+    font-weight:700;
+  }
+
+  /* Drill steps */
+  ol.steps{
+    margin:0;
+    padding-left:20px;
+  }
+  ol.steps li{
+    margin-bottom:8px;
+  }
+
+  .compare-row{
+    display:flex;
+    gap:8px;
+    margin-bottom:8px;
+    align-items:stretch;
+  }
+  .compare-col{
+    flex:1;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px 10px;
+    font-size:0.85em;
+  }
+  .compare-col.hammer{background:#f4f6f8;}
+  .compare-col.golf{background:var(--accent-light);}
+  .compare-col b{display:block;color:var(--accent);font-size:0.95em;margin-bottom:3px;}
+
+  /* Equipment checklist */
+  .eq-list{list-style:none;margin:0;padding:0;}
+  .eq-list li{
+    display:flex;
+    gap:8px;
+    padding:8px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:0.9em;
+  }
+  .eq-list li:last-child{border-bottom:none;}
+  .eq-list .dot{
+    flex:0 0 auto;
+    width:8px;height:8px;
+    border-radius:50%;
+    background:var(--accent);
+    margin-top:6px;
+  }
+
+  /* Checklist */
+  .check-item{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:10px 4px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+  }
+  .check-item:last-child{border-bottom:none;}
+  .check-item input{
+    width:20px;height:20px;
+    flex:0 0 auto;
+    margin-top:2px;
+    accent-color:var(--accent);
+  }
+  .check-item span{font-size:0.92em;}
+  .check-item.checked span{
+    color:var(--good);
+    text-decoration:line-through;
+    text-decoration-color:var(--good);
+  }
+  .progress-wrap{
+    background:#eef1f3;
+    border-radius:10px;
+    height:10px;
+    overflow:hidden;
+    margin:6px 0 4px 0;
+  }
+  .progress-bar{
+    height:100%;
+    background:var(--good);
+    width:0%;
+    transition:width .25s ease;
+  }
+  .progress-label{
+    font-size:0.8em;
+    color:var(--sub);
+    text-align:right;
+  }
+  .reset-btn{
+    margin-top:10px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--sub);
+    padding:8px 14px;
+    border-radius:8px;
+    font-family:inherit;
+    font-size:0.82em;
+    cursor:pointer;
+  }
+
+  footer{
+    max-width:var(--max-w);
+    margin:0 auto;
+    padding:14px 16px 24px 16px;
+    text-align:center;
+    color:var(--sub);
+    font-size:0.75em;
+  }
+  footer .ver{
+    font-weight:700;
+    color:var(--accent);
+  }
+
+  /* PC mode adjustments */
+  body.pc main{padding:16px 20px 60px 20px;}
+  body.pc .mech{display:none;}
+  body.pc table.desktop-table{display:table;}
+  body.pc .compare-row{gap:16px;}
+  body.pc .card{padding:20px 24px;}
+</style>
+</head>
+<body class="mobile">
+
+<header class="top">
+  <div class="nav-inner">
+    <div class="brand-row">
+      <div class="brand">
+        아이언 정타 · 다운블로우
+        <small>마스터 훈련 가이드북 · 연습장용</small>
+      </div>
+      <div class="view-toggle" id="viewToggle">
+        <button type="button" data-view="mobile" class="active">모바일</button>
+        <button type="button" data-view="pc">PC</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="tabbar" id="tabbar">
+  <button type="button" class="tab-btn active" data-target="p1">① 핵심원리</button>
+  <button type="button" class="tab-btn" data-target="p2">② 3대 메커니즘</button>
+  <button type="button" class="tab-btn" data-target="p3">③ 드릴1 체중이동</button>
+  <button type="button" class="tab-btn" data-target="p4">④ 드릴2 망치질</button>
+  <button type="button" class="tab-btn" data-target="p5">⑤ 매트·장비</button>
+  <button type="button" class="tab-btn" data-target="p6">⑥ 체크리스트</button>
+</div>
+
+<main>
+
+  <!-- 1. 핵심원리 -->
+  <section class="panel active" id="p1">
+    <div class="card">
+      <h2>🎯 아이언 고민의 해답</h2>
+      <p>번호별 비거리가 들쭉날쭉한 근본 원인은 <b>'일정하지 않은 로프트'</b>와 <b>'다운블로우의 부재'</b>입니다. 임팩트 순간 클럽 본래의 각도를 제어하지 못하기 때문에 8번 아이언 하나로도 거리가 크게 흔들립니다.</p>
+      <p>정타와 다운블로우는 별개의 동작이 아닙니다. 스위트 스팟에 공을 싣으려면 반드시 헤드가 <b>하향 궤적</b>을 그리며 <b>공부터 타격</b>하는 과정이 선행되어야 합니다.</p>
+      <div class="quote">
+        "아이언 정타의 핵심은 공을 띄우는 것이 아니라 지면으로 압축하는 것입니다. 다운블로우가 실현되어야만 로프트가 적절히 서면서 공이 클럽 페이스 정중앙에 머무는 '찹쌀떡' 같은 묵직한 손맛과 일정한 비거리를 얻을 수 있습니다."
+      </div>
+      <p>다운블로우는 임팩트 순간 클럽의 물리적 효율을 극대화하여 구질을 직선으로 만들고 비거리를 일정하게 유지해주는 열쇠입니다.</p>
+    </div>
+  </section>
+
+  <!-- 2. 메커니즘 -->
+  <section class="panel" id="p2">
+    <div class="card">
+      <h2>⚙️ 다운블로우의 3대 핵심 메커니즘</h2>
+      <p>다운블로우가 임팩트 시점에 일으키는 물리적 변화입니다. 훈련의 목적을 이해하는 것이 첫걸음입니다.</p>
+
+      <!-- mobile cards -->
+      <div class="mech">
+        <div class="mech-title">디로프팅 (Delofting)</div>
+        <div class="mech-sub">임팩트 시 클럽의 원래 로프트보다 각도가 낮게(서서) 맞도록 하는 동작</div>
+        <ul>
+          <li><b>비거리</b> · 에너지 전달 극대화로 증대</li>
+          <li><b>탄도</b> · 바람에 강한 안정적 탄도 형성</li>
+          <li><b>정타</b> · 페이스 상단이 아닌 중심부 타격</li>
+        </ul>
+      </div>
+      <div class="mech">
+        <div class="mech-title">핸드 포워드 (Hand Forward)</div>
+        <div class="mech-sub">손(핸들)이 클럽 헤드보다 타겟 방향으로 앞서 있는 샤프트 린 상태</div>
+        <ul>
+          <li><b>비거리</b> · 일정한 로프트 유지로 거리 편차 감소</li>
+          <li><b>탄도</b> · 볼이 뜨기만 하는 풍선 효과 방지</li>
+          <li><b>정타</b> · 손목 풀림(스쿠핑) 방지로 견고한 컨택</li>
+        </ul>
+      </div>
+      <div class="mech">
+        <div class="mech-title">스윙 최저점 (Low Point)</div>
+        <div class="mech-sub">스윙 원의 가장 낮은 지점이 공 뒤가 아닌 '공 앞 2~3인치'에서 형성되는 원리</div>
+        <ul>
+          <li><b>비거리</b> · 지면 마찰 전 볼 타격으로 손실 방지</li>
+          <li><b>탄도</b> · 하향 타격에 의한 강력한 백스핀 발생</li>
+          <li><b>정타</b> · 뒷땅 없는 깨끗한 '볼-퍼스트' 컨택</li>
+        </ul>
+      </div>
+
+      <!-- desktop table -->
+      <table class="desktop-table">
+        <thead>
+          <tr><th>핵심 개념</th><th>물리적 메커니즘</th><th>기대 효과</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>디로프팅</b></td>
+            <td>임팩트 시 클럽의 원래 로프트보다 각도가 낮게(서서) 맞도록 하는 동작</td>
+            <td>비거리: 에너지 전달 극대화로 증대<br>탄도: 바람에 강한 안정적 탄도 형성<br>정타: 페이스 상단이 아닌 중심부 타격</td>
+          </tr>
+          <tr>
+            <td><b>핸드 포워드</b></td>
+            <td>손(핸들)이 클럽 헤드보다 타겟 방향으로 앞서 있는 샤프트 린 상태</td>
+            <td>비거리: 일정한 로프트 유지로 거리 편차 감소<br>탄도: 볼이 뜨기만 하는 풍선 효과 방지<br>정타: 손목 풀림(스쿠핑) 방지로 견고한 컨택</td>
+          </tr>
+          <tr>
+            <td><b>스윙 최저점</b></td>
+            <td>스윙 원의 가장 낮은 지점이 공 뒤가 아닌 '공 앞 2~3인치'에서 형성되는 원리</td>
+            <td>비거리: 지면 마찰 전 볼 타격으로 손실 방지<br>탄도: 하향 타격에 의한 강력한 백스핀 발생<br>정타: 뒷땅 없는 깨끗한 '볼-퍼스트' 컨택</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tip">
+        💡 클럽이 짧아질수록 스윙 궤도의 원이 작아지므로 더 가파른 'V자형' 디봇을 만들어야 정확한 비거리가 확보됩니다. 롱 아이언은 궤도가 완만하지만, 공부터 맞고 앞 땅을 스치는 다운블로우 원리는 동일하게 적용됩니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 드릴1 -->
+  <section class="panel" id="p3">
+    <div class="card">
+      <h2>🦶 [드릴 1] 오른발 일직선 드릴</h2>
+      <p>다운블로우를 방해하는 최대 적은 임팩트 시 체중이 오른발에 남는 것입니다. 체중이 뒤에 남으면 스윙 최저점이 공보다 뒤에 형성되어 뒷땅이나 얇은 탑볼이 발생합니다.</p>
+      <h3>진행 순서</h3>
+      <ol class="steps">
+        <li>평소 어드레스 자세를 취한 뒤, 오른발을 왼발 뒤쪽으로 옮겨 양발이 타겟 라인과 평행한 <b>'일직선'</b>이 되도록 배치합니다.</li>
+        <li>양발 간격은 아주 좁게 유지하며, 오직 균형을 잡기 위한 최소한의 지지만 합니다.</li>
+        <li>이 상태에서 부드럽게 풀스윙 혹은 70% 스윙을 진행합니다.</li>
+        <li>임팩트 시 체중이 조금이라도 오른발에 남아 있다면, 지지 기반이 없으므로 몸이 오른쪽으로 넘어지거나 자세가 즉각 무너집니다.</li>
+        <li><b>자가 진단</b>: 성공적인 수행 시, 임팩트 순간 명치(Sternum)가 왼발 위에 정확히 위치하며 견고하게 버티는 느낌을 받아야 합니다.</li>
+      </ol>
+      <div class="tip">
+        💡 이 드릴은 체중이 뒤에 남아 탄도가 너무 높게 뜨거나 뒷땅을 자주 치는 골퍼에게 '왼발 축'의 중요성을 몸에 각인시켜 줍니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 드릴2 -->
+  <section class="panel" id="p4">
+    <div class="card">
+      <h2>🔨 [드릴 2] 티 박기 & 망치질 드릴</h2>
+      <p>체중 이동이 해결되었다면, 이제 손목이 일찍 풀리는 <b>'스쿠핑'</b>을 제거해야 합니다. 공을 띄우려는 본능적 퍼 올리기 동작을 망치질 메커니즘으로 치환하여 하향 타격의 감각을 익힙니다.</p>
+
+      <h3>망치질 vs 골프 스윙 비교</h3>
+      <div class="compare-row">
+        <div class="compare-col hammer">
+          <b>망치질</b>
+          A. 손(핸들)이 먼저 아래로 내려오며 가속 시작<br>
+          B. 마지막 순간 손목이 펴지며 못 머리를 강력 타격<br>
+          C. 못을 수직으로 박아 넣는 하향 힘 전달
+        </div>
+        <div class="compare-col golf">
+          <b>골프 스윙</b>
+          A. 손이 헤드보다 앞서 내려오는 '핸드 퍼스트' 유도<br>
+          B. 임팩트까지 코킹 유지 후 공 앞에서 압축(Compression)<br>
+          C. 공을 지면에 박아 넣는 느낌의 다운블로우 완성
+        </div>
+      </div>
+
+      <h3>티 박기 시뮬레이션 가이드</h3>
+      <p>공 앞 약 2~3인치 지점에 티(Tee)가 비스듬히 박혀 있다고 상상하십시오. 클럽 헤드로 공을 맞춘 뒤, 그 기세를 이어 공 앞의 티를 지면 속으로 더 깊이 박아 넣는다는 느낌으로 <b>"장작을 패듯"</b> 내려쳐야 합니다.</p>
+      <div class="tip">
+        💡 이 이미지가 형성될 때 비로소 공부터 타격하고 앞 디봇을 내는 진정한 다운블로우가 완성됩니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. 장비 -->
+  <section class="panel" id="p5">
+    <div class="card">
+      <h2>🧰 연습장 매트의 한계 극복 및 장비 활용법</h2>
+      <p>일반 연습장 매트는 뒤를 쳐도 헤드가 미끄러지며 공을 맞히기 때문에 정타 여부를 착각하게 만듭니다. '코리안 탱크' 최경주 프로는 해변의 모래 위에 선을 긋고 공부터 정확히 타격하는 훈련을 통해 세계적인 정타 능력을 갖췄습니다.</p>
+      <h3>프로급 훈련을 위한 디봇 확인 매트 선택 기준</h3>
+      <ul class="eq-list">
+        <li><span class="dot"></span><span><b>디봇 흔적 가시성</b> · 샷 직후 클럽의 최저점이 공 앞(타겟 쪽)에 형성되었는지 즉각 확인 가능할 것</span></li>
+        <li><span class="dot"></span><span><b>2cm 이상 두께</b> · 하향 타격 시 손목·팔꿈치 충격을 흡수할 완충성 보유</span></li>
+        <li><span class="dot"></span><span><b>1.5kg 이상 중량</b> · 강한 마찰력에도 매트가 밀리거나 날아가지 않는 안정성</span></li>
+        <li><span class="dot"></span><span><b>논슬립·내구성</b> · 바닥 접지력이 강화되어 실내외 어디서든 고정</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 6. 체크리스트 -->
+  <section class="panel" id="p6">
+    <div class="card">
+      <h2>✅ 아이언 정타 마스터 최종 체크리스트</h2>
+      <p>연습장에서 샷 직전과 직후, 아래 항목을 점검하십시오. 체크는 자동 저장되며 다음 방문 시에도 유지됩니다.</p>
+      <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="progress-label" id="progressLabel">0 / 6 완료</div>
+
+      <div id="checklist">
+        <label class="check-item" data-id="c1">
+          <input type="checkbox">
+          <span>어드레스 체크 — 체중이 지나치게 오른쪽에 실려 '뒤집어진' 상태는 아닌가?</span>
+        </label>
+        <label class="check-item" data-id="c2">
+          <input type="checkbox">
+          <span>정렬 체크 — '일직선 드릴'의 느낌을 살려 왼발에 축을 두고 서 있는가?</span>
+        </label>
+        <label class="check-item" data-id="c3">
+          <input type="checkbox">
+          <span>임팩트 이미지 — 공 앞 2~3인치 지점에 박힌 못을 망치로 내리찍는 상상을 하고 있는가?</span>
+        </label>
+        <label class="check-item" data-id="c4">
+          <input type="checkbox">
+          <span>샤프트 린 — 임팩트 순간 손이 헤드보다 앞서서 '공을 눌러주는' 느낌을 받았는가?</span>
+        </label>
+        <label class="check-item" data-id="c5">
+          <input type="checkbox">
+          <span>피드백 확인 — 샷 이후 매트(혹은 디봇)의 흔적이 공이 있던 자리보다 타겟 방향으로 치우쳐 있는가?</span>
+        </label>
+        <label class="check-item" data-id="c6">
+          <input type="checkbox">
+          <span>타격음 점검 — 공을 퍼 올리는 '퍽' 소리가 아닌, 공을 압착하는 '착'/'찹쌀떡' 소리가 났는가?</span>
+        </label>
+      </div>
+      <button type="button" class="reset-btn" id="resetBtn">체크리스트 초기화</button>
+      <div class="tip" style="margin-top:12px;">
+        💡 단순히 공을 맞히는 것에 급급하지 마십시오. '하향 타격'의 물리적 감각을 익힌다면, 필드 위 어떤 상황에서도 핀을 직접 공략하는 자신감을 얻게 될 것입니다.
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  아이언 정타 · 다운블로우 마스터 훈련 가이드북 &middot; <span class="ver">v1.0</span>
+</footer>
+
+<script>
+  // 탭 전환
+  var tabBtns = document.querySelectorAll('.tab-btn');
+  var panels = document.querySelectorAll('.panel');
+  tabBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      tabBtns.forEach(function(b){ b.classList.remove('active'); });
+      panels.forEach(function(p){ p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.target).classList.add('active');
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+
+  // 모바일/PC 뷰 전환
+  var viewBtns = document.querySelectorAll('#viewToggle button');
+  viewBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      viewBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.body.classList.remove('mobile','pc');
+      document.body.classList.add(btn.dataset.view);
+    });
+  });
+
+  // 체크리스트 저장/복원
+  var STORAGE_KEY = 'iron_guide_checklist_v1';
+  function loadState(){
+    try{
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    }catch(e){ return {}; }
+  }
+  function saveState(state){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+  function updateProgress(){
+    var items = document.querySelectorAll('.check-item');
+    var total = items.length;
+    var done = document.querySelectorAll('.check-item.checked').length;
+    document.getElementById('progressBar').style.width = (done/total*100) + '%';
+    document.getElementById('progressLabel').textContent = done + ' / ' + total + ' 완료';
+  }
+  function applyState(){
+    var state = loadState();
+    document.querySelectorAll('.check-item').forEach(function(item){
+      var id = item.dataset.id;
+      var cb = item.querySelector('input');
+      if(state[id]){
+        cb.checked = true;
+        item.classList.add('checked');
+      }
+    });
+    updateProgress();
+  }
+  document.querySelectorAll('.check-item input').forEach(function(cb){
+    cb.addEventListener('change', function(){
+      var item = cb.closest('.check-item');
+      var state = loadState();
+      state[item.dataset.id] = cb.checked;
+      saveState(state);
+      item.classList.toggle('checked', cb.checked);
+      updateProgress();
+    });
+  });
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    saveState({});
+    document.querySelectorAll('.check-item').forEach(function(item){
+      item.querySelector('input').checked = false;
+      item.classList.remove('checked');
+    });
+    updateProgress();
+  });
+  applyState();
+</script>
+
+</body>
+</html>
