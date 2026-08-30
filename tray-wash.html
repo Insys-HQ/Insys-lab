@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v2.3 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v2.4 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -153,7 +153,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v2.3</span>
+    <span class="vb">v2.4</span>
   </div>
 </div>
 </div>
@@ -196,13 +196,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v2.3 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v2.4 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v2.3
+// 트레이 세척·탈수·건조 시뮬레이터 v2.4
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='2.3';
+const VER='2.4';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -237,7 +237,7 @@ const S={
   hours:8,days:22,rate:130,gasRate:900,
   // 기구·구조
   convLen:12000,clipPitch:500,guideRod:true,trayWeight:50,
-  washDryLen:4000,dewatLen:2000,dryLen:4000,ioLen:2000,trayPitch:450,
+  washDryLen:4000,dewatLen:2000,dryLen:4000,ioLen:500,moduleGap:500,trayPitch:450,
   containerType:'40ft',moduleSplit:true
 };
 const CH=2; // 트레이는 좌우 2CH 고정
@@ -389,7 +389,7 @@ function bindSlider(id){
   el.addEventListener('input',()=>{rg.value=el.value;el.classList.add('s-user');onChange(id);});
 }
 function syncState(){
-  ['trayW','trayD','trayT','qty','dlv','wZones','wHole','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeAttack','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','convKW','hours','days','rate','gasRate','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','ioLen','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
+  ['trayW','trayD','trayT','qty','dlv','wZones','wHole','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeAttack','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','convKW','hours','days','rate','gasRate','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','ioLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
   const bt=gi('boilerType');if(bt)S.boilerType=bt.value;
   const wi=gi('wTankIns');if(wi)S.wTankIns=wi.checked;
   const bi=gi('boilerIns');if(bi)S.boilerIns=bi.checked;
@@ -540,7 +540,10 @@ function calcAll(){
   const dewatEff=Math.min(99,(1-residual/(qtyH*0.03))*100);
   const dryEff=Math.min(99,65+S.dryTemp*0.28+S.dryRecirc*0.12);
   // ── 컨베이어 속도·길이·체류시간 연동 ──
-  const convTotalLen = S.washDryLen + S.dewatLen + S.dryLen + S.ioLen; // 모듈 합산
+  // 총길이 = 모듈합 + 조 사이 간격 2곳(세척↔탈수, 탈수↔건조) + 입출구
+  const nGaps = 2; // 조 사이 간격 지점 수
+  const gapTotal = S.moduleGap * nGaps;
+  const convTotalLen = S.washDryLen + S.dewatLen + S.dryLen + S.ioLen + gapTotal;
   const speedMmin = S.qty * (S.trayPitch/1000) / 60; // 처리량→속도 m/min
   const speedMs = speedMmin/60;
   // ── 세척 CAPA (2CH 합계) 및 투입 간격 ──
@@ -565,7 +568,7 @@ function calcAll(){
   // 체류 충분성 판정
   const washOK = dwellWash>=needWash, dewatOK=dwellDewat>=needDewat, dryOK=dwellDry>=needDry;
 
-  R={washFlow,qPerCh,washPumpTotal,convTotalLen,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,nPerFace,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist};
+  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,nPerFace,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist};
 }
 
 // ── 좌측 렌더 ──
@@ -709,7 +712,7 @@ function renderLeft(){
   }else if(_tab==='result'){
     calcAll();
     const kt=totalKnives(S.knifePass);
-    const totalLen=S.washDryLen+S.dewatLen+S.dryLen+S.ioLen;
+    const totalLen=R.convTotalLen;
     // 전체 설계 취합 요약
     h='<div class="card"><div class="ch"><span class="ci">📊</span><span class="cl">종합 설계 요약 (전 항목 취합)</span><span class="cq">실시간</span></div><div class="cb">'
       +'<table class="tbl"><thead><tr><th>구분</th><th>항목</th><th>값</th></tr></thead><tbody>'
@@ -726,7 +729,7 @@ function renderLeft(){
       +srow('온수','보일러',(S.boilerType==='gas'?'가스':'전기')+'·'+S.boilerTankL+'L·단열'+(S.boilerIns?'O':'X'))
       +srow('급수','방식',(S.supplyMode==='cascade'?'캐스케이드(역류)':'직공급')+' · 청수'+R.supplyFresh.toFixed(0)+'L/h'+(S.aux1st?'·1차보조':''))
       +srow('CAPA','2CH 합계','1CH '+R.capa1ch+'매 × 2CH = '+R.capa2ch+'매/h · '+R.feedIntervalSec.toFixed(1)+'초마다 2개 투입')
-      +srow('컨베이어','속도/길이',R.speedMmin.toFixed(2)+'m/min · 총'+R.convTotalLen+'mm (세척'+S.washDryLen+'+탈수'+S.dewatLen+'+건조'+S.dryLen+'+입출'+S.ioLen+')')
+      +srow('컨베이어','속도/길이',R.speedMmin.toFixed(2)+'m/min · 총'+R.convTotalLen+'mm (세척'+S.washDryLen+'+탈수'+S.dewatLen+'+건조'+S.dryLen+'+입출'+S.ioLen+'+간격'+R.gapTotal+')')
       +srow('기구','고정/운송','클립'+S.clipPitch+'mm·가이드봉'+(S.guideRod?'O':'X')+' · '+S.containerType+'·모듈분할'+(S.moduleSplit?'O':'X'))
       +'</tbody></table>'
       +'<div class="kpi" style="margin-top:10px;">'
@@ -755,7 +758,7 @@ function renderLeft(){
       // 단계별 세척 입력이면 재렌더(펌프출력·유량 갱신)
       if(el.id&&el.id.startsWith('stg')){ syncState(); renderLeft(); renderRight(); return; }
       // 모듈 길이·피치·처리량 변경 시 재렌더(총길이·속도·CAPA 즉시 연동)
-      if(['washDryLen','dewatLen','dryLen','ioLen','trayPitch','qty'].indexOf(el.id)>=0||(el.id&&el.id.startsWith('stgTank'))){ syncState(); calcAll(); renderLeft(); renderRight(); return; }
+      if(['washDryLen','dewatLen','dryLen','ioLen','moduleGap','trayPitch','qty'].indexOf(el.id)>=0||(el.id&&el.id.startsWith('stgTank'))){ syncState(); calcAll(); renderLeft(); renderRight(); return; }
       onChange(el.id);
     });
     el.addEventListener('change',()=>{
@@ -950,7 +953,7 @@ function drawBalanceChart(){
 function buildMech(){
   syncState();
   const nClips = Math.floor(R.convTotalLen/S.clipPitch);
-  const totalLen = S.washDryLen+S.dewatLen+S.dryLen+S.ioLen;
+  const totalLen = R.convTotalLen;
   const cont = {'40ft':{L:12032,W:2352,H:2393,nm:"40ft 컨테이너"},'20ft':{L:5898,W:2352,H:2393,nm:"20ft 컨테이너"}}[S.containerType];
   const lenFit = totalLen<=cont.L;
   var h='<div class="card"><div class="ch"><span class="ci">⚙️</span><span class="cl">기구·구조 설계</span><span class="cq">고정·분리·운송</span></div><div class="cb">';
@@ -972,9 +975,11 @@ function buildMech(){
     +'<tr><td style="font-weight:700;">세척조</td><td><input type="number" id="washDryLen" value="'+S.washDryLen+'" style="width:70px;border:1.5px solid #c5d5e5;border-radius:5px;padding:3px 5px;font-size:13px;font-family:inherit;"></td><td>'+R.dwellWash.toFixed(0)+'/'+R.needWash.toFixed(0)+'s</td><td class="hi">'+R.optWashLen+'</td><td>'+(R.washOK?'✅':'⚠️단축과다')+'</td></tr>'
     +'<tr><td style="font-weight:700;">탈수조</td><td><input type="number" id="dewatLen" value="'+S.dewatLen+'" style="width:70px;border:1.5px solid #c5d5e5;border-radius:5px;padding:3px 5px;font-size:13px;font-family:inherit;"></td><td>'+R.dwellDewat.toFixed(0)+'/'+R.needDewat.toFixed(0)+'s</td><td class="hi">'+R.optDewatLen+'</td><td>'+(R.dewatOK?'✅':'⚠️')+'</td></tr>'
     +'<tr><td style="font-weight:700;">건조기</td><td><input type="number" id="dryLen" value="'+S.dryLen+'" style="width:70px;border:1.5px solid #c5d5e5;border-radius:5px;padding:3px 5px;font-size:13px;font-family:inherit;"></td><td>'+R.dwellDry.toFixed(0)+'/'+R.needDry.toFixed(0)+'s</td><td class="hi">'+R.optDryLen+'</td><td>'+(R.dryOK?'✅':'⚠️')+'</td></tr>'
-    +'<tr><td style="font-weight:700;">입출구</td><td><input type="number" id="ioLen" value="'+S.ioLen+'" style="width:70px;border:1.5px solid #c5d5e5;border-radius:5px;padding:3px 5px;font-size:13px;font-family:inherit;"></td><td>-</td><td>-</td><td>-</td></tr>'
+
     +'</tbody></table>';
-  h+='<div class="chbox" style="background:#e3f2fd;border-color:#90caf9;color:#1565c0;">🔧 <b>컨베이어 총길이 = 모듈 합산 = <span style="font-size:16px;">'+R.convTotalLen+'mm</span></b> (자동)<br>⚙️ <b>컨베이어 속도 = 처리량 '+S.qty+'매/h × 피치 '+S.trayPitch+'mm = <span style="font-size:16px;">'+R.speedMmin.toFixed(2)+'m/min</span></b><br>길이를 줄이면 체류시간↓ → 필요 최소 이하면 공정 효과 부족(⚠️). 처리량↑ 시 속도↑ → 더 긴 길이 필요.</div>';
+  h+='<div class="g2" style="margin-top:6px;">'+fld('moduleGap','조 사이 간격','mm',S.moduleGap)+fld('ioLen','입출구','mm',S.ioLen)+'</div>';
+  h+='<div class="chbox" style="background:#fff8e1;border-color:#ffe082;color:#e65100;">📐 <b>조 사이 간격</b>: 세척조↔탈수조, 탈수조↔건조로 상부 구조가 각 <b>'+S.moduleGap+'mm씩 2곳 = '+R.gapTotal+'mm</b> 벌어짐 (컨베이어만 연결). 몸체 분리로 수분·열 차단.</div>';
+  h+='<div class="chbox" style="background:#e3f2fd;border-color:#90caf9;color:#1565c0;">🔧 <b>컨베이어 총길이 = 모듈합 + 조간격 = <span style="font-size:16px;">'+R.convTotalLen+'mm</span></b><br>&nbsp;&nbsp;(세척'+S.washDryLen+' + 탈수'+S.dewatLen+' + 건조'+S.dryLen+' + 입출'+S.ioLen+' + 간격'+R.gapTotal+')<br>⚙️ <b>속도 = '+S.qty+'매/h × 피치'+S.trayPitch+'mm = <span style="font-size:16px;">'+R.speedMmin.toFixed(2)+'m/min</span></b></div>';
   h+='<div class="g2" style="margin-top:6px;">'+fld('trayPitch','트레이 피치','mm',S.trayPitch)+'<div class="fl"><label>컨베이어 총길이(자동)</label><input type="text" value="'+R.convTotalLen+'mm" readonly style="background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#1b5e20;font-family:inherit;"></div></div>';
   h+='<div class="chbox" style="background:'+(lenFit?'#e8f5e9':'#fff3e0')+';border-color:'+(lenFit?'#a5d6a7':'#ffcc80')+';color:'+(lenFit?'#1b5e20':'#e65100')+';">📦 <b>총 라인 '+totalLen+'mm</b> / '+cont.nm+' 내부 '+cont.L+'mm '+(lenFit?'✅ 단일 적재 가능':'⚠️ 초과 → 조별 분할 운송 필수')+'<br>몸체 폭·높이 <b>'+(cont.W-100)+'×'+(cont.H-100)+'mm 이내</b> 제작 (여유 100mm). '+(S.moduleSplit?'조별 분할 → 컨테이너 적재 → <b>현장 조립</b> (플랜지·볼팅 + 체인 재연결)':'⚠️ 일체형 — 40ft 초과 시 운송 불가')+'</div>';
 
