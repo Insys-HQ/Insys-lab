@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>세척·탈수·건조 통합설비 시뮬레이터 v1.1 | 인시스 AI혁신 연구개발실</title>
+<title>세척·탈수·건조 통합설비 시뮬레이터 v1.2 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -16,26 +16,26 @@
   --bg:#eef2f6; --card:#fff; --line:#dde5ee;
   --good:#2e7d32; --warn:#e65100; --bad:#c62828;
 }
-body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;}
-@media(min-width:768px){body{font-size:15px;}}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5;}
+@media(min-width:768px){body{font-size:16px;}}
 
 /* 헤더 */
 .hdr{background:linear-gradient(120deg,#0d2137 0%,#0d7fa8 100%);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
 .hdr-inner{max-width:1200px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-.hdr-t{font-size:17px;font-weight:900;letter-spacing:-.3px;}
-.hdr-s{font-size:11px;opacity:.85;font-weight:400;margin-top:1px;}
+.hdr-t{font-size:19px;font-weight:900;letter-spacing:-.3px;}
+.hdr-s{font-size:13px;opacity:.85;font-weight:400;margin-top:1px;}
 .hdr-r{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-.hdr-r a,.hdr-r button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;padding:4px 11px;border-radius:7px;font-size:11px;font-weight:700;font-family:inherit;text-decoration:none;cursor:pointer;}
+.hdr-r a,.hdr-r button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;padding:4px 11px;border-radius:7px;font-size:13px;font-weight:700;font-family:inherit;text-decoration:none;cursor:pointer;}
 .hdr-r button.on{background:#fff;color:var(--navy);}
-.vb{background:rgba(255,255,255,.25);padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;}
+.vb{background:rgba(255,255,255,.25);padding:4px 10px;border-radius:7px;font-size:13px;font-weight:700;}
 
 .wrap{max-width:1200px;margin:0 auto;padding:10px 14px;}
 .wrap.mobile{max-width:430px;}
 
 /* 공정 스텝 탭 */
 .proctab{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
-.proctab button{flex:1;min-width:80px;background:#fff;border:2px solid var(--line);border-radius:9px;padding:8px 6px;font-family:inherit;font-size:12px;font-weight:700;color:#7a90a4;cursor:pointer;transition:.2s;}
-.proctab button .pe{font-size:16px;display:block;margin-bottom:2px;}
+.proctab button{flex:1;min-width:80px;background:#fff;border:2px solid var(--line);border-radius:9px;padding:8px 6px;font-family:inherit;font-size:14px;font-weight:700;color:#7a90a4;cursor:pointer;transition:.2s;}
+.proctab button .pe{font-size:18px;display:block;margin-bottom:2px;}
 .proctab button.on{color:#fff;border-color:transparent;}
 .proctab button.on.pw{background:var(--wash);}
 .proctab button.on.pd{background:var(--dewat);}
@@ -49,22 +49,22 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:12px;}
 .ch{padding:9px 13px;background:#f6f9fc;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
-.ch .ci{font-size:16px;}
-.ch .cl{font-size:14px;font-weight:800;color:var(--navy);}
-.ch .cq{margin-left:auto;font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px;background:#e3f0f8;color:var(--teal);}
+.ch .ci{font-size:18px;}
+.ch .cl{font-size:15px;font-weight:800;color:var(--navy);}
+.ch .cq{margin-left:auto;font-size:13px;font-weight:700;padding:3px 9px;border-radius:7px;background:#e3f0f8;color:var(--teal);}
 .cb{padding:11px 13px;}
 
-.st{font-size:12px;font-weight:800;color:var(--steel);margin:10px 0 6px;padding-bottom:3px;border-bottom:1px dashed var(--line);}
+.st{font-size:14px;font-weight:800;color:var(--steel);margin:10px 0 6px;padding-bottom:3px;border-bottom:1px dashed var(--line);}
 .st:first-child{margin-top:0;}
 
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 @media(max-width:520px){.g3{grid-template-columns:1fr 1fr;}}
 .fl{display:flex;flex-direction:column;gap:3px;}
-.fl label{font-size:11px;font-weight:600;color:#5a7088;}
-.fl input,.fl select{border:1.5px solid #c5d5e5;border-radius:7px;padding:5px 8px;font-size:13px;font-family:inherit;font-weight:600;color:var(--ink);background:#fff;}
+.fl label{font-size:13px;font-weight:600;color:#5a7088;}
+.fl input,.fl select{border:1.5px solid #c5d5e5;border-radius:7px;padding:5px 8px;font-size:15px;font-family:inherit;font-weight:600;color:var(--ink);background:#fff;}
 .fl input:focus,.fl select:focus{outline:none;border-color:var(--teal);}
-.fl .un{font-size:10px;color:#9aabb8;}
+.fl .un{font-size:13px;color:#9aabb8;}
 .s-rec{background:#e3f4fd !important;border-color:#0d7fa8 !important;}
 .s-auto{background:#e8f5e9 !important;border-color:#43a047 !important;}
 .s-user{background:#fff9e6 !important;border-color:#d4a017 !important;}
@@ -73,22 +73,22 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 /* 슬라이더 */
 .sv{background:#f8fafc;border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin-bottom:7px;}
 .sv-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:6px;}
-.sv-l{font-size:12px;font-weight:700;color:#1a3a5a;}
+.sv-l{font-size:14px;font-weight:700;color:#1a3a5a;}
 .sv-r{display:flex;align-items:center;gap:5px;}
-.sv-n{width:62px;border:1.5px solid #c5d5e5;border-radius:6px;padding:3px 6px;font-size:13px;font-weight:700;text-align:right;font-family:inherit;color:var(--ink);}
-.sv-u{font-size:10px;color:#9aabb8;min-width:26px;}
-.sv-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:7px;}
+.sv-n{width:62px;border:1.5px solid #c5d5e5;border-radius:6px;padding:3px 6px;font-size:15px;font-weight:700;text-align:right;font-family:inherit;color:var(--ink);}
+.sv-u{font-size:13px;color:#9aabb8;min-width:26px;}
+.sv-badge{font-size:13px;font-weight:700;padding:2px 8px;border-radius:7px;}
 .sv-badge.opt{background:#d4edda;color:#155724;}
 .sv-badge.low{background:#fff3cd;color:#856404;}
 .sv-badge.high{background:#f8d7da;color:#721c24;}
 .sv-bar{position:relative;background:#e3eaf0;border-radius:7px;height:24px;overflow:hidden;}
 .sv-opt{position:absolute;top:0;height:100%;background:rgba(46,125,50,.13);border-left:2px solid rgba(46,125,50,.4);border-right:2px solid rgba(46,125,50,.4);}
 .sv-fill{position:absolute;top:0;left:0;height:100%;border-radius:7px 0 0 7px;transition:width .3s,background .3s;display:flex;align-items:center;justify-content:flex-end;padding-right:7px;}
-.sv-fill span{font-size:10px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3);}
+.sv-fill span{font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3);}
 .sv-range{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;}
-.sv-mm{display:flex;justify-content:space-between;font-size:9px;color:#9aabb8;margin-top:2px;}
+.sv-mm{display:flex;justify-content:space-between;font-size:13px;color:#9aabb8;margin-top:2px;}
 .sv-state{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;}
-.sv-si{font-size:10px;padding:1px 7px;border-radius:6px;font-weight:600;border:1px solid;}
+.sv-si{font-size:13px;padding:1px 7px;border-radius:6px;font-weight:600;border:1px solid;}
 .sv-si.o{border-color:#2e7d32;background:#e8f5e9;color:#1b5e20;}
 .sv-si.c{border-color:#0d7fa8;background:#e3f4fd;color:#0b5a80;}
 .sv-si.w{border-color:#f9a825;background:#fff8e1;color:#e65100;}
@@ -98,8 +98,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 .kpi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
 @media(max-width:520px){.kpi{grid-template-columns:1fr 1fr;}}
 .kc{border-radius:10px;padding:10px 8px;text-align:center;}
-.kc .kv{font-size:19px;font-weight:900;}
-.kc .kl{font-size:10px;font-weight:600;margin-top:1px;opacity:.85;}
+.kc .kv{font-size:22px;font-weight:900;}
+.kc .kl{font-size:13px;font-weight:600;margin-top:1px;opacity:.85;}
 .kc.k1{background:linear-gradient(135deg,#e3f2fd,#bbdefb);color:#0d47a1;}
 .kc.k2{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);color:#1b5e20;}
 .kc.k3{background:linear-gradient(135deg,#fff3e0,#ffe0b2);color:#e65100;}
@@ -109,44 +109,44 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 
 /* 전기료/효율 */
 .cost{background:#fffdf5;border:1px solid #f0e4c0;border-radius:10px;padding:10px 12px;margin-top:10px;}
-.cost-h{font-size:13px;font-weight:800;color:#8a6d00;margin-bottom:8px;}
+.cost-h{font-size:15px;font-weight:800;color:#8a6d00;margin-bottom:8px;}
 .cost-in{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:9px;}
 .cost-fl{display:flex;align-items:center;gap:4px;}
-.cost-fl label{font-size:11px;color:#6a5a2a;font-weight:600;}
-.cost-fl input{width:54px;border:1.5px solid #e0d090;border-radius:6px;padding:3px 6px;font-size:12px;font-weight:700;text-align:right;font-family:inherit;color:#5a4a1a;}
-.cost-fl span{font-size:10px;color:#9a8a5a;}
+.cost-fl label{font-size:13px;color:#6a5a2a;font-weight:600;}
+.cost-fl input{width:54px;border:1.5px solid #e0d090;border-radius:6px;padding:3px 6px;font-size:14px;font-weight:700;text-align:right;font-family:inherit;color:#5a4a1a;}
+.cost-fl span{font-size:13px;color:#9a8a5a;}
 .cost-res{display:flex;gap:8px;flex-wrap:wrap;}
 .cost-it{flex:1;min-width:88px;background:#fff;border:1px solid #ede0b8;border-radius:8px;padding:6px 8px;text-align:center;}
 .cost-it.hl{background:#fff3cd;border-color:#ffc107;}
-.cost-it .cl2{font-size:10px;color:#8a7a4a;}
-.cost-it .cv{font-size:15px;font-weight:800;color:#6a5310;margin-top:1px;}
+.cost-it .cl2{font-size:13px;color:#8a7a4a;}
+.cost-it .cv{font-size:16px;font-weight:800;color:#6a5310;margin-top:1px;}
 .cost-it.hl .cv{color:#b8860b;}
 
 .save{margin-top:9px;padding-top:9px;border-top:1px dashed #e0d090;}
-.save-h{font-size:12px;font-weight:800;color:#2e7d32;margin-bottom:6px;}
-.save-i{font-size:11px;color:#3a5a3a;padding:4px 8px;background:#f1f8f1;border-left:3px solid #66bb6a;border-radius:0 6px 6px 0;margin-bottom:4px;}
+.save-h{font-size:14px;font-weight:800;color:#2e7d32;margin-bottom:6px;}
+.save-i{font-size:13px;color:#3a5a3a;padding:4px 8px;background:#f1f8f1;border-left:3px solid #66bb6a;border-radius:0 6px 6px 0;margin-bottom:4px;}
 
 /* 표 */
-.tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;}
-.tbl th{background:#eaf2f8;color:var(--navy);padding:5px 6px;text-align:center;font-weight:700;border:1px solid #d5e2ec;font-size:11px;}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px;}
+.tbl th{background:#eaf2f8;color:var(--navy);padding:5px 6px;text-align:center;font-weight:700;border:1px solid #d5e2ec;font-size:13px;}
 .tbl td{padding:4px 6px;text-align:center;border:1px solid #e5ecf2;}
 .tbl td.hi{font-weight:800;color:var(--teal);}
-.tbl .tg{display:inline-block;padding:1px 7px;border-radius:6px;font-size:10px;font-weight:700;}
+.tbl .tg{display:inline-block;padding:1px 7px;border-radius:6px;font-size:13px;font-weight:700;}
 .tg-g{background:#d4edda;color:#155724;}
 .tg-w{background:#fff3cd;color:#856404;}
 .tg-r{background:#f8d7da;color:#721c24;}
 
 .rec{background:#f0f7ff;border:1px solid #cfe3f5;border-radius:9px;padding:9px 11px;margin-top:9px;}
-.rec-i{font-size:11px;color:#1a4060;padding:3px 0;line-height:1.55;}
+.rec-i{font-size:13px;color:#1a4060;padding:3px 0;line-height:1.55;}
 
 .hide{display:none !important;}
-.note{font-size:10px;color:#9aabb8;margin-top:5px;line-height:1.5;}
-footer{text-align:center;font-size:10px;color:#7a90a4;padding:14px;}
+.note{font-size:13px;color:#9aabb8;margin-top:5px;line-height:1.5;}
+footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
 
 /* ── 상관관계 표 ── */
-.corr-intro{background:#f3f0fb;border:1px solid #d8cef0;border-radius:9px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#4a3a7a;line-height:1.6;}
-.corr-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px;}
-.corr-tbl th{background:#ede7f6;color:#4527a0;padding:7px 8px;text-align:left;font-weight:700;border:1px solid #d1c4e9;font-size:11px;}
+.corr-intro{background:#f3f0fb;border:1px solid #d8cef0;border-radius:9px;padding:10px 12px;margin-bottom:10px;font-size:14px;color:#4a3a7a;line-height:1.6;}
+.corr-tbl{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:12px;}
+.corr-tbl th{background:#ede7f6;color:#4527a0;padding:7px 8px;text-align:left;font-weight:700;border:1px solid #d1c4e9;font-size:13px;}
 .corr-tbl td{padding:6px 8px;border:1px solid #e8e2f2;vertical-align:top;line-height:1.5;}
 .corr-tbl td.var{font-weight:700;color:#5e35b1;white-space:nowrap;}
 .corr-up{color:#c62828;font-weight:700;}
@@ -154,18 +154,18 @@ footer{text-align:center;font-size:10px;color:#7a90a4;padding:14px;}
 .corr-eff{color:#2e7d32;font-weight:700;}
 .corr-cost{color:#e65100;font-weight:700;}
 .corr-arrow{display:inline-block;font-weight:900;}
-.corr-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;margin-bottom:10px;padding:8px 10px;background:#faf8ff;border-radius:8px;}
+.corr-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;margin-bottom:10px;padding:8px 10px;background:#faf8ff;border-radius:8px;}
 .corr-legend span{display:flex;align-items:center;gap:4px;}
-.corr-sect{font-size:13px;font-weight:800;color:#4527a0;margin:14px 0 7px;padding-left:8px;border-left:4px solid #5e35b1;}
+.corr-sect{font-size:15px;font-weight:800;color:#4527a0;margin:14px 0 7px;padding-left:8px;border-left:4px solid #5e35b1;}
 .corr-map{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px;overflow-x:auto;}
 .tradeoff{background:#fff8f0;border:1px solid #ffd9a8;border-radius:9px;padding:10px 12px;margin-bottom:8px;}
-.tradeoff-h{font-size:12px;font-weight:800;color:#c05a00;margin-bottom:4px;}
-.tradeoff-b{font-size:11px;color:#6a4a2a;line-height:1.6;}
+.tradeoff-h{font-size:14px;font-weight:800;color:#c05a00;margin-bottom:4px;}
+.tradeoff-b{font-size:13px;color:#6a4a2a;line-height:1.6;}
 .flowbar{display:flex;align-items:stretch;gap:4px;margin-bottom:10px;overflow-x:auto;}
-.flowstep{flex:1;min-width:66px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 5px;text-align:center;font-size:10px;position:relative;}
-.flowstep .fe{font-size:15px;display:block;}
+.flowstep{flex:1;min-width:66px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 5px;text-align:center;font-size:13px;position:relative;}
+.flowstep .fe{font-size:16px;display:block;}
 .flowstep .fn{font-weight:700;color:var(--navy);margin-top:1px;}
-.flowstep .fv{font-size:9px;color:var(--teal);font-weight:700;margin-top:1px;}
+.flowstep .fv{font-size:13px;color:var(--teal);font-weight:700;margin-top:1px;}
 .flowstep.aw{border-top:3px solid var(--wash);}
 .flowstep.ad{border-top:3px solid var(--dewat);}
 .flowstep.ar{border-top:3px solid var(--dry);}
@@ -182,7 +182,7 @@ footer{text-align:center;font-size:10px;color:#7a90a4;padding:14px;}
     <a href="https://insys-hq.github.io/Insys-lab/wash-dry.html" target="_blank" rel="noopener">🔗 바로가기</a>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v1.1</span>
+    <span class="vb">v1.2</span>
   </div>
 </div>
 </div>
@@ -210,13 +210,13 @@ footer{text-align:center;font-size:10px;color:#7a90a4;padding:14px;}
   </div>
 </div>
 
-<footer>인시스 AI혁신 연구개발실 · 세척·탈수·건조 통합설비 시뮬레이터 v1.1 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 세척·탈수·건조 통합설비 시뮬레이터 v1.2 · 2026</footer>
 
 <script>
 // ═══════════════════════════════════════════════
-// 세척·탈수·건조 통합설비 시뮬레이터 v1.1
+// 세척·탈수·건조 통합설비 시뮬레이터 v1.2
 // ═══════════════════════════════════════════════
-const VER='1.1';
+const VER='1.2';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 const HP_PER_KW=1.341;
@@ -406,7 +406,7 @@ function renderLeft(){
       +sliderHTML('wPress','🔧 분사압력','kPa',50,600,10,S.wPress,150,280)
       +'<div class="g2">'+fld('wCol','가로 노즐수','개',S.wCol)+fld('wRow','세로 노즐수','개',S.wRow)+'</div>'
       +sliderHTML('wTemp','🌡️ 세척온도','°C',20,90,1,S.wTemp,50,65)
-      +'<div class="g2" style="margin-top:6px;">'+fld('wZones','세척 단수','단',S.wZones)+'<div class="fl"><label>세척조 단열</label><label style="display:flex;align-items:center;gap:6px;font-size:12px;margin-top:4px;"><input type="checkbox" id="wTankIns" '+(S.wTankIns?'checked':'')+'> 단열재 적용</label></div></div>'
+      +'<div class="g2" style="margin-top:6px;">'+fld('wZones','세척 단수','단',S.wZones)+'<div class="fl"><label>세척조 단열</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="wTankIns" '+(S.wTankIns?'checked':'')+'> 단열재 적용</label></div></div>'
       +'<div class="st">저수조 치수</div><div class="g3">'
       +fld('wTankL','길이','mm',S.wTankL)+fld('wTankW','폭','mm',S.wTankW)+fld('wTankD','깊이','mm',S.wTankD)+'</div>'
       +'<div class="st">배수펌프</div><div class="g2">'
@@ -436,7 +436,7 @@ function renderLeft(){
     h='<div class="card"><div class="ch"><span class="ci">♨️</span><span class="cl">온수·유틸리티</span><span class="cq">보일러·단열</span></div><div class="cb">'
       +'<div class="st">온수 보일러 (외부 설치)</div>'
       +'<div class="g2">'+sel('boilerType','열원',[['gas','가스보일러'],['electric','전기보일러']],S.boilerType)
-      +'<div class="fl"><label>보일러 탱크 단열</label><label style="display:flex;align-items:center;gap:6px;font-size:12px;margin-top:4px;"><input type="checkbox" id="boilerIns" '+(S.boilerIns?'checked':'')+'> 단열재 적용</label></div></div>'
+      +'<div class="fl"><label>보일러 탱크 단열</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="boilerIns" '+(S.boilerIns?'checked':'')+'> 단열재 적용</label></div></div>'
       +'<div class="g3" style="margin-top:6px;">'+fld('boilerTankL','보일러탱크','L',S.boilerTankL)+fld('makeupWater','보충수량','L/h',S.makeupWater)+fld('inletTemp','유입수온','°C',S.inletTemp)+'</div>'
       +'<div class="st">기타</div><div class="g2">'+fld('convKW','컨베이어','kW',S.convKW)+'</div>'
       +'<div class="note">💡 외부 보일러+단열탱크로 온수 집중공급 시 세척조 개별 히터는 유지열손실만 부담 → 전기부하 대폭 절감.</div>'
