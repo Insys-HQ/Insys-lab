@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v2.5 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v2.7 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -153,7 +153,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v2.5</span>
+    <span class="vb">v2.7</span>
   </div>
 </div>
 </div>
@@ -196,13 +196,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v2.5 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v2.7 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v2.5
+// 트레이 세척·탈수·건조 시뮬레이터 v2.7
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='2.5';
+const VER='2.7';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -212,7 +212,7 @@ const S={
   // 세척 (2CH 고정)
   wZones:3,wHole:2.5,wTemp:60,
   // 단계별 독립 설정 [1차, 2차, 3차헹굼]
-  stgPress:[280,200,120], stgCol:[6,4,3], stgRow:[6,5,4], stgType:['wash','wash','rinse'],
+  stgPress:[280,200,120], stgCol:[4,3,3], stgRow:[3,3,2], stgType:['wash','wash','rinse'],
   wTankL:1500,wTankW:800,wTankD:600,wTankIns:true,
   // 사용 단 조합: 'all'(1·2·3), '13'(1·3), '1'(1단만)
   stageCombo:'all',
@@ -222,7 +222,9 @@ const S={
   stgTankMode:'auto',
   stgTankW:[1200,1000,800], stgTankD:[1000,800,700], stgTankH:[600,600,500],
   // 순환 회전시간(분) [세척, 세척, 헹굼]
-  stgTurnover:[4,3,2.5],
+  stgTurnover:[2.5,2,2],
+  // 저수조 폭 고정(세척부 폭 기준), 용량은 길이·깊이로 흡수
+  stgTankFixW:1200,
   // 배수조: 'single'(공통1) or 'perstage'(단별)
   drainMode:'single',
   drainCount:1,drainHead:8,
@@ -296,12 +298,25 @@ function tankOptimal(flowLpm, turnoverMin){
   const vol = flowLpm * turnoverMin * 1.2; // L
   return Math.max(100, Math.round(vol/50)*50); // 50L 올림, 최소100L
 }
-// 용량(L) → 치수 역산 (깊이 고정 시 바닥면적, 정사각 근사)
-function volToDim(volL, depthMm, fill){
+// 용량(L) → 치수 역산: 폭(W) 고정, 깊이(D) 기준 길이(L) 산출
+// 세척기 저수조는 폭이 세척부에 맞춰 고정, 용량은 길이·깊이로 흡수
+function volToDim(volL, widthMm, depthMm, fill, maxLenMm){
   fill = fill||0.75;
-  const floorMm2 = volL*1e6/(depthMm*fill); // 바닥면적 mm²
-  const side = Math.sqrt(floorMm2); // 정사각 한 변
-  return {W:Math.round(side/10)*10, D:Math.round(side/10)*10};
+  maxLenMm = maxLenMm||3500;
+  let d = depthMm;
+  let lengthMm = volL*1e6/(widthMm*d*fill);
+  // 길이가 세척조(최대길이) 초과 시 깊이를 키워 흡수 (최대 깊이 1200mm)
+  while(lengthMm > maxLenMm && d < 1200){
+    d += 50;
+    lengthMm = volL*1e6/(widthMm*d*fill);
+  }
+  // 깊이 최대인데도 길면 폭을 키움 (최대 폭 1500mm)
+  let w = widthMm;
+  while(lengthMm > maxLenMm && w < 1500){
+    w += 50;
+    lengthMm = volL*1e6/(w*d*fill);
+  }
+  return {W:w, L:Math.round(lengthMm/10)*10, D:d};
 }
 // 치수 → 용량 (L)
 function dimToVol(W,D,H,fill){ fill=fill||0.75; return Math.round(W*D*H*fill/1e6); }
@@ -418,6 +433,7 @@ function syncState(){
   const dm=gi('drainMode');if(dm)S.drainMode=dm.value;
   const ta=gi('stgTankAuto');if(ta)S.stgTankAuto=ta.checked;
   const tm=gi('stgTankMode');if(tm)S.stgTankMode=tm.value;
+  const fw=gi('stgTankFixW');if(fw&&fw.value!=='')S.stgTankFixW=+fw.value;
   for(let i=0;i<3;i++){
     const t=gi('stgTank'+i);if(t&&t.value!=='')S.stgTank[i]=+t.value;
     const w=gi('stgTankW'+i);if(w&&w.value!=='')S.stgTankW[i]=+w.value;
@@ -477,25 +493,29 @@ function calcAll(){
     const optTank=tankOptimal(d.flow, turnover);
     // 입력 모드별 용량·치수
     let tankL_i, dimW, dimD, dimH;
-    dimH = S.stgTankH[i]||600;
+    const fixW = S.stgTankFixW||1200; // 폭 고정
+    dimH = S.stgTankH[i]||800;
+    // 저수조 최대 길이 = 세척조 길이 - 여유(200mm) (하단 설치)
+    const maxTankLen = S.washDryLen - 200;
     if(S.stgTankMode==='auto'){
       tankL_i = optTank;
-      const dm = volToDim(tankL_i, dimH, 0.75);
-      dimW = dm.W; dimD = dm.D;
+      const dm = volToDim(tankL_i, fixW, dimH, 0.75, maxTankLen);
+      dimW = dm.W; dimD = dm.L; dimH = dm.D;
     } else if(S.stgTankMode==='volume'){
       tankL_i = S.stgTank[i]||optTank;
-      const dm = volToDim(tankL_i, dimH, 0.75);
-      dimW = dm.W; dimD = dm.D;
+      const dm = volToDim(tankL_i, fixW, dimH, 0.75, maxTankLen);
+      dimW = dm.W; dimD = dm.L; dimH = dm.D;
     } else { // dim: 치수 입력 → 용량 역산
-      dimW = S.stgTankW[i]||1000; dimD = S.stgTankD[i]||800;
+      dimW = S.stgTankW[i]||fixW; dimD = S.stgTankD[i]||1000; dimH = S.stgTankH[i]||800;
       tankL_i = dimToVol(dimW, dimD, dimH, 0.75);
     }
+    const tankLenOver = dimD > maxTankLen; // 세척조 초과 여부
     const heater_i = heaterMaintainKW(tankL_i, S.wTemp, S.wTankIns);
     // 실제 회전시간 (용량/유량)
     const actTurnover = d.flow>0 ? tankL_i/d.flow : 0;
     totalTankL += tankL_i;
     washHeaterTotal += heater_i;
-    stgTanks.push({idx:i,active:true,tankL:tankL_i,optTank,heater:heater_i,flow:d.flow,turnover,actTurnover,dimW,dimD,dimH});
+    stgTanks.push({idx:i,active:true,tankL:tankL_i,optTank,heater:heater_i,flow:d.flow,turnover,actTurnover,dimW,dimD,dimH,tankLenOver,maxTankLen});
   }
   const tankL = totalTankL; // 전체 합계
   const washHeaterEach = washHeaterTotal/Math.max(1,actStages.length);
@@ -651,8 +671,9 @@ function renderLeft(){
       +'<div class="st">사용 단 조합</div>'
       +'<div class="g2">'+sel('stageCombo','사용 단',[['all','1·2·3단 전체'],['13','1·3단만(2단 생략)'],['1','1단만']],S.stageCombo)
       +sel('stgTankMode','저수조 입력',[['auto','자동 최적(회전율)'],['volume','용량 입력→치수'],['dim','치수 입력→용량']],S.stgTankMode)+'</div>'
+      +'<div class="g2" style="margin-top:6px;">'+fld('stgTankFixW','저수조 폭(고정)','mm',S.stgTankFixW)+'<div class="fl"><label>회전시간 목표</label><input type="text" value="세척2.5·헹굼2분" readonly style="background:#eef1f4;border:1.5px solid #ccc;border-radius:6px;padding:5px 8px;font-size:13px;color:#666;font-family:inherit;"></div></div>'
       +'<div class="st">단별 독립 저수조 (사용 단만 설치)</div>'
-      +'<table class="tbl"><thead><tr><th>단</th><th>유량</th><th>회전</th><th>용량(L)</th><th>가로×세로×깊이(mm)</th></tr></thead><tbody>'
+      +'<table class="tbl"><thead><tr><th>단</th><th>유량</th><th>회전</th><th>용량(L)</th><th>폭×길이×깊이(mm)</th></tr></thead><tbody>'
       +R.stgTanks.map(function(t){
           var nm=['1차','2차','3차헹굼'][t.idx];
           if(!t.active) return '<tr style="opacity:.4;"><td>'+nm+'</td><td colspan="4" style="color:#999;">미사용 (저수조·펌프 불필요)</td></tr>';
@@ -668,13 +689,14 @@ function renderLeft(){
             volCell='<span class="hi" style="color:#43a047;">'+t.tankL+'L(자동)</span>';
             dimCell='<input type="number" id="stgTankW'+t.idx+'" value="'+t.dimW+'" style="'+st+'">×<input type="number" id="stgTankD'+t.idx+'" value="'+t.dimD+'" style="'+st+'">×<input type="number" id="stgTankH'+t.idx+'" value="'+t.dimH+'" style="'+st+'">';
           }
-          var turnMark = t.actTurnover<2?'⚠️짧음':t.actTurnover>8?'⚠️과대':'✅';
-          return '<tr><td style="font-weight:700;">'+nm+'</td><td>'+(t.flow?t.flow.toFixed(0):'—')+'LPM</td><td style="font-size:12px;">'+t.actTurnover.toFixed(1)+'분'+turnMark+'</td><td>'+volCell+'</td><td>'+dimCell+'</td></tr>';
+          var overMark = t.tankLenOver ? ' <span style="color:#c62828;font-weight:700;font-size:11px;">⚠️세척조('+S.washDryLen+')초과</span>' : '';
+          var turnMark = t.actTurnover<1.5?'⚠️짧음':t.actTurnover>4?'⚠️과대':'✅';
+          return '<tr><td style="font-weight:700;">'+nm+'</td><td>'+(t.flow?t.flow.toFixed(0):'—')+'LPM</td><td style="font-size:12px;">'+t.actTurnover.toFixed(1)+'분'+turnMark+'</td><td>'+volCell+'</td><td>'+dimCell+overMark+'</td></tr>';
         }).join('')
       +'</tbody></table>'
       +'<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">💧 <b>각 단 독립 저수조</b> '+R.actStages.length+'개 · 총 <b>'+R.tankL+'L</b><br>'
       +'📐 <b>치수↔용량 양방향</b>: 용량 입력 시 치수 자동(깊이 기준 정사각), 치수 입력 시 용량 자동 계산.<br>'
-      +'🔄 <b>회전시간</b> = 저수조÷펌프유량. 적정 2~8분 (짧으면 캐비테이션, 길면 과대). 오염도 다르므로 물 안 섞고 캐스케이드 오버플로우로만 연결(3→2→1).</div>'
+      +'🔄 <b>회전시간</b> = 저수조÷펌프유량. 적정 2~3분. <b>저수조 길이 ≤ 세척조 길이('+S.washDryLen+'mm)</b> — 초과 시 깊이·폭으로 흡수. 폭은 세척부에 맞춰 고정. 오염도 다르므로 물 안 섞고 캐스케이드 오버플로우로만 연결(3→2→1).</div>'
       +'<div class="st">배수 · 단열</div>'
       +'<div class="g2">'+sel('drainMode','배수 방식',[['single','공통 배수조(캐스케이드)'],['perstage','단별 독립 배수']],S.drainMode)
       +'<div class="fl"><label>세척조 단열</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="wTankIns" '+(S.wTankIns?'checked':'')+'> 단열재</label></div></div>'
@@ -898,7 +920,7 @@ function buildRec(){
   if(S.supplyMode==='direct')r.push('♻️ <b>직공급 사용 중</b> → 캐스케이드(역류)로 전환 시 청수 57%·가열에너지 53% 절감 (월 약 41만원)');
   else r.push('✅ <b>캐스케이드 급수</b> 적용 중 — 청수·에너지 최적. 1차 오염 심하면 보조급수 활용');
   if(S.stageCombo==='all'&&S.dlv<=2)r.push('💧 <b>오염도 낮음(1·2·3단 전체 사용)</b> → 1·3단만으로 줄이면 2단 저수조·펌프 생략, 투자·운전비↓');
-  R.stgTanks.forEach(function(t){ if(t.active&&t.actTurnover<2)r.push('⚠️ <b>'+['1차','2차','3차'][t.idx]+' 저수조 회전 '+t.actTurnover.toFixed(1)+'분(짧음)</b> → 용량↑ 필요 (펌프 캐비테이션·수온급변 방지)'); });
+  R.stgTanks.forEach(function(t){ if(t.active&&t.actTurnover<1.5)r.push('⚠️ <b>'+['1차','2차','3차'][t.idx]+' 저수조 회전 '+t.actTurnover.toFixed(1)+'분(짧음)</b> → 용량↑ 필요 (펌프 캐비테이션·수온급변 방지)'); });
   if(S.stgTankMode==='auto')r.push('📦 <b>저수조 자동 최적(회전율 기반)</b> 적용 중 — 용량/치수 직접 입력하려면 입력모드 변경');
   if(filterScore(S)<3)r.push('🧹 <b>여과 '+filterScore(S)+'/3단</b> → 금속망·슬러지·펌프흡입 3단 완비 시 순환수 청정↑·노즐막힘↓·펌프수명↑');
   else r.push('✅ <b>여과 3단 완비</b> — 순환수 청정 유지, 세척품질·설비수명 최적');
