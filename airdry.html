@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>에어나이프 탈수기 시뮬레이터 | 인시스 AI혁신 연구개발실</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+:root{
+  --bg:#f4f6f8; --card:#ffffff; --line:#e2e6ea;
+  --ink:#1f2937; --ink-soft:#4b5563; --sub:#6b7280;
+  --brand:#1e4d8c; --brand-dark:#153a68; --brand-soft:#eaf1fb;
+  --ok:#1a7f4e; --ok-bg:#e6f6ee;
+  --warn:#a3690a; --warn-bg:#fdf3e0;
+  --bad:#b3261e; --bad-bg:#fbe9e8;
+  --radius:10px;
+  --maxw:1100px;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:14px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{margin:0 0 6px; color:var(--ink); font-weight:700;}
+p{margin:0 0 6px;}
+button{font-family:inherit;}
+
+/* ---------- Header ---------- */
+header.topbar{
+  background:var(--brand); color:#fff; width:100%;
+}
+.nav-inner{
+  max-width:var(--maxw); margin:0 auto; padding:10px 14px;
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+.brand-block{display:flex; flex-direction:column;}
+.brand-block .title{font-size:15px; font-weight:700;}
+.brand-block .sub{font-size:11px; color:#cfe0f5;}
+.view-toggle{
+  display:flex; background:rgba(255,255,255,.15); border-radius:999px; padding:3px;
+}
+.view-toggle button{
+  border:none; background:transparent; color:#fff; font-size:11px; padding:5px 10px;
+  border-radius:999px; cursor:pointer; opacity:.75;
+}
+.view-toggle button.active{background:#fff; color:var(--brand-dark); opacity:1; font-weight:700;}
+
+/* ---------- Container ---------- */
+.wrap{max-width:var(--maxw); margin:0 auto; padding:10px 12px 12px;}
+
+/* ---------- Step tabs ---------- */
+.step-tabs{
+  display:flex; overflow-x:auto; gap:6px; padding:8px 0 10px;
+  -webkit-overflow-scrolling:touch;
+}
+.step-tabs::-webkit-scrollbar{height:4px;}
+.step-tabs button{
+  flex:0 0 auto; border:1px solid var(--line); background:#fff; color:var(--ink-soft);
+  border-radius:999px; padding:6px 12px; font-size:12px; cursor:pointer; white-space:nowrap;
+}
+.step-tabs button.active{background:var(--brand); border-color:var(--brand); color:#fff; font-weight:700;}
+.step-tabs button.done::after{content:" ✓"; color:#8fd19e;}
+.step-tabs button.active.done::after{color:#d7ffe4;}
+
+/* ---------- Card ---------- */
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  padding:12px; margin-bottom:8px;
+}
+.card h2{font-size:15px; padding-bottom:6px; border-bottom:2px solid var(--brand-soft); margin-bottom:8px;}
+.card h2 .step-no{color:var(--brand); margin-right:4px;}
+.card .desc{font-size:12px; color:var(--sub); margin-bottom:8px;}
+
+.grid2{display:grid; grid-template-columns:1fr; gap:8px;}
+.field{display:flex; flex-direction:column; gap:3px;}
+.field label{font-size:12px; color:var(--ink-soft); font-weight:500;}
+.field .hint{font-size:11px; color:var(--sub);}
+input[type=number], input[type=text], select{
+  border:1px solid var(--line); border-radius:6px; padding:7px 8px; font-size:14px;
+  background:#fff; color:var(--ink); width:100%;
+}
+input[type=range]{width:100%; accent-color:var(--brand);}
+.radio-row{display:flex; flex-wrap:wrap; gap:6px;}
+.radio-row label{
+  border:1px solid var(--line); border-radius:6px; padding:6px 9px; font-size:12px;
+  cursor:pointer; color:var(--ink-soft); display:flex; align-items:center; gap:4px;
+}
+.radio-row input{margin:0;}
+.radio-row label.sel{background:var(--brand-soft); border-color:var(--brand); color:var(--brand-dark); font-weight:700;}
+
+.btn{
+  border:none; border-radius:7px; padding:9px 14px; font-size:13px; font-weight:700;
+  cursor:pointer; background:var(--brand); color:#fff;
+}
+.btn.ghost{background:#fff; color:var(--brand); border:1px solid var(--brand);}
+.btn.sm{padding:5px 9px; font-size:11px;}
+.btn-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+
+table{width:100%; border-collapse:collapse; font-size:12px;}
+table th, table td{border:1px solid var(--line); padding:5px 6px; text-align:center;}
+table th{background:var(--brand-soft); color:var(--brand-dark); font-weight:700;}
+table td.l{text-align:left;}
+
+.badge{display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700;}
+.badge.ok{background:var(--ok-bg); color:var(--ok);}
+.badge.warn{background:var(--warn-bg); color:var(--warn);}
+.badge.bad{background:var(--bad-bg); color:var(--bad);}
+
+.slider-block{margin-bottom:8px;}
+.slider-block .row1{display:flex; justify-content:space-between; align-items:baseline;}
+.slider-block .val{font-weight:700; color:var(--brand-dark); font-size:14px;}
+
+.kpi-row{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0;}
+.kpi{
+  background:var(--brand-soft); border-radius:8px; padding:8px 10px;
+}
+.kpi .lb{font-size:11px; color:var(--brand-dark);}
+.kpi .num{font-size:17px; font-weight:900; color:var(--brand-dark);}
+.kpi .unit{font-size:11px; color:var(--brand-dark); font-weight:400;}
+
+.graph-tabs{display:flex; gap:6px; margin-bottom:6px;}
+.graph-tabs button{
+  flex:1; border:1px solid var(--line); background:#fff; border-radius:6px; padding:6px; font-size:11px; cursor:pointer;
+}
+.graph-tabs button.active{background:var(--brand); color:#fff; border-color:var(--brand); font-weight:700;}
+canvas{width:100%; display:block; background:#fff; border-radius:6px;}
+.canvas-wrap{border:1px solid var(--line); border-radius:8px; padding:6px;}
+.legend-hint{font-size:11px; color:var(--sub); margin-top:4px;}
+
+.warn-list{list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px;}
+.warn-list li{
+  border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:12px;
+  display:flex; justify-content:space-between; align-items:center; gap:8px;
+}
+
+footer{
+  text-align:center; padding:12px 10px; color:var(--sub); font-size:11px;
+}
+footer .ver{font-weight:700; color:var(--brand-dark);}
+
+.pill-note{
+  background:var(--warn-bg); color:var(--warn); border-radius:8px; padding:8px 10px; font-size:11px; margin-bottom:8px;
+}
+
+/* ---------- PC (min-width 768) ---------- */
+@media (min-width:768px){
+  body{font-size:16px;}
+  .wrap{padding:16px 20px 80px;}
+  .grid2{grid-template-columns:1fr 1fr;}
+  .kpi-row{grid-template-columns:repeat(4,1fr);}
+  .card{padding:12px 18px;}
+  .card h2{font-size:18px;}
+  table{font-size:13px;}
+  .step-tabs button{font-size:13px; padding:7px 14px;}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="nav-inner">
+    <div class="brand-block">
+      <div class="title">에어나이프 탈수기 시뮬레이터</div>
+      <div class="sub">인시스 AI혁신 연구개발실 · 인텍코리아 안산공장 트레이 라인 2단계</div>
+    </div>
+    <div class="view-toggle">
+      <button id="btnMobile" class="active" onclick="setView('mobile')">모바일</button>
+      <button id="btnPc" onclick="setView('pc')">PC</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="step-tabs" id="stepTabs"></div>
+
+  <!-- STEP 1 -->
+  <section class="card" data-step="1">
+    <h2><span class="step-no">STEP 1</span>트레이 사양 (세척기 연동)</h2>
+    <p class="desc">wash.html에서 확정된 트레이 규격을 불러오거나 직접 입력합니다.</p>
+    <div class="grid2">
+      <div class="field">
+        <label>트레이 프리셋</label>
+        <select id="trayPreset" onchange="applyTrayPreset()">
+          <option value="A">A형 430×330×150 mm</option>
+          <option value="B">B형 320×210×50 mm</option>
+          <option value="C">C형 320×210×30 mm</option>
+          <option value="custom">직접 입력</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>재질</label>
+        <select id="trayMaterial">
+          <option value="PP">PP</option>
+          <option value="PE">PE</option>
+          <option value="PC">PC</option>
+          <option value="STS">STS</option>
+          <option value="AL">AL</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>길이 L (mm, 진행방향)</label>
+        <input type="number" id="trayL" value="430">
+      </div>
+      <div class="field">
+        <label>폭 V (mm)</label>
+        <input type="number" id="trayV" value="330">
+      </div>
+      <div class="field">
+        <label>높이 T (mm)</label>
+        <input type="number" id="trayT" value="150">
+      </div>
+      <div class="field">
+        <label>중량 (g)</label>
+        <input type="number" id="trayW" value="50">
+      </div>
+    </div>
+    <div class="pill-note">투입 자세: 세워서 투입, 면이 진행방향과 평행 (세척기 STEP1 조건 승계)</div>
+    <div class="btn-row">
+      <button class="btn ghost sm" onclick="importFromWash()">wash.html 사양 JSON 불러오기</button>
+      <button class="btn ghost sm" onclick="exportJson('tray')">현재 값 저장(JSON)</button>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card" data-step="2">
+    <h2><span class="step-no">STEP 2</span>세척기 인계 조건</h2>
+    <p class="desc">헹굼조 직후 트레이 표면 상태 — 탈수기 입력 조건입니다.</p>
+    <div class="grid2">
+      <div class="field">
+        <label>헹굼 직후 잔수량 (mL/매)</label>
+        <input type="number" id="residualWater" value="18">
+        <span class="hint">세척기 신수량 0.20 L/매 기준 표면 부착 잔수 추정치. 실측 시 교체.</span>
+      </div>
+      <div class="field">
+        <label>진입 속도 (m/min, 세척기 컨베이어 승계)</label>
+        <input type="number" id="entrySpeed" value="4.00">
+      </div>
+      <div class="field">
+        <label>진입 시 트레이 표면 상태</label>
+        <select id="surfaceState">
+          <option value="film">균일 수막(필름) 상태</option>
+          <option value="drop">방울(비드) 형태 잔수</option>
+          <option value="pocket">포켓 내부 고임 잔수</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>채널 수 (세척기 동일)</label>
+        <input type="number" id="channels" value="2">
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card" data-step="3">
+    <h2><span class="step-no">STEP 3</span>탈수 목표 설정</h2>
+    <div class="grid2">
+      <div class="field">
+        <label>목표 처리량 (매/hr)</label>
+        <select id="targetRate">
+          <option value="600">600</option>
+          <option value="800">800</option>
+          <option value="1000" selected>1,000</option>
+          <option value="1200">1,200</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>목표 탈수율 (%)</label>
+        <input type="number" id="targetEff" value="97">
+        <span class="hint">트레이 95~99% / 박스 80% 기준. 트레이 기본 97% 권장.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="card" data-step="4">
+    <h2><span class="step-no">STEP 4</span>에어나이프 배치 구조</h2>
+    <p class="desc">측면 양쪽 설치, 사선(직각 아님) 배치, 위→아래 쓸어내림 방식.</p>
+    <div class="grid2">
+      <div class="field">
+        <label>설치 위치</label>
+        <div class="radio-row" id="posRow">
+          <label class="sel"><input type="radio" name="pos" value="both_side" checked> 양측면 동시</label>
+        </div>
+        <span class="hint">구조 확정 — 양측면 고정 (요청 사양)</span>
+      </div>
+      <div class="field">
+        <label>스윕 방향</label>
+        <div class="radio-row" id="sweepRow">
+          <label class="sel"><input type="radio" name="sweep" value="top_down" checked> 상 → 하 (사선)</label>
+        </div>
+        <span class="hint">구조 확정 — 상단 진입, 사선으로 하단 쓸어내림</span>
+      </div>
+      <div class="field">
+        <label>좌우 대칭 여부</label>
+        <select id="symmetric">
+          <option value="yes">대칭 (좌우 동일 사양)</option>
+          <option value="no">비대칭 (개별 설정)</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="card" data-step="5">
+    <h2><span class="step-no">STEP 5</span>노즐 슬릿 파라미터</h2>
+    <div class="grid2">
+      <div class="field">
+        <label>슬릿 폭 (mm)</label>
+        <input type="number" id="slitWidth" value="1.5" step="0.1">
+      </div>
+      <div class="field">
+        <label>슬릿 길이 (mm, 트레이 이송폭 커버)</label>
+        <input type="number" id="slitLength" value="350">
+      </div>
+      <div class="field">
+        <label>블로워 공급압력 기준값 (kPa)</label>
+        <input type="number" id="basePressure" value="12">
+      </div>
+    </div>
+    <p class="desc" style="margin-top:6px;">슬릿 간격·각도·거리는 STEP 6에서 동시 조절합니다.</p>
+  </section>
+
+  <!-- STEP 6 -->
+  <section class="card" data-step="6">
+    <h2><span class="step-no">STEP 6</span>시뮬레이션 — 3변수 동시 조절</h2>
+    <p class="desc">슬릿 간격 · 노즐 각도 · 노즐-트레이 거리를 동시에 조절하면 탈수효과와 필요 링블로어 용량이 즉시 갱신됩니다.</p>
+
+    <div class="slider-block">
+      <div class="row1"><label>슬릿 간격 (트레이 이송방향 피치)</label><span class="val"><span id="vSpacing">40</span> mm</span></div>
+      <input type="range" id="sSpacing" min="20" max="100" step="1" value="40" oninput="onSim()">
+    </div>
+    <div class="slider-block">
+      <div class="row1"><label>노즐 각도 (트레이면 기준 사선각)</label><span class="val"><span id="vAngle">35</span> °</span></div>
+      <input type="range" id="sAngle" min="15" max="60" step="1" value="35" oninput="onSim()">
+    </div>
+    <div class="slider-block">
+      <div class="row1"><label>노즐-트레이 거리</label><span class="val"><span id="vDist">25</span> mm</span></div>
+      <input type="range" id="sDist" min="10" max="50" step="1" value="25" oninput="onSim()">
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi"><div class="lb">탈수효과</div><div class="num" id="kpiEff">-</div><div class="unit">%</div></div>
+      <div class="kpi"><div class="lb">필요 링블로어 용량</div><div class="num" id="kpiFlow">-</div><div class="unit">㎥/min</div></div>
+      <div class="kpi"><div class="lb">필요 정압</div><div class="num" id="kpiPress">-</div><div class="unit">kPa</div></div>
+      <div class="kpi"><div class="lb">판정</div><div class="num" id="kpiJudge">-</div><div class="unit">&nbsp;</div></div>
+    </div>
+
+    <div class="graph-tabs">
+      <button class="active" onclick="setGraphMode('spacing')">간격별 곡선</button>
+      <button onclick="setGraphMode('angle')">각도별 곡선</button>
+      <button onclick="setGraphMode('dist')">거리별 곡선</button>
+      <button onclick="setGraphMode('contour')">등고선(2변수)</button>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="simCanvas" width="1000" height="440"></canvas>
+    </div>
+    <div class="legend-hint" id="graphLegend">파란선: 탈수효과(%) · 주황선: 필요 링블로어 용량(㎥/min) · 세로 점선: 현재 슬라이더 값</div>
+
+    <div class="btn-row">
+      <button class="btn ghost sm" onclick="findOptimal()">목표 만족 · 최소 용량 조합 자동 탐색</button>
+    </div>
+    <div id="optimalResult" style="margin-top:6px; font-size:12px;"></div>
+  </section>
+
+  <!-- STEP 7 -->
+  <section class="card" data-step="7">
+    <h2><span class="step-no">STEP 7</span>링블로어 선정</h2>
+    <div class="grid2">
+      <div class="field">
+        <label>선정 여유율</label>
+        <select id="blowerMargin">
+          <option value="1.15">1.15 (표준)</option>
+          <option value="1.25">1.25 (여유)</option>
+          <option value="1.10">1.10 (최소)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>대수 구성</label>
+        <select id="blowerCount">
+          <option value="1">1대 (양측 공용)</option>
+          <option value="2" selected>2대 (좌/우 개별)</option>
+        </select>
+      </div>
+    </div>
+    <div id="blowerResultTable"></div>
+  </section>
+
+  <!-- STEP 8 -->
+  <section class="card" data-step="8">
+    <h2><span class="step-no">STEP 8</span>덕트·분배</h2>
+    <div class="grid2">
+      <div class="field">
+        <label>덕트 경로</label>
+        <select id="ductPath">
+          <option value="single">단일 헤더 분기</option>
+          <option value="dual" selected>좌우 독립 헤더</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>소음기 적용</label>
+        <select id="silencer">
+          <option value="none">미적용</option>
+          <option value="basic" selected>흡음형 소음기 적용</option>
+        </select>
+      </div>
+    </div>
+    <p class="desc" id="ductNote"></p>
+  </section>
+
+  <!-- STEP 9 -->
+  <section class="card" data-step="9">
+    <h2><span class="step-no">STEP 9</span>배수 회수</h2>
+    <div class="grid2">
+      <div class="field">
+        <label>낙수 집수 위치</label>
+        <select id="drainPos">
+          <option value="lower_tray">하부 집수 트레이 (사선 스윕 낙하 구간)</option>
+          <option value="side_gutter">측면 집수 거터</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>세척조 리턴 여부</label>
+        <select id="drainReturn">
+          <option value="yes" selected>세척조로 리턴 (여과 후)</option>
+          <option value="no">별도 배수 처리</option>
+        </select>
+      </div>
+    </div>
+    <p class="desc" id="drainNote"></p>
+  </section>
+
+  <!-- STEP 10 -->
+  <section class="card" data-step="10">
+    <h2><span class="step-no">STEP 10</span>소음·진동</h2>
+    <div id="noiseResult"></div>
+  </section>
+
+  <!-- STEP 11 -->
+  <section class="card" data-step="11">
+    <h2><span class="step-no">STEP 11</span>라인 반영</h2>
+    <div class="grid2">
+      <div class="field">
+        <label>에어나이프 구간 길이 (mm, 자동 산출)</label>
+        <input type="number" id="knifeLength" readonly>
+      </div>
+      <div class="field">
+        <label>세척부 길이 (mm, wash.html 값)</label>
+        <input type="number" id="washLength" value="7000">
+      </div>
+    </div>
+    <div id="lineResult"></div>
+  </section>
+
+  <!-- 판정 결과 -->
+  <section class="card" data-step="judge">
+    <h2>판정 결과</h2>
+    <ul class="warn-list" id="judgeList"></ul>
+  </section>
+
+  <!-- 사양서 -->
+  <section class="card" data-step="spec">
+    <h2>결과·사양서</h2>
+    <p class="desc">현재 설정을 사양서 HTML로 다운로드합니다.</p>
+    <div class="btn-row">
+      <button class="btn" onclick="downloadSpec()">사양서 HTML 다운로드</button>
+      <button class="btn ghost" onclick="exportJson('all')">전체 설정 JSON 저장</button>
+      <button class="btn ghost" onclick="saveToFirebase()">Firebase 저장</button>
+    </div>
+    <p class="desc" id="fbStatus" style="margin-top:6px;"></p>
+  </section>
+
+  <footer>
+    담당: 인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr &nbsp;|&nbsp; airdry.html <span class="ver">v1.0</span>
+  </footer>
+</div>
+
+<script>
+/* ===================== 버전 ===================== */
+const APP_VERSION = "v1.0";
+
+/* ===================== 상태 ===================== */
+const TRAY_PRESET = {
+  A:{L:430,V:330,T:150,W:50},
+  B:{L:320,V:210,T:50,W:50},
+  C:{L:320,V:210,T:30,W:50}
+};
+
+let graphMode = "spacing";
+
+/* ===================== STEP 탭 ===================== */
+const STEP_LIST = [
+  {id:"1",label:"트레이"},
+  {id:"2",label:"인계조건"},
+  {id:"3",label:"목표"},
+  {id:"4",label:"배치구조"},
+  {id:"5",label:"슬릿"},
+  {id:"6",label:"시뮬레이션"},
+  {id:"7",label:"블로워"},
+  {id:"8",label:"덕트"},
+  {id:"9",label:"배수"},
+  {id:"10",label:"소음"},
+  {id:"11",label:"라인반영"},
+  {id:"judge",label:"판정"},
+  {id:"spec",label:"사양서"}
+];
+
+function buildTabs(){
+  const box = document.getElementById('stepTabs');
+  box.innerHTML = "";
+  STEP_LIST.forEach(s=>{
+    const b = document.createElement('button');
+    b.textContent = s.label;
+    b.dataset.step = s.id;
+    b.onclick = ()=>gotoStep(s.id);
+    box.appendChild(b);
+  });
+  gotoStep("1");
+}
+function gotoStep(id){
+  document.querySelectorAll('.card').forEach(c=>{
+    c.style.display = (c.dataset.step===id) ? "block" : "none";
+  });
+  document.querySelectorAll('#stepTabs button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.step===id);
+  });
+  if(id==="6"){ onSim(); }
+  if(id==="7"){ renderBlower(); }
+  if(id==="8"){ renderDuct(); }
+  if(id==="9"){ renderDrain(); }
+  if(id==="10"){ renderNoise(); }
+  if(id==="11"){ renderLine(); }
+  if(id==="judge"){ renderJudge(); }
+}
+
+/* ===================== 뷰 전환 ===================== */
+function setView(mode){
+  document.getElementById('btnMobile').classList.toggle('active', mode==='mobile');
+  document.getElementById('btnPc').classList.toggle('active', mode==='pc');
+  document.documentElement.style.fontSize = (mode==='pc') ? '16px' : '14px';
+}
+
+/* ===================== STEP1 ===================== */
+function applyTrayPreset(){
+  const p = document.getElementById('trayPreset').value;
+  if(p==="custom") return;
+  const d = TRAY_PRESET[p];
+  document.getElementById('trayL').value = d.L;
+  document.getElementById('trayV').value = d.V;
+  document.getElementById('trayT').value = d.T;
+  document.getElementById('trayW').value = d.W;
+}
+function importFromWash(){
+  const txt = prompt("wash.html에서 내보낸 트레이 사양 JSON을 붙여넣으세요.");
+  if(!txt) return;
+  try{
+    const d = JSON.parse(txt);
+    if(d.L) document.getElementById('trayL').value = d.L;
+    if(d.V) document.getElementById('trayV').value = d.V;
+    if(d.T) document.getElementById('trayT').value = d.T;
+    if(d.W) document.getElementById('trayW').value = d.W;
+    if(d.material) document.getElementById('trayMaterial').value = d.material;
+    alert("불러오기 완료");
+  }catch(e){
+    alert("JSON 형식 오류: " + e.message);
+  }
+}
+function getTray(){
+  return {
+    L: Number(document.getElementById('trayL').value)||430,
+    V: Number(document.getElementById('trayV').value)||330,
+    T: Number(document.getElementById('trayT').value)||150,
+    W: Number(document.getElementById('trayW').value)||50,
+    material: document.getElementById('trayMaterial').value
+  };
+}
+
+/* ===================== 공기 물성 / 계산 엔진 ===================== */
+const RHO_AIR = 1.2; // kg/m3
+
+// 노즐 출구 풍속 (기준압력 P[kPa] 기준)
+function exitVelocity(P_kPa){
+  const dP = P_kPa*1000; // Pa
+  return 0.90*Math.sqrt(2*dP/RHO_AIR); // m/s
+}
+// 거리 감쇠 (슬릿제트: L0 = 250mm)
+function decayedVelocity(v0, distMm){
+  const L0 = 250;
+  return v0*Math.exp(-distMm/L0);
+}
+// 각도 계수: 사선 최적각 35도 부근 (그라운드 가우시안)
+function angleFactor(angleDeg){
+  const opt = 35, sigma = 20;
+  return Math.exp(-Math.pow((angleDeg-opt)/sigma,2));
+}
+// 간격(피치) 커버리지: 기준 40mm=1.0, 넓어질수록 저하
+function coverageFactor(spacingMm){
+  return Math.min(1, 40/spacingMm);
+}
+// 탈수효과(%) : 0~99.5% 포화
+function dewaterEffect(spacingMm, angleDeg, distMm, P_kPa){
+  const v0 = exitVelocity(P_kPa);
+  const v = decayedVelocity(v0, distMm);
+  const cov = coverageFactor(spacingMm);
+  const ang = angleFactor(angleDeg);
+  const k = 0.28;
+  const eff = 100*(1-Math.exp(-k*(v/10)*cov*ang));
+  return Math.min(99.5, eff);
+}
+// 필요 링블로어 용량(㎥/min) : 슬릿 개수 x 슬릿면적 x 풍속
+function requiredFlow(spacingMm, distMm, P_kPa){
+  const tray = getTray();
+  const slitW = Number(document.getElementById('slitWidth').value)||1.5;
+  const slitLen = Number(document.getElementById('slitLength').value)||350;
+  const v0 = exitVelocity(P_kPa);
+  const sweepLen = tray.T + tray.L*0.3; // 사선 스윕 실이동거리 근사
+  const numSlits = Math.max(1, Math.ceil(sweepLen/spacingMm));
+  const areaPerSlit = (slitW/1000)*(slitLen/1000); // m2
+  const flow_m3s = v0*areaPerSlit*numSlits*2; // 양측면 x2
+  return flow_m3s*60; // m3/min
+}
+
+function currentParams(){
+  return {
+    spacing: Number(document.getElementById('sSpacing').value),
+    angle: Number(document.getElementById('sAngle').value),
+    dist: Number(document.getElementById('sDist').value),
+    P: Number(document.getElementById('basePressure').value)||12
+  };
+}
+
+/* ===================== STEP6 시뮬레이션 ===================== */
+function onSim(){
+  const p = currentParams();
+  document.getElementById('vSpacing').textContent = p.spacing;
+  document.getElementById('vAngle').textContent = p.angle;
+  document.getElementById('vDist').textContent = p.dist;
+
+  const eff = dewaterEffect(p.spacing, p.angle, p.dist, p.P);
+  const flow = requiredFlow(p.spacing, p.dist, p.P);
+  const target = Number(document.getElementById('targetEff').value)||97;
+
+  document.getElementById('kpiEff').textContent = eff.toFixed(1);
+  document.getElementById('kpiFlow').textContent = flow.toFixed(2);
+  document.getElementById('kpiPress').textContent = p.P.toFixed(1);
+
+  const judgeEl = document.getElementById('kpiJudge');
+  if(eff>=target){
+    judgeEl.innerHTML = '<span class="badge ok">적합</span>';
+  } else if(eff>=target-5){
+    judgeEl.innerHTML = '<span class="badge warn">조건부</span>';
+  } else {
+    judgeEl.innerHTML = '<span class="badge bad">부적합</span>';
+  }
+
+  // 저장 (사양서/판정용)
+  window.__lastSim = {spacing:p.spacing, angle:p.angle, dist:p.dist, P:p.P, eff, flow};
+
+  drawGraph();
+}
+
+function setGraphMode(m){
+  graphMode = m;
+  document.querySelectorAll('.graph-tabs button').forEach((b,i)=>{
+    b.classList.toggle('active', ['spacing','angle','dist','contour'][i]===m);
+  });
+  drawGraph();
+}
+
+function drawGraph(){
+  const canvas = document.getElementById('simCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.font = "12px sans-serif";
+
+  if(graphMode==="contour"){ drawContour(ctx,W,H); return; }
+
+  const p = currentParams();
+  let xs=[], xLabel="", xCur=0, range;
+  if(graphMode==="spacing"){ range=[20,100]; xLabel="슬릿 간격(mm)"; xCur=p.spacing; }
+  else if(graphMode==="angle"){ range=[15,60]; xLabel="노즐 각도(°)"; xCur=p.angle; }
+  else { range=[10,50]; xLabel="노즐-트레이 거리(mm)"; xCur=p.dist; }
+
+  const N=60;
+  const effArr=[], flowArr=[];
+  for(let i=0;i<=N;i++){
+    const x = range[0] + (range[1]-range[0])*i/N;
+    let sp=p.spacing, an=p.angle, di=p.dist;
+    if(graphMode==="spacing") sp=x;
+    else if(graphMode==="angle") an=x;
+    else di=x;
+    effArr.push(dewaterEffect(sp,an,di,p.P));
+    flowArr.push(requiredFlow(sp,di,p.P));
+  }
+
+  const padL=46, padR=46, padT=20, padB=32;
+  const plotW = W-padL-padR, plotH = H-padT-padB;
+  const effMax=100, flowMax = Math.max(...flowArr)*1.15;
+
+  // axes
+  ctx.strokeStyle="#d1d5db"; ctx.lineWidth=1;
+  ctx.strokeRect(padL,padT,plotW,plotH);
+  ctx.fillStyle="#6b7280";
+  ctx.fillText(xLabel, W/2-30, H-8);
+  ctx.save(); ctx.translate(14,H/2+20); ctx.rotate(-Math.PI/2); ctx.fillStyle="#1e4d8c"; ctx.fillText("탈수효과 %",0,0); ctx.restore();
+  ctx.save(); ctx.translate(W-12,H/2+30); ctx.rotate(-Math.PI/2); ctx.fillStyle="#c2650a"; ctx.fillText("용량 ㎥/min",0,0); ctx.restore();
+
+  function xpix(i){ return padL + plotW*i/N; }
+  function yEff(v){ return padT + plotH*(1-v/effMax); }
+  function yFlow(v){ return padT + plotH*(1-v/flowMax); }
+
+  // grid
+  ctx.strokeStyle="#f0f2f4";
+  for(let g=1;g<4;g++){
+    const gy = padT+plotH*g/4;
+    ctx.beginPath(); ctx.moveTo(padL,gy); ctx.lineTo(padL+plotW,gy); ctx.stroke();
+  }
+
+  // target line
+  const target = Number(document.getElementById('targetEff').value)||97;
+  ctx.strokeStyle="#1a7f4e"; ctx.setLineDash([4,4]);
+  const ty = yEff(target);
+  ctx.beginPath(); ctx.moveTo(padL,ty); ctx.lineTo(padL+plotW,ty); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle="#1a7f4e"; ctx.fillText("목표 "+target+"%", padL+4, ty-4);
+
+  // eff curve
+  ctx.strokeStyle="#1e4d8c"; ctx.lineWidth=2;
+  ctx.beginPath();
+  effArr.forEach((v,i)=>{ const x=xpix(i), y=yEff(v); if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+  ctx.stroke();
+
+  // flow curve
+  ctx.strokeStyle="#c2650a"; ctx.lineWidth=2;
+  ctx.beginPath();
+  flowArr.forEach((v,i)=>{ const x=xpix(i), y=yFlow(v); if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+  ctx.stroke();
+
+  // current marker
+  const curFrac = (xCur-range[0])/(range[1]-range[0]);
+  const cx = padL+plotW*curFrac;
+  ctx.strokeStyle="#9ca3af"; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(cx,padT); ctx.lineTo(cx,padT+plotH); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // axis ticks
+  ctx.fillStyle="#6b7280";
+  ctx.fillText(range[0], padL-6, padT+plotH+16);
+  ctx.fillText(range[1], padL+plotW-16, padT+plotH+16);
+}
+
+function drawContour(ctx,W,H){
+  const p = currentParams();
+  const padL=46, padR=20, padT=20, padB=40;
+  const plotW = W-padL-padR, plotH = H-padT-padB;
+  const spR=[20,100], anR=[15,60];
+  const nx=60, ny=40;
+  const cellW = plotW/nx, cellH = plotH/ny;
+
+  for(let j=0;j<ny;j++){
+    const an = anR[0] + (anR[1]-anR[0])*j/(ny-1);
+    for(let i=0;i<nx;i++){
+      const sp = spR[0] + (spR[1]-spR[0])*i/(nx-1);
+      const eff = dewaterEffect(sp, an, p.dist, p.P);
+      const t = eff/100;
+      // 저채도 blue->green business tone
+      const r = Math.round(235 - t*140);
+      const g = Math.round(240 - t*40);
+      const b = Math.round(250 - t*180);
+      ctx.fillStyle = `rgb(${r},${g},${b})`;
+      const x = padL + i*cellW;
+      const y = padT + plotH - (j+1)*cellH;
+      ctx.fillRect(x,y,cellW+1,cellH+1);
+    }
+  }
+  ctx.strokeStyle="#d1d5db"; ctx.strokeRect(padL,padT,plotW,plotH);
+  ctx.fillStyle="#6b7280"; ctx.font="12px sans-serif";
+  ctx.fillText("슬릿 간격(mm) →", padL+plotW/2-40, H-10);
+  ctx.save(); ctx.translate(14,padT+plotH/2+20); ctx.rotate(-Math.PI/2); ctx.fillText("노즐 각도(°) →",0,0); ctx.restore();
+  ctx.fillText(spR[0], padL-4, padT+plotH+14);
+  ctx.fillText(spR[1], padL+plotW-14, padT+plotH+14);
+  ctx.fillText(anR[0], padL-24, padT+plotH-2);
+  ctx.fillText(anR[1], padL-24, padT+8);
+
+  // current point marker
+  const cx = padL + plotW*(p.spacing-spR[0])/(spR[1]-spR[0]);
+  const cy = padT + plotH - plotH*(p.angle-anR[0])/(anR[1]-anR[0]);
+  ctx.fillStyle="#b3261e";
+  ctx.beginPath(); ctx.arc(cx,cy,5,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle="#fff"; ctx.lineWidth=1.5; ctx.stroke();
+
+  document.getElementById('graphLegend').textContent =
+    `색상: 탈수효과(연할수록 낮음/진할수록 높음) · 거리 고정값 ${p.dist}mm 기준 · 빨간점: 현재 설정`;
+}
+
+function findOptimal(){
+  const target = Number(document.getElementById('targetEff').value)||97;
+  const p = currentParams();
+  let best=null;
+  for(let sp=20; sp<=100; sp+=5){
+    for(let an=15; an<=60; an+=2){
+      for(let di=10; di<=50; di+=2){
+        const eff = dewaterEffect(sp,an,di,p.P);
+        if(eff>=target){
+          const flow = requiredFlow(sp,di,p.P);
+          if(!best || flow<best.flow){
+            best = {sp,an,di,eff,flow};
+          }
+        }
+      }
+    }
+  }
+  const box = document.getElementById('optimalResult');
+  if(!best){
+    box.innerHTML = `<span class="badge bad">부적합</span> 탐색 범위 내 목표 ${target}% 달성 조합 없음 — 공급압력을 높이거나 목표를 재검토하세요.`;
+    return;
+  }
+  box.innerHTML = `<span class="badge ok">최적 조합</span> 간격 ${best.sp}mm · 각도 ${best.an}° · 거리 ${best.di}mm
+    → 탈수효과 ${best.eff.toFixed(1)}% / 필요 용량 ${best.flow.toFixed(2)} ㎥/min
+    <button class="btn ghost sm" style="margin-left:6px" onclick="applyOptimal(${best.sp},${best.an},${best.di})">이 조합 적용</button>`;
+}
+function applyOptimal(sp,an,di){
+  document.getElementById('sSpacing').value = sp;
+  document.getElementById('sAngle').value = an;
+  document.getElementById('sDist').value = di;
+  onSim();
+}
+
+/* ===================== STEP7 링블로어 ===================== */
+const BLOWER_SNAP = [1.5,2.2,3.7,5.5,7.5,11,15,18.5]; // kW 규격 스냅
+
+function renderBlower(){
+  const sim = window.__lastSim || {}; onSim();
+  const s = window.__lastSim;
+  const margin = Number(document.getElementById('blowerMargin').value)||1.15;
+  const count = Number(document.getElementById('blowerCount').value)||2;
+  const flowPerUnit = (s.flow*margin)/count;
+  // 소요동력 근사: P(kW) = Q(m3/min)*ΔP(kPa)/ (60*eta*1000) *1000 -> 간이식
+  const eta = 0.55;
+  const powerKw = (flowPerUnit/60)*(s.P*1000)/(eta*1000);
+  const snap = BLOWER_SNAP.find(v=>v>=powerKw) || BLOWER_SNAP[BLOWER_SNAP.length-1];
+
+  document.getElementById('blowerResultTable').innerHTML = `
+    <table>
+      <tr><th>항목</th><th>값</th></tr>
+      <tr><td class="l">필요 총 풍량 (여유율 포함)</td><td>${(s.flow*margin).toFixed(2)} ㎥/min</td></tr>
+      <tr><td class="l">대당 풍량</td><td>${flowPerUnit.toFixed(2)} ㎥/min (${count}대 구성)</td></tr>
+      <tr><td class="l">필요 정압</td><td>${s.P.toFixed(1)} kPa</td></tr>
+      <tr><td class="l">대당 소요동력(근사)</td><td>${powerKw.toFixed(2)} kW</td></tr>
+      <tr><td class="l">선정 규격(스냅)</td><td><b>${snap} kW × ${count}대</b></td></tr>
+    </table>`;
+}
+
+/* ===================== STEP8 덕트 ===================== */
+function renderDuct(){
+  const dual = document.getElementById('ductPath').value==="dual";
+  document.getElementById('ductNote').textContent = dual
+    ? "좌우 독립 헤더 구성 — 좌우 풍량 편차 최소화, 개별 댐퍼로 미세조정 가능."
+    : "단일 헤더 분기 구성 — 배관 단순화되나 좌우 분배 균일도 저하 가능(댐퍼 밸런싱 필수).";
+}
+
+/* ===================== STEP9 배수 ===================== */
+function renderDrain(){
+  const ret = document.getElementById('drainReturn').value==="yes";
+  document.getElementById('drainNote').textContent = ret
+    ? "사선 스윕 낙수는 세척기 여과 계통(1~2차)으로 리턴 — 세척기 신수 보충량 절감 효과 기대."
+    : "별도 배수 처리 — 세척조 리턴 배관/여과 연동 불필요, 신수 보충량은 세척기 기준 유지.";
+}
+
+/* ===================== STEP10 소음 ===================== */
+function renderNoise(){
+  const s = window.__lastSim || {};
+  onSim();
+  const v0 = exitVelocity(window.__lastSim.P);
+  // 소음 근사: 80 + 20*log10(v0/50) dB(A) 스타일 간이 추정
+  const dB = 80 + 20*Math.log10(Math.max(v0,10)/50);
+  const silencer = document.getElementById('silencer')?.value || "basic";
+  const dBFinal = silencer==="basic" ? dB-8 : dB;
+  let badge = 'ok', label='적합';
+  if(dBFinal>=85){badge='bad'; label='부적합';}
+  else if(dBFinal>=80){badge='warn'; label='조건부';}
+  document.getElementById('noiseResult').innerHTML = `
+    <table>
+      <tr><th>항목</th><th>값</th></tr>
+      <tr><td class="l">노즐 출구 풍속</td><td>${v0.toFixed(1)} m/s</td></tr>
+      <tr><td class="l">추정 소음 레벨 (근접 1m)</td><td>${dBFinal.toFixed(1)} dB(A)</td></tr>
+      <tr><td class="l">작업환경 기준 (참고 90dB 이하)</td><td><span class="badge ${badge}">${label}</span></td></tr>
+    </table>
+    <p class="desc" style="margin-top:6px;">85dB(A) 이상 시 방음커버 또는 저소음 노즐(라운드형) 검토 권고.</p>`;
+}
+
+/* ===================== STEP11 라인 반영 ===================== */
+function renderLine(){
+  const tray = getTray();
+  const entry = Number(document.getElementById('entrySpeed').value)||4.0;
+  // 에어나이프 구간 길이 = 스윕 구간 + 입출구 여유 500x2
+  const sweepLen = tray.T + tray.L*0.3;
+  const knifeLen = Math.ceil((sweepLen*2 + 1000)/50)*50; // 여유 반영, 50mm 라운딩
+  document.getElementById('knifeLength').value = knifeLen;
+
+  const washLen = Number(document.getElementById('washLength').value)||7000;
+  const totalLen = washLen + 800 + knifeLen + 800; // 이송구간 800mm씩 가정
+  const container40 = 12032;
+  const modules = Math.ceil(totalLen/(container40-300));
+
+  document.getElementById('lineResult').innerHTML = `
+    <table>
+      <tr><th>항목</th><th>값</th></tr>
+      <tr><td class="l">에어나이프 구간 길이</td><td>${knifeLen} mm</td></tr>
+      <tr><td class="l">세척부 + 탈수부 합산 길이 (이송구간 포함)</td><td>${totalLen} mm</td></tr>
+      <tr><td class="l">40ft 컨테이너 기준 모듈 분할</td><td>${modules} 모듈</td></tr>
+    </table>`;
+}
+
+/* ===================== 판정 ===================== */
+function renderJudge(){
+  onSim();
+  const s = window.__lastSim;
+  const target = Number(document.getElementById('targetEff').value)||97;
+  const tray = getTray();
+  const items = [];
+
+  items.push(judgeItem("탈수효과", s.eff>=target, s.eff>=target-5,
+    `${s.eff.toFixed(1)}% (목표 ${target}%)`));
+
+  // 부상(비산) 위험: 트레이 자중 대비 풍압 반력 개략 비교
+  const v0 = exitVelocity(s.P);
+  const dynPress = 0.5*RHO_AIR*v0*v0; // Pa
+  const slitLen = Number(document.getElementById('slitLength').value)||350;
+  const slitW = Number(document.getElementById('slitWidth').value)||1.5;
+  const forceN = dynPress*(slitLen/1000)*(slitW/1000);
+  const weightN = (tray.W/1000)*9.81;
+  const ratio = forceN/weightN;
+  items.push(judgeItem("경량 트레이 부상 위험 (반력/자중비)", ratio<3, ratio<6,
+    `${ratio.toFixed(1)}배 — 클립 고정 상태 확인 필요`));
+
+  const dB = 80 + 20*Math.log10(Math.max(v0,10)/50) - 8;
+  items.push(judgeItem("소음 수준", dB<80, dB<85, `${dB.toFixed(1)} dB(A)`));
+
+  const flow = s.flow;
+  items.push(judgeItem("링블로어 용량 여유", flow<400, flow<600, `${flow.toFixed(1)} ㎥/min`));
+
+  const list = document.getElementById('judgeList');
+  list.innerHTML = items.map(it=>`
+    <li><span>${it.label} — ${it.detail}</span><span class="badge ${it.badge}">${it.text}</span></li>
+  `).join("");
+}
+function judgeItem(label, okCond, warnCond, detail){
+  if(okCond) return {label,detail,badge:'ok',text:'적합'};
+  if(warnCond) return {label,detail,badge:'warn',text:'조건부'};
+  return {label,detail,badge:'bad',text:'부적합'};
+}
+
+/* ===================== JSON / 사양서 ===================== */
+function exportJson(scope){
+  let data;
+  if(scope==="tray"){
+    data = getTray();
+  } else {
+    data = {
+      tray: getTray(),
+      handoff: {
+        residualWater: document.getElementById('residualWater').value,
+        entrySpeed: document.getElementById('entrySpeed').value,
+        surfaceState: document.getElementById('surfaceState').value,
+        channels: document.getElementById('channels').value
+      },
+      target: {
+        rate: document.getElementById('targetRate').value,
+        eff: document.getElementById('targetEff').value
+      },
+      sim: window.__lastSim,
+      version: APP_VERSION
+    };
+  }
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = "airdry_" + scope + ".json";
+  a.click();
+}
+
+function downloadSpec(){
+  onSim(); renderBlower(); renderLine(); renderJudge();
+  const s = window.__lastSim;
+  const tray = getTray();
+  const html = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>에어나이프 탈수기 사양서 ${APP_VERSION}</title>
+  <style>body{font-family:'Malgun Gothic',sans-serif;font-size:14px;color:#1f2937;max-width:800px;margin:20px auto;padding:0 16px;}
+  h1{font-size:20px;border-bottom:3px solid #1e4d8c;padding-bottom:8px;}
+  table{width:100%;border-collapse:collapse;margin:10px 0;}
+  th,td{border:1px solid #d1d5db;padding:6px 8px;font-size:13px;}
+  th{background:#eaf1fb;color:#153a68;}
+  </style></head><body>
+  <h1>에어나이프 탈수기 사양서 <small>${APP_VERSION}</small></h1>
+  <p>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · 발행일 2026년 ${new Date().getMonth()+1}월 ${new Date().getDate()}일</p>
+  <table>
+    <tr><th>트레이</th><td>${tray.L}×${tray.V}×${tray.T} mm / ${tray.material} / ${tray.W} g</td></tr>
+    <tr><th>슬릿 간격</th><td>${s.spacing} mm</td></tr>
+    <tr><th>노즐 각도</th><td>${s.angle} °</td></tr>
+    <tr><th>노즐-트레이 거리</th><td>${s.dist} mm</td></tr>
+    <tr><th>공급압력</th><td>${s.P} kPa</td></tr>
+    <tr><th>탈수효과</th><td>${s.eff.toFixed(1)} %</td></tr>
+    <tr><th>필요 링블로어 용량</th><td>${s.flow.toFixed(2)} ㎥/min</td></tr>
+    <tr><th>에어나이프 구간 길이</th><td>${document.getElementById('knifeLength').value} mm</td></tr>
+  </table>
+  </body></html>`;
+  const blob = new Blob([html], {type:"text/html"});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = "airdry_spec.html";
+  a.click();
+}
+
+/* ===================== Firebase (연결 준비 스텁) =====================
+   실제 프로젝트 config(apiKey 등) 입력 전까지는 비활성 상태로 유지되며,
+   저장 요청 시 JSON 내보내기로 자동 폴백된다. wash.html의 동일 미결 항목과 통일된 처리 방식. */
+const firebaseConfig = {
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
+let fbReady = false;
+try{
+  if(firebaseConfig.apiKey && typeof firebase !== "undefined"){
+    firebase.initializeApp(firebaseConfig);
+    fbReady = true;
+  }
+}catch(e){ fbReady = false; }
+
+function currentFullState(){
+  return {
+    tray: getTray(),
+    handoff: {
+      residualWater: document.getElementById('residualWater').value,
+      entrySpeed: document.getElementById('entrySpeed').value,
+      surfaceState: document.getElementById('surfaceState').value,
+      channels: document.getElementById('channels').value
+    },
+    target: {
+      rate: document.getElementById('targetRate').value,
+      eff: document.getElementById('targetEff').value
+    },
+    sim: window.__lastSim,
+    version: APP_VERSION
+  };
+}
+
+function saveToFirebase(){
+  const statusEl = document.getElementById('fbStatus');
+  if(!fbReady){
+    statusEl.textContent = "Firebase 설정(config) 미입력 상태 — JSON 저장으로 대체합니다. 관리자에게 프로젝트 config 등록을 요청하세요.";
+    exportJson('all');
+    return;
+  }
+  const db = firebase.firestore();
+  db.collection('airdry_states').add({...currentFullState(), savedAt:new Date().toISOString()})
+    .then(()=>{ statusEl.textContent = "Firebase에 저장되었습니다."; })
+    .catch(err=>{ statusEl.textContent = "저장 실패: " + err.message; });
+}
+
+/* ===================== 초기화 ===================== */
+buildTabs();
+onSim();
+</script>
+</body>
+</html>
