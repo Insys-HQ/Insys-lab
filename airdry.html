@@ -77,11 +77,6 @@ header.topbar{
   padding:12px; margin-bottom:8px;
 }
 .card h2{font-size:15px; padding-bottom:6px; border-bottom:2px solid var(--brand-soft); margin-bottom:8px;}
-.dash-card{
-  position:sticky; top:6px; z-index:40;
-  border:1px solid var(--brand); box-shadow:0 3px 10px rgba(30,77,140,.12);
-}
-.dash-card h2{color:var(--brand-dark);}
 .card h2 .step-no{color:var(--brand); margin-right:4px;}
 .card .desc{font-size:12px; color:var(--sub); margin-bottom:8px;}
 
@@ -159,7 +154,7 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
 /* ---------- PC (min-width 768) ---------- */
 @media (min-width:768px){
   body{font-size:16px;}
-  .wrap{padding:16px 20px 80px;}
+  .wrap{padding:16px 20px 12px;}
   .grid2{grid-template-columns:1fr 1fr;}
   .kpi-row{grid-template-columns:repeat(4,1fr);}
   .card{padding:12px 18px;}
@@ -167,6 +162,43 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
   table{font-size:13px;}
   .step-tabs button{font-size:13px; padding:7px 14px;}
 }
+
+/* ---------- 2단 레이아웃 (입력 좌측 / 결과 우측, min-width 1024) ---------- */
+.layout-grid{display:flex; flex-direction:column; gap:0;}
+.right-panel{margin-top:2px;}
+@media (min-width:1024px){
+  .layout-grid{display:grid; grid-template-columns:420px 1fr; gap:14px; align-items:start;}
+  .left-panel{min-width:0;}
+  .right-panel{
+    position:sticky; top:8px; margin-top:0;
+    max-height:calc(100vh - 16px); overflow-y:auto;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .right-panel .card{margin-bottom:0;}
+}
+
+/* ---------- 공정 흐름 ---------- */
+.flow-row{display:flex; align-items:center; flex-wrap:wrap; gap:4px;}
+.flow-step{
+  background:#f3f5f7; border:1px solid var(--line); border-radius:8px; padding:8px 10px;
+  font-size:12px; font-weight:700; color:var(--ink-soft); min-width:88px; text-align:center;
+}
+.flow-step span{display:block; font-weight:400; font-size:10px; color:var(--sub); margin-top:2px;}
+.flow-step.active{background:var(--brand); color:#fff; border-color:var(--brand);}
+.flow-step.active span{color:#dce8f7;}
+.flow-step.done{background:var(--ok-bg); color:var(--ok); border-color:var(--ok);}
+.flow-step.done span{color:var(--ok);}
+.flow-step.disabled{opacity:.5;}
+.flow-arrow{color:var(--sub); font-size:14px;}
+
+/* ---------- 경고 배너 ---------- */
+.alert-box{display:flex; flex-direction:column; gap:6px; margin-top:8px;}
+.alert-line{border-radius:8px; padding:8px 10px; font-size:12px; font-weight:700;}
+.alert-line.warn{background:var(--warn-bg); color:var(--warn);}
+.alert-line.bad{background:var(--bad-bg); color:var(--bad);}
+
+.kpi-row6{grid-template-columns:repeat(2,1fr);}
+@media (min-width:768px){ .kpi-row6{grid-template-columns:repeat(3,1fr);} }
 </style>
 </head>
 <body>
@@ -186,23 +218,8 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
 
 <div class="wrap">
 
-  <!-- 통합 결과 대시보드 (모든 STEP 공통 상단 고정) -->
-  <section class="card dash-card" id="dashCard">
-    <h2>📊 통합 공정 결과 — 세척 · 탈수 · 건조</h2>
-    <p class="desc">어느 STEP에서든 입력값을 바꾸면 이 그래프와 수치가 즉시 갱신됩니다.</p>
-
-    <div class="kpi-row" id="dashKpi">
-      <div class="kpi"><div class="lb">세척 직후 잔수</div><div class="num" id="dkWash">-</div><div class="unit">mL/매</div></div>
-      <div class="kpi"><div class="lb">탈수 효과</div><div class="num" id="dkDewaterEff">-</div><div class="unit">%</div></div>
-      <div class="kpi"><div class="lb">탈수 후 잔수</div><div class="num" id="dkDewaterResidual">-</div><div class="unit">mL/매</div></div>
-      <div class="kpi"><div class="lb">건조 부하(개략추정)</div><div class="num" id="dkDryLoad">-</div><div class="unit">kW</div></div>
-    </div>
-
-    <div class="canvas-wrap">
-      <canvas id="dashCanvas" width="1000" height="260"></canvas>
-    </div>
-    <p class="legend-hint">막대: 공정 단계별 잔수량(mL/매) · 점선: 목표 탈수율 기준선 · 건조 부하는 3단계 상세 설계 전 개략 추정치입니다.</p>
-  </section>
+  <div class="layout-grid">
+  <div class="left-panel">
 
   <div class="step-tabs" id="stepTabs"></div>
 
@@ -335,14 +352,14 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
 
   <!-- STEP 5 -->
   <section class="card" data-step="5">
-    <h2><span class="step-no">STEP 5</span>노즐 슬릿 파라미터</h2>
+    <h2><span class="step-no">STEP 5</span>에어나이프 슬릿 파라미터 (링블로어 연결)</h2>
     <div class="grid2">
       <div class="field">
-        <label>슬릿 폭 (mm)</label>
+        <label>에어나이프 슬릿 폭 (mm)</label>
         <input type="number" id="slitWidth" oninput="onSim()" value="1.5" step="0.1">
       </div>
       <div class="field">
-        <label>슬릿 길이 (mm, 트레이 이송폭 커버)</label>
+        <label>에어나이프 슬릿 길이 (mm, 트레이 이송폭 커버)</label>
         <input type="number" id="slitLength" oninput="onSim()" value="350">
       </div>
       <div class="field">
@@ -350,16 +367,16 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
         <input type="number" id="basePressure" oninput="onSim()" value="12">
       </div>
     </div>
-    <p class="desc" style="margin-top:6px;">슬릿 간격·각도·거리는 STEP 6에서 동시 조절합니다.</p>
+    <p class="desc" style="margin-top:6px;">에어나이프 슬릿 간격·각도·거리는 STEP 6에서 동시 조절합니다.</p>
   </section>
 
   <!-- STEP 6 -->
   <section class="card" data-step="6">
     <h2><span class="step-no">STEP 6</span>시뮬레이션 — 3변수 동시 조절</h2>
-    <p class="desc">슬릿 간격 · 노즐 각도 · 노즐-트레이 거리를 동시에 조절하면 탈수효과와 필요 링블로어 용량이 즉시 갱신됩니다.</p>
+    <p class="desc">에어나이프 슬릿 간격 · 노즐 각도 · 노즐-트레이 거리를 동시에 조절하면 탈수효과와 필요 링블로어 용량이 즉시 갱신됩니다.</p>
 
     <div class="slider-block">
-      <div class="row1"><label>슬릿 간격 (트레이 이송방향 피치)</label><span class="val"><span id="vSpacing">40</span> mm</span></div>
+      <div class="row1"><label>에어나이프 슬릿 간격 (트레이 이송방향 피치)</label><span class="val"><span id="vSpacing">40</span> mm</span></div>
       <input type="range" id="sSpacing" min="20" max="100" step="1" value="40" oninput="onSim()">
     </div>
     <div class="slider-block">
@@ -377,22 +394,7 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
       <div class="kpi"><div class="lb">필요 정압</div><div class="num" id="kpiPress">-</div><div class="unit">kPa</div></div>
       <div class="kpi"><div class="lb">판정</div><div class="num" id="kpiJudge">-</div><div class="unit">&nbsp;</div></div>
     </div>
-
-    <div class="graph-tabs">
-      <button class="active" onclick="setGraphMode('spacing')">간격별 곡선</button>
-      <button onclick="setGraphMode('angle')">각도별 곡선</button>
-      <button onclick="setGraphMode('dist')">거리별 곡선</button>
-      <button onclick="setGraphMode('contour')">등고선(2변수)</button>
-    </div>
-    <div class="canvas-wrap">
-      <canvas id="simCanvas" width="1000" height="440"></canvas>
-    </div>
-    <div class="legend-hint" id="graphLegend">파란선: 탈수효과(%) · 주황선: 필요 링블로어 용량(㎥/min) · 세로 점선: 현재 슬라이더 값</div>
-
-    <div class="btn-row">
-      <button class="btn ghost sm" onclick="findOptimal()">목표 만족 · 최소 용량 조합 자동 탐색</button>
-    </div>
-    <div id="optimalResult" style="margin-top:6px; font-size:12px;"></div>
+    <p class="desc" style="margin-top:6px;">그래프·최적조합 탐색 결과는 우측 패널에서 실시간으로 확인할 수 있습니다.</p>
   </section>
 
   <!-- STEP 7 -->
@@ -502,14 +504,84 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
     <p class="desc" id="fbStatus" style="margin-top:6px;"></p>
   </section>
 
+  </div><!-- /left-panel -->
+
+  <div class="right-panel">
+
+    <!-- 공정 흐름 -->
+    <section class="card">
+      <h2>⚙ 공정 흐름</h2>
+      <div class="flow-row" id="flowRow"></div>
+    </section>
+
+    <!-- 핵심 지표 -->
+    <section class="card">
+      <h2>📊 핵심 지표</h2>
+      <div class="kpi-row kpi-row6" id="dashKpi">
+        <div class="kpi"><div class="lb">탈수효과</div><div class="num" id="dkDewaterEff">-</div><div class="unit">%</div></div>
+        <div class="kpi"><div class="lb">처리량</div><div class="num" id="dkRate">-</div><div class="unit">매/h</div></div>
+        <div class="kpi"><div class="lb">필요 풍량</div><div class="num" id="dkFlow">-</div><div class="unit">㎥/min</div></div>
+        <div class="kpi"><div class="lb">총 소요동력</div><div class="num" id="dkPower">-</div><div class="unit">kW</div></div>
+        <div class="kpi"><div class="lb">탈수 후 잔수</div><div class="num" id="dkDewaterResidual">-</div><div class="unit">mL/매</div></div>
+        <div class="kpi"><div class="lb">추정 소음</div><div class="num" id="dkNoise">-</div><div class="unit">dB(A)</div></div>
+      </div>
+      <div id="alertBox" class="alert-box"></div>
+    </section>
+
+    <!-- 3변수 시뮬레이션 그래프 -->
+    <section class="card">
+      <h2>📈 에어나이프 시뮬레이션</h2>
+      <div class="graph-tabs">
+        <button class="active" onclick="setGraphMode('spacing')">간격별 곡선</button>
+        <button onclick="setGraphMode('angle')">각도별 곡선</button>
+        <button onclick="setGraphMode('dist')">거리별 곡선</button>
+        <button onclick="setGraphMode('contour')">등고선(2변수)</button>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="simCanvas" width="1000" height="380"></canvas>
+      </div>
+      <div class="legend-hint" id="graphLegend">파란선: 탈수효과(%) · 주황선: 필요 링블로어 용량(㎥/min) · 세로 점선: 현재 슬라이더 값</div>
+      <div class="btn-row">
+        <button class="btn ghost sm" onclick="findOptimal()">목표 만족 · 최소 용량 조합 자동 탐색</button>
+      </div>
+      <div id="optimalResult" style="margin-top:6px; font-size:12px;"></div>
+    </section>
+
+    <!-- 공정 단계별 잔수 흐름 -->
+    <section class="card">
+      <h2>💧 공정 단계별 잔수 흐름</h2>
+      <div class="canvas-wrap">
+        <canvas id="dashCanvas" width="1000" height="240"></canvas>
+      </div>
+      <p class="legend-hint">세척 직후 → 탈수 후 → 건조 후(목표, 개략추정) 잔수량 변화입니다.</p>
+    </section>
+
+    <!-- 가동 비용 예측 -->
+    <section class="card">
+      <h2>💡 링블로어 가동 비용 예측</h2>
+      <div class="grid2">
+        <div class="field"><label>일 가동시간 (h/일)</label><input type="number" id="pwrHour" value="8" oninput="onSim()"></div>
+        <div class="field"><label>월 가동일수 (일/월)</label><input type="number" id="pwrDays" value="22" oninput="onSim()"></div>
+        <div class="field"><label>전력 단가 (원/kWh)</label><input type="number" id="pwrRate" value="130" oninput="onSim()"></div>
+      </div>
+      <div class="kpi-row" style="grid-template-columns:1fr 1fr 1fr;">
+        <div class="kpi"><div class="lb">일 소비</div><div class="num" id="pwrDay">-</div><div class="unit">kWh</div></div>
+        <div class="kpi"><div class="lb">월 소비</div><div class="num" id="pwrMonth">-</div><div class="unit">kWh</div></div>
+        <div class="kpi"><div class="lb">월 전기료</div><div class="num" id="pwrCost">-</div><div class="unit">원</div></div>
+      </div>
+    </section>
+
+  </div><!-- /right-panel -->
+  </div><!-- /layout-grid -->
+
   <footer>
-    담당: 인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr &nbsp;|&nbsp; airdry.html <span class="ver">v1.1</span>
+    담당: 인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr &nbsp;|&nbsp; airdry.html <span class="ver">v2.0</span>
   </footer>
 </div>
 
 <script>
 /* ===================== 버전 ===================== */
-const APP_VERSION = "v1.1";
+const APP_VERSION = "v2.0";
 
 /* ===================== 상태 ===================== */
 const TRAY_PRESET = {
@@ -526,7 +598,7 @@ const STEP_LIST = [
   {id:"2",label:"인계조건"},
   {id:"3",label:"목표"},
   {id:"4",label:"배치구조"},
-  {id:"5",label:"슬릿"},
+  {id:"5",label:"에어나이프"},
   {id:"6",label:"시뮬레이션"},
   {id:"7",label:"블로워"},
   {id:"8",label:"덕트"},
@@ -717,7 +789,7 @@ function drawGraph(){
 
   const p = currentParams();
   let xs=[], xLabel="", xCur=0, range;
-  if(graphMode==="spacing"){ range=[20,100]; xLabel="슬릿 간격(mm)"; xCur=p.spacing; }
+  if(graphMode==="spacing"){ range=[20,100]; xLabel="에어나이프 슬릿 간격(mm)"; xCur=p.spacing; }
   else if(graphMode==="angle"){ range=[15,60]; xLabel="노즐 각도(°)"; xCur=p.angle; }
   else { range=[10,50]; xLabel="노즐-트레이 거리(mm)"; xCur=p.dist; }
 
@@ -815,7 +887,7 @@ function drawContour(ctx,W,H){
   }
   ctx.strokeStyle="#d1d5db"; ctx.strokeRect(padL,padT,plotW,plotH);
   ctx.fillStyle="#6b7280"; ctx.font="12px sans-serif";
-  ctx.fillText("슬릿 간격(mm) →", padL+plotW/2-40, H-10);
+  ctx.fillText("에어나이프 슬릿 간격(mm) →", padL+plotW/2-50, H-10);
   ctx.save(); ctx.translate(14,padT+plotH/2+20); ctx.rotate(-Math.PI/2); ctx.fillText("노즐 각도(°) →",0,0); ctx.restore();
   ctx.fillText(spR[0], padL-4, padT+plotH+14);
   ctx.fillText(spR[1], padL+plotW-14, padT+plotH+14);
@@ -1037,7 +1109,7 @@ function downloadSpec(){
   <p>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · 발행일 2026년 ${new Date().getMonth()+1}월 ${new Date().getDate()}일</p>
   <table>
     <tr><th>트레이</th><td>${tray.L}×${tray.V}×${tray.T} mm / ${tray.material} / ${tray.W} g</td></tr>
-    <tr><th>슬릿 간격</th><td>${s.spacing} mm</td></tr>
+    <tr><th>에어나이프 슬릿 간격</th><td>${s.spacing} mm</td></tr>
     <tr><th>노즐 각도</th><td>${s.angle} °</td></tr>
     <tr><th>노즐-트레이 거리</th><td>${s.dist} mm</td></tr>
     <tr><th>공급압력</th><td>${s.P} kPa</td></tr>
@@ -1113,16 +1185,88 @@ function renderDashboard(){
   const dewaterResidual = washResidual*(1-s.eff/100); // mL/매
   const rate = Number(document.getElementById('targetRate').value)||1000; // 매/hr
 
-  // 건조 부하 개략 추정: 탈수 후 잔수를 전량 증발시키는 데 필요한 열량
-  const massFlowKgHr = (dewaterResidual/1000) * rate; // kg/hr (물 밀도 1kg/L)
-  const dryLoadKw = massFlowKgHr*LATENT_HEAT_KJKG/3600;
+  const margin = Number(document.getElementById('blowerMargin')?.value)||1.15;
+  const count = Number(document.getElementById('blowerCount')?.value)||2;
+  const eta = 0.55;
+  const totalFlow = s.flow*margin;
+  const totalPowerKw = (totalFlow/60)*(s.P*1000)/(eta*1000);
 
-  document.getElementById('dkWash').textContent = washResidual.toFixed(1);
+  const v0 = exitVelocity(s.P);
+  const silencer = document.getElementById('silencer')?.value || "basic";
+  let dB = 80 + 20*Math.log10(Math.max(v0,10)/50);
+  if(silencer==="basic") dB -= 8;
+
   document.getElementById('dkDewaterEff').textContent = s.eff.toFixed(1);
+  document.getElementById('dkRate').textContent = rate;
+  document.getElementById('dkFlow').textContent = totalFlow.toFixed(1);
+  document.getElementById('dkPower').textContent = totalPowerKw.toFixed(2);
   document.getElementById('dkDewaterResidual').textContent = dewaterResidual.toFixed(2);
-  document.getElementById('dkDryLoad').textContent = dryLoadKw.toFixed(2);
+  document.getElementById('dkNoise').textContent = dB.toFixed(1);
 
   drawDashboardChart(washResidual, dewaterResidual);
+  renderFlow();
+  renderAlerts();
+  renderPower(totalPowerKw);
+}
+
+/* ===================== 공정 흐름 ===================== */
+function renderFlow(){
+  const box = document.getElementById('flowRow');
+  if(!box) return;
+  const s = window.__lastSim;
+  const target = Number(document.getElementById('targetEff').value)||97;
+  const dewaterOk = s && s.eff>=target;
+  box.innerHTML = `
+    <div class="flow-step done">세척 인계<span>완료</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step ${dewaterOk?'done':'active'}">에어나이프 탈수<span>${s?s.eff.toFixed(0)+'%':'-'}</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">배수 회수<span>연동</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step disabled">열풍 건조<span>3단계 예정</span></div>
+  `;
+}
+
+/* ===================== 경고 배너 ===================== */
+function renderAlerts(){
+  const box = document.getElementById('alertBox');
+  if(!box) return;
+  const s = window.__lastSim;
+  if(!s){ box.innerHTML=""; return; }
+  const target = Number(document.getElementById('targetEff').value)||97;
+  const tray = getTray();
+  const v0 = exitVelocity(s.P);
+  const dynPress = 0.5*RHO_AIR*v0*v0;
+  const slitLen = Number(document.getElementById('slitLength').value)||350;
+  const slitW = Number(document.getElementById('slitWidth').value)||1.5;
+  const forceN = dynPress*(slitLen/1000)*(slitW/1000);
+  const weightN = (tray.W/1000)*9.81;
+  const ratio = forceN/weightN;
+
+  const alerts = [];
+  if(s.eff<target){
+    alerts.push({level: s.eff>=target-5?'warn':'bad', text:`탈수율 ${s.eff.toFixed(1)}% — 목표 ${target}% 미달`});
+  }
+  if(ratio>=3){
+    alerts.push({level: ratio<6?'warn':'bad', text:`경량 트레이 반력/자중비 ${ratio.toFixed(1)}배 — 클립 고정 상태 확인 필요`});
+  }
+  box.innerHTML = alerts.map(a=>`
+    <div class="alert-line ${a.level}">${a.level==='bad'?'●':'⚠'} ${a.text}</div>
+  `).join("");
+}
+
+/* ===================== 가동 비용 예측 ===================== */
+function renderPower(totalPowerKw){
+  const hour = Number(document.getElementById('pwrHour')?.value)||8;
+  const days = Number(document.getElementById('pwrDays')?.value)||22;
+  const rate = Number(document.getElementById('pwrRate')?.value)||130;
+  const dayKwh = totalPowerKw*hour;
+  const monthKwh = dayKwh*days;
+  const monthCost = monthKwh*rate;
+  const dEl=document.getElementById('pwrDay'), mEl=document.getElementById('pwrMonth'), cEl=document.getElementById('pwrCost');
+  if(dEl) dEl.textContent = dayKwh.toFixed(1);
+  if(mEl) mEl.textContent = monthKwh.toFixed(0);
+  if(cEl) cEl.textContent = Math.round(monthCost).toLocaleString();
 }
 
 function drawDashboardChart(washResidual, dewaterResidual){
