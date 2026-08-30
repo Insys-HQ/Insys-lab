@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v1.7 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v1.8 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -153,7 +153,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v1.7</span>
+    <span class="vb">v1.8</span>
   </div>
 </div>
 </div>
@@ -196,13 +196,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v1.7 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v1.8 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v1.7
+// 트레이 세척·탈수·건조 시뮬레이터 v1.8
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='1.7';
+const VER='1.8';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -515,14 +515,14 @@ function renderLeft(){
         +'<div class="fl"><label>분사압력</label><input type="number" id="stgPress'+i+'" value="'+S.stgPress[i]+'" style="border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:14px;font-family:inherit;font-weight:600;"><span class="un">kPa</span></div>'
         +'<div class="fl"><label>펌프 출력</label><input type="text" value="'+(d.pkw?d.pkw.toFixed(2):'—')+'kW" readonly style="border:1.5px solid #a5d6a7;background:#e8f5e9;border-radius:6px;padding:5px 8px;font-size:14px;font-family:inherit;font-weight:700;color:#1b5e20;"></div></div>'
         +'<div class="g2">'
-        +'<div class="fl"><label>가로 노즐수</label><input type="number" id="stgCol'+i+'" value="'+S.stgCol[i]+'" style="border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:14px;font-family:inherit;font-weight:600;"><span class="un">개</span></div>'
-        +'<div class="fl"><label>세로 노즐수</label><input type="number" id="stgRow'+i+'" value="'+S.stgRow[i]+'" style="border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:14px;font-family:inherit;font-weight:600;"><span class="un">개</span></div></div>'
-        +'<div style="margin-top:6px;font-size:13px;color:'+(isRinse?'#00838f':'#1565c0')+';font-weight:600;">→ 유량 '+(d.flow?d.flow.toFixed(0):'—')+'LPM · '+(d.nPerFace||'—')+'개/면 · '+(isRinse?'청수 소비':'순환')+' '+(d.water?d.water.toFixed(0):'—')+'L/h</div>'
+        +'<div class="fl"><label>가로 노즐수 <span style="color:#0d7fa8;font-size:11px;">(면당)</span></label><input type="number" id="stgCol'+i+'" value="'+S.stgCol[i]+'" style="border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:14px;font-family:inherit;font-weight:600;"><span class="un">개</span></div>'
+        +'<div class="fl"><label>세로 노즐수 <span style="color:#0d7fa8;font-size:11px;">(면당)</span></label><input type="number" id="stgRow'+i+'" value="'+S.stgRow[i]+'" style="border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:14px;font-family:inherit;font-weight:600;"><span class="un">개</span></div></div>'
+        +'<div style="margin-top:6px;font-size:13px;color:'+(isRinse?'#00838f':'#1565c0')+';font-weight:600;">→ <b>'+(d.nPerFace||'—')+'개/면</b> × 2면(외벽+격벽) × 2CH = <b>총 '+(d.nPerFace?d.nPerFace*4:'—')+'개</b> · 유량 '+(d.flow?d.flow.toFixed(0):'—')+'LPM · '+(isRinse?'청수':'순환')+' '+(d.water?d.water.toFixed(0):'—')+'L/h</div>'
         +'</div>';
     }
     h='<div class="card"><div class="ch"><span class="ci">💧</span><span class="cl">세척부 (단계별 독립 설정)</span><span class="cq">1차·2차·헹굼</span></div><div class="cb">'
       +'<div class="chbox" style="background:#fff8f0;border-color:#ffd9a8;color:#8a5a00;">🎯 <b>단계별 차등 설정으로 전력·물 최소화</b>: 1차는 고압·다노즐(큰오염), 2차는 중압(정밀), 3차 헹굼은 저압·청수(잔류·세제 제거). 균일 고압 대비 최대 47% 전력 절감.</div>'
-      +'<div class="chbox">🍽️ <b>트레이 2CH 구조</b>: 세워진 트레이 외벽+격벽 2면, 좌우 2채널 독립 노즐. 총 '+(CH*FACES_PER_CH)+'면 분사.</div>'
+      +'<div class="chbox">🍽️ <b>트레이 2CH 노즐 구조</b>: 노즐수는 <b>1개 면(외벽 또는 격벽)당</b> 기준으로 입력합니다.<br>실제 총 노즐 = 입력값 × <b>2면</b>(외벽+격벽) × <b>2CH</b>(좌우 채널) = <b>×4</b>. 각 채널·각 면 모두 독립 노즐이 설치됩니다.</div>'
       +'<div class="st">공통 조건</div><div class="g3">'
       +fld('trayW','폭(높이)','mm',S.trayW)+fld('trayD','깊이','mm',S.trayD)+fld('trayT','두께','mm',S.trayT)+'</div>'
       +'<div class="g3" style="margin-top:6px;">'+fld('qty','처리량','매/h',S.qty)+fld('dlv','오염도','1~5',S.dlv)+fld('wZones','세척 단수','단',S.wZones)+'</div>'
@@ -598,6 +598,7 @@ function renderLeft(){
       +'<table class="tbl"><thead><tr><th>구분</th><th>항목</th><th>값</th></tr></thead><tbody>'
       +srow('트레이','규격/처리량','트레이 '+S.trayW+'×'+S.trayD+'×'+S.trayT+'mm · '+S.qty+'매/h · 오염도'+S.dlv)
       +srow('세척','단계별 압력',S.stgPress.slice(0,S.wZones).map((p,i)=>(i+1)+'차'+(S.stgType[i]==='rinse'?'(헹굼)':'')+' '+p+'kPa').join(' / '))
+      +srow('세척','노즐 총수',S.stgCol.slice(0,S.wZones).map((c,i)=>(c*S.stgRow[i]*4)).reduce((a,b)=>a+b,0)+'개 (면당×2면×2CH)')
       +srow('세척','펌프/저수조',R.washPumpTotal.toFixed(1)+'kW · 탱크'+R.tankL+'L · '+S.wTemp+'°C · 단열'+(S.wTankIns?'O':'X'))
       +srow('탈수','에어나이프',R.knifeTotal+'개('+S.knifePass+'패스) · '+S.knifeAng+'° · '+S.knifeVel+'m/s · 이격'+S.knifeGap+'mm')
       +srow('탈수','링블로어',R.blowerSel.unit.kw+'kW×'+R.blowerSel.count+'대 · 배관'+R.mainDuctSpec)
