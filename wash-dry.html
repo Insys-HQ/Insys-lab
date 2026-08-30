@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>세척·탈수·건조 통합설비 시뮬레이터 v1.0 | 인시스 AI혁신 연구개발실</title>
+<title>세척·탈수·건조 통합설비 시뮬레이터 v1.1 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -42,6 +42,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 .proctab button.on.pr{background:var(--dry);}
 .proctab button.on.po{background:var(--steel);}
 .proctab button.on.ps{background:var(--navy);}
+.proctab button.on.pc{background:#5e35b1;}
 
 .layout{display:grid;grid-template-columns:1fr;gap:12px;}
 @media(min-width:960px){.layout{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);}}
@@ -141,6 +142,25 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 .hide{display:none !important;}
 .note{font-size:10px;color:#9aabb8;margin-top:5px;line-height:1.5;}
 footer{text-align:center;font-size:10px;color:#7a90a4;padding:14px;}
+
+/* ── 상관관계 표 ── */
+.corr-intro{background:#f3f0fb;border:1px solid #d8cef0;border-radius:9px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#4a3a7a;line-height:1.6;}
+.corr-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px;}
+.corr-tbl th{background:#ede7f6;color:#4527a0;padding:7px 8px;text-align:left;font-weight:700;border:1px solid #d1c4e9;font-size:11px;}
+.corr-tbl td{padding:6px 8px;border:1px solid #e8e2f2;vertical-align:top;line-height:1.5;}
+.corr-tbl td.var{font-weight:700;color:#5e35b1;white-space:nowrap;}
+.corr-up{color:#c62828;font-weight:700;}
+.corr-dn{color:#1565c0;font-weight:700;}
+.corr-eff{color:#2e7d32;font-weight:700;}
+.corr-cost{color:#e65100;font-weight:700;}
+.corr-arrow{display:inline-block;font-weight:900;}
+.corr-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;margin-bottom:10px;padding:8px 10px;background:#faf8ff;border-radius:8px;}
+.corr-legend span{display:flex;align-items:center;gap:4px;}
+.corr-sect{font-size:13px;font-weight:800;color:#4527a0;margin:14px 0 7px;padding-left:8px;border-left:4px solid #5e35b1;}
+.corr-map{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px;overflow-x:auto;}
+.tradeoff{background:#fff8f0;border:1px solid #ffd9a8;border-radius:9px;padding:10px 12px;margin-bottom:8px;}
+.tradeoff-h{font-size:12px;font-weight:800;color:#c05a00;margin-bottom:4px;}
+.tradeoff-b{font-size:11px;color:#6a4a2a;line-height:1.6;}
 .flowbar{display:flex;align-items:stretch;gap:4px;margin-bottom:10px;overflow-x:auto;}
 .flowstep{flex:1;min-width:66px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 5px;text-align:center;font-size:10px;position:relative;}
 .flowstep .fe{font-size:15px;display:block;}
@@ -162,7 +182,7 @@ footer{text-align:center;font-size:10px;color:#7a90a4;padding:14px;}
     <a href="https://insys-hq.github.io/Insys-lab/wash-dry.html" target="_blank" rel="noopener">🔗 바로가기</a>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v1.0</span>
+    <span class="vb">v1.1</span>
   </div>
 </div>
 </div>
@@ -178,6 +198,7 @@ footer{text-align:center;font-size:10px;color:#7a90a4;padding:14px;}
     <button class="pd" data-tab="dewat"><span class="pe">💨</span>탈수</button>
     <button class="pr" data-tab="dry"><span class="pe">🔥</span>건조</button>
     <button class="po" data-tab="util"><span class="pe">♨️</span>온수·유틸</button>
+    <button class="pc" data-tab="corr"><span class="pe">🔗</span>상관관계</button>
     <button class="ps" data-tab="result"><span class="pe">📊</span>종합결과</button>
   </div>
 
@@ -189,13 +210,13 @@ footer{text-align:center;font-size:10px;color:#7a90a4;padding:14px;}
   </div>
 </div>
 
-<footer>인시스 AI혁신 연구개발실 · 세척·탈수·건조 통합설비 시뮬레이터 v1.0 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 세척·탈수·건조 통합설비 시뮬레이터 v1.1 · 2026</footer>
 
 <script>
 // ═══════════════════════════════════════════════
-// 세척·탈수·건조 통합설비 시뮬레이터 v1.0
+// 세척·탈수·건조 통합설비 시뮬레이터 v1.1
 // ═══════════════════════════════════════════════
-const VER='1.0';
+const VER='1.1';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 const HP_PER_KW=1.341;
@@ -420,6 +441,8 @@ function renderLeft(){
       +'<div class="st">기타</div><div class="g2">'+fld('convKW','컨베이어','kW',S.convKW)+'</div>'
       +'<div class="note">💡 외부 보일러+단열탱크로 온수 집중공급 시 세척조 개별 히터는 유지열손실만 부담 → 전기부하 대폭 절감.</div>'
       +'</div></div>';
+  } else if(_tab==='corr'){
+    h=buildCorrelation();
   } else if(_tab==='result'){
     h='<div class="card"><div class="ch"><span class="ci">📊</span><span class="cl">전기료·가스비 예측</span></div><div class="cb">'
       +'<div class="cost-in">'
@@ -438,6 +461,85 @@ function renderLeft(){
     el.addEventListener('change',()=>{ if(el.id==='itype'||el.id==='boilerType'){renderLeft();} onChange(el.id);});
   });
 }
+function buildCorrelation(){
+  var h='<div class="card"><div class="ch"><span class="ci">🔗</span><span class="cl">변수 상관관계 맵</span><span class="cq">무엇을 바꾸면 무엇이 변하나</span></div><div class="cb">';
+
+  h+='<div class="corr-intro">💡 이 시뮬레이터는 아래 인과관계로 계산됩니다. <b class="corr-up">↑</b>는 증가, <b class="corr-dn">↓</b>는 감소를 뜻합니다. 최적 설계의 핵심은 <b>탈수를 강화해 건조 에너지를 줄이고</b>, <b>단열로 열손실을 막는 것</b>입니다.</div>';
+
+  h+='<div class="corr-legend">'
+    +'<span><b class="corr-up">↑증가</b></span>'
+    +'<span><b class="corr-dn">↓감소</b></span>'
+    +'<span><b class="corr-eff">효율</b></span>'
+    +'<span><b class="corr-cost">에너지·비용</b></span></div>';
+
+  // ── 세척부 ──
+  h+='<div class="corr-sect">💧 세척부</div>';
+  h+='<table class="corr-tbl"><thead><tr><th style="width:22%">변수</th><th style="width:8%">조작</th><th>연쇄 영향</th></tr></thead><tbody>'
+    +cr('홀 직경','↑','노즐 유량<span class="corr-up">↑</span> → 펌프부하<span class="corr-cost">↑</span> · 세척력<span class="corr-eff">↑</span> · 물사용<span class="corr-cost">↑</span> (2~3mm 최적)')
+    +cr('분사 압력','↑','노즐 유량<span class="corr-up">↑</span> · 세척력<span class="corr-eff">↑</span> · 펌프 전력<span class="corr-cost">↑↑</span> (압력은 전력에 제곱 비례)')
+    +cr('노즐 수','↑','커버리지<span class="corr-eff">↑</span> · 총유량<span class="corr-up">↑</span> · 펌프부하<span class="corr-cost">↑</span> · 배관 규격<span class="corr-up">↑</span>')
+    +cr('세척 온도','↑','세척력<span class="corr-eff">↑</span> · 히터부하<span class="corr-cost">↑</span> · 보일러부하<span class="corr-cost">↑</span> (60°C 이상 유지류 급속 용해)')
+    +cr('세척 단수','↑','세척율<span class="corr-eff">↑↑</span> · 총 펌프/히터<span class="corr-cost">↑</span> · 설비 길이<span class="corr-cost">↑</span> · 체류시간<span class="corr-up">↑</span>')
+    +cr('저수조 크기','↑','탱크 용량<span class="corr-up">↑</span> → 유지히터<span class="corr-cost">↑</span> · 보충수<span class="corr-cost">↑</span> (필요 최소로)')
+    +cr('저수조 단열','ON','유지 열손실<span class="corr-dn">↓50%</span> · 히터부하<span class="corr-cost">↓</span> · 전기료<span class="corr-cost">↓</span> ✅저비용 고효율')
+    +cr('배수펌프 댓수','↑','배수시간<span class="corr-dn">↓</span> · 사이클<span class="corr-eff">↑</span> · 투자비<span class="corr-cost">↑</span> (공용 1대는 투자↓ 시간↑)')
+    +'</tbody></table>';
+
+  // ── 탈수부 ──
+  h+='<div class="corr-sect">💨 탈수부 (핵심 절감 포인트)</div>';
+  h+='<table class="corr-tbl"><thead><tr><th style="width:22%">변수</th><th style="width:8%">조작</th><th>연쇄 영향</th></tr></thead><tbody>'
+    +cr('나이프 개수','↑','물 제거<span class="corr-eff">↑</span> · 잔류수분<span class="corr-dn">↓</span> → <b>건조 열부하<span class="corr-dn">↓↓</span></b> · 블로어부하<span class="corr-cost">↑</span> (4개 최적)')
+    +cr('분사 각도','45~60°','물 제거효율<span class="corr-eff">최대</span> (제품 진행 역방향으로 밀어냄, 벗어나면 잔류<span class="corr-up">↑</span>)')
+    +cr('토출 속도','↑','물 제거<span class="corr-eff">↑</span> · 잔류수분<span class="corr-dn">↓</span> · 블로어부하<span class="corr-cost">↑</span> (55~80m/s 최적)')
+    +cr('나이프 압력','↑','토출력<span class="corr-eff">↑</span> · 블로어 전력<span class="corr-cost">↑</span> (12~20kPa 최적)')
+    +cr('블로어 댓수','↑','풍량<span class="corr-up">↑</span> · 탈수능력<span class="corr-eff">↑</span> · 전력<span class="corr-cost">↑</span>')
+    +'</tbody></table>';
+
+  // ── 건조부 ──
+  h+='<div class="corr-sect">🔥 건조부 (최대 에너지 소비원)</div>';
+  h+='<table class="corr-tbl"><thead><tr><th style="width:22%">변수</th><th style="width:8%">조작</th><th>연쇄 영향</th></tr></thead><tbody>'
+    +cr('열풍 온도','↑','건조속도<span class="corr-eff">↑</span> · <b>열부하<span class="corr-cost">↑↑</span></b> (최대 소비원, 탈수 강화로 낮추는 게 이득)')
+    +cr('열풍 풍량','↑','건조속도<span class="corr-eff">↑</span> · 가열부하<span class="corr-cost">↑</span> · 송풍전력<span class="corr-cost">↑</span>')
+    +cr('순환 재사용','↑','신선공기 가열<span class="corr-dn">↓↓</span> · <b>열부하<span class="corr-dn">↓</span></b> (60~80%, 덕트 투자 필요)')
+    +cr('잔류수분(탈수결과)','↓','증발부하<span class="corr-dn">↓↓</span> → <b>건조 에너지<span class="corr-dn">↓↓</span></b> (탈수가 건조를 결정)')
+    +'</tbody></table>';
+
+  // ── 온수·유틸 ──
+  h+='<div class="corr-sect">♨️ 온수·유틸리티</div>';
+  h+='<table class="corr-tbl"><thead><tr><th style="width:22%">변수</th><th style="width:8%">조작</th><th>연쇄 영향</th></tr></thead><tbody>'
+    +cr('보일러 열원','가스','열원단가<span class="corr-dn">↓40~60%</span> vs 전기 · 전기부하<span class="corr-dn">↓</span> (전력피크 회피)')
+    +cr('보일러 탱크 단열','ON','열손실<span class="corr-dn">↓68%</span> · 보일러부하<span class="corr-cost">↓</span> ✅고효율')
+    +cr('외부 보일러 집중공급','ON','세척조 개별 히터<span class="corr-dn">↓60%</span> · 전기부하<span class="corr-dn">↓</span> (온수 집중 관리)')
+    +cr('보충수량','↑','보일러 가열부하<span class="corr-cost">↑</span> (폐열회수로 예열 시 절감)')
+    +cr('유입 수온','↑','보일러 ΔT<span class="corr-dn">↓</span> · 가열부하<span class="corr-dn">↓</span> (폐열회수 열교환기 효과)')
+    +'</tbody></table>';
+
+  // ── 핵심 트레이드오프 ──
+  h+='<div class="corr-sect">⚖️ 효율 ↔ 투자비 트레이드오프</div>';
+  h+='<div class="tradeoff"><div class="tradeoff-h">1. 탈수 투자 vs 건조 에너지</div><div class="tradeoff-b">에어나이프·블로어를 강화(투자↑)하면 잔류수분이 줄어 <b>건조 열부하가 급감</b>합니다. 건조 히터가 최대 소비원이므로, 탈수 투자가 운전비·총에너지 모두에서 이득입니다. → <b class="corr-eff">탈수에 먼저 투자</b></div></div>';
+  h+='<div class="tradeoff"><div class="tradeoff-h">2. 단열 투자 vs 유지 전력</div><div class="tradeoff-b">저수조·보일러 탱크 단열은 저렴한 투자로 유지 열손실을 40~68% 줄입니다. 회수기간이 가장 짧은 절감책입니다. → <b class="corr-eff">우선 적용</b></div></div>';
+  h+='<div class="tradeoff"><div class="tradeoff-h">3. 배수펌프 공용 vs 개별</div><div class="tradeoff-b">공용 1대(투자↓)는 배수시간이 늘어 사이클타임이 증가하고, 단별 개별(투자↑)은 동시 배수로 처리량이 높습니다. 처리량 목표에 따라 선택합니다.</div></div>';
+  h+='<div class="tradeoff"><div class="tradeoff-h">4. 순환 재사용 vs 덕트 투자</div><div class="tradeoff-b">열풍 순환 재사용률을 높이면(덕트·열교환 투자↑) 신선공기 가열부하가 크게 줄어 건조 에너지를 절감합니다. 가동시간이 길수록 회수가 빠릅니다.</div></div>';
+
+  // ── 최적화 우선순위 ──
+  h+='<div class="corr-sect">🎯 최적 설계 우선순위 (효율·투자비 균형)</div>';
+  h+='<table class="corr-tbl"><thead><tr><th style="width:8%">순위</th><th style="width:30%">조치</th><th>효과 / 회수</th></tr></thead><tbody>'
+    +'<tr><td class="var">1</td><td class="var">저수조·보일러 단열</td><td>유지열손실 40~68%↓ · <span class="corr-eff">회수 가장 빠름</span></td></tr>'
+    +'<tr><td class="var">2</td><td class="var">가스보일러+온수 집중공급</td><td>열원단가↓ · 세척조 전기히터 60%↓</td></tr>'
+    +'<tr><td class="var">3</td><td class="var">탈수(에어나이프) 강화</td><td>건조 열부하 급감 · <span class="corr-eff">최대 에너지 절감</span></td></tr>'
+    +'<tr><td class="var">4</td><td class="var">배수 폐열회수</td><td>보충수 예열 → 보일러 20~30%↓</td></tr>'
+    +'<tr><td class="var">5</td><td class="var">열풍 순환 재사용 60~80%</td><td>건조 신선공기 가열부하↓ (덕트 투자)</td></tr>'
+    +'<tr><td class="var">6</td><td class="var">심야전력 예열</td><td>전력단가 약 40%↓ (운영 조치)</td></tr>'
+    +'</tbody></table>';
+
+  h+='</div></div>';
+  return h;
+}
+
+function cr(v,op,eff){
+  return '<tr><td class="var">'+v+'</td><td style="text-align:center;font-weight:800;color:#5e35b1;">'+op+'</td><td>'+eff+'</td></tr>';
+}
+
 function fld(id,label,unit,val){return '<div class="fl"><label>'+label+'</label><input type="number" id="'+id+'" value="'+val+'"><span class="un">'+unit+'</span></div>';}
 function sel(id,label,opts,cur){let o=opts.map(x=>'<option value="'+x[0]+'"'+(x[0]===cur?' selected':'')+'>'+x[1]+'</option>').join('');return '<div class="fl"><label>'+label+'</label><select id="'+id+'">'+o+'</select></div>';}
 
