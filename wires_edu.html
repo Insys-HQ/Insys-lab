@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>YAESU C4FM·WIRES-X·PDN·MMDVM 교육 및 구축 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#173f66;
+  --text:#22282f;
+  --sub:#555c64;
+  --line:#ccd4dc;
+}
+*{box-sizing:border-box}
+body{
+  font-family:"Noto Sans KR",Arial,sans-serif;
+  line-height:1.7;
+  color:var(--text);
+  background:#f4f6f8;
+  margin:0;
+  font-size:14px; /* mobile-first 기본 폰트 */
+}
+main{
+  max-width:1100px;
+  margin:0 auto;
+  background:#ffffff;
+  padding:20px 16px;
+  box-shadow:0 2px 15px rgba(0,0,0,.08);
+}
+h1{
+  color:var(--navy);
+  border-bottom:4px solid var(--navy);
+  padding-bottom:10px;
+  margin:0 0 12px;
+  font-size:1.4rem;
+}
+h2{
+  color:var(--navy);
+  border-left:6px solid var(--navy);
+  padding-left:10px;
+  margin:24px 0 8px;
+  font-size:1.15rem;
+}
+h3{
+  color:var(--text);
+  margin:16px 0 8px;
+  font-size:1.05rem;
+}
+p{margin:8px 0}
+table{border-collapse:collapse;width:100%;margin:10px 0;font-size:.95em}
+th,td{border:1px solid var(--line);padding:8px;vertical-align:top}
+th{background:#e9f0f6;color:var(--navy)}
+.box{padding:12px 14px;margin:12px 0;border-radius:6px}
+.ok{background:#edf7ed;border-left:5px solid #2f7a34;color:#1f4b23}
+.warn{background:#fdeeee;border-left:5px solid #b93030;color:#6e1f1f}
+.info{background:#eef5fb;border-left:5px solid #3978a8;color:#1e4a67}
+pre{background:#f6f7f8;padding:14px;white-space:pre-wrap;border-radius:4px;font-size:.9em;color:var(--text)}
+.small{font-size:.85em;color:var(--sub)}
+a{color:#155e9a}
+ul,ol{padding-left:20px;margin:8px 0}
+footer{
+  margin-top:24px;
+  padding-top:12px;
+  border-top:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:6px;
+  font-size:.8em;
+  color:var(--sub);
+}
+
+/* PC(768px 이상)에서 폰트 확대 및 여백 확장 */
+@media (min-width:768px){
+  body{font-size:16px}
+  main{padding:40px 52px}
+  h1{font-size:1.9rem}
+  h2{font-size:1.4rem;margin-top:32px}
+  h3{font-size:1.15rem}
+}
+</style>
+</head>
+<body>
+<main>
+<h1>YAESU C4FM · WIRES-X · PDN · MMDVM 교육 및 구축 가이드</h1>
+<p><b>목적:</b> 대한적십자사 서울지사 재난대응 하이브리드 무선망과 개인 C4FM 연구용 시스템을 이해하기 위한 교육자료입니다.</p>
+<p><b>검증 원칙:</b> YAESU 공식 최신 노드 안내, 공식 매뉴얼 및 MMDVM 공식 프로젝트 자료를 우선했습니다. 공식 자료로 확인되지 않는 기능은 사실로 단정하지 않고 <b>현장 검증 필요</b>로 표시했습니다.</p>
+
+<div class="box warn"><b>중요한 정정</b><br>
+이전 설명에서 "PDN이면 아날로그 FM도 자동으로 인터넷으로 전달된다"는 식으로 단정한 부분은 정확하지 않습니다.
+YAESU는 <b>Portable Digital Node Mode</b>와 <b>Portable HRI Mode</b>를 구분합니다.
+아날로그 FM을 인터넷망과 연계하려면 <b>Portable HRI Mode</b>를 검토해야 합니다.
+또한 "LTE가 연결되면 3개 거점이 자동으로 아날로그 중계기가 된다"는 것도 실제 설정과 시험으로 확인해야 합니다.</div>
+
+<h2>1. 용어부터 이해하기</h2>
+<table>
+<tr><th>용어</th><th>정확한 의미</th><th>이번 시스템에서의 의미</th></tr>
+<tr><td>RF</td><td>무선 주파수를 이용한 실제 무선 구간</td><td>145.620MHz VHF, 전국망 UHF 등</td></tr>
+<tr><td>FM</td><td>아날로그 주파수 변조</td><td>기존 봉사원 아날로그 통신</td></tr>
+<tr><td>C4FM</td><td>YAESU System Fusion 계열의 디지털 방식</td><td>YAESU 디지털 무전기 통신</td></tr>
+<tr><td>AMS</td><td>Automatic Mode Select. FM/C4FM 신호에 따라 모드를 자동 선택</td><td>아날로그·디지털 혼용 운용</td></tr>
+<tr><td>WIRES-X</td><td>YAESU의 인터넷 기반 아마추어무선 통신 시스템</td><td>RF와 인터넷을 연결</td></tr>
+<tr><td>Node</td><td>무선망과 인터넷망을 연결하는 WIRES-X 접점</td><td>신월동·마장동·이동차</td></tr>
+<tr><td>Room</td><td>여러 WIRES-X 노드가 접속할 수 있는 커뮤니티 공간</td><td>신월동 Host에서 운영하려는 공간</td></tr>
+<tr><td>HRI-200</td><td>YAESU WIRES-X 연결용 인터페이스</td><td>신월동 Host 구성</td></tr>
+<tr><td>PDN</td><td>Portable Digital Node. 대응 C4FM 무전기와 PC를 연결해 WIRES-X 노드로 운용</td><td>마장동·이동차에서 검토</td></tr>
+<tr><td>Portable Digital Node Mode</td><td>C4FM 디지털 통신을 인터넷과 연결하는 PDN 방식</td><td>아날로그 FM 연계 목적이라면 이것만으로 판단하면 안 됨</td></tr>
+<tr><td>Portable HRI Mode</td><td>C4FM Digital과 Analog FM을 모두 인터넷과 연계할 수 있는 PDN 방식</td><td>145.620MHz 아날로그 연계에서 핵심 검토 대상</td></tr>
+<tr><td>MMDVM</td><td>Multi-Mode Digital Voice Modem. 여러 디지털 음성 모드를 처리하는 범용 모뎀 계열</td><td>개인 C4FM 연구용 대안</td></tr>
+<tr><td>MMDVMHost</td><td>MMDVM과 네트워크를 연결하는 호스트 프로그램</td><td>Raspberry Pi 또는 PC에서 운용 가능</td></tr>
+<tr><td>YSF</td><td>System Fusion 네트워크에서 사용되는 디지털 음성 네트워크 용어</td><td>개인 연구망에서 활용</td></tr>
+</table>
+
+<h2>2. 가장 중요한 개념</h2>
+<pre>아날로그 FM / C4FM
+        │
+        ▼
+      무전기
+        │
+        ├── RF ───────────► 다른 무전기
+        │
+        ▼
+ WIRES-X / MMDVM 계층
+        │
+        ▼
+      인터넷
+        │
+        ▼
+ 다른 Node / Room / YSF 네트워크</pre>
+<div class="box warn"><b>인터넷 연결 ≠ WIRES-X 연결 ≠ RF 재송신</b><br>
+LTE 라우터가 인터넷에 연결되었다는 사실만으로 무전기가 자동으로 다른 거점의 RF를 중계하는 것은 아닙니다.</div>
+
+<h2>3. FTM-510D</h2>
+<p>YAESU 공식 자료에서 FTM-510D는 VHF/UHF 듀얼밴드 C4FM/FM 모빌 무전기이며 WIRES-X Portable Digital Node 대응 기종 목록에 포함됩니다.</p>
+<table><tr><th>항목</th><th>확인 내용</th></tr>
+<tr><td>밴드</td><td>VHF 144MHz대 / UHF 430MHz대</td></tr>
+<tr><td>모드</td><td>FM / C4FM</td></tr>
+<tr><td>출력</td><td>VHF 최대 55W / UHF 최대 50W (공식 카탈로그)</td></tr>
+<tr><td>WIRES-X</td><td>Portable Digital Node 대응</td></tr>
+<tr><td>PC 연결</td><td>YAESU SCU-58 등 지정 연결 케이블</td></tr></table>
+<p class="small">출처: <a href="https://www.yaesu.com/Files/E481AE42-1B78-7375-E6063867085AFCC1/FTM-510D%20Series_catalog_ENG_2508.pdf" target="_blank" rel="noopener">YAESU FTM-510D 공식 카탈로그</a></p>
+
+<h2>4. HRI-200과 WIRES-X Host</h2>
+<p>YAESU의 최신 WIRES-X 노드 안내에서는 HRI-200 노드를 PC + HRI-200 + 대응 트랜시버로 구성하고, 인터넷과 무선을 연결하는 WIRES-X 노드로 설명합니다.</p>
+<div class="box ok"><b>신월동 Host 목표 구성</b><br>
+FTM-510D + HRI-200 + Windows PC + LTE 인터넷을 이용하여 WIRES-X Host/Node를 구성하고 Room을 운영하는 중심 노드로 사용하는 구조입니다.</div>
+<p>최신 YAESU 안내는 WIRES-X PC Software Ver.2.000 이상, Windows 11, RAM 4GB 이상, 저장공간 64GB 이상, USB 2.0, 유선 LAN 권장 및 8Mbps 이상의 인터넷 회선을 제시합니다.</p>
+<p class="small">출처: <a href="https://yaesu.com/jp/en/wires-x/node/index.php" target="_blank" rel="noopener">YAESU WIRES-X Opening a Node</a></p>
+
+<h2>5. 공인 IP와 포트</h2>
+<table><tr><th>구성</th><th>최신 YAESU 안내</th></tr>
+<tr><td>일반 HRI-200 노드</td><td>일반적인 최신 운용에서 Global IP/포트 개방이 필수라고 명시하지 않음</td></tr>
+<tr><td>Portable Digital Node</td><td>Global IP 불필요</td></tr>
+<tr><td>Portable HRI Mode</td><td>Global IP 불필요</td></tr>
+<tr><td>Legacy Room</td><td>구형 Ver.1.570 이전 노드와 연결되는 Room을 만들 때만 동적/고정 Global IP 및 UDP 46114, 46120, 46122 필요</td></tr></table>
+<div class="box info"><b>따라서</b> "WIRES-X는 공인 IP가 반드시 필요하다"도 아니고 "어떤 경우에도 필요 없다"도 아닙니다. 최신 일반 운용과 Legacy Room을 구분해야 합니다.</div>
+<p class="small">출처: <a href="https://yaesu.com/jp/en/wires-x/node/index.php" target="_blank" rel="noopener">YAESU 최신 WIRES-X 노드 안내</a></p>
+
+<h2>6. PDN의 두 운용 방식</h2>
+<h3>6-1. Portable Digital Node Mode</h3>
+<p>YAESU는 이 방식을 C4FM 디지털 통신만 인터넷과 연결하는 방식으로 설명합니다. Direct Operation에서는 PC에 연결된 무전기의 마이크 신호가 PC와 인터넷으로 전달되고 인터넷 신호는 해당 무전기 스피커에서 들립니다. 이 모드에서는 해당 PDN 무전기가 공중 RF로 송수신하지 않는다고 명시합니다.</p>
+<div class="box warn"><b>중요:</b> 145.620MHz 아날로그 봉사원 통신을 인터넷망과 연계하려는 목적이라면 Portable Digital Node Mode만으로는 부족합니다.</div>
+
+<h3>6-2. Portable HRI Mode</h3>
+<p>YAESU는 Portable HRI Mode를 C4FM Digital과 Analog FM 모두 인터넷과 통신할 수 있는 방식으로 설명합니다.</p>
+<p>Access Point 운용에서는 별도의 로컬 C4FM 무전기가 PDN 무전기와 RF로 통신하고, PDN 무전기가 로컬 C4FM/Analog 신호를 인터넷으로 전달하며 인터넷에서 온 Node/Room 신호를 로컬 무전기로 송신하는 구조를 설명합니다.</p>
+<div class="box ok"><b>적십자 시스템에서 핵심 확인사항:</b><br>
+마장동과 이동차에서 145.620MHz 아날로그 봉사원 통신까지 WIRES-X 인터넷망과 연계하려면 FTM-510D의 Portable HRI Mode / Access Point 운용이 목표 구조에 맞는지 실제 설정으로 확인해야 합니다.</div>
+<p class="small">출처: <a href="https://www.yaesu.com/jp/en/wires-x/pdf/WIRES-X_PDN_Function_OM_ENG_1902-C.pdf" target="_blank" rel="noopener">YAESU WIRES-X PDN Function Manual</a></p>
+
+<h2>7. 적십자 3거점 목표 구조</h2>
+<pre>                 [ 신월동 ]
+        FTM-510D + HRI-200 + Windows PC
+                     │
+                  LTE 인터넷
+                     │
+              ┌──────┴──────┐
+              │             │
+           [마장동]       [이동통신차]
+          FTM-510D        FTM-510D
+       PDN / HRI 검토   PDN / HRI 검토
+              │             │
+             LTE           LTE
+
+      ───────── 145.620 MHz VHF ─────────
+       서울 봉사원 / 현장 아날로그 무전기</pre>
+<p>위 그림은 구축 목표 구조입니다. 실제 아날로그 RF가 어떤 방식으로 WIRES-X에 들어가고 다른 거점에서 RF로 나오는지는 선택한 PDN/Portable HRI 운용방식과 설정을 실제 장비로 확인해야 합니다.</p>
+
+<h2>8. 재난 발생 시 활용</h2>
+<ol>
+<li>이동통신차가 현장으로 출동합니다.</li>
+<li>현장 봉사원들은 145.620MHz 아날로그 FM으로 직접 교신합니다.</li>
+<li>현장 접근 봉사원이 이동통신차의 RF 도달권에 들어오면 직접 교신합니다.</li>
+<li>원거리 봉사원이 신월동 또는 마장동과 RF 교신이 가능하면 해당 거점을 통한 통신 경로를 확보하는 것이 목표입니다.</li>
+<li>그 RF 통신을 LTE/WIRES-X를 통해 이동통신차까지 연결하는 기능은 실제 Portable HRI/Access Point 설정으로 검증합니다.</li>
+</ol>
+<div class="box warn"><b>금지해야 할 단정:</b> "3개의 FTM-510D가 같은 주파수에서 자동으로 중계기가 된다."<br>
+정확한 표현은 "RF와 WIRES-X 인터넷 경로를 설정하여 원하는 브리지 기능을 구현하고 실제 통신 경로를 시험한다"입니다.</div>
+
+<h2>9. 매주 화요일 21시 정기교신</h2>
+<p>145.620MHz 아날로그 FM 정기교신은 주간 통신망 점검훈련으로 활용할 수 있습니다.</p>
+<ul><li>봉사원 무전기 정상 여부</li><li>지역별 RF 도달상태</li><li>3개 거점 노드 상태</li><li>LTE 연결상태</li><li>인터넷 브리지 경로</li><li>재난 시 통신 숙련도</li></ul>
+
+<h2>10. 전국 아날로그 광역망 연계</h2>
+<p>전국 광역망이 UHF를 사용한다는 현재 설계 조건에서는 <b>마장동 FTM-510D만 전국 광역망 주파수로 전환</b>하는 운용을 목표로 합니다.</p>
+<table><tr><th>상태</th><th>신월동</th><th>마장동</th><th>이동차</th></tr>
+<tr><td>서울 로컬</td><td>145.620</td><td>145.620</td><td>145.620</td></tr>
+<tr><td>전국망 필요</td><td>145.620 유지</td><td>UHF 전국망 채널</td><td>145.620 유지</td></tr></table>
+<p>전국망과 서울망 사이의 실제 음성 게이트웨이 구성은 광역망 운용규칙과 WIRES-X 설정을 별도로 검증해야 합니다.</p>
+
+<h2>11. 직접 RF와 LTE 연결</h2>
+<pre>① 직접 RF
+봉사원 ───── RF ───── 이동통신차
+
+② 인터넷 경로
+봉사원 ─ RF ─ 기지국 ─ WIRES-X ─ LTE ─ 이동통신차</pre>
+<p>두 경로가 동시에 존재할 수 있지만 같은 음성이 RF와 인터넷 경로를 모두 거쳐 다시 RF로 나오면 지연, 에코, 중복수신 또는 루프가 생길 수 있으므로 실제 시험이 필요합니다.</p>
+
+<h2>12. 개인 C4FM 연구망 — MMDVM</h2>
+<p>MMDVM은 Multi-Mode Digital Voice Modem 계열의 범용 디지털 모뎀입니다. MMDVMHost 공식 프로젝트는 MMDVM/DVMega와 네트워크 사이를 연결하며 D-Star, DMR, P25, NXDN, System Fusion(YSF), POCSAG, FM 등을 지원한다고 설명합니다.</p>
+<p>또한 MMDVMHost는 32/64비트 Linux와 Windows(Visual Studio 2022, x86/x64)에서 빌드할 수 있다고 공식 프로젝트에 명시되어 있습니다.</p>
+<pre>C4FM 무전기
+      │
+    MMDVM
+      │
+ MMDVMHost
+      │
+YSF Gateway / Network
+      │
+   인터넷
+      │
+해외 YSF / 관련 네트워크</pre>
+<p class="small">출처: <a href="https://github.com/g4klx/MMDVM-Host" target="_blank" rel="noopener">MMDVMHost 공식 GitHub</a> · <a href="https://github.com/g4klx/YSFClients" target="_blank" rel="noopener">YSFClients 공식 GitHub</a></p>
+
+<h2>13. Raspberry Pi와 Mini PC 비교</h2>
+<table><tr><th>항목</th><th>Raspberry Pi</th><th>Mini PC</th></tr>
+<tr><td>전력</td><td>낮은 편</td><td>일반적으로 더 높음</td></tr>
+<tr><td>크기</td><td>매우 작음</td><td>소형이지만 Pi보다 큼</td></tr>
+<tr><td>OS</td><td>Linux 중심</td><td>Windows/Linux 선택 폭이 넓음</td></tr>
+<tr><td>MMDVMHost</td><td>지원</td><td>Windows/Linux 지원</td></tr>
+<tr><td>연구·분석</td><td>좋음</td><td>매우 좋음</td></tr>
+<tr><td>원격관리</td><td>가능</td><td>Windows 환경에서 편리</td></tr>
+<tr><td>저장장치</td><td>구성에 따라 microSD 등</td><td>SSD 구성 용이</td></tr>
+</table>
+<p><b>중요:</b> MMDVM은 Raspberry Pi 전용이 아닙니다. 공식 MMDVMHost 프로젝트가 Linux와 Windows를 모두 지원합니다.</p>
+
+<h2>14. 개인국을 YAESU C4FM 핸디로 구성</h2>
+<p>개인 연구 목적이라면 FTM-510D 대신 C4FM 지원 YAESU 핸디를 사용할 수 있습니다.</p>
+<pre>YAESU C4FM 핸디
+       │
+MMDVM / 적절한 인터페이스
+       │
+Raspberry Pi 또는 Mini PC
+       │
+YSF 네트워크 / Reflector</pre>
+<p>특정 핸디 모델의 PC 연결 방식과 MMDVM 인터페이스 호환성은 모델별 매뉴얼을 확인한 후 결정해야 합니다.</p>
+
+<h2>15. 3,520원 LTE 요금제</h2>
+<div class="box warn"><b>월 3,520원이라는 가격만으로 "충분하다"고 판단하면 안 됩니다.</b><br>
+월 데이터 제공량, 소진 후 속도, LTE 라우터 사용 가능 여부, 테더링 제한, 통신망 등을 확인해야 합니다.</div>
+<p>실제 투자 전 1회선을 먼저 개통하여 WIRES-X를 24~72시간 운용하고 데이터 사용량을 측정하는 것이 가장 안전합니다.</p>
+
+<h2>16. 실제 투자 전 1차 검증 순서</h2>
+<table><tr><th>단계</th><th>시험</th><th>통과 기준</th></tr>
+<tr><td>1</td><td>FTM-510D ↔ PC</td><td>정상 인식</td></tr>
+<tr><td>2</td><td>WIRES-X 설치/로그인</td><td>정상 실행 및 노드 등록</td></tr>
+<tr><td>3</td><td>LTE 라우터</td><td>인터넷 안정</td></tr>
+<tr><td>4</td><td>WIRES-X 연결</td><td>Node/Room 접속</td></tr>
+<tr><td>5</td><td>Portable HRI/Access Point</td><td>아날로그 FM ↔ 인터넷 경로 확인</td></tr>
+<tr><td>6</td><td>두 번째 노드</td><td>양방향 음성 확인</td></tr>
+<tr><td>7</td><td>145.620MHz</td><td>직접 RF와 인터넷 경로 구분</td></tr>
+<tr><td>8</td><td>24~72시간</td><td>끊김·재부팅·LTE 장애 확인</td></tr>
+<tr><td>9</td><td>데이터 사용량</td><td>3,520원 요금제 적정성 확인</td></tr>
+<tr><td>10</td><td>3거점 확대</td><td>1차 검증 통과 후 집행</td></tr></table>
+
+<h2>17. 구축 전 체크리스트</h2>
+<ul>
+<li>□ FTM-510D 펌웨어 확인</li><li>□ WIRES-X PC 소프트웨어 최신 버전 확인</li>
+<li>□ SCU-58 및 드라이버 확인</li><li>□ HRI-200 Host 운용 방식 확인</li>
+<li>□ 마장동/이동차의 Portable Digital Node와 Portable HRI Mode 구분</li>
+<li>□ 아날로그 FM 인터넷 연계 시 Portable HRI/Access Point 설정 확인</li>
+<li>□ LTE 라우터에서 실제 WIRES-X 연결 확인</li>
+<li>□ Legacy Room 여부와 Global IP/UDP 포트 필요성 확인</li>
+<li>□ 145.620MHz 직접 RF 시험</li><li>□ RF → 인터넷 → RF 전체 경로 시험</li>
+<li>□ 동일 주파수 중복 송신·에코 시험</li><li>□ 마장동 UHF 전국망 전환 시험</li>
+<li>□ LTE 데이터 사용량 측정</li><li>□ 24~72시간 연속 운용시험</li>
+</ul>
+
+<h2>18. 최종 결론</h2>
+<div class="box ok">
+<b>확정적으로 이해할 내용</b><br>
+1. FTM-510D는 FM과 C4FM을 지원하는 VHF/UHF 무전기입니다.<br>
+2. WIRES-X는 YAESU의 인터넷 기반 시스템입니다.<br>
+3. HRI-200은 공식 WIRES-X 노드 구성에 사용하는 인터페이스입니다.<br>
+4. FTM-510D는 Portable Digital Node 대응 기종입니다.<br>
+5. Portable Digital Node Mode와 Portable HRI Mode는 기능이 다릅니다.<br>
+6. 아날로그 FM을 인터넷과 연계하려면 Portable HRI Mode/Access Point 운용을 검토해야 합니다.<br>
+7. MMDVMHost는 System Fusion/YSF를 지원하고 Linux와 Windows에서 운용할 수 있습니다.
+</div>
+<div class="box warn">
+<b>투자 전에 반드시 실증할 내용</b><br>
+3개 거점의 FTM-510D가 145.620MHz 아날로그 통신을 어떤 방식으로 LTE/WIRES-X를 통해 상호 연결하고 RF로 재송신하는지는 단순 장비 연결만으로 보장된다고 가정하지 않습니다.
+<b>1개 노드 → 2개 노드 → 3개 노드</b> 순으로 실제 시험한 후 최종 구축비를 집행합니다.
+</div>
+
+<h2>19. 공식 참고자료</h2>
+<ol>
+<li><a href="https://yaesu.com/jp/en/wires-x/node/index.php" target="_blank" rel="noopener">YAESU WIRES-X Opening a Node</a></li>
+<li><a href="https://www.yaesu.com/jp/en/wires-x/pdf/WIRES-X_PDN_Function_OM_ENG_1902-C.pdf" target="_blank" rel="noopener">YAESU WIRES-X PDN Function Manual</a></li>
+<li><a href="https://www.yaesu.com/Files/451D7430-C9DC-65ED-A634186CE87D2F4D/HRI-200_Manual_ENG_2510-P.pdf" target="_blank" rel="noopener">YAESU HRI-200 Instruction Manual</a></li>
+<li><a href="https://www.yaesu.com/Files/E481AE42-1B78-7375-E6063867085AFCC1/FTM-510D%20Series_catalog_ENG_2508.pdf" target="_blank" rel="noopener">YAESU FTM-510D Series 공식 카탈로그</a></li>
+<li><a href="https://github.com/g4klx/MMDVM-Host" target="_blank" rel="noopener">MMDVMHost 공식 GitHub</a></li>
+<li><a href="https://github.com/g4klx/YSFClients" target="_blank" rel="noopener">YSFClients 공식 GitHub</a></li>
+</ol>
+<p class="small">※ 주파수·출력·중계 및 아마추어무선국 운용은 해당 무선국의 허가조건과 관련 규정을 준수해야 합니다.</p>
+
+<footer>
+<span>대한적십자사 서울특별시지사 재난대응봉사회</span>
+<span>v1.0 · 2026-08-30</span>
+</footer>
+</main>
+</body>
+</html>
