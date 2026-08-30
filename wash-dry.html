@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>세척·탈수·건조 통합설비 시뮬레이터 v1.0 | 인시스 AI혁신 연구개발실</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0d2137; --teal:#0d7fa8; --steel:#3a6b8a; --ink:#152535;
+  --wash:#0d7fa8; --dewat:#e08a1e; --dry:#c0392b;
+  --bg:#eef2f6; --card:#fff; --line:#dde5ee;
+  --good:#2e7d32; --warn:#e65100; --bad:#c62828;
+}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;}
+@media(min-width:768px){body{font-size:15px;}}
+
+/* 헤더 */
+.hdr{background:linear-gradient(120deg,#0d2137 0%,#0d7fa8 100%);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.hdr-inner{max-width:1200px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.hdr-t{font-size:17px;font-weight:900;letter-spacing:-.3px;}
+.hdr-s{font-size:11px;opacity:.85;font-weight:400;margin-top:1px;}
+.hdr-r{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.hdr-r a,.hdr-r button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;padding:4px 11px;border-radius:7px;font-size:11px;font-weight:700;font-family:inherit;text-decoration:none;cursor:pointer;}
+.hdr-r button.on{background:#fff;color:var(--navy);}
+.vb{background:rgba(255,255,255,.25);padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;}
+
+.wrap{max-width:1200px;margin:0 auto;padding:10px 14px;}
+.wrap.mobile{max-width:430px;}
+
+/* 공정 스텝 탭 */
+.proctab{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.proctab button{flex:1;min-width:80px;background:#fff;border:2px solid var(--line);border-radius:9px;padding:8px 6px;font-family:inherit;font-size:12px;font-weight:700;color:#7a90a4;cursor:pointer;transition:.2s;}
+.proctab button .pe{font-size:16px;display:block;margin-bottom:2px;}
+.proctab button.on{color:#fff;border-color:transparent;}
+.proctab button.on.pw{background:var(--wash);}
+.proctab button.on.pd{background:var(--dewat);}
+.proctab button.on.pr{background:var(--dry);}
+.proctab button.on.po{background:var(--steel);}
+.proctab button.on.ps{background:var(--navy);}
+
+.layout{display:grid;grid-template-columns:1fr;gap:12px;}
+@media(min-width:960px){.layout{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);}}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.ch{padding:9px 13px;background:#f6f9fc;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.ch .ci{font-size:16px;}
+.ch .cl{font-size:14px;font-weight:800;color:var(--navy);}
+.ch .cq{margin-left:auto;font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px;background:#e3f0f8;color:var(--teal);}
+.cb{padding:11px 13px;}
+
+.st{font-size:12px;font-weight:800;color:var(--steel);margin:10px 0 6px;padding-bottom:3px;border-bottom:1px dashed var(--line);}
+.st:first-child{margin-top:0;}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+@media(max-width:520px){.g3{grid-template-columns:1fr 1fr;}}
+.fl{display:flex;flex-direction:column;gap:3px;}
+.fl label{font-size:11px;font-weight:600;color:#5a7088;}
+.fl input,.fl select{border:1.5px solid #c5d5e5;border-radius:7px;padding:5px 8px;font-size:13px;font-family:inherit;font-weight:600;color:var(--ink);background:#fff;}
+.fl input:focus,.fl select:focus{outline:none;border-color:var(--teal);}
+.fl .un{font-size:10px;color:#9aabb8;}
+.s-rec{background:#e3f4fd !important;border-color:#0d7fa8 !important;}
+.s-auto{background:#e8f5e9 !important;border-color:#43a047 !important;}
+.s-user{background:#fff9e6 !important;border-color:#d4a017 !important;}
+.s-ro{background:#eef1f4 !important;color:#7a8a99 !important;}
+
+/* 슬라이더 */
+.sv{background:#f8fafc;border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin-bottom:7px;}
+.sv-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:6px;}
+.sv-l{font-size:12px;font-weight:700;color:#1a3a5a;}
+.sv-r{display:flex;align-items:center;gap:5px;}
+.sv-n{width:62px;border:1.5px solid #c5d5e5;border-radius:6px;padding:3px 6px;font-size:13px;font-weight:700;text-align:right;font-family:inherit;color:var(--ink);}
+.sv-u{font-size:10px;color:#9aabb8;min-width:26px;}
+.sv-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:7px;}
+.sv-badge.opt{background:#d4edda;color:#155724;}
+.sv-badge.low{background:#fff3cd;color:#856404;}
+.sv-badge.high{background:#f8d7da;color:#721c24;}
+.sv-bar{position:relative;background:#e3eaf0;border-radius:7px;height:24px;overflow:hidden;}
+.sv-opt{position:absolute;top:0;height:100%;background:rgba(46,125,50,.13);border-left:2px solid rgba(46,125,50,.4);border-right:2px solid rgba(46,125,50,.4);}
+.sv-fill{position:absolute;top:0;left:0;height:100%;border-radius:7px 0 0 7px;transition:width .3s,background .3s;display:flex;align-items:center;justify-content:flex-end;padding-right:7px;}
+.sv-fill span{font-size:10px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3);}
+.sv-range{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;}
+.sv-mm{display:flex;justify-content:space-between;font-size:9px;color:#9aabb8;margin-top:2px;}
+.sv-state{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;}
+.sv-si{font-size:10px;padding:1px 7px;border-radius:6px;font-weight:600;border:1px solid;}
+.sv-si.o{border-color:#2e7d32;background:#e8f5e9;color:#1b5e20;}
+.sv-si.c{border-color:#0d7fa8;background:#e3f4fd;color:#0b5a80;}
+.sv-si.w{border-color:#f9a825;background:#fff8e1;color:#e65100;}
+.sv-si.b{border-color:#c62828;background:#ffebee;color:#b71c1c;}
+
+/* KPI */
+.kpi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+@media(max-width:520px){.kpi{grid-template-columns:1fr 1fr;}}
+.kc{border-radius:10px;padding:10px 8px;text-align:center;}
+.kc .kv{font-size:19px;font-weight:900;}
+.kc .kl{font-size:10px;font-weight:600;margin-top:1px;opacity:.85;}
+.kc.k1{background:linear-gradient(135deg,#e3f2fd,#bbdefb);color:#0d47a1;}
+.kc.k2{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);color:#1b5e20;}
+.kc.k3{background:linear-gradient(135deg,#fff3e0,#ffe0b2);color:#e65100;}
+.kc.k4{background:linear-gradient(135deg,#f3e5f5,#e1bee7);color:#6a1b9a;}
+.kc.k5{background:linear-gradient(135deg,#fce4ec,#f8bbd0);color:#ad1457;}
+.kc.k6{background:linear-gradient(135deg,#e0f2f1,#b2dfdb);color:#00695c;}
+
+/* 전기료/효율 */
+.cost{background:#fffdf5;border:1px solid #f0e4c0;border-radius:10px;padding:10px 12px;margin-top:10px;}
+.cost-h{font-size:13px;font-weight:800;color:#8a6d00;margin-bottom:8px;}
+.cost-in{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:9px;}
+.cost-fl{display:flex;align-items:center;gap:4px;}
+.cost-fl label{font-size:11px;color:#6a5a2a;font-weight:600;}
+.cost-fl input{width:54px;border:1.5px solid #e0d090;border-radius:6px;padding:3px 6px;font-size:12px;font-weight:700;text-align:right;font-family:inherit;color:#5a4a1a;}
+.cost-fl span{font-size:10px;color:#9a8a5a;}
+.cost-res{display:flex;gap:8px;flex-wrap:wrap;}
+.cost-it{flex:1;min-width:88px;background:#fff;border:1px solid #ede0b8;border-radius:8px;padding:6px 8px;text-align:center;}
+.cost-it.hl{background:#fff3cd;border-color:#ffc107;}
+.cost-it .cl2{font-size:10px;color:#8a7a4a;}
+.cost-it .cv{font-size:15px;font-weight:800;color:#6a5310;margin-top:1px;}
+.cost-it.hl .cv{color:#b8860b;}
+
+.save{margin-top:9px;padding-top:9px;border-top:1px dashed #e0d090;}
+.save-h{font-size:12px;font-weight:800;color:#2e7d32;margin-bottom:6px;}
+.save-i{font-size:11px;color:#3a5a3a;padding:4px 8px;background:#f1f8f1;border-left:3px solid #66bb6a;border-radius:0 6px 6px 0;margin-bottom:4px;}
+
+/* 표 */
+.tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;}
+.tbl th{background:#eaf2f8;color:var(--navy);padding:5px 6px;text-align:center;font-weight:700;border:1px solid #d5e2ec;font-size:11px;}
+.tbl td{padding:4px 6px;text-align:center;border:1px solid #e5ecf2;}
+.tbl td.hi{font-weight:800;color:var(--teal);}
+.tbl .tg{display:inline-block;padding:1px 7px;border-radius:6px;font-size:10px;font-weight:700;}
+.tg-g{background:#d4edda;color:#155724;}
+.tg-w{background:#fff3cd;color:#856404;}
+.tg-r{background:#f8d7da;color:#721c24;}
+
+.rec{background:#f0f7ff;border:1px solid #cfe3f5;border-radius:9px;padding:9px 11px;margin-top:9px;}
+.rec-i{font-size:11px;color:#1a4060;padding:3px 0;line-height:1.55;}
+
+.hide{display:none !important;}
+.note{font-size:10px;color:#9aabb8;margin-top:5px;line-height:1.5;}
+footer{text-align:center;font-size:10px;color:#7a90a4;padding:14px;}
+.flowbar{display:flex;align-items:stretch;gap:4px;margin-bottom:10px;overflow-x:auto;}
+.flowstep{flex:1;min-width:66px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 5px;text-align:center;font-size:10px;position:relative;}
+.flowstep .fe{font-size:15px;display:block;}
+.flowstep .fn{font-weight:700;color:var(--navy);margin-top:1px;}
+.flowstep .fv{font-size:9px;color:var(--teal);font-weight:700;margin-top:1px;}
+.flowstep.aw{border-top:3px solid var(--wash);}
+.flowstep.ad{border-top:3px solid var(--dewat);}
+.flowstep.ar{border-top:3px solid var(--dry);}
+</style>
+</head>
+<body>
+<div class="hdr">
+<div class="hdr-inner">
+  <div>
+    <div class="hdr-t">🏭 세척·탈수·건조 통합설비 시뮬레이터</div>
+    <div class="hdr-s">인시스 AI혁신 연구개발실 | 효율↑ 투자비↓ 최적 설계</div>
+  </div>
+  <div class="hdr-r">
+    <a href="https://insys-hq.github.io/Insys-lab/wash-dry.html" target="_blank" rel="noopener">🔗 바로가기</a>
+    <button class="on" id="bPC">PC</button>
+    <button id="bMB">모바일</button>
+    <span class="vb">v1.0</span>
+  </div>
+</div>
+</div>
+
+<div class="wrap" id="wrap">
+
+  <!-- 공정 흐름 요약 -->
+  <div class="flowbar" id="flowbar"></div>
+
+  <!-- 공정 탭 -->
+  <div class="proctab">
+    <button class="on pw" data-tab="wash"><span class="pe">💧</span>세척</button>
+    <button class="pd" data-tab="dewat"><span class="pe">💨</span>탈수</button>
+    <button class="pr" data-tab="dry"><span class="pe">🔥</span>건조</button>
+    <button class="po" data-tab="util"><span class="pe">♨️</span>온수·유틸</button>
+    <button class="ps" data-tab="result"><span class="pe">📊</span>종합결과</button>
+  </div>
+
+  <div class="layout">
+    <!-- 좌: 입력 -->
+    <div id="leftCol"></div>
+    <!-- 우: 결과 -->
+    <div id="rightCol"></div>
+  </div>
+</div>
+
+<footer>인시스 AI혁신 연구개발실 · 세척·탈수·건조 통합설비 시뮬레이터 v1.0 · 2026</footer>
+
+<script>
+// ═══════════════════════════════════════════════
+// 세척·탈수·건조 통합설비 시뮬레이터 v1.0
+// ═══════════════════════════════════════════════
+const VER='1.0';
+const gi=id=>document.getElementById(id);
+const gv=id=>{const e=gi(id);return e?e.value:'';};
+const HP_PER_KW=1.341;
+
+// 상태 (기본값)
+const S={
+  // 세척
+  itemW:600,itemD:400,itemH:300,itype:'box',qty:200,dlv:3,
+  wZones:3,wHole:2.5,wPress:200,wCol:4,wRow:3,wTemp:60,
+  wTankL:1500,wTankW:800,wTankD:600,wTankIns:true,
+  drainCount:1,drainHead:8,
+  // 탈수
+  knifeCount:4,knifeAng:50,knifeVel:60,knifePress:15,blowerCount:1,
+  // 건조
+  dryTemp:80,dryAirVol:30,dryRecirc:70,heaterCount:2,
+  // 온수/유틸
+  boilerType:'gas',boilerTankL:1000,boilerIns:true,makeupWater:300,inletTemp:15,
+  convKW:1.5,
+  // 전기료
+  hours:8,days:22,rate:130,gasRate:900
+};
+
+// ── 물리 계산 함수 ──
+function nozzleQ(holeMm,presKPa){const Cd=0.62,r=holeMm/1000/2,A=Math.PI*r*r;return Cd*Math.sqrt(2*presKPa*1000/1000)*A*1000*60;}
+function pumpPowerKW(lpm,headM,eff){const Q=lpm/60000;return 1000*9.81*Q*headM/eff/1000;}
+function lpmToKW(lpm,presKPa,eff){return (lpm/60000*presKPa*1000)/eff/1000;}
+
+// 탱크 용량 (치수 기반)
+function tankVol(L,W,D){return Math.round(L*W*D*0.75/1e6);} // L, 75%충진
+
+// 히터 유지전력 (단열여부 반영)
+function heaterMaintainKW(tankL,temp,insulated){
+  const coef=insulated?0.022:0.045; // 단열 시 열손실계수 절반↓
+  return tankL*coef*(Math.max(0,temp-20)/40);
+}
+
+// 에어나이프 풍량 (m³/min)
+function knifeAirFlow(itemW_mm,slotW_mm,velMs,count){
+  const A=(itemW_mm/1000)*(slotW_mm/1000); // 슬롯 단면적 m²
+  return A*velMs*60*count; // m³/min
+}
+// 링블로어 동력
+function blowerKW(airM3min,pressKPa,eff){return (airM3min/60)*pressKPa*1000/eff/1000;}
+
+// 건조 열부하 (kW)
+function dryerKW(residualKgH,airVolM3min,dTemp,recircPct){
+  const evap=residualKgH*2260/3600; // 증발 잠열
+  const airHeat=(airVolM3min/60)*1.2*1005*dTemp/1000;
+  const fresh=airHeat*(1-recircPct/100); // 순환 재사용분 제외
+  return evap+fresh;
+}
+
+// 탈수 후 잔류수분 추정 (에어나이프 성능 기반)
+function residualWater(qtyPerH,knifeCount,knifeVel,knifeAng){
+  // 기본 잔류 8kg/h → 나이프 성능으로 감소
+  const base=qtyPerH*0.04; // 개당 40g 잔류 가정
+  const effCount=Math.min(1,knifeCount/4);
+  const effVel=Math.min(1,knifeVel/60);
+  const effAng=1-Math.abs(knifeAng-50)/100; // 50°가 최적
+  const removeEff=0.5+0.4*(effCount*effVel*effAng);
+  return base*(1-removeEff);
+}
+
+// ═══════════════════════════════════════════════
+// 슬라이더 컴포넌트
+// ═══════════════════════════════════════════════
+function sliderHTML(id,label,unit,min,max,step,val,optMin,optMax){
+  return '<div class="sv" id="sv-'+id+'">'
+    +'<div class="sv-h"><span class="sv-l">'+label+'</span>'
+    +'<div class="sv-r"><span class="sv-badge" id="bd-'+id+'">—</span>'
+    +'<input class="sv-n" type="number" id="'+id+'" value="'+val+'" min="'+min+'" max="'+max+'" step="'+step+'">'
+    +'<span class="sv-u">'+unit+'</span></div></div>'
+    +'<div class="sv-bar"><div class="sv-opt" id="op-'+id+'"></div><div class="sv-fill" id="fl-'+id+'"></div>'
+    +'<input type="range" class="sv-range" id="rg-'+id+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"></div>'
+    +'<div class="sv-mm"><span>'+min+unit+'</span><span>'+max+unit+'</span></div>'
+    +'<div class="sv-state" id="ss-'+id+'" data-optmin="'+optMin+'" data-optmax="'+optMax+'" data-unit="'+unit+'"></div></div>';
+}
+function updateSlider(id){
+  const el=gi(id),rg=gi('rg-'+id),fl=gi('fl-'+id),op=gi('op-'+id),bd=gi('bd-'+id),ss=gi('ss-'+id);
+  if(!el||!fl)return;
+  const val=+el.value,min=+el.min,max=+el.max;
+  const optMin=+ss.dataset.optmin,optMax=+ss.dataset.optmax,unit=ss.dataset.unit;
+  const pct=Math.min(100,Math.max(0,(val-min)/(max-min)*100));
+  const pMin=Math.min(100,Math.max(0,(optMin-min)/(max-min)*100));
+  const pMax=Math.min(100,Math.max(0,(optMax-min)/(max-min)*100));
+  let status='opt',stxt='✅ 최적',scls='o';
+  if(val<optMin){status='low';stxt='⚠️ 부족';scls='w';}
+  else if(val>optMax){status='high';stxt='🔴 초과';scls='b';}
+  const colors={opt:'linear-gradient(90deg,#2e7d32,#43a047)',low:'linear-gradient(90deg,#f57f17,#ffb300)',high:'linear-gradient(90deg,#c62828,#e53935)'};
+  fl.style.width=pct+'%';fl.style.background=colors[status];fl.innerHTML='<span>'+val+'</span>';
+  op.style.left=pMin+'%';op.style.width=(pMax-pMin)+'%';
+  bd.textContent=stxt;bd.className='sv-badge '+status;
+  if(rg&&+rg.value!==val)rg.value=val;
+  ss.innerHTML='<span class="sv-si o">최적 '+optMin+'~'+optMax+unit+'</span>'
+    +'<span class="sv-si c">현재 '+val+unit+'</span>'
+    +'<span class="sv-si '+scls+'">'+stxt+'</span>';
+}
+function bindSlider(id){
+  const el=gi(id),rg=gi('rg-'+id);
+  if(!el||!rg)return;
+  rg.addEventListener('input',()=>{el.value=rg.value;el.classList.add('s-user');onChange(id);});
+  el.addEventListener('input',()=>{rg.value=el.value;el.classList.add('s-user');onChange(id);});
+}
+
+// 입력값 → S 갱신
+function syncState(){
+  ['itemW','itemD','itemH','qty','dlv','wZones','wHole','wPress','wCol','wRow','wTemp',
+   'wTankL','wTankW','wTankD','drainCount','drainHead','knifeCount','knifeAng','knifeVel',
+   'knifePress','blowerCount','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL',
+   'makeupWater','inletTemp','convKW','hours','days','rate','gasRate'].forEach(k=>{
+    const e=gi(k); if(e&&e.value!=='') S[k]=+e.value;
+  });
+  const it=gi('itype'); if(it) S.itype=it.value;
+  const bt=gi('boilerType'); if(bt) S.boilerType=bt.value;
+  const wi=gi('wTankIns'); if(wi) S.wTankIns=wi.checked;
+  const bi=gi('boilerIns'); if(bi) S.boilerIns=bi.checked;
+}
+
+let _tab='wash';
+function onChange(id){ syncState(); if(id&&gi(id))updateSlider(id); calcAll(); renderRight(); }
+
+// ═══════════════════════════════════════════════
+// 종합 계산
+// ═══════════════════════════════════════════════
+let R={};
+function calcAll(){
+  syncState();
+  const qtyH=S.qty;
+  // 세척
+  const qEach=nozzleQ(S.wHole,S.wPress);
+  const nPerFace=S.wCol*S.wRow;
+  const faces=S.itype==='box'?4:2;
+  const washFlow=qEach*nPerFace*faces*1.15;
+  const washPumpKW=lpmToKW(washFlow,S.wPress,0.75);
+  const tankL=tankVol(S.wTankL,S.wTankW,S.wTankD);
+  const washHeaterEach=heaterMaintainKW(tankL,S.wTemp,S.wTankIns);
+  const washHeaterTotal=washHeaterEach*S.wZones; // 단수만큼 유지히터 합산
+  const washPumpTotal=washPumpKW*S.wZones;
+  // 배수펌프
+  const drainFlow=tankL/3; // 3분 배수
+  const drainKW=pumpPowerKW(drainFlow,S.drainHead,0.6)*S.drainCount;
+  // 탈수
+  const airFlow=knifeAirFlow(S.itemW,1,S.knifeVel,S.knifeCount);
+  const blowKW=blowerKW(airFlow,S.knifePress,0.65)*S.blowerCount;
+  const residual=residualWater(qtyH,S.knifeCount,S.knifeVel,S.knifeAng);
+  // 건조
+  const dryKW=dryerKW(residual,S.dryAirVol,S.dryTemp-20,S.dryRecirc)*1;
+  // 온수 보일러
+  const boilerHeatKW=(S.makeupWater*4.18*(S.wTemp-S.inletTemp))/3600;
+  const boilerLossKW=heaterMaintainKW(S.boilerTankL,S.wTemp,S.boilerIns);
+  const boilerTotalKW=boilerHeatKW+boilerLossKW;
+  // 전기 총부하 (보일러가 가스면 전기 제외)
+  const elecHeater=(S.boilerType==='electric')?boilerTotalKW:0;
+  const gasLoad=(S.boilerType==='gas')?boilerTotalKW:0;
+  // 세척조 히터: 외부 보일러가 온수 공급하면 세척조 개별 히터는
+  // 보조 유지용만 필요 (보일러가 주 열원). 보일러 있으면 세척조 히터 60% 경감
+  const washHeatElec = washHeaterTotal * 0.4;
+  const elecTotal=washPumpTotal+drainKW+blowKW+dryKW+washHeatElec+elecHeater+S.convKW;
+  const elecReal=washPumpTotal+drainKW+blowKW*1+dryKW*0.7+washHeatElec*0.35+elecHeater*0.35+S.convKW;
+
+  // 커버리지·세척율(간이)
+  const covF=Math.min(100,(nPerFace*8000)/(S.itemD*S.itemH)*100);
+  const washEff=Math.min(99,50+S.wZones*10+(S.wTemp-40)*0.3-(S.dlv-1)*4);
+  const dewatEff=Math.min(99,(1-residual/(qtyH*0.04))*100);
+  const dryEff=Math.min(99,60+S.dryTemp*0.3+S.dryRecirc*0.15);
+
+  R={qEach,washFlow,washPumpKW,washPumpTotal,tankL,washHeaterEach,washHeaterTotal,
+     drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,
+     elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,covF,nPerFace,faces,
+     washHeatElec,elecHeater};
+}
+
+// ═══════════════════════════════════════════════
+// 좌측 패널 렌더 (탭별)
+// ═══════════════════════════════════════════════
+function renderLeft(){
+  const L=gi('leftCol'); let h='';
+  if(_tab==='wash'){
+    h='<div class="card"><div class="ch"><span class="ci">💧</span><span class="cl">세척부 설계</span><span class="cq">노즐·펌프·저수조</span></div><div class="cb">'
+      +'<div class="st">피세척물</div><div class="g3">'
+      +fld('itemW','가로','mm',S.itemW)+fld('itemD','세로','mm',S.itemD)+fld('itemH','높이','mm',S.itemH)
+      +'</div><div class="g2" style="margin-top:6px;">'
+      +sel('itype','종류',[['box','박스(4면)'],['tray','트레이(2면)']],S.itype)
+      +fld('qty','시간당 처리량','개/h',S.qty)+'</div>'
+      +'<div class="st">세척 노즐</div>'
+      +sliderHTML('wHole','💧 홀 직경','mm',0.5,10,0.1,S.wHole,2,3)
+      +sliderHTML('wPress','🔧 분사압력','kPa',50,600,10,S.wPress,150,280)
+      +'<div class="g2">'+fld('wCol','가로 노즐수','개',S.wCol)+fld('wRow','세로 노즐수','개',S.wRow)+'</div>'
+      +sliderHTML('wTemp','🌡️ 세척온도','°C',20,90,1,S.wTemp,50,65)
+      +'<div class="g2" style="margin-top:6px;">'+fld('wZones','세척 단수','단',S.wZones)+'<div class="fl"><label>세척조 단열</label><label style="display:flex;align-items:center;gap:6px;font-size:12px;margin-top:4px;"><input type="checkbox" id="wTankIns" '+(S.wTankIns?'checked':'')+'> 단열재 적용</label></div></div>'
+      +'<div class="st">저수조 치수</div><div class="g3">'
+      +fld('wTankL','길이','mm',S.wTankL)+fld('wTankW','폭','mm',S.wTankW)+fld('wTankD','깊이','mm',S.wTankD)+'</div>'
+      +'<div class="st">배수펌프</div><div class="g2">'
+      +fld('drainCount','펌프 댓수','대',S.drainCount)+fld('drainHead','양정','m',S.drainHead)+'</div>'
+      +'</div></div>';
+  } else if(_tab==='dewat'){
+    h='<div class="card"><div class="ch"><span class="ci">💨</span><span class="cl">탈수부 설계</span><span class="cq">에어나이프·링블로어</span></div><div class="cb">'
+      +'<div class="st">에어나이프</div>'
+      +sliderHTML('knifeCount','🔪 나이프 개수','개',2,8,1,S.knifeCount,4,6)
+      +sliderHTML('knifeAng','📐 분사 각도','°',20,80,1,S.knifeAng,45,60)
+      +sliderHTML('knifeVel','💨 토출 속도','m/s',30,120,5,S.knifeVel,55,80)
+      +sliderHTML('knifePress','🔧 나이프 압력','kPa',5,40,1,S.knifePress,12,20)
+      +'<div class="st">링블로어</div>'
+      +'<div class="g2">'+fld('blowerCount','블로어 댓수','대',S.blowerCount)+'</div>'
+      +'<div class="note">💡 에어나이프 각도 45~60°(제품 진행 역방향)에서 물 제거 효율 최대. 탈수 강화 시 건조 열부하가 급감합니다.</div>'
+      +'</div></div>';
+  } else if(_tab==='dry'){
+    h='<div class="card"><div class="ch"><span class="ci">🔥</span><span class="cl">건조부 설계</span><span class="cq">열풍기·순환</span></div><div class="cb">'
+      +'<div class="st">열풍 건조</div>'
+      +sliderHTML('dryTemp','🌡️ 열풍 온도','°C',40,140,5,S.dryTemp,70,100)
+      +sliderHTML('dryAirVol','🌀 열풍 풍량','m³/min',10,80,5,S.dryAirVol,25,45)
+      +sliderHTML('dryRecirc','♻️ 순환 재사용','%',0,90,5,S.dryRecirc,60,80)
+      +'<div class="g2" style="margin-top:6px;">'+fld('heaterCount','열풍기 댓수','대',S.heaterCount)+'</div>'
+      +'<div class="note">💡 순환 재사용률↑ → 신선공기 가열부하↓ (덕트 투자 필요). 탈수 성능이 좋으면 건조 온도·풍량을 낮춰 에너지 절감.</div>'
+      +'</div></div>';
+  } else if(_tab==='util'){
+    h='<div class="card"><div class="ch"><span class="ci">♨️</span><span class="cl">온수·유틸리티</span><span class="cq">보일러·단열</span></div><div class="cb">'
+      +'<div class="st">온수 보일러 (외부 설치)</div>'
+      +'<div class="g2">'+sel('boilerType','열원',[['gas','가스보일러'],['electric','전기보일러']],S.boilerType)
+      +'<div class="fl"><label>보일러 탱크 단열</label><label style="display:flex;align-items:center;gap:6px;font-size:12px;margin-top:4px;"><input type="checkbox" id="boilerIns" '+(S.boilerIns?'checked':'')+'> 단열재 적용</label></div></div>'
+      +'<div class="g3" style="margin-top:6px;">'+fld('boilerTankL','보일러탱크','L',S.boilerTankL)+fld('makeupWater','보충수량','L/h',S.makeupWater)+fld('inletTemp','유입수온','°C',S.inletTemp)+'</div>'
+      +'<div class="st">기타</div><div class="g2">'+fld('convKW','컨베이어','kW',S.convKW)+'</div>'
+      +'<div class="note">💡 외부 보일러+단열탱크로 온수 집중공급 시 세척조 개별 히터는 유지열손실만 부담 → 전기부하 대폭 절감.</div>'
+      +'</div></div>';
+  } else if(_tab==='result'){
+    h='<div class="card"><div class="ch"><span class="ci">📊</span><span class="cl">전기료·가스비 예측</span></div><div class="cb">'
+      +'<div class="cost-in">'
+      +'<div class="cost-fl"><label>가동시간</label><input type="number" id="hours" value="'+S.hours+'"><span>h/일</span></div>'
+      +'<div class="cost-fl"><label>가동일수</label><input type="number" id="days" value="'+S.days+'"><span>일/월</span></div>'
+      +'<div class="cost-fl"><label>전력단가</label><input type="number" id="rate" value="'+S.rate+'"><span>원/kWh</span></div>'
+      +'<div class="cost-fl"><label>가스단가</label><input type="number" id="gasRate" value="'+S.gasRate+'"><span>원/m³</span></div>'
+      +'</div><div id="costResult"></div></div></div>';
+  }
+  L.innerHTML=h;
+  // 슬라이더 바인딩
+  L.querySelectorAll('.sv-n').forEach(el=>{updateSlider(el.id);bindSlider(el.id);});
+  // 일반 입력 바인딩
+  L.querySelectorAll('input:not(.sv-n):not(.sv-range),select').forEach(el=>{
+    el.addEventListener('input',()=>onChange(el.id));
+    el.addEventListener('change',()=>{ if(el.id==='itype'||el.id==='boilerType'){renderLeft();} onChange(el.id);});
+  });
+}
+function fld(id,label,unit,val){return '<div class="fl"><label>'+label+'</label><input type="number" id="'+id+'" value="'+val+'"><span class="un">'+unit+'</span></div>';}
+function sel(id,label,opts,cur){let o=opts.map(x=>'<option value="'+x[0]+'"'+(x[0]===cur?' selected':'')+'>'+x[1]+'</option>').join('');return '<div class="fl"><label>'+label+'</label><select id="'+id+'">'+o+'</select></div>';}
+
+// ═══════════════════════════════════════════════
+// 우측 결과 렌더
+// ═══════════════════════════════════════════════
+function renderRight(){
+  calcAll();
+  renderFlow();
+  const Rc=gi('rightCol');
+  const totalEff=((R.washEff+R.dewatEff+R.dryEff)/3);
+  let h='<div class="card"><div class="ch"><span class="ci">📈</span><span class="cl">통합 성능·에너지</span></div><div class="cb">'
+    +'<div class="kpi">'
+    +kc('k1',R.washEff.toFixed(0)+'%','세척 효율')
+    +kc('k2',R.dewatEff.toFixed(0)+'%','탈수 효율')
+    +kc('k3',R.dryEff.toFixed(0)+'%','건조 효율')
+    +kc('k4',R.elecTotal.toFixed(1),'전기정격(kW)')
+    +kc('k5',R.elecReal.toFixed(1),'전기실운전(kW)')
+    +kc('k6',R.gasLoad>0?R.gasLoad.toFixed(1)+'kW':'—','가스부하')
+    +'</div>';
+  // 공정별 전력표
+  h+='<table class="tbl"><thead><tr><th>공정</th><th>설비</th><th>정격(kW)</th><th>실운전(kW)</th></tr></thead><tbody>'
+    +row('세척','순환펌프×'+S.wZones,R.washPumpTotal,R.washPumpTotal)
+    +row('세척','유지히터×'+S.wZones,R.washHeaterTotal,R.washHeaterTotal*0.35)
+    +row('세척','배수펌프×'+S.drainCount,R.drainKW,R.drainKW)
+    +row('탈수','링블로어×'+S.blowerCount,R.blowKW,R.blowKW)
+    +row('건조','열풍기',R.dryKW,R.dryKW*0.7)
+    +row('공통','컨베이어',S.convKW,S.convKW)
+    +(R.elecHeater>0?row('온수','전기보일러',R.elecHeater,R.elecHeater*0.35):'')
+    +'</tbody></table>';
+  if(R.gasLoad>0) h+='<div class="note">※ 가스보일러 부하 '+R.gasLoad.toFixed(1)+'kW는 가스비로 별도 계산 (전기 제외)</div>';
+  h+='</div></div>';
+
+  // 최적화 권장
+  h+='<div class="card"><div class="ch"><span class="ci">🎯</span><span class="cl">효율·투자비 최적화 권장</span></div><div class="cb">'+buildRecommend()+'</div></div>';
+  Rc.innerHTML=h;
+
+  // 종합결과 탭이면 전기료 렌더
+  if(_tab==='result') renderCost();
+}
+function kc(cls,v,l){return '<div class="kc '+cls+'"><div class="kv">'+v+'</div><div class="kl">'+l+'</div></div>';}
+function row(p,e,rated,real){return '<tr><td>'+p+'</td><td>'+e+'</td><td class="hi">'+rated.toFixed(1)+'</td><td>'+real.toFixed(1)+'</td></tr>';}
+
+function renderFlow(){
+  const f=gi('flowbar');
+  f.innerHTML=
+    fs('aw','💧','세척',R.washEff.toFixed(0)+'%')
+    +fs('ad','💨','탈수',R.dewatEff.toFixed(0)+'%')
+    +fs('ar','🔥','건조',R.dryEff.toFixed(0)+'%')
+    +fs('','⚡','전기',R.elecReal.toFixed(1)+'kW')
+    +fs('','♨️','온수',(R.gasLoad>0?'가스':'전기'));
+}
+function fs(cls,e,n,v){return '<div class="flowstep '+cls+'"><span class="fe">'+e+'</span><span class="fn">'+n+'</span><span class="fv">'+v+'</span></div>';}
+
+function buildRecommend(){
+  const recs=[];
+  if(!S.wTankIns) recs.push('🧥 <b>세척 저수조 단열 미적용</b> → 단열재 적용 시 유지열손실 약 50%↓ (단당 '+(heaterMaintainKW(R.tankL,S.wTemp,false)-heaterMaintainKW(R.tankL,S.wTemp,true)).toFixed(1)+'kW 절감)');
+  if(!S.boilerIns) recs.push('🧥 <b>보일러 탱크 단열 미적용</b> → 단열 시 손실 68%↓');
+  if(S.boilerType==='electric') recs.push('♨️ <b>전기보일러 사용 중</b> → 가스보일러 전환 시 열원단가 절감 (전기 대비 가스 kWh당 약 40~60%↓)');
+  if(S.knifeAng<45||S.knifeAng>60) recs.push('📐 <b>에어나이프 각도 '+S.knifeAng+'°</b> → 45~60°로 조정 시 물 제거 효율↑ → 건조부하↓');
+  if(S.knifeCount<4) recs.push('🔪 <b>나이프 '+S.knifeCount+'개</b> → 4개 이상 시 잔류수분↓ → 건조 열부하 감소 (탈수 투자가 건조 에너지보다 저렴)');
+  if(S.dryRecirc<60) recs.push('♻️ <b>열풍 순환 '+S.dryRecirc+'%</b> → 60~80%로 높이면 신선공기 가열부하 대폭↓');
+  if(S.dryTemp>100) recs.push('🌡️ <b>건조온도 '+S.dryTemp+'°C</b> → 탈수 강화로 온도 낮추면 열부하↓');
+  if(S.wTemp>65) recs.push('🌡️ <b>세척온도 '+S.wTemp+'°C</b> → 5°C 인하 시 히터·보일러 부하↓ (세척율 영향 확인)');
+  // 항상 표시되는 원칙
+  recs.push('💡 <b>핵심 원칙</b>: 탈수(에어나이프) 강화 → 건조 열부하 급감. 건조 히터가 가장 큰 에너지 소비원이므로, 탈수에 투자하는 것이 총 에너지·투자비 모두 유리합니다.');
+  return recs.map(r=>'<div class="rec-i">'+r+'</div>').join('');
+}
+
+function renderCost(){
+  const cr=gi('costResult'); if(!cr)return;
+  const elecReal=R.elecReal;
+  const daily=elecReal*S.hours;
+  const monthly=daily*S.days;
+  const cost=monthly*S.rate;
+  // 가스비 (가스보일러)
+  let gasCost=0,gasNote='';
+  if(R.gasLoad>0){
+    // 가스 kW → m³/h (LNG 발열량 약 10.4kWh/m³, 효율 90%)
+    const gasM3H=R.gasLoad/(10.4*0.9);
+    const gasM3Month=gasM3H*S.hours*S.days;
+    gasCost=gasM3Month*S.gasRate;
+    gasNote='<div class="cost-it"><div class="cl2">월 가스</div><div class="cv">'+Math.round(gasM3Month).toLocaleString()+' m³</div></div>';
+  }
+  const totalMonth=cost+gasCost;
+  cr.innerHTML='<div class="cost-res">'
+    +'<div class="cost-it"><div class="cl2">일 전력</div><div class="cv">'+Math.round(daily)+' kWh</div></div>'
+    +'<div class="cost-it"><div class="cl2">월 전력</div><div class="cv">'+Math.round(monthly).toLocaleString()+' kWh</div></div>'
+    +gasNote
+    +'<div class="cost-it hl"><div class="cl2">월 에너지비 합계</div><div class="cv">'+Math.round(totalMonth).toLocaleString()+' 원</div></div>'
+    +'</div>'
+    +'<div class="note">※ 전기 실운전 부하 기준 + 가스비 합산. 심야전력·폐열회수 미반영(추가 절감 여지).</div>'
+    +'<div class="save"><div class="save-h">💰 추가 절감 방안</div>'
+    +'<div class="save-i">🌙 심야전력(23~09시) 예열 활용 → 전력단가 약 40%↓</div>'
+    +'<div class="save-i">♻️ 세척 배수 폐열회수(열교환기)로 보충수 예열 → 보일러 부하 20~30%↓</div>'
+    +'<div class="save-i">💨 탈수 강화로 건조온도 인하 → 건조 열부하가 최대 소비원</div>'
+    +'</div>';
+}
+
+// ═══════════════════════════════════════════════
+// 탭 전환
+// ═══════════════════════════════════════════════
+document.querySelectorAll('.proctab button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.proctab button').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    _tab=btn.dataset.tab;
+    renderLeft(); renderRight();
+  });
+});
+// PC/모바일
+gi('bPC').addEventListener('click',()=>{gi('bPC').classList.add('on');gi('bMB').classList.remove('on');gi('wrap').classList.remove('mobile');});
+gi('bMB').addEventListener('click',()=>{gi('bMB').classList.add('on');gi('bPC').classList.remove('on');gi('wrap').classList.add('mobile');});
+
+// 초기화
+renderLeft();
+renderRight();
+</script>
+</body>
+</html>
