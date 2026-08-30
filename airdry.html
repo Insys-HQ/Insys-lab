@@ -77,6 +77,11 @@ header.topbar{
   padding:12px; margin-bottom:8px;
 }
 .card h2{font-size:15px; padding-bottom:6px; border-bottom:2px solid var(--brand-soft); margin-bottom:8px;}
+.dash-card{
+  position:sticky; top:6px; z-index:40;
+  border:1px solid var(--brand); box-shadow:0 3px 10px rgba(30,77,140,.12);
+}
+.dash-card h2{color:var(--brand-dark);}
 .card h2 .step-no{color:var(--brand); margin-right:4px;}
 .card .desc{font-size:12px; color:var(--sub); margin-bottom:8px;}
 
@@ -181,6 +186,24 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
 
 <div class="wrap">
 
+  <!-- 통합 결과 대시보드 (모든 STEP 공통 상단 고정) -->
+  <section class="card dash-card" id="dashCard">
+    <h2>📊 통합 공정 결과 — 세척 · 탈수 · 건조</h2>
+    <p class="desc">어느 STEP에서든 입력값을 바꾸면 이 그래프와 수치가 즉시 갱신됩니다.</p>
+
+    <div class="kpi-row" id="dashKpi">
+      <div class="kpi"><div class="lb">세척 직후 잔수</div><div class="num" id="dkWash">-</div><div class="unit">mL/매</div></div>
+      <div class="kpi"><div class="lb">탈수 효과</div><div class="num" id="dkDewaterEff">-</div><div class="unit">%</div></div>
+      <div class="kpi"><div class="lb">탈수 후 잔수</div><div class="num" id="dkDewaterResidual">-</div><div class="unit">mL/매</div></div>
+      <div class="kpi"><div class="lb">건조 부하(개략추정)</div><div class="num" id="dkDryLoad">-</div><div class="unit">kW</div></div>
+    </div>
+
+    <div class="canvas-wrap">
+      <canvas id="dashCanvas" width="1000" height="260"></canvas>
+    </div>
+    <p class="legend-hint">막대: 공정 단계별 잔수량(mL/매) · 점선: 목표 탈수율 기준선 · 건조 부하는 3단계 상세 설계 전 개략 추정치입니다.</p>
+  </section>
+
   <div class="step-tabs" id="stepTabs"></div>
 
   <!-- STEP 1 -->
@@ -190,7 +213,7 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
     <div class="grid2">
       <div class="field">
         <label>트레이 프리셋</label>
-        <select id="trayPreset" onchange="applyTrayPreset()">
+        <select id="trayPreset" onchange="applyTrayPreset(); onSim();">
           <option value="A">A형 430×330×150 mm</option>
           <option value="B">B형 320×210×50 mm</option>
           <option value="C">C형 320×210×30 mm</option>
@@ -199,7 +222,7 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
       </div>
       <div class="field">
         <label>재질</label>
-        <select id="trayMaterial">
+        <select id="trayMaterial" onchange="onSim()">
           <option value="PP">PP</option>
           <option value="PE">PE</option>
           <option value="PC">PC</option>
@@ -209,19 +232,19 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
       </div>
       <div class="field">
         <label>길이 L (mm, 진행방향)</label>
-        <input type="number" id="trayL" value="430">
+        <input type="number" id="trayL" oninput="onSim()" value="430">
       </div>
       <div class="field">
         <label>폭 V (mm)</label>
-        <input type="number" id="trayV" value="330">
+        <input type="number" id="trayV" oninput="onSim()" value="330">
       </div>
       <div class="field">
         <label>높이 T (mm)</label>
-        <input type="number" id="trayT" value="150">
+        <input type="number" id="trayT" oninput="onSim()" value="150">
       </div>
       <div class="field">
         <label>중량 (g)</label>
-        <input type="number" id="trayW" value="50">
+        <input type="number" id="trayW" oninput="onSim()" value="50">
       </div>
     </div>
     <div class="pill-note">투입 자세: 세워서 투입, 면이 진행방향과 평행 (세척기 STEP1 조건 승계)</div>
@@ -238,16 +261,16 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
     <div class="grid2">
       <div class="field">
         <label>헹굼 직후 잔수량 (mL/매)</label>
-        <input type="number" id="residualWater" value="18">
+        <input type="number" id="residualWater" oninput="onSim()" value="18">
         <span class="hint">세척기 신수량 0.20 L/매 기준 표면 부착 잔수 추정치. 실측 시 교체.</span>
       </div>
       <div class="field">
         <label>진입 속도 (m/min, 세척기 컨베이어 승계)</label>
-        <input type="number" id="entrySpeed" value="4.00">
+        <input type="number" id="entrySpeed" oninput="onSim()" value="4.00">
       </div>
       <div class="field">
         <label>진입 시 트레이 표면 상태</label>
-        <select id="surfaceState">
+        <select id="surfaceState" onchange="onSim()">
           <option value="film">균일 수막(필름) 상태</option>
           <option value="drop">방울(비드) 형태 잔수</option>
           <option value="pocket">포켓 내부 고임 잔수</option>
@@ -255,7 +278,7 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
       </div>
       <div class="field">
         <label>채널 수 (세척기 동일)</label>
-        <input type="number" id="channels" value="2">
+        <input type="number" id="channels" oninput="onSim()" value="2">
       </div>
     </div>
   </section>
@@ -266,7 +289,7 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
     <div class="grid2">
       <div class="field">
         <label>목표 처리량 (매/hr)</label>
-        <select id="targetRate">
+        <select id="targetRate" onchange="onSim()">
           <option value="600">600</option>
           <option value="800">800</option>
           <option value="1000" selected>1,000</option>
@@ -275,7 +298,7 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
       </div>
       <div class="field">
         <label>목표 탈수율 (%)</label>
-        <input type="number" id="targetEff" value="97">
+        <input type="number" id="targetEff" oninput="onSim()" value="97">
         <span class="hint">트레이 95~99% / 박스 80% 기준. 트레이 기본 97% 권장.</span>
       </div>
     </div>
@@ -316,15 +339,15 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
     <div class="grid2">
       <div class="field">
         <label>슬릿 폭 (mm)</label>
-        <input type="number" id="slitWidth" value="1.5" step="0.1">
+        <input type="number" id="slitWidth" oninput="onSim()" value="1.5" step="0.1">
       </div>
       <div class="field">
         <label>슬릿 길이 (mm, 트레이 이송폭 커버)</label>
-        <input type="number" id="slitLength" value="350">
+        <input type="number" id="slitLength" oninput="onSim()" value="350">
       </div>
       <div class="field">
         <label>블로워 공급압력 기준값 (kPa)</label>
-        <input type="number" id="basePressure" value="12">
+        <input type="number" id="basePressure" oninput="onSim()" value="12">
       </div>
     </div>
     <p class="desc" style="margin-top:6px;">슬릿 간격·각도·거리는 STEP 6에서 동시 조절합니다.</p>
@@ -378,7 +401,7 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
     <div class="grid2">
       <div class="field">
         <label>선정 여유율</label>
-        <select id="blowerMargin">
+        <select id="blowerMargin" onchange="onSim()">
           <option value="1.15">1.15 (표준)</option>
           <option value="1.25">1.25 (여유)</option>
           <option value="1.10">1.10 (최소)</option>
@@ -386,7 +409,7 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
       </div>
       <div class="field">
         <label>대수 구성</label>
-        <select id="blowerCount">
+        <select id="blowerCount" onchange="onSim()">
           <option value="1">1대 (양측 공용)</option>
           <option value="2" selected>2대 (좌/우 개별)</option>
         </select>
@@ -401,14 +424,14 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
     <div class="grid2">
       <div class="field">
         <label>덕트 경로</label>
-        <select id="ductPath">
+        <select id="ductPath" onchange="onSim()">
           <option value="single">단일 헤더 분기</option>
           <option value="dual" selected>좌우 독립 헤더</option>
         </select>
       </div>
       <div class="field">
         <label>소음기 적용</label>
-        <select id="silencer">
+        <select id="silencer" onchange="onSim()">
           <option value="none">미적용</option>
           <option value="basic" selected>흡음형 소음기 적용</option>
         </select>
@@ -423,14 +446,14 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
     <div class="grid2">
       <div class="field">
         <label>낙수 집수 위치</label>
-        <select id="drainPos">
+        <select id="drainPos" onchange="onSim()">
           <option value="lower_tray">하부 집수 트레이 (사선 스윕 낙하 구간)</option>
           <option value="side_gutter">측면 집수 거터</option>
         </select>
       </div>
       <div class="field">
         <label>세척조 리턴 여부</label>
-        <select id="drainReturn">
+        <select id="drainReturn" onchange="onSim()">
           <option value="yes" selected>세척조로 리턴 (여과 후)</option>
           <option value="no">별도 배수 처리</option>
         </select>
@@ -455,7 +478,7 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
       </div>
       <div class="field">
         <label>세척부 길이 (mm, wash.html 값)</label>
-        <input type="number" id="washLength" value="7000">
+        <input type="number" id="washLength" oninput="onSim()" value="7000">
       </div>
     </div>
     <div id="lineResult"></div>
@@ -480,13 +503,13 @@ footer .ver{font-weight:700; color:var(--brand-dark);}
   </section>
 
   <footer>
-    담당: 인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr &nbsp;|&nbsp; airdry.html <span class="ver">v1.0</span>
+    담당: 인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr &nbsp;|&nbsp; airdry.html <span class="ver">v1.1</span>
   </footer>
 </div>
 
 <script>
 /* ===================== 버전 ===================== */
-const APP_VERSION = "v1.0";
+const APP_VERSION = "v1.1";
 
 /* ===================== 상태 ===================== */
 const TRAY_PRESET = {
@@ -666,6 +689,13 @@ function onSim(){
   window.__lastSim = {spacing:p.spacing, angle:p.angle, dist:p.dist, P:p.P, eff, flow};
 
   drawGraph();
+  renderDashboard();
+  renderBlower();
+  renderDuct();
+  renderDrain();
+  renderNoise();
+  renderLine();
+  renderJudge();
 }
 
 function setGraphMode(m){
@@ -840,8 +870,8 @@ function applyOptimal(sp,an,di){
 const BLOWER_SNAP = [1.5,2.2,3.7,5.5,7.5,11,15,18.5]; // kW 규격 스냅
 
 function renderBlower(){
-  const sim = window.__lastSim || {}; onSim();
   const s = window.__lastSim;
+  if(!s) return;
   const margin = Number(document.getElementById('blowerMargin').value)||1.15;
   const count = Number(document.getElementById('blowerCount').value)||2;
   const flowPerUnit = (s.flow*margin)/count;
@@ -879,9 +909,9 @@ function renderDrain(){
 
 /* ===================== STEP10 소음 ===================== */
 function renderNoise(){
-  const s = window.__lastSim || {};
-  onSim();
-  const v0 = exitVelocity(window.__lastSim.P);
+  const s = window.__lastSim;
+  if(!s) return;
+  const v0 = exitVelocity(s.P);
   // 소음 근사: 80 + 20*log10(v0/50) dB(A) 스타일 간이 추정
   const dB = 80 + 20*Math.log10(Math.max(v0,10)/50);
   const silencer = document.getElementById('silencer')?.value || "basic";
@@ -924,8 +954,8 @@ function renderLine(){
 
 /* ===================== 판정 ===================== */
 function renderJudge(){
-  onSim();
   const s = window.__lastSim;
+  if(!s) return;
   const target = Number(document.getElementById('targetEff').value)||97;
   const tray = getTray();
   const items = [];
@@ -1071,6 +1101,66 @@ function saveToFirebase(){
   db.collection('airdry_states').add({...currentFullState(), savedAt:new Date().toISOString()})
     .then(()=>{ statusEl.textContent = "Firebase에 저장되었습니다."; })
     .catch(err=>{ statusEl.textContent = "저장 실패: " + err.message; });
+}
+
+/* ===================== 통합 대시보드 (세척·탈수·건조) ===================== */
+const LATENT_HEAT_KJKG = 2400; // 개략 증발잠열 kJ/kg (상온~온풍 기준)
+
+function renderDashboard(){
+  const s = window.__lastSim;
+  if(!s) return;
+  const washResidual = Number(document.getElementById('residualWater').value)||0; // mL/매
+  const dewaterResidual = washResidual*(1-s.eff/100); // mL/매
+  const rate = Number(document.getElementById('targetRate').value)||1000; // 매/hr
+
+  // 건조 부하 개략 추정: 탈수 후 잔수를 전량 증발시키는 데 필요한 열량
+  const massFlowKgHr = (dewaterResidual/1000) * rate; // kg/hr (물 밀도 1kg/L)
+  const dryLoadKw = massFlowKgHr*LATENT_HEAT_KJKG/3600;
+
+  document.getElementById('dkWash').textContent = washResidual.toFixed(1);
+  document.getElementById('dkDewaterEff').textContent = s.eff.toFixed(1);
+  document.getElementById('dkDewaterResidual').textContent = dewaterResidual.toFixed(2);
+  document.getElementById('dkDryLoad').textContent = dryLoadKw.toFixed(2);
+
+  drawDashboardChart(washResidual, dewaterResidual);
+}
+
+function drawDashboardChart(washResidual, dewaterResidual){
+  const canvas = document.getElementById('dashCanvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.font="12px sans-serif";
+
+  const padL=60, padR=30, padT=20, padB=40;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const stages = [
+    {label:"세척 직후(헹굼)", value:washResidual},
+    {label:"탈수 후", value:dewaterResidual},
+    {label:"건조 후(목표, 개략)", value:dewaterResidual*0.03}
+  ];
+  const maxV = Math.max(...stages.map(s=>s.value), 1)*1.15;
+
+  ctx.strokeStyle="#d1d5db"; ctx.strokeRect(padL,padT,plotW,plotH);
+  ctx.fillStyle="#6b7280";
+
+  const barW = plotW/stages.length*0.5;
+  stages.forEach((st,i)=>{
+    const cx = padL + plotW*(i+0.5)/stages.length;
+    const barH = plotH*(st.value/maxV);
+    const y = padT+plotH-barH;
+    const colors = ["#1e4d8c","#2f8f5b","#c2650a"];
+    ctx.fillStyle = colors[i];
+    ctx.fillRect(cx-barW/2, y, barW, barH);
+    ctx.fillStyle="#1f2937";
+    ctx.fillText(st.value.toFixed(2)+" mL", cx-barW/2, y-6);
+    ctx.fillStyle="#4b5563";
+    ctx.fillText(st.label, cx-barW/2-4, padT+plotH+16);
+  });
+
+  ctx.fillStyle="#6b7280";
+  ctx.save(); ctx.translate(16,padT+plotH/2+20); ctx.rotate(-Math.PI/2); ctx.fillText("잔수량 (mL/매)",0,0); ctx.restore();
 }
 
 /* ===================== 초기화 ===================== */
