@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v1.2 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v1.4 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -37,6 +37,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 .proctab button.on.pr{background:var(--dry);}
 .proctab button.on.po{background:var(--steel);}
 .proctab button.on.pc{background:#5e35b1;}
+.proctab button.on.pm{background:#00838f;}
 .proctab button.on.ps{background:var(--navy);}
 .layout{display:grid;grid-template-columns:1fr;gap:12px;}
 @media(min-width:960px){.layout{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);}}
@@ -147,10 +148,11 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <div class="hdr-s">인시스 AI혁신 연구개발실 | 좌우 2CH 세워서 투입 · 효율↑ 투자비↓</div>
   </div>
   <div class="hdr-r">
-    <a href="https://insys-hq.github.io/Insys-lab/tray-wash.html" target="_blank" rel="noopener">🔗 바로가기</a>
+    <button id="btnSave" style="background:#00c853;">💾 저장</button>
+    <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v1.2</span>
+    <span class="vb">v1.4</span>
   </div>
 </div>
 </div>
@@ -161,6 +163,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button class="pd" data-tab="dewat"><span class="pe">💨</span>탈수</button>
     <button class="pr" data-tab="dry"><span class="pe">🔥</span>건조</button>
     <button class="po" data-tab="util"><span class="pe">♨️</span>온수·유틸</button>
+    <button class="pm" data-tab="mech"><span class="pe">⚙️</span>기구·구조</button>
     <button class="pc" data-tab="corr"><span class="pe">🔗</span>상관관계</button>
     <button class="ps" data-tab="result"><span class="pe">📊</span>종합결과</button>
   </div>
@@ -169,13 +172,35 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <div id="rightCol"></div>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v1.2 · 2026</footer>
+<!-- 저장 모달 -->
+<div id="saveModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#fff;border-radius:12px;max-width:440px;width:100%;padding:18px;">
+    <div style="font-size:16px;font-weight:800;color:#0d2137;margin-bottom:12px;">💾 조건 저장</div>
+    <div class="fl" style="margin-bottom:8px;"><label>저장 이름</label><input type="text" id="saveName" placeholder="예: 600트레이 3단 오염도3" style="border:1.5px solid #c5d5e5;border-radius:7px;padding:7px 9px;font-size:14px;font-family:inherit;"></div>
+    <div class="fl" style="margin-bottom:8px;"><label>현장/메모</label><input type="text" id="saveMemo" placeholder="예: A공장 트레이라인" style="border:1.5px solid #c5d5e5;border-radius:7px;padding:7px 9px;font-size:14px;font-family:inherit;"></div>
+    <div id="saveStatus" style="font-size:13px;min-height:18px;margin-bottom:8px;"></div>
+    <div style="display:flex;gap:8px;">
+      <button id="doSave" style="flex:1;background:#00c853;color:#fff;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">저장</button>
+      <button id="closeSave" style="flex:1;background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">취소</button>
+    </div>
+  </div>
+</div>
+<!-- 불러오기 모달 -->
+<div id="loadModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#fff;border-radius:12px;max-width:520px;width:100%;padding:18px;max-height:80vh;display:flex;flex-direction:column;">
+    <div style="font-size:16px;font-weight:800;color:#0d2137;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">📂 저장된 조건 <span id="loadCount" style="font-size:13px;color:#7a90a4;font-weight:400;"></span></div>
+    <input type="text" id="loadSearch" placeholder="🔍 이름·현장 검색" style="border:1.5px solid #c5d5e5;border-radius:7px;padding:7px 9px;font-size:14px;font-family:inherit;margin-bottom:8px;">
+    <div id="loadList" style="overflow-y:auto;flex:1;">불러오는 중...</div>
+    <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
+  </div>
+</div>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v1.4 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v1.2
+// 트레이 세척·탈수·건조 시뮬레이터 v1.4
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='1.2';
+const VER='1.4';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -193,7 +218,11 @@ const S={
   // 온수/유틸
   boilerType:'gas',boilerTankL:1000,boilerIns:true,makeupWater:250,inletTemp:15,convKW:1.5,
   // 전기료
-  hours:8,days:22,rate:130,gasRate:900
+  hours:8,days:22,rate:130,gasRate:900,
+  // 기구·구조
+  convLen:12000,clipPitch:500,guideRod:true,trayWeight:50,
+  washDryLen:4000,dewatLen:2000,dryLen:4000,ioLen:2000,
+  containerType:'40ft',moduleSplit:true
 };
 const CH=2; // 트레이는 좌우 2CH 고정
 const FACES_PER_CH=2; // 채널당 외벽+격벽 2면
@@ -315,10 +344,13 @@ function bindSlider(id){
   el.addEventListener('input',()=>{rg.value=el.value;el.classList.add('s-user');onChange(id);});
 }
 function syncState(){
-  ['trayW','trayD','trayT','qty','dlv','wZones','wHole','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','makeupWater','inletTemp','convKW','hours','days','rate','gasRate'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
+  ['trayW','trayD','trayT','qty','dlv','wZones','wHole','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','makeupWater','inletTemp','convKW','hours','days','rate','gasRate','convLen','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','ioLen'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
   const bt=gi('boilerType');if(bt)S.boilerType=bt.value;
   const wi=gi('wTankIns');if(wi)S.wTankIns=wi.checked;
   const bi=gi('boilerIns');if(bi)S.boilerIns=bi.checked;
+  const gr=gi('guideRod');if(gr)S.guideRod=gr.checked;
+  const ms=gi('moduleSplit');if(ms)S.moduleSplit=ms.checked;
+  const ct=gi('containerType');if(ct)S.containerType=ct.value;
 }
 let _tab='wash';
 function onChange(id){syncState();if(id&&gi(id))updateSlider(id);calcAll();renderRight();}
@@ -440,10 +472,36 @@ function renderLeft(){
       +'<div class="st">기타</div><div class="g2">'+fld('convKW','컨베이어','kW',S.convKW)+'</div>'
       +'<div class="note">💡 외부 보일러+단열탱크로 온수 집중공급 시 세척조 개별 히터는 유지열손실만 부담.</div>'
       +'</div></div>';
+  }else if(_tab==='mech'){
+    h=buildMech();
   }else if(_tab==='corr'){
     h=buildCorr();
   }else if(_tab==='result'){
-    h='<div class="card"><div class="ch"><span class="ci">📊</span><span class="cl">전기료·가스비 예측</span></div><div class="cb">'
+    calcAll();
+    const kt=totalKnives(S.knifePass);
+    const totalLen=S.washDryLen+S.dewatLen+S.dryLen+S.ioLen;
+    // 전체 설계 취합 요약
+    h='<div class="card"><div class="ch"><span class="ci">📊</span><span class="cl">종합 설계 요약 (전 항목 취합)</span><span class="cq">실시간</span></div><div class="cb">'
+      +'<table class="tbl"><thead><tr><th>구분</th><th>항목</th><th>값</th></tr></thead><tbody>'
+      +srow('트레이','규격','트레이 '+S.trayW+'×'+S.trayD+'×'+S.trayT+'mm · '+S.qty+'매/h · 오염도'+S.dlv)
+      +srow('세척','노즐/압력/온도',S.wCol+'×'+S.wRow+'개 · '+S.wPress+'kPa · '+S.wTemp+'°C · '+S.wZones+'단')
+      +srow('세척','펌프/저수조',R.washPumpTotal.toFixed(1)+'kW · 탱크'+R.tankL+'L · 단열'+(S.wTankIns?'O':'X'))
+      +srow('탈수','에어나이프',kt+'개('+S.knifePass+'패스×앞뒤×2CH) · '+S.knifeAng+'° · '+S.knifeVel+'m/s · 이격'+S.knifeGap+'mm')
+      +srow('탈수','링블로어/배관',R.blowerSel.unit.kw+'kW×'+R.blowerSel.count+'대 · 메인'+R.mainDuctSpec)
+      +srow('건조','열풍',S.dryTemp+'°C · '+S.dryAirVol+'m³/min · 순환'+S.dryRecirc+'%')
+      +srow('온수','보일러',(S.boilerType==='gas'?'가스':'전기')+' · 탱크'+S.boilerTankL+'L · 단열'+(S.boilerIns?'O':'X'))
+      +srow('기구','고정/분리','클립'+S.clipPitch+'mm · 가이드봉'+(S.guideRod?'O':'X')+' · 조분리 O')
+      +srow('운송','컨테이너',S.containerType+' · 총'+totalLen+'mm · 모듈분할'+(S.moduleSplit?'O':'X'))
+      +'</tbody></table>'
+      +'<div class="kpi" style="margin-top:10px;">'
+      +kc('k1',R.washEff.toFixed(0)+'%','세척 효율')
+      +kc('k2',R.dewatEff.toFixed(0)+'%','탈수 효율')
+      +kc('k3',R.dryEff.toFixed(0)+'%','건조 효율')
+      +kc('k4',R.elecTotal.toFixed(1),'전기정격kW')
+      +kc('k5',R.elecReal.toFixed(1),'전기실운전kW')
+      +kc('k6',R.gasLoad>0?R.gasLoad.toFixed(1):'—','가스kW')
+      +'</div></div></div>'
+      +'<div class="card"><div class="ch"><span class="ci">💰</span><span class="cl">전기료·가스비 예측</span></div><div class="cb">'
       +'<div class="cost-in">'
       +'<div class="cost-fl"><label>가동시간</label><input type="number" id="hours" value="'+S.hours+'"><span>h/일</span></div>'
       +'<div class="cost-fl"><label>가동일수</label><input type="number" id="days" value="'+S.days+'"><span>일/월</span></div>'
@@ -493,7 +551,15 @@ function renderRight(){
 function kc(c,v,l){return '<div class="kc '+c+'"><div class="kv">'+v+'</div><div class="kl">'+l+'</div></div>';}
 function row(p,e,r,rl){return '<tr><td>'+p+'</td><td>'+e+'</td><td class="hi">'+r.toFixed(1)+'</td><td>'+rl.toFixed(1)+'</td></tr>';}
 function renderFlow(){
-  gi('flowbar').innerHTML=fs('aw','💧','세척',R.washEff.toFixed(0)+'%')+fs('ad','💨','탈수',R.dewatEff.toFixed(0)+'%')+fs('ar','🔥','건조',R.dryEff.toFixed(0)+'%')+fs('','⚡','전기',R.elecReal.toFixed(1)+'kW')+fs('','♨️','온수',R.gasLoad>0?'가스':'전기');
+  // 전체 탭 핵심값 실시간 취합 대시보드
+  gi('flowbar').innerHTML=
+    fs('aw','💧','세척효율',R.washEff.toFixed(0)+'%')
+    +fs('ad','💨','탈수효율',R.dewatEff.toFixed(0)+'%')
+    +fs('ar','🔥','건조효율',R.dryEff.toFixed(0)+'%')
+    +fs('','🔪','나이프',R.knifeTotal+'개')
+    +fs('','💨','블로어',R.blowerSel.unit.kw+'kW×'+R.blowerSel.count)
+    +fs('','⚡','전기',R.elecReal.toFixed(1)+'kW')
+    +fs('','♨️','온수',R.gasLoad>0?'가스':'전기');
 }
 function fs(c,e,n,v){return '<div class="flowstep '+c+'"><span class="fe">'+e+'</span><span class="fn">'+n+'</span><span class="fv">'+v+'</span></div>';}
 function renderBlowerInfo(){
@@ -549,8 +615,54 @@ function renderCost(){
     +'<div class="save-i">💨 트레이는 탈수 강화가 건조 절감의 핵심</div></div>';
 }
 // ── 상관관계 ──
+function buildMech(){
+  syncState();
+  const nClips = Math.floor(S.convLen/S.clipPitch);
+  const totalLen = S.washDryLen+S.dewatLen+S.dryLen+S.ioLen;
+  const cont = {'40ft':{L:12032,W:2352,H:2393,nm:"40ft 컨테이너"},'20ft':{L:5898,W:2352,H:2393,nm:"20ft 컨테이너"}}[S.containerType];
+  const lenFit = totalLen<=cont.L;
+  var h='<div class="card"><div class="ch"><span class="ci">⚙️</span><span class="cl">기구·구조 설계</span><span class="cq">고정·분리·운송</span></div><div class="cb">';
+
+  h+='<div class="chbox" style="background:#e0f7fa;border-color:#80deea;color:#006064;">🍽️ 트레이는 <b>수십 g 경량</b>이라 고압수·에어탈수·열풍 과정에서 체인 컨베이어 이탈 위험이 큽니다. 클립 고정 + 가이드봉 + 조 분리 구조가 필수입니다.</div>';
+
+  h+='<div class="st">① 트레이 고정 (이탈 방지)</div>';
+  h+='<div class="g2">'+fld('trayWeight','트레이 무게','g',S.trayWeight)+fld('clipPitch','클립 간격','mm',S.clipPitch)+'</div>';
+  h+='<div class="g2" style="margin-top:6px;">'+fld('convLen','컨베이어 길이','mm',S.convLen)+'<div class="fl"><label>가이드봉</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="guideRod" '+(S.guideRod?'checked':'')+'> 중간·상단 설치</label></div></div>';
+  h+='<div class="chbox">🔧 <b>긴 클립 + 짧은 클립을 '+S.clipPitch+'mm 간격 교대 배치</b> → 컨베이어 '+S.convLen+'mm에 <b>'+nClips+'쌍</b> ('+(nClips*2)+'개). '+(S.guideRod?'중간·상단 <b>가이드봉</b>으로 상하 이탈 방지.':'⚠️ 가이드봉 미설치 — 상단 이탈 위험')+'</div>';
+
+  h+='<div class="st">② 조(槽) 분리 구조</div>';
+  h+='<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">💧 <b>세척조 ↔ 탈수조 분리</b>: 세척조 하단 수분이 탈수조로 넘어가지 않도록 방수 격벽 + 드립트레이(물받이).<br>💨 <b>탈수조 ↔ 열풍건조기 분리</b>: 몸체는 분리, <b>체인만 관통</b>. 조 사이 실링(브러시/래버린스)으로 수분·열 차단.</div>';
+
+  h+='<div class="st">③ 40ft 컨테이너 운송·현장 조립</div>';
+  h+='<div class="g2">'+sel('containerType','컨테이너',[["40ft","40ft (12032mm)"],["20ft","20ft (5898mm)"]],S.containerType)+'<div class="fl"><label>모듈 분할</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="moduleSplit" '+(S.moduleSplit?'checked':'')+'> 조별 분할 제작</label></div></div>';
+  h+='<div class="st" style="font-size:13px;">모듈별 길이</div><div class="g2">'+fld('washDryLen','세척조','mm',S.washDryLen)+fld('dewatLen','탈수조','mm',S.dewatLen)+'</div>';
+  h+='<div class="g2" style="margin-top:6px;">'+fld('dryLen','건조기','mm',S.dryLen)+fld('ioLen','입출구','mm',S.ioLen)+'</div>';
+  h+='<div class="chbox" style="background:'+(lenFit?'#e8f5e9':'#fff3e0')+';border-color:'+(lenFit?'#a5d6a7':'#ffcc80')+';color:'+(lenFit?'#1b5e20':'#e65100')+';">📦 <b>총 라인 '+totalLen+'mm</b> / '+cont.nm+' 내부 '+cont.L+'mm '+(lenFit?'✅ 단일 적재 가능':'⚠️ 초과 → 조별 분할 운송 필수')+'<br>몸체 폭·높이 <b>'+(cont.W-100)+'×'+(cont.H-100)+'mm 이내</b> 제작 (여유 100mm). '+(S.moduleSplit?'조별 분할 → 컨테이너 적재 → <b>현장 조립</b> (플랜지·볼팅 + 체인 재연결)':'⚠️ 일체형 — 40ft 초과 시 운송 불가')+'</div>';
+
+  h+='<div class="st">구조 요건 체크리스트</div>';
+  h+='<table class="tbl"><tbody>'
+    +mrow('트레이 고정','긴/짧은 클립 '+S.clipPitch+'mm 교대 '+nClips+'쌍', true)
+    +mrow('상하 이탈방지','가이드봉 중간·상단', S.guideRod)
+    +mrow('세척-탈수 분리','방수격벽+드립트레이', true)
+    +mrow('탈수-건조 분리','몸체분리 체인관통+실링', true)
+    +mrow('컨테이너 적재',cont.nm+' '+(lenFit?'단일':'분할'), true)
+    +mrow('현장 조립','모듈 플랜지·볼팅+체인연결', S.moduleSplit)
+    +'</tbody></table>';
+
+  h+='</div></div>';
+  return h;
+}
+function srow(cat,item,val){
+  return '<tr><td style="font-weight:700;color:#0d7fa8;">'+cat+'</td><td style="text-align:left;font-size:13px;">'+item+'</td><td style="text-align:left;font-size:13px;font-weight:600;">'+val+'</td></tr>';
+}
+function mrow(item,detail,ok){
+  return '<tr><td style="text-align:left;font-weight:700;">'+item+'</td><td style="text-align:left;font-size:13px;">'+detail+'</td><td>'+(ok?'<span style="color:#2e7d32;font-weight:800;">✅</span>':'<span style="color:#e65100;font-weight:800;">⚠️</span>')+'</td></tr>';
+}
+
 function buildCorr(){
-  var h='<div class="card"><div class="ch"><span class="ci">🔗</span><span class="cl">트레이 변수 상관관계</span></div><div class="cb">';
+  calcAll();
+  var h='<div class="card"><div class="ch"><span class="ci">🔗</span><span class="cl">트레이 변수 상관관계</span><span class="cq">현재값 반영</span></div><div class="cb">';
+  h+='<div class="corr-intro" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">📊 <b>현재 설정 결과</b>: 세척 '+R.washEff.toFixed(0)+'% · 탈수 '+R.dewatEff.toFixed(0)+'% · 건조 '+R.dryEff.toFixed(0)+'% · 나이프 '+R.knifeTotal+'개 · 블로어 '+R.blowerSel.unit.kw+'kW×'+R.blowerSel.count+'대 · 전기 '+R.elecReal.toFixed(1)+'kW</div>';
   h+='<div class="corr-intro">💡 트레이는 <b>세워서 좌우 2CH 투입</b>되는 평판입니다. <b class="corr-up">↑</b>증가 <b class="corr-dn">↓</b>감소. 핵심은 <b>탈수 강화로 건조 에너지를 줄이는 것</b>입니다.</div>';
   h+='<div class="corr-legend"><span><b class="corr-up">↑증가</b></span><span><b class="corr-dn">↓감소</b></span><span><b class="corr-eff">효율</b></span><span><b class="corr-cost">에너지·비용</b></span></div>';
   h+='<div class="corr-sect">💧 세척부 (2CH)</div><table class="corr-tbl"><thead><tr><th style="width:24%">변수</th><th style="width:8%">조작</th><th>연쇄 영향</th></tr></thead><tbody>'
@@ -596,6 +708,124 @@ document.querySelectorAll('.proctab button').forEach(btn=>{
 });
 gi('bPC').addEventListener('click',()=>{gi('bPC').classList.add('on');gi('bMB').classList.remove('on');gi('wrap').classList.remove('mobile');});
 gi('bMB').addEventListener('click',()=>{gi('bMB').classList.add('on');gi('bPC').classList.remove('on');gi('wrap').classList.add('mobile');});
+
+// ═══════════════════════════════════════════════
+// Firebase REST — 조건 저장/불러오기/수정
+// ═══════════════════════════════════════════════
+const FB_API='AIzaSyC4DWFGGJjJmVlqnfmZaVDdKJWCXK0Yr_g';
+const FB_COL='tray_sessions';
+const FB_BASE='https://firestore.googleapis.com/v1/projects/insys-work/databases/(default)/documents/'+FB_COL;
+let _editId=null; // 수정 중인 문서 ID
+
+async function fbRest(url,opts){
+  opts=opts||{};
+  const sep=url.includes('?')?'&':'?';
+  const r=await fetch(url+sep+'key='+FB_API,opts);
+  if(!r.ok){const t=await r.text();throw new Error('Firebase '+r.status+': '+t.slice(0,150));}
+  return r.json();
+}
+function toFsV(v){
+  if(v===null||v===undefined)return{nullValue:null};
+  if(typeof v==='boolean')return{booleanValue:v};
+  if(typeof v==='number')return{doubleValue:v};
+  if(typeof v==='string')return{stringValue:v};
+  return{stringValue:String(v)};
+}
+function toFields(o){const f={};for(const k in o)if(o[k]!==undefined)f[k]=toFsV(o[k]);return f;}
+function fromFsV(v){
+  if(!v)return null;
+  if('stringValue'in v)return v.stringValue;
+  if('doubleValue'in v)return v.doubleValue;
+  if('integerValue'in v)return Number(v.integerValue);
+  if('booleanValue'in v)return v.booleanValue;
+  return null;
+}
+function fromFields(f){const o={};for(const k in f)o[k]=fromFsV(f[k]);return o;}
+
+// 현재 설정 수집 (모든 S + 결과 요약)
+function collectSettings(){
+  syncState();calcAll();
+  return Object.assign({},S,{
+    _resWashEff:+R.washEff.toFixed(1),_resDewatEff:+R.dewatEff.toFixed(1),
+    _resDryEff:+R.dryEff.toFixed(1),_resElecReal:+R.elecReal.toFixed(1),
+    _resKnifeTotal:R.knifeTotal,_resBlowerKW:+R.blowKW.toFixed(1)
+  });
+}
+// 설정 적용
+function applySettings(d){
+  for(const k in S){ if(d[k]!==undefined) S[k]=d[k]; }
+  // checkbox·select는 S에 반영됨 → renderLeft가 반영
+  renderLeft();renderRight();
+}
+
+// 저장 (신규 or 수정)
+async function doFbSave(){
+  const name=(gi('saveName').value||'').trim();
+  const memo=(gi('saveMemo').value||'').trim();
+  if(!name){gi('saveStatus').innerHTML='<span style="color:#c62828;">이름을 입력하세요</span>';return;}
+  gi('saveStatus').innerHTML='<span style="color:#0d7fa8;">저장 중...</span>';
+  try{
+    const data=collectSettings();
+    const body={fields:toFields(Object.assign({},data,{name,memo,savedAt:new Date().toISOString()}))};
+    if(_editId){
+      await fbRest(FB_BASE+'/'+_editId,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    }else{
+      await fbRest(FB_BASE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    }
+    gi('saveStatus').innerHTML='<span style="color:#2e7d32;">✅ 저장 완료</span>';
+    setTimeout(()=>{gi('saveModal').style.display='none';_editId=null;},800);
+  }catch(e){
+    const is403=String(e.message).includes('403')||String(e.message).includes('PERMISSION');
+    gi('saveStatus').innerHTML='<span style="color:#c62828;">'+(is403?'⚠️ Firebase 규칙에 tray_sessions 추가 필요':e.message)+'</span>';
+  }
+}
+// 목록 불러오기
+async function fbLoadList(kw){
+  const list=gi('loadList');list.innerHTML='불러오는 중...';
+  try{
+    const d=await fbRest(FB_BASE);
+    let docs=(d.documents||[]).map(x=>Object.assign({_id:x.name.split('/').pop()},fromFields(x.fields)))
+      .sort((a,b)=>(b.savedAt||'')>(a.savedAt||'')?1:-1);
+    if(kw){const q=kw.toLowerCase();docs=docs.filter(x=>[x.name,x.memo].some(v=>(v||'').toLowerCase().includes(q)));}
+    gi('loadCount').textContent=docs.length+'건';
+    if(!docs.length){list.innerHTML='<div style="text-align:center;color:#7a90a4;padding:20px;font-size:14px;">저장된 조건이 없습니다</div>';return;}
+    list.innerHTML=docs.map(x=>{
+      const dt=(x.savedAt||'').slice(0,16).replace('T',' ');
+      return '<div class="load-item" data-id="'+x._id+'" style="border:1px solid #dde5ee;border-radius:8px;padding:9px 11px;margin-bottom:7px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;">'
+        +'<div style="flex:1;min-width:0;"><div style="font-weight:700;color:#0d2137;font-size:14px;">'+(x.name||'—')+'</div>'
+        +'<div style="font-size:12px;color:#7a90a4;">'+dt+' | '+(x.memo||'')+' | 세척'+(x._resWashEff||'?')+'% 탈수'+(x._resDewatEff||'?')+'% '+(x._resElecReal||'?')+'kW</div></div>'
+        +'<button class="load-del" data-id="'+x._id+'" style="background:#ffebee;color:#c62828;border:none;border-radius:6px;padding:5px 9px;font-size:13px;cursor:pointer;font-family:inherit;">🗑</button></div>';
+    }).join('');
+    // 클릭 이벤트
+    list.querySelectorAll('.load-item').forEach(el=>{
+      el.addEventListener('click',e=>{
+        if(e.target.classList.contains('load-del'))return;
+        const doc=docs.find(x=>x._id===el.dataset.id);
+        if(doc){applySettings(doc);gi('loadModal').style.display='none';}
+      });
+    });
+    list.querySelectorAll('.load-del').forEach(btn=>{
+      btn.addEventListener('click',async e=>{
+        e.stopPropagation();
+        if(!confirm('삭제하시겠습니까?'))return;
+        try{await fetch(FB_BASE+'/'+btn.dataset.id+'?key='+FB_API,{method:'DELETE'});fbLoadList(gi('loadSearch').value);}catch(err){}
+      });
+    });
+  }catch(e){
+    const is403=String(e.message).includes('403')||String(e.message).includes('PERMISSION');
+    list.innerHTML='<div style="color:#c62828;font-size:13px;padding:12px;line-height:1.6;">'
+      +(is403?'⚠️ <b>Firebase 규칙에 tray_sessions 추가 필요</b><br><a href="https://console.firebase.google.com/project/insys-work/firestore/rules" target="_blank" style="color:#0d7fa8;">규칙 페이지 열기 ↗</a><br>match /tray_sessions/{doc} { allow read, write: if true; }':e.message)+'</div>';
+  }
+}
+
+// 이벤트
+gi('btnSave').addEventListener('click',()=>{_editId=null;gi('saveName').value='';gi('saveMemo').value='';gi('saveStatus').innerHTML='';gi('saveModal').style.display='flex';});
+gi('btnLoad').addEventListener('click',()=>{gi('loadModal').style.display='flex';fbLoadList('');});
+gi('doSave').addEventListener('click',doFbSave);
+gi('closeSave').addEventListener('click',()=>gi('saveModal').style.display='none');
+gi('closeLoad').addEventListener('click',()=>gi('loadModal').style.display='none');
+gi('loadSearch').addEventListener('input',()=>fbLoadList(gi('loadSearch').value));
+
 renderLeft();renderRight();
 </script>
 </body>
