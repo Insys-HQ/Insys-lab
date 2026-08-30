@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>트레이 세척·탈수·건조 시뮬레이터 v1.0 | 인시스 AI혁신 연구개발실</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0d2137;--teal:#0d7fa8;--steel:#3a6b8a;--ink:#152535;
+  --wash:#0d7fa8;--dewat:#e08a1e;--dry:#c0392b;
+  --bg:#eef2f6;--card:#fff;--line:#dde5ee;
+  --good:#2e7d32;--warn:#e65100;--bad:#c62828;
+}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55;}
+@media(min-width:768px){body{font-size:16px;}}
+.hdr{background:linear-gradient(120deg,#0d2137 0%,#0d7fa8 100%);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.hdr-inner{max-width:1200px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.hdr-t{font-size:19px;font-weight:900;letter-spacing:-.3px;}
+.hdr-s{font-size:13px;opacity:.85;font-weight:400;margin-top:1px;}
+.hdr-r{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.hdr-r a,.hdr-r button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;padding:5px 12px;border-radius:7px;font-size:13px;font-weight:700;font-family:inherit;text-decoration:none;cursor:pointer;}
+.hdr-r button.on{background:#fff;color:var(--navy);}
+.vb{background:rgba(255,255,255,.25);padding:5px 11px;border-radius:7px;font-size:13px;font-weight:700;}
+.wrap{max-width:1200px;margin:0 auto;padding:10px 14px;}
+.wrap.mobile{max-width:430px;}
+.proctab{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.proctab button{flex:1;min-width:84px;background:#fff;border:2px solid var(--line);border-radius:9px;padding:9px 6px;font-family:inherit;font-size:14px;font-weight:700;color:#7a90a4;cursor:pointer;transition:.2s;}
+.proctab button .pe{font-size:18px;display:block;margin-bottom:2px;}
+.proctab button.on{color:#fff;border-color:transparent;}
+.proctab button.on.pw{background:var(--wash);}
+.proctab button.on.pd{background:var(--dewat);}
+.proctab button.on.pr{background:var(--dry);}
+.proctab button.on.po{background:var(--steel);}
+.proctab button.on.pc{background:#5e35b1;}
+.proctab button.on.ps{background:var(--navy);}
+.layout{display:grid;grid-template-columns:1fr;gap:12px;}
+@media(min-width:960px){.layout{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.ch{padding:9px 13px;background:#f6f9fc;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.ch .ci{font-size:18px;}
+.ch .cl{font-size:15px;font-weight:800;color:var(--navy);}
+.ch .cq{margin-left:auto;font-size:13px;font-weight:700;padding:3px 9px;border-radius:7px;background:#e3f0f8;color:var(--teal);}
+.cb{padding:11px 13px;}
+.st{font-size:14px;font-weight:800;color:var(--steel);margin:10px 0 6px;padding-bottom:3px;border-bottom:1px dashed var(--line);}
+.st:first-child{margin-top:0;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+@media(max-width:520px){.g3{grid-template-columns:1fr 1fr;}}
+.fl{display:flex;flex-direction:column;gap:3px;}
+.fl label{font-size:13px;font-weight:600;color:#5a7088;}
+.fl input,.fl select{border:1.5px solid #c5d5e5;border-radius:7px;padding:6px 8px;font-size:14px;font-family:inherit;font-weight:600;color:var(--ink);background:#fff;}
+.fl input:focus,.fl select:focus{outline:none;border-color:var(--teal);}
+.fl .un{font-size:13px;color:#9aabb8;}
+.s-rec{background:#e3f4fd !important;border-color:#0d7fa8 !important;}
+.s-auto{background:#e8f5e9 !important;border-color:#43a047 !important;}
+.sv{background:#f8fafc;border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin-bottom:7px;}
+.sv-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:6px;}
+.sv-l{font-size:14px;font-weight:700;color:#1a3a5a;}
+.sv-r{display:flex;align-items:center;gap:5px;}
+.sv-n{width:66px;border:1.5px solid #c5d5e5;border-radius:6px;padding:4px 6px;font-size:14px;font-weight:700;text-align:right;font-family:inherit;color:var(--ink);}
+.sv-u{font-size:13px;color:#9aabb8;min-width:28px;}
+.sv-badge{font-size:13px;font-weight:700;padding:2px 8px;border-radius:7px;}
+.sv-badge.opt{background:#d4edda;color:#155724;}
+.sv-badge.low{background:#fff3cd;color:#856404;}
+.sv-badge.high{background:#f8d7da;color:#721c24;}
+.sv-bar{position:relative;background:#e3eaf0;border-radius:7px;height:26px;overflow:hidden;}
+.sv-opt{position:absolute;top:0;height:100%;background:rgba(46,125,50,.13);border-left:2px solid rgba(46,125,50,.4);border-right:2px solid rgba(46,125,50,.4);}
+.sv-fill{position:absolute;top:0;left:0;height:100%;border-radius:7px 0 0 7px;transition:width .3s,background .3s;display:flex;align-items:center;justify-content:flex-end;padding-right:7px;}
+.sv-fill span{font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3);}
+.sv-range{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0;}
+.sv-mm{display:flex;justify-content:space-between;font-size:13px;color:#9aabb8;margin-top:2px;}
+.sv-state{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;}
+.sv-si{font-size:13px;padding:1px 7px;border-radius:6px;font-weight:600;border:1px solid;}
+.sv-si.o{border-color:#2e7d32;background:#e8f5e9;color:#1b5e20;}
+.sv-si.c{border-color:#0d7fa8;background:#e3f4fd;color:#0b5a80;}
+.sv-si.w{border-color:#f9a825;background:#fff8e1;color:#e65100;}
+.sv-si.b{border-color:#c62828;background:#ffebee;color:#b71c1c;}
+.kpi{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+@media(max-width:520px){.kpi{grid-template-columns:1fr 1fr;}}
+.kc{border-radius:10px;padding:11px 8px;text-align:center;}
+.kc .kv{font-size:22px;font-weight:900;}
+.kc .kl{font-size:13px;font-weight:600;margin-top:1px;opacity:.85;}
+.kc.k1{background:linear-gradient(135deg,#e3f2fd,#bbdefb);color:#0d47a1;}
+.kc.k2{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);color:#1b5e20;}
+.kc.k3{background:linear-gradient(135deg,#fff3e0,#ffe0b2);color:#e65100;}
+.kc.k4{background:linear-gradient(135deg,#f3e5f5,#e1bee7);color:#6a1b9a;}
+.kc.k5{background:linear-gradient(135deg,#fce4ec,#f8bbd0);color:#ad1457;}
+.kc.k6{background:linear-gradient(135deg,#e0f2f1,#b2dfdb);color:#00695c;}
+.cost{background:#fffdf5;border:1px solid #f0e4c0;border-radius:10px;padding:10px 12px;margin-top:10px;}
+.cost-in{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:9px;}
+.cost-fl{display:flex;align-items:center;gap:4px;}
+.cost-fl label{font-size:13px;color:#6a5a2a;font-weight:600;}
+.cost-fl input{width:58px;border:1.5px solid #e0d090;border-radius:6px;padding:4px 6px;font-size:14px;font-weight:700;text-align:right;font-family:inherit;color:#5a4a1a;}
+.cost-fl span{font-size:13px;color:#9a8a5a;}
+.cost-res{display:flex;gap:8px;flex-wrap:wrap;}
+.cost-it{flex:1;min-width:92px;background:#fff;border:1px solid #ede0b8;border-radius:8px;padding:7px 8px;text-align:center;}
+.cost-it.hl{background:#fff3cd;border-color:#ffc107;}
+.cost-it .cl2{font-size:13px;color:#8a7a4a;}
+.cost-it .cv{font-size:16px;font-weight:800;color:#6a5310;margin-top:1px;}
+.cost-it.hl .cv{color:#b8860b;}
+.save{margin-top:9px;padding-top:9px;border-top:1px dashed #e0d090;}
+.save-h{font-size:14px;font-weight:800;color:#2e7d32;margin-bottom:6px;}
+.save-i{font-size:13px;color:#3a5a3a;padding:5px 8px;background:#f1f8f1;border-left:3px solid #66bb6a;border-radius:0 6px 6px 0;margin-bottom:4px;}
+.tbl{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px;}
+.tbl th{background:#eaf2f8;color:var(--navy);padding:6px;text-align:center;font-weight:700;border:1px solid #d5e2ec;font-size:13px;}
+.tbl td{padding:5px 6px;text-align:center;border:1px solid #e5ecf2;}
+.tbl td.hi{font-weight:800;color:var(--teal);}
+.rec{background:#f0f7ff;border:1px solid #cfe3f5;border-radius:9px;padding:9px 11px;margin-top:9px;}
+.rec-i{font-size:13px;color:#1a4060;padding:3px 0;line-height:1.55;}
+.corr-intro{background:#f3f0fb;border:1px solid #d8cef0;border-radius:9px;padding:10px 12px;margin-bottom:10px;font-size:14px;color:#4a3a7a;line-height:1.6;}
+.corr-tbl{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:12px;}
+.corr-tbl th{background:#ede7f6;color:#4527a0;padding:7px 8px;text-align:left;font-weight:700;border:1px solid #d1c4e9;font-size:13px;}
+.corr-tbl td{padding:6px 8px;border:1px solid #e8e2f2;vertical-align:top;line-height:1.5;}
+.corr-tbl td.var{font-weight:700;color:#5e35b1;white-space:nowrap;}
+.corr-up{color:#c62828;font-weight:700;}
+.corr-dn{color:#1565c0;font-weight:700;}
+.corr-eff{color:#2e7d32;font-weight:700;}
+.corr-cost{color:#e65100;font-weight:700;}
+.corr-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;margin-bottom:10px;padding:8px 10px;background:#faf8ff;border-radius:8px;}
+.corr-sect{font-size:15px;font-weight:800;color:#4527a0;margin:14px 0 7px;padding-left:8px;border-left:4px solid #5e35b1;}
+.tradeoff{background:#fff8f0;border:1px solid #ffd9a8;border-radius:9px;padding:10px 12px;margin-bottom:8px;}
+.tradeoff-h{font-size:14px;font-weight:800;color:#c05a00;margin-bottom:4px;}
+.tradeoff-b{font-size:13px;color:#6a4a2a;line-height:1.6;}
+.note{font-size:13px;color:#9aabb8;margin-top:5px;line-height:1.5;}
+footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
+.flowbar{display:flex;align-items:stretch;gap:4px;margin-bottom:10px;overflow-x:auto;}
+.flowstep{flex:1;min-width:72px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 5px;text-align:center;font-size:13px;}
+.flowstep .fe{font-size:17px;display:block;}
+.flowstep .fn{font-weight:700;color:var(--navy);margin-top:1px;}
+.flowstep .fv{font-size:13px;color:var(--teal);font-weight:700;margin-top:1px;}
+.flowstep.aw{border-top:3px solid var(--wash);}
+.flowstep.ad{border-top:3px solid var(--dewat);}
+.flowstep.ar{border-top:3px solid var(--dry);}
+.chbox{background:#eef6fb;border:1px solid #cde3f0;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:13px;color:#0b5a80;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="hdr">
+<div class="hdr-inner">
+  <div>
+    <div class="hdr-t">🍽️ 트레이 세척·탈수·건조 시뮬레이터</div>
+    <div class="hdr-s">인시스 AI혁신 연구개발실 | 좌우 2CH 세워서 투입 · 효율↑ 투자비↓</div>
+  </div>
+  <div class="hdr-r">
+    <a href="https://insys-hq.github.io/Insys-lab/tray-wash.html" target="_blank" rel="noopener">🔗 바로가기</a>
+    <button class="on" id="bPC">PC</button>
+    <button id="bMB">모바일</button>
+    <span class="vb">v1.0</span>
+  </div>
+</div>
+</div>
+<div class="wrap" id="wrap">
+  <div class="flowbar" id="flowbar"></div>
+  <div class="proctab">
+    <button class="on pw" data-tab="wash"><span class="pe">💧</span>세척</button>
+    <button class="pd" data-tab="dewat"><span class="pe">💨</span>탈수</button>
+    <button class="pr" data-tab="dry"><span class="pe">🔥</span>건조</button>
+    <button class="po" data-tab="util"><span class="pe">♨️</span>온수·유틸</button>
+    <button class="pc" data-tab="corr"><span class="pe">🔗</span>상관관계</button>
+    <button class="ps" data-tab="result"><span class="pe">📊</span>종합결과</button>
+  </div>
+  <div class="layout">
+    <div id="leftCol"></div>
+    <div id="rightCol"></div>
+  </div>
+</div>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v1.0 · 2026</footer>
+<script>
+// ═══════════════════════════════════════════════
+// 트레이 세척·탈수·건조 시뮬레이터 v1.0
+// 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
+// ═══════════════════════════════════════════════
+const VER='1.0';
+const gi=id=>document.getElementById(id);
+const gv=id=>{const e=gi(id);return e?e.value:'';};
+
+const S={
+  // 트레이 규격 (세워서 투입)
+  trayW:600,trayD:400,trayT:50,qty:200,dlv:3,
+  // 세척 (2CH 고정)
+  wZones:3,wHole:2.5,wPress:200,wCol:4,wRow:6,wTemp:60,
+  wTankL:1500,wTankW:800,wTankD:600,wTankIns:true,
+  drainCount:1,drainHead:8,
+  // 탈수
+  knifeCount:4,knifeAng:50,knifeVel:60,knifePress:15,blowerCount:1,
+  // 건조
+  dryTemp:75,dryAirVol:25,dryRecirc:70,heaterCount:2,
+  // 온수/유틸
+  boilerType:'gas',boilerTankL:1000,boilerIns:true,makeupWater:250,inletTemp:15,convKW:1.5,
+  // 전기료
+  hours:8,days:22,rate:130,gasRate:900
+};
+const CH=2; // 트레이는 좌우 2CH 고정
+const FACES_PER_CH=2; // 채널당 외벽+격벽 2면
+
+// ── 물리 계산 ──
+function nozzleQ(h,p){const Cd=0.62,r=h/1000/2,A=Math.PI*r*r;return Cd*Math.sqrt(2*p*1000/1000)*A*1000*60;}
+function pumpPowerKW(lpm,head,eff){return 1000*9.81*(lpm/60000)*head/eff/1000;}
+function lpmToKW(lpm,p,eff){return (lpm/60000*p*1000)/eff/1000;}
+function tankVol(L,W,D){return Math.round(L*W*D*0.75/1e6);}
+function heaterMaintainKW(t,temp,ins){return t*(ins?0.022:0.045)*(Math.max(0,temp-20)/40);}
+function knifeAirFlow(len_mm,slot_mm,vel,cnt){return (len_mm/1000)*(slot_mm/1000)*vel*60*cnt;}
+function blowerKW(air,p,eff){return (air/60)*p*1000/eff/1000;}
+function dryerKW(res,airVol,dT,recirc){const evap=res*2260/3600;const airH=(airVol/60)*1.2*1005*dT/1000;return evap+airH*(1-recirc/100);}
+// 트레이 잔류수분 — 평판이라 탈수 효율 좋음 (개당 30g 기준)
+function residualWater(qty,cnt,vel,ang){const base=qty*0.03;const eC=Math.min(1,cnt/4),eV=Math.min(1,vel/60),eA=1-Math.abs(ang-50)/100;const rm=0.55+0.4*(eC*eV*eA);return base*(1-rm);}
+
+// ── 슬라이더 ──
+function sliderHTML(id,label,unit,min,max,step,val,oMin,oMax){
+  return '<div class="sv" id="sv-'+id+'"><div class="sv-h"><span class="sv-l">'+label+'</span>'
+    +'<div class="sv-r"><span class="sv-badge" id="bd-'+id+'">—</span>'
+    +'<input class="sv-n" type="number" id="'+id+'" value="'+val+'" min="'+min+'" max="'+max+'" step="'+step+'">'
+    +'<span class="sv-u">'+unit+'</span></div></div>'
+    +'<div class="sv-bar"><div class="sv-opt" id="op-'+id+'"></div><div class="sv-fill" id="fl-'+id+'"></div>'
+    +'<input type="range" class="sv-range" id="rg-'+id+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"></div>'
+    +'<div class="sv-mm"><span>'+min+unit+'</span><span>'+max+unit+'</span></div>'
+    +'<div class="sv-state" id="ss-'+id+'" data-omin="'+oMin+'" data-omax="'+oMax+'" data-unit="'+unit+'"></div></div>';
+}
+function updateSlider(id){
+  const el=gi(id),rg=gi('rg-'+id),fl=gi('fl-'+id),op=gi('op-'+id),bd=gi('bd-'+id),ss=gi('ss-'+id);
+  if(!el||!fl)return;
+  const val=+el.value,min=+el.min,max=+el.max,oMin=+ss.dataset.omin,oMax=+ss.dataset.omax,unit=ss.dataset.unit;
+  const pct=Math.min(100,Math.max(0,(val-min)/(max-min)*100));
+  const pMin=Math.min(100,Math.max(0,(oMin-min)/(max-min)*100));
+  const pMax=Math.min(100,Math.max(0,(oMax-min)/(max-min)*100));
+  let st='opt',tx='✅ 최적',cl='o';
+  if(val<oMin){st='low';tx='⚠️ 부족';cl='w';}else if(val>oMax){st='high';tx='🔴 초과';cl='b';}
+  const col={opt:'linear-gradient(90deg,#2e7d32,#43a047)',low:'linear-gradient(90deg,#f57f17,#ffb300)',high:'linear-gradient(90deg,#c62828,#e53935)'};
+  fl.style.width=pct+'%';fl.style.background=col[st];fl.innerHTML='<span>'+val+'</span>';
+  op.style.left=pMin+'%';op.style.width=(pMax-pMin)+'%';
+  bd.textContent=tx;bd.className='sv-badge '+st;
+  if(rg&&+rg.value!==val)rg.value=val;
+  ss.innerHTML='<span class="sv-si o">최적 '+oMin+'~'+oMax+unit+'</span><span class="sv-si c">현재 '+val+unit+'</span><span class="sv-si '+cl+'">'+tx+'</span>';
+}
+function bindSlider(id){
+  const el=gi(id),rg=gi('rg-'+id);if(!el||!rg)return;
+  rg.addEventListener('input',()=>{el.value=rg.value;el.classList.add('s-user');onChange(id);});
+  el.addEventListener('input',()=>{rg.value=el.value;el.classList.add('s-user');onChange(id);});
+}
+function syncState(){
+  ['trayW','trayD','trayT','qty','dlv','wZones','wHole','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifeCount','knifeAng','knifeVel','knifePress','blowerCount','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','makeupWater','inletTemp','convKW','hours','days','rate','gasRate'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
+  const bt=gi('boilerType');if(bt)S.boilerType=bt.value;
+  const wi=gi('wTankIns');if(wi)S.wTankIns=wi.checked;
+  const bi=gi('boilerIns');if(bi)S.boilerIns=bi.checked;
+}
+let _tab='wash';
+function onChange(id){syncState();if(id&&gi(id))updateSlider(id);calcAll();renderRight();}
+
+// ── 종합 계산 (2CH 트레이) ──
+let R={};
+function calcAll(){
+  syncState();
+  const qtyH=S.qty;
+  const qEach=nozzleQ(S.wHole,S.wPress);
+  const nPerFace=S.wCol*S.wRow;
+  // 트레이 분사면: 세워진 트레이 = trayD(폭) × trayW(높이)
+  const washFlow=qEach*nPerFace*FACES_PER_CH*CH*1.15;
+  const qPerCh=washFlow/CH;
+  const washPumpKW=lpmToKW(washFlow,S.wPress,0.75);
+  const tankL=tankVol(S.wTankL,S.wTankW,S.wTankD);
+  const washHeaterEach=heaterMaintainKW(tankL,S.wTemp,S.wTankIns);
+  const washHeaterTotal=washHeaterEach*S.wZones;
+  const washPumpTotal=washPumpKW*S.wZones;
+  const drainFlow=tankL/3;
+  const drainKW=pumpPowerKW(drainFlow,S.drainHead,0.6)*S.drainCount;
+  // 탈수 — 세워진 트레이 높이(trayW)를 나이프 길이로
+  const airFlow=knifeAirFlow(S.trayW,1,S.knifeVel,S.knifeCount);
+  const blowKW=blowerKW(airFlow,S.knifePress,0.65)*S.blowerCount;
+  const residual=residualWater(qtyH,S.knifeCount,S.knifeVel,S.knifeAng);
+  const dryKW=dryerKW(residual,S.dryAirVol,S.dryTemp-20,S.dryRecirc);
+  const boilerHeatKW=(S.makeupWater*4.18*(S.wTemp-S.inletTemp))/3600;
+  const boilerLossKW=heaterMaintainKW(S.boilerTankL,S.wTemp,S.boilerIns);
+  const boilerTotalKW=boilerHeatKW+boilerLossKW;
+  const elecHeater=(S.boilerType==='electric')?boilerTotalKW:0;
+  const gasLoad=(S.boilerType==='gas')?boilerTotalKW:0;
+  const washHeatElec=washHeaterTotal*0.4; // 외부보일러 공급 시 세척조 보조 유지만
+  const elecTotal=washPumpTotal+drainKW+blowKW+dryKW+washHeatElec+elecHeater+S.convKW;
+  const elecReal=washPumpTotal+drainKW+blowKW+dryKW*0.7+washHeatElec*0.35+elecHeater*0.35+S.convKW;
+  // 효율 (트레이 특성 반영: 평판이라 탈수·건조 우수)
+  const washEff=Math.min(99,52+S.wZones*10+(S.wTemp-40)*0.3-(S.dlv-1)*4);
+  const dewatEff=Math.min(99,(1-residual/(qtyH*0.03))*100);
+  const dryEff=Math.min(99,65+S.dryTemp*0.28+S.dryRecirc*0.12);
+  R={qEach,washFlow,qPerCh,washPumpTotal,tankL,washHeaterEach,washHeaterTotal,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,nPerFace,washHeatElec,elecHeater};
+}
+
+// ── 좌측 렌더 ──
+function renderLeft(){
+  const L=gi('leftCol');let h='';
+  if(_tab==='wash'){
+    h='<div class="card"><div class="ch"><span class="ci">💧</span><span class="cl">세척부 (좌우 2CH)</span><span class="cq">세워서 투입</span></div><div class="cb">'
+      +'<div class="chbox">🍽️ <b>트레이 2CH 구조</b>: 중앙 격벽으로 좌·우 채널 분리. 세워진 트레이의 <b>외벽면 + 격벽면(2면)</b>에 채널별 독립 노즐 배치. 총 '+(CH*FACES_PER_CH)+'면 분사.</div>'
+      +'<div class="st">트레이 규격 (세워서 투입)</div><div class="g3">'
+      +fld('trayW','폭(높이방향)','mm',S.trayW)+fld('trayD','깊이(컨베이어)','mm',S.trayD)+fld('trayT','두께','mm',S.trayT)+'</div>'
+      +'<div class="g2" style="margin-top:6px;">'+fld('qty','시간당 처리량','매/h',S.qty)+fld('dlv','오염도(1~5)','',S.dlv)+'</div>'
+      +'<div class="st">세척 노즐 (채널당 1면 기준)</div>'
+      +sliderHTML('wHole','💧 홀 직경','mm',0.5,10,0.1,S.wHole,2,3)
+      +sliderHTML('wPress','🔧 분사압력','kPa',50,600,10,S.wPress,150,280)
+      +'<div class="g2">'+fld('wCol','가로 노즐수','개',S.wCol)+fld('wRow','세로 노즐수','개',S.wRow)+'</div>'
+      +sliderHTML('wTemp','🌡️ 세척온도','°C',20,90,1,S.wTemp,50,65)
+      +'<div class="g2" style="margin-top:6px;">'+fld('wZones','세척 단수','단',S.wZones)+'<div class="fl"><label>세척조 단열</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="wTankIns" '+(S.wTankIns?'checked':'')+'> 단열재 적용</label></div></div>'
+      +'<div class="st">저수조 · 배수</div><div class="g3">'
+      +fld('wTankL','조 길이','mm',S.wTankL)+fld('wTankW','조 폭','mm',S.wTankW)+fld('wTankD','조 깊이','mm',S.wTankD)+'</div>'
+      +'<div class="g2" style="margin-top:6px;">'+fld('drainCount','배수펌프','대',S.drainCount)+fld('drainHead','양정','m',S.drainHead)+'</div>'
+      +'</div></div>';
+  }else if(_tab==='dewat'){
+    h='<div class="card"><div class="ch"><span class="ci">💨</span><span class="cl">탈수부 (에어나이프)</span><span class="cq">2CH</span></div><div class="cb">'
+      +'<div class="chbox">🍽️ 트레이는 <b>평판</b>이라 세워서 투입 시 중력 배수 + 에어나이프로 물 제거가 우수합니다. 탈수를 강화하면 건조 부하가 크게 줄어듭니다.</div>'
+      +sliderHTML('knifeCount','🔪 나이프 개수','개',2,8,1,S.knifeCount,4,6)
+      +sliderHTML('knifeAng','📐 분사 각도','°',20,80,1,S.knifeAng,45,60)
+      +sliderHTML('knifeVel','💨 토출 속도','m/s',30,120,5,S.knifeVel,55,80)
+      +sliderHTML('knifePress','🔧 나이프 압력','kPa',5,40,1,S.knifePress,12,20)
+      +'<div class="g2">'+fld('blowerCount','링블로어 댓수','대',S.blowerCount)+'</div>'
+      +'<div class="note">💡 세워진 트레이 양면에 에어나이프 45~60° 배치, 진행 역방향으로 물을 밀어냅니다.</div>'
+      +'</div></div>';
+  }else if(_tab==='dry'){
+    h='<div class="card"><div class="ch"><span class="ci">🔥</span><span class="cl">건조부 (열풍)</span><span class="cq">저부하</span></div><div class="cb">'
+      +'<div class="chbox">🍽️ 트레이는 얇은 평판이라 잔류수분이 적어 <b>건조 열부하가 낮습니다</b>. 탈수가 좋으면 건조온도·풍량을 낮춰 에너지를 아낄 수 있습니다.</div>'
+      +sliderHTML('dryTemp','🌡️ 열풍 온도','°C',40,140,5,S.dryTemp,65,95)
+      +sliderHTML('dryAirVol','🌀 열풍 풍량','m³/min',10,80,5,S.dryAirVol,20,40)
+      +sliderHTML('dryRecirc','♻️ 순환 재사용','%',0,90,5,S.dryRecirc,60,80)
+      +'<div class="g2" style="margin-top:6px;">'+fld('heaterCount','열풍기 댓수','대',S.heaterCount)+'</div>'
+      +'</div></div>';
+  }else if(_tab==='util'){
+    h='<div class="card"><div class="ch"><span class="ci">♨️</span><span class="cl">온수·유틸리티</span><span class="cq">보일러·단열</span></div><div class="cb">'
+      +'<div class="st">온수 보일러 (외부 설치)</div>'
+      +'<div class="g2">'+sel('boilerType','열원',[['gas','가스보일러'],['electric','전기보일러']],S.boilerType)
+      +'<div class="fl"><label>보일러 탱크 단열</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="boilerIns" '+(S.boilerIns?'checked':'')+'> 단열재 적용</label></div></div>'
+      +'<div class="g3" style="margin-top:6px;">'+fld('boilerTankL','보일러탱크','L',S.boilerTankL)+fld('makeupWater','보충수량','L/h',S.makeupWater)+fld('inletTemp','유입수온','°C',S.inletTemp)+'</div>'
+      +'<div class="st">기타</div><div class="g2">'+fld('convKW','컨베이어','kW',S.convKW)+'</div>'
+      +'<div class="note">💡 외부 보일러+단열탱크로 온수 집중공급 시 세척조 개별 히터는 유지열손실만 부담.</div>'
+      +'</div></div>';
+  }else if(_tab==='corr'){
+    h=buildCorr();
+  }else if(_tab==='result'){
+    h='<div class="card"><div class="ch"><span class="ci">📊</span><span class="cl">전기료·가스비 예측</span></div><div class="cb">'
+      +'<div class="cost-in">'
+      +'<div class="cost-fl"><label>가동시간</label><input type="number" id="hours" value="'+S.hours+'"><span>h/일</span></div>'
+      +'<div class="cost-fl"><label>가동일수</label><input type="number" id="days" value="'+S.days+'"><span>일/월</span></div>'
+      +'<div class="cost-fl"><label>전력단가</label><input type="number" id="rate" value="'+S.rate+'"><span>원/kWh</span></div>'
+      +'<div class="cost-fl"><label>가스단가</label><input type="number" id="gasRate" value="'+S.gasRate+'"><span>원/m³</span></div>'
+      +'</div><div id="costResult"></div></div></div>';
+  }
+  L.innerHTML=h;
+  L.querySelectorAll('.sv-n').forEach(el=>{updateSlider(el.id);bindSlider(el.id);});
+  L.querySelectorAll('input:not(.sv-n):not(.sv-range),select').forEach(el=>{
+    el.addEventListener('input',()=>onChange(el.id));
+    el.addEventListener('change',()=>{if(el.id==='boilerType'){renderLeft();}onChange(el.id);});
+  });
+}
+function fld(id,l,u,v){return '<div class="fl"><label>'+l+'</label><input type="number" id="'+id+'" value="'+v+'"><span class="un">'+u+'</span></div>';}
+function sel(id,l,o,c){return '<div class="fl"><label>'+l+'</label><select id="'+id+'">'+o.map(x=>'<option value="'+x[0]+'"'+(x[0]===c?' selected':'')+'>'+x[1]+'</option>').join('')+'</select></div>';}
+
+// ── 우측 결과 ──
+function renderRight(){
+  calcAll();renderFlow();
+  const Rc=gi('rightCol');
+  let h='<div class="card"><div class="ch"><span class="ci">📈</span><span class="cl">통합 성능·에너지 (2CH)</span></div><div class="cb"><div class="kpi">'
+    +kc('k1',R.washEff.toFixed(0)+'%','세척 효율')
+    +kc('k2',R.dewatEff.toFixed(0)+'%','탈수 효율')
+    +kc('k3',R.dryEff.toFixed(0)+'%','건조 효율')
+    +kc('k4',R.elecTotal.toFixed(1),'전기정격(kW)')
+    +kc('k5',R.elecReal.toFixed(1),'전기실운전(kW)')
+    +kc('k6',R.gasLoad>0?R.gasLoad.toFixed(1)+'kW':'—','가스부하')
+    +'</div>'
+    +'<table class="tbl"><thead><tr><th>공정</th><th>설비</th><th>정격kW</th><th>실운전kW</th></tr></thead><tbody>'
+    +row('세척','순환펌프×'+S.wZones,R.washPumpTotal,R.washPumpTotal)
+    +row('세척','유지히터(보조)',R.washHeatElec,R.washHeatElec*0.35)
+    +row('세척','배수펌프×'+S.drainCount,R.drainKW,R.drainKW)
+    +row('탈수','링블로어×'+S.blowerCount,R.blowKW,R.blowKW)
+    +row('건조','열풍기',R.dryKW,R.dryKW*0.7)
+    +row('공통','컨베이어',S.convKW,S.convKW)
+    +(R.elecHeater>0?row('온수','전기보일러',R.elecHeater,R.elecHeater*0.35):'')
+    +'</tbody></table>'
+    +(R.gasLoad>0?'<div class="note">※ 가스보일러 '+R.gasLoad.toFixed(1)+'kW는 가스비로 별도 계산</div>':'')
+    +'</div></div>';
+  h+='<div class="card"><div class="ch"><span class="ci">🎯</span><span class="cl">효율·투자비 최적화 권장</span></div><div class="cb">'+buildRec()+'</div></div>';
+  Rc.innerHTML=h;
+  if(_tab==='result')renderCost();
+}
+function kc(c,v,l){return '<div class="kc '+c+'"><div class="kv">'+v+'</div><div class="kl">'+l+'</div></div>';}
+function row(p,e,r,rl){return '<tr><td>'+p+'</td><td>'+e+'</td><td class="hi">'+r.toFixed(1)+'</td><td>'+rl.toFixed(1)+'</td></tr>';}
+function renderFlow(){
+  gi('flowbar').innerHTML=fs('aw','💧','세척',R.washEff.toFixed(0)+'%')+fs('ad','💨','탈수',R.dewatEff.toFixed(0)+'%')+fs('ar','🔥','건조',R.dryEff.toFixed(0)+'%')+fs('','⚡','전기',R.elecReal.toFixed(1)+'kW')+fs('','♨️','온수',R.gasLoad>0?'가스':'전기');
+}
+function fs(c,e,n,v){return '<div class="flowstep '+c+'"><span class="fe">'+e+'</span><span class="fn">'+n+'</span><span class="fv">'+v+'</span></div>';}
+function buildRec(){
+  const r=[];
+  if(!S.wTankIns)r.push('🧥 <b>세척 저수조 단열 미적용</b> → 적용 시 유지손실 약 50%↓');
+  if(!S.boilerIns)r.push('🧥 <b>보일러 탱크 단열 미적용</b> → 단열 시 손실 68%↓');
+  if(S.boilerType==='electric')r.push('♨️ <b>전기보일러</b> → 가스 전환 시 열원단가 40~60%↓');
+  if(S.knifeAng<45||S.knifeAng>60)r.push('📐 <b>에어나이프 '+S.knifeAng+'°</b> → 45~60°로 조정 시 물 제거↑');
+  if(S.knifeCount<4)r.push('🔪 <b>나이프 '+S.knifeCount+'개</b> → 4개↑ 시 잔류수분↓ → 건조부하↓');
+  if(S.dryRecirc<60)r.push('♻️ <b>순환 '+S.dryRecirc+'%</b> → 60~80%로 높이면 가열부하↓');
+  if(S.dryTemp>95)r.push('🌡️ <b>건조온도 '+S.dryTemp+'°C</b> → 트레이는 평판이라 낮춰도 충분');
+  r.push('💡 <b>트레이 핵심</b>: 평판 특성상 탈수가 잘 되면 건조 에너지가 크게 절감됩니다. 에어나이프 최적화가 가장 효과적입니다.');
+  return r.map(x=>'<div class="rec-i">'+x+'</div>').join('');
+}
+function renderCost(){
+  const cr=gi('costResult');if(!cr)return;
+  const daily=R.elecReal*S.hours,monthly=daily*S.days,cost=monthly*S.rate;
+  let gasCost=0,gasNote='';
+  if(R.gasLoad>0){const gM3H=R.gasLoad/(10.4*0.9),gM3M=gM3H*S.hours*S.days;gasCost=gM3M*S.gasRate;gasNote='<div class="cost-it"><div class="cl2">월 가스</div><div class="cv">'+Math.round(gM3M).toLocaleString()+' m³</div></div>';}
+  cr.innerHTML='<div class="cost-res">'
+    +'<div class="cost-it"><div class="cl2">일 전력</div><div class="cv">'+Math.round(daily)+' kWh</div></div>'
+    +'<div class="cost-it"><div class="cl2">월 전력</div><div class="cv">'+Math.round(monthly).toLocaleString()+' kWh</div></div>'
+    +gasNote
+    +'<div class="cost-it hl"><div class="cl2">월 에너지비 합계</div><div class="cv">'+Math.round(cost+gasCost).toLocaleString()+' 원</div></div></div>'
+    +'<div class="note">※ 전기 실운전 + 가스비 합산. 심야전력·폐열회수 미반영.</div>'
+    +'<div class="save"><div class="save-h">💰 추가 절감 방안</div>'
+    +'<div class="save-i">🌙 심야전력(23~09시) 예열 → 전력단가 약 40%↓</div>'
+    +'<div class="save-i">♻️ 세척 배수 폐열회수 → 보충수 예열 → 보일러 20~30%↓</div>'
+    +'<div class="save-i">💨 트레이는 탈수 강화가 건조 절감의 핵심</div></div>';
+}
+// ── 상관관계 ──
+function buildCorr(){
+  var h='<div class="card"><div class="ch"><span class="ci">🔗</span><span class="cl">트레이 변수 상관관계</span></div><div class="cb">';
+  h+='<div class="corr-intro">💡 트레이는 <b>세워서 좌우 2CH 투입</b>되는 평판입니다. <b class="corr-up">↑</b>증가 <b class="corr-dn">↓</b>감소. 핵심은 <b>탈수 강화로 건조 에너지를 줄이는 것</b>입니다.</div>';
+  h+='<div class="corr-legend"><span><b class="corr-up">↑증가</b></span><span><b class="corr-dn">↓감소</b></span><span><b class="corr-eff">효율</b></span><span><b class="corr-cost">에너지·비용</b></span></div>';
+  h+='<div class="corr-sect">💧 세척부 (2CH)</div><table class="corr-tbl"><thead><tr><th style="width:24%">변수</th><th style="width:8%">조작</th><th>연쇄 영향</th></tr></thead><tbody>'
+    +cr('홀 직경','↑','노즐유량<span class="corr-up">↑</span>·세척력<span class="corr-eff">↑</span>·펌프부하<span class="corr-cost">↑</span> (2~3mm 최적)')
+    +cr('분사 압력','↑','세척력<span class="corr-eff">↑</span>·펌프전력<span class="corr-cost">↑↑</span> (2CH이므로 총유량 2배)')
+    +cr('노즐 수','↑','커버리지<span class="corr-eff">↑</span>·유량<span class="corr-up">↑</span> (외벽+격벽 각 채널 독립)')
+    +cr('세척 온도','↑','세척력<span class="corr-eff">↑</span>·히터/보일러부하<span class="corr-cost">↑</span>')
+    +cr('세척 단수','↑','세척율<span class="corr-eff">↑↑</span>·펌프/히터<span class="corr-cost">↑</span>')
+    +cr('저수조 단열','ON','유지손실<span class="corr-dn">↓50%</span> ✅저비용 고효율')
+    +'</tbody></table>';
+  h+='<div class="corr-sect">💨 탈수부 (트레이 강점)</div><table class="corr-tbl"><thead><tr><th style="width:24%">변수</th><th style="width:8%">조작</th><th>연쇄 영향</th></tr></thead><tbody>'
+    +cr('나이프 개수','↑','잔류수분<span class="corr-dn">↓</span> → <b>건조부하<span class="corr-dn">↓↓</span></b> (4개 최적)')
+    +cr('분사 각도','45~60°','물 제거<span class="corr-eff">최대</span> (진행 역방향)')
+    +cr('토출 속도','↑','잔류수분<span class="corr-dn">↓</span>·블로어부하<span class="corr-cost">↑</span>')
+    +cr('평판 특성','—','세워서 투입 → 중력배수 + 에어나이프 → 탈수효율<span class="corr-eff">우수</span>')
+    +'</tbody></table>';
+  h+='<div class="corr-sect">🔥 건조부 (저부하)</div><table class="corr-tbl"><thead><tr><th style="width:24%">변수</th><th style="width:8%">조작</th><th>연쇄 영향</th></tr></thead><tbody>'
+    +cr('열풍 온도','↑','건조속도<span class="corr-eff">↑</span>·열부하<span class="corr-cost">↑↑</span> (트레이는 낮춰도 충분)')
+    +cr('순환 재사용','↑','신선공기 가열<span class="corr-dn">↓↓</span>·열부하<span class="corr-dn">↓</span>')
+    +cr('잔류수분(탈수결과)','↓','증발부하<span class="corr-dn">↓↓</span> → <b>건조에너지<span class="corr-dn">↓↓</span></b>')
+    +'</tbody></table>';
+  h+='<div class="corr-sect">⚖️ 효율 ↔ 투자비 트레이드오프</div>';
+  h+='<div class="tradeoff"><div class="tradeoff-h">1. 탈수 투자 vs 건조 에너지</div><div class="tradeoff-b">트레이는 평판이라 에어나이프 효과가 특히 큽니다. 탈수 강화(투자↑) → 잔류수분↓ → <b>건조 열부하 급감</b>. 트레이 설비의 최대 절감 포인트입니다.</div></div>';
+  h+='<div class="tradeoff"><div class="tradeoff-h">2. 단열 투자 vs 유지 전력</div><div class="tradeoff-b">저수조·보일러 단열은 저렴한 투자로 열손실 40~68%↓. 회수기간 최단.</div></div>';
+  h+='<div class="tradeoff"><div class="tradeoff-h">3. 순환 재사용 vs 덕트 투자</div><div class="tradeoff-b">열풍 순환률↑(덕트 투자) → 신선공기 가열부하↓. 트레이는 건조부하가 낮아 중간 수준이면 충분합니다.</div></div>';
+  h+='<div class="corr-sect">🎯 트레이 최적 설계 우선순위</div><table class="corr-tbl"><thead><tr><th style="width:8%">순위</th><th style="width:32%">조치</th><th>효과</th></tr></thead><tbody>'
+    +'<tr><td class="var">1</td><td class="var">저수조·보일러 단열</td><td>유지손실 40~68%↓ · <span class="corr-eff">회수 최단</span></td></tr>'
+    +'<tr><td class="var">2</td><td class="var">에어나이프 탈수 강화</td><td>건조 열부하 급감 · <span class="corr-eff">트레이 최대 절감</span></td></tr>'
+    +'<tr><td class="var">3</td><td class="var">가스보일러+온수 집중</td><td>세척조 전기히터 60%↓</td></tr>'
+    +'<tr><td class="var">4</td><td class="var">배수 폐열회수</td><td>보일러 20~30%↓</td></tr>'
+    +'<tr><td class="var">5</td><td class="var">심야전력 예열</td><td>전력단가 40%↓</td></tr>'
+    +'</tbody></table>';
+  h+='</div></div>';return h;
+}
+function cr(v,op,eff){return '<tr><td class="var">'+v+'</td><td style="text-align:center;font-weight:800;color:#5e35b1;">'+op+'</td><td>'+eff+'</td></tr>';}
+
+// ── 이벤트 ──
+document.querySelectorAll('.proctab button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.proctab button').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');_tab=btn.dataset.tab;renderLeft();renderRight();
+  });
+});
+gi('bPC').addEventListener('click',()=>{gi('bPC').classList.add('on');gi('bMB').classList.remove('on');gi('wrap').classList.remove('mobile');});
+gi('bMB').addEventListener('click',()=>{gi('bMB').classList.add('on');gi('bPC').classList.remove('on');gi('wrap').classList.add('mobile');});
+renderLeft();renderRight();
+</script>
+</body>
+</html>
