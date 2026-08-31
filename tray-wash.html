@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v3.3 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v3.4 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -153,7 +153,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v3.3</span>
+    <span class="vb">v3.4</span>
   </div>
 </div>
 </div>
@@ -196,13 +196,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v3.3 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v3.4 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v3.3
+// 트레이 세척·탈수·건조 시뮬레이터 v3.4
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='3.3';
+const VER='3.4';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -423,7 +423,7 @@ function bindSlider(id){
   el.addEventListener('input',()=>{rg.value=el.value;el.classList.add('s-user');onChange(id);});
 }
 function syncState(){
-  ['trayW','trayD','trayT','qty','dlv','wZones','wHole','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeAttack','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','ioLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
+  ['trayW','trayD','trayT','qty','dlv','wHole','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeAttack','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','ioLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
   const bt=gi('boilerType');if(bt)S.boilerType=bt.value;
   const wi=gi('wTankIns');if(wi)S.wTankIns=wi.checked;
   const bi=gi('boilerIns');if(bi)S.boilerIns=bi.checked;
@@ -748,7 +748,7 @@ function renderLeft(){
       // ══ ③ 공통 조건 ══
       +'<div class="st">② 트레이 · 공통 조건</div><div class="g3">'
       +fld('trayW','폭(높이)','mm',S.trayW)+fld('trayD','깊이','mm',S.trayD)+fld('trayT','두께','mm',S.trayT)+'</div>'
-      +'<div class="g2" style="margin-top:6px;">'+fld('qty','처리량(1CH)','매/h',S.qty)+fld('wZones','세척 단수','단',S.wZones)+'</div>'
+      +'<div class="g2" style="margin-top:6px;">'+fld('qty','처리량(1CH)','매/h',S.qty)+'<div class="fl"><label>세척 단수 (조합 자동)</label><input type="text" value="'+(S.stageCombo==='all'?'3단 (1·2·3)':S.stageCombo==='13'?'2단 (1·3)':'1단')+'" readonly style="background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#1b5e20;font-family:inherit;"></div></div>'
       +sliderHTML('wHole','💧 홀 직경(공통)','mm',0.5,10,0.1,S.wHole,2,3)
       +sliderHTML('wTemp','🌡️ 세척온도(공통)','°C',20,90,1,S.wTemp,50,65)
 
@@ -954,7 +954,7 @@ function renderLeft(){
         el.id==='boilerType'||el.id==='containerType'||el.id==='supplyMode'||el.id==='aux1st'
         ||el.id==='meshFilter'||el.id==='sludgeFilter'||el.id==='pumpStrainer'
         ||el.id==='drainMode'||el.id==='stgTankMode'||el.id==='dlv'
-        ||(el.id&&el.id.startsWith('stgType'))||el.id==='wZones'
+        ||(el.id&&el.id.startsWith('stgType'))
         ||['washDryLen','dewatLen','dryLen','ioLen','moduleGap','trayPitch','qty','tempSensor','rinseTemp','rinseWater','hours','days','targetMonth','workers','wage'].indexOf(el.id)>=0||(el.id&&el.id.startsWith('directValve'))
         ||(el.id&&el.id.startsWith('stg'));
       if(needRerender){ syncState(); calcAll(); renderLeft(); renderRight(); }
@@ -1252,7 +1252,7 @@ function buildCorr(){
     +cr('분사 압력','↑','세척력<span class="corr-eff">↑</span>·펌프전력<span class="corr-cost">↑↑</span> (2CH이므로 총유량 2배)')
     +cr('노즐 수','↑','커버리지<span class="corr-eff">↑</span>·유량<span class="corr-up">↑</span> (외벽+격벽 각 채널 독립)')
     +cr('세척 온도','↑','세척력<span class="corr-eff">↑</span>·히터/보일러부하<span class="corr-cost">↑</span>')
-    +cr('세척 단수','↑','세척율<span class="corr-eff">↑↑</span>·펌프/히터<span class="corr-cost">↑</span>')
+    +cr('사용 단 조합','3단↑','세척율<span class="corr-eff">↑↑</span>·펌프/히터/저수조<span class="corr-cost">↑</span> (1·3단만 선택 시 절감)')
     +cr('저수조 단열','ON','유지손실<span class="corr-dn">↓50%</span> ✅저비용 고효율')
     +'</tbody></table>';
   h+='<div class="corr-sect">💨 탈수부 (트레이 강점)</div><table class="corr-tbl"><thead><tr><th style="width:24%">변수</th><th style="width:8%">조작</th><th>연쇄 영향</th></tr></thead><tbody>'
