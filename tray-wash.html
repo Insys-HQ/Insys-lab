@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v3.1 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v3.2 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -153,7 +153,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v3.1</span>
+    <span class="vb">v3.2</span>
   </div>
 </div>
 </div>
@@ -196,13 +196,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v3.1 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v3.2 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v3.1
+// 트레이 세척·탈수·건조 시뮬레이터 v3.2
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='3.1';
+const VER='3.2';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -691,79 +691,85 @@ function renderLeft(){
         +'<div style="margin-top:6px;font-size:13px;color:'+(isRinse?'#00838f':'#1565c0')+';font-weight:600;">→ <b>'+(d.nPerFace||'—')+'개/면</b> × 2면(외벽+격벽) × 2CH = <b>총 '+(d.nPerFace?d.nPerFace*4:'—')+'개</b> · 유량 '+(d.flow?d.flow.toFixed(0):'—')+'LPM · '+(isRinse?'청수':'순환')+' '+(d.water?d.water.toFixed(0):'—')+'L/h</div>'
         +'</div>';
     }
-    h='<div class="card"><div class="ch"><span class="ci">💧</span><span class="cl">세척부 (단계별 독립 설정)</span><span class="cq">1차·2차·헹굼</span></div><div class="cb">'
-      +'<div class="chbox" style="background:#fff8f0;border-color:#ffd9a8;color:#8a5a00;">🎯 <b>단계별 차등 설정으로 전력·물 최소화</b>: 1차는 고압·다노즐(큰오염), 2차는 중압(정밀), 3차 헹굼은 저압·청수(잔류·세제 제거). 균일 고압 대비 최대 47% 전력 절감.</div>'
-      +'<div class="chbox">🍽️ <b>트레이 2CH 노즐 구조</b>: 노즐수는 <b>1개 면(외벽 또는 격벽)당</b> 기준으로 입력합니다.<br>실제 총 노즐 = 입력값 × <b>2면</b>(외벽+격벽) × <b>2CH</b>(좌우 채널) = <b>×4</b>. 각 채널·각 면 모두 독립 노즐이 설치됩니다.</div>'
-      +'<div class="st">공통 조건</div><div class="g3">'
+    h='<div class="card"><div class="ch"><span class="ci">💧</span><span class="cl">세척부 설계 (단계별 독립)</span><span class="cq">실시간 연동</span></div><div class="cb">'
+      // ══ ① 상단 실시간 요약 대시보드 (항상 최상단 고정) ══
+      +'<div style="background:linear-gradient(135deg,#e3f2fd,#e8f5e9);border:2px solid #90caf9;border-radius:11px;padding:11px 13px;margin-bottom:11px;">'
+      +'<div style="font-size:14px;font-weight:800;color:#0d2137;margin-bottom:8px;">📊 실시간 세척 성능 (값 변경 시 즉시 반영)</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">'
+      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:19px;font-weight:900;color:#1b5e20;">'+R.washEff.toFixed(0)+'%</div><div style="font-size:12px;color:#5a7088;">세척 효율</div></div>'
+      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:19px;font-weight:900;color:#0d47a1;">'+R.capa2ch+'</div><div style="font-size:12px;color:#5a7088;">CAPA 매/h(2CH)</div></div>'
+      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:19px;font-weight:900;color:#6a1b9a;">'+R.washPumpTotal.toFixed(1)+'</div><div style="font-size:12px;color:#5a7088;">순환펌프 kW</div></div>'
+      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:17px;font-weight:900;color:#00695c;">'+R.actStages.length+'단</div><div style="font-size:12px;color:#5a7088;">세척조 구성</div></div>'
+      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:17px;font-weight:900;color:#e65100;">'+R.tankL+'L</div><div style="font-size:12px;color:#5a7088;">총 저수량</div></div>'
+      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:17px;font-weight:900;color:#c62828;">'+R.optWashLen+'</div><div style="font-size:12px;color:#5a7088;">최적 조길이 mm</div></div>'
+      +'</div>'
+      +'<div style="margin-top:7px;font-size:12px;color:#37474f;line-height:1.6;">⏱️ 투입 '+R.feedIntervalSec.toFixed(1)+'초/2개 · 컨베이어 '+R.speedMmin.toFixed(2)+'m/min · 체류 '+R.dwellWash.toFixed(0)+'s(필요'+R.needWash.toFixed(0)+'s '+(R.washOK?'✅':'⚠️')+')</div>'
+      +'</div>'
+
+      // ══ ② 사용 단 조합 (최상단 - 이걸 바꾸면 아래 전부 연동) ══
+      +'<div class="st">① 사용 단 조합 <span style="color:#c62828;font-size:12px;">(변경 시 저수조·노즐·효율·CAPA 전체 연동)</span></div>'
+      +'<div class="g2">'+sel('stageCombo','사용 단',[['all','1·2·3단 전체 (예세척+본세척+헹굼)'],['13','1·3단만 (세척+헹굼, 2단 생략)'],['1','1단만 (간이 세척)']],S.stageCombo)+fld('dlv','오염도','1~5',S.dlv)+'</div>'
+      +'<div class="chbox" style="background:#fff8f0;border-color:#ffd9a8;color:#8a5a00;">🎯 <b>'+(S.stageCombo==='all'?'3단 전체':S.stageCombo==='13'?'1·3단만':'1단만')+'</b> 선택됨 → 저수조 '+R.actStages.length+'개, 노즐·펌프·효율이 이 조합에 맞춰 자동 재계산됩니다. 오염도가 낮으면 단수를 줄여 투자·운전비 절감.</div>'
+
+      // ══ ③ 공통 조건 ══
+      +'<div class="st">② 트레이 · 공통 조건</div><div class="g3">'
       +fld('trayW','폭(높이)','mm',S.trayW)+fld('trayD','깊이','mm',S.trayD)+fld('trayT','두께','mm',S.trayT)+'</div>'
-      +'<div class="g3" style="margin-top:6px;">'+fld('qty','처리량(1CH)','매/h',S.qty)+fld('dlv','오염도','1~5',S.dlv)+fld('wZones','세척 단수','단',S.wZones)+'</div>'
-      +'<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">📊 <b>세척 CAPA (2CH 합계)</b><br>'
-      +'⏱️ 투입: <b>'+R.feedIntervalSec.toFixed(1)+'초</b>마다 좌우 <b>2개씩</b> 동시 투입<br>'
-      +'🏃 컨베이어 속도: <b>'+R.speedMmin.toFixed(2)+' m/min</b> (트레이 '+R.traysPerMin.toFixed(1)+'매/분/CH)<br>'
-      +'🍽️ <b>시간당 세척량: 1CH '+R.capa1ch+'매 × 2CH = <span style="font-size:17px;">'+R.capa2ch+'매/h</span></b></div>'
-      +'<div class="g3" style="margin-top:6px;">'+fld('targetMonth','목표 월수량','매',S.targetMonth)+fld('hours','일 근무시간','h',S.hours)+fld('days','월 근무일수','일',S.days)+'</div>'
-      +'<div class="chbox" style="background:'+(R.capaEnough?'#e8f5e9':'#ffebee')+';border-color:'+(R.capaEnough?'#a5d6a7':'#ef9a9a')+';color:'+(R.capaEnough?'#1b5e20':'#b71c1c')+';">'
-      +'📅 <b>최대 월 생산능력 = '+R.capa2ch+'매/h × '+S.hours+'h × '+S.days+'일 = '+R.monthlyCapa.toLocaleString()+'매</b><br>'
-      +'🎯 <b>목표 '+S.targetMonth.toLocaleString()+'매</b> → '+(R.capaEnough?'✅ 달성 가능 (일 <b>'+R.needHours.toFixed(1)+'시간</b>만 세척)':'⚠️ 능력 부족 (처리량↑ 또는 근무↑ 필요)')+'</div>'
-      +'<div class="st">인력 투입 효율 (관통식 2명)</div>'
-      +'<div class="g3">'+fld('workers','투입 인원','명',S.workers)+fld('wage','시급','원',S.wage)+'<div class="fl"><label>설비 방식</label><input type="text" value="관통식(직선)" readonly style="background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#1b5e20;font-family:inherit;"></div></div>'
-      +'<div class="chbox" style="background:#e1f5fe;border-color:#81d4fa;color:#01579b;">👥 <b>관통식 '+S.workers+'명 투입</b> (기존 리턴식은 1명 순환대기)<br>'
-      +'⏱️ 목표 '+S.targetMonth.toLocaleString()+'매를 <b>일 '+R.workHoursPerDay.toFixed(1)+'시간</b>만에 완료 → 나머지 <b>'+R.freeHoursPerDay.toFixed(1)+'시간</b> 다른 업무 전환<br>'
-      +'💰 세척 인건비 <b>'+Math.round(R.laborCostMonth).toLocaleString()+'원/월</b>'+(R.freeManHourMonth>0?' · 여유 인력 <b>'+Math.round(R.freeManHourMonth)+'인시/월</b> 확보':'')+'<br>'
-      +'🚀 <b>빨리 세척하고 다른 일 하는 것이 유리</b> — CAPA(처리량)를 높이면 세척시간↓ 인력전환↑</div>'
+      +'<div class="g2" style="margin-top:6px;">'+fld('qty','처리량(1CH)','매/h',S.qty)+fld('wZones','세척 단수','단',S.wZones)+'</div>'
       +sliderHTML('wHole','💧 홀 직경(공통)','mm',0.5,10,0.1,S.wHole,2,3)
       +sliderHTML('wTemp','🌡️ 세척온도(공통)','°C',20,90,1,S.wTemp,50,65)
-      +'<div class="st">단계별 설정 (압력·노즐수 개별)</div>'
+
+      // ══ ④ 단계별 노즐·압력 설정 ══
+      +'<div class="st">③ 단계별 노즐·압력 설정 <span style="color:#0d7fa8;font-size:12px;">(각 단 독립)</span></div>'
+      +'<div class="chbox">🍽️ 노즐수는 <b>면당</b> 기준. 실제 = 입력 × 2면(외벽+격벽) × 2CH = ×4. 1차 고압·다노즐, 헹굼 저압·소노즐이 효율적.</div>'
       +stgHtml
-      +'<div class="st">사용 단 조합</div>'
-      +'<div class="g2">'+sel('stageCombo','사용 단',[['all','1·2·3단 전체'],['13','1·3단만(2단 생략)'],['1','1단만']],S.stageCombo)
-      +sel('stgTankMode','저수조 입력',[['auto','자동 최적(회전율)'],['volume','용량 입력→치수'],['dim','치수 입력→용량']],S.stgTankMode)+'</div>'
-      +'<div class="g2" style="margin-top:6px;">'+fld('stgTankFixW','저수조 폭(고정)','mm',S.stgTankFixW)+'<div class="fl"><label>회전시간 목표</label><input type="text" value="세척2.5·헹굼2분" readonly style="background:#eef1f4;border:1.5px solid #ccc;border-radius:6px;padding:5px 8px;font-size:13px;color:#666;font-family:inherit;"></div></div>'
-      +'<div class="st">단별 독립 저수조 (사용 단만 설치)</div>'
-      +'<table class="tbl"><thead><tr><th>단</th><th>유량</th><th>회전</th><th>용량(L)</th><th>폭×길이×깊이(mm)</th></tr></thead><tbody>'
+
+      // ══ ⑤ 저수조 추천 (사용 단만) ══
+      +'<div class="st">④ 단별 독립 저수조 <span style="color:#0d7fa8;font-size:12px;">(사용 단만 자동 추천)</span></div>'
+      +'<div class="g2">'+sel('stgTankMode','저수조 입력',[['auto','자동 최적(회전율)'],['volume','용량 입력→치수'],['dim','치수 입력→용량']],S.stgTankMode)+fld('stgTankFixW','저수조 폭(고정)','mm',S.stgTankFixW)+'</div>'
+      +'<table class="tbl" style="margin-top:6px;"><thead><tr><th>단</th><th>유량</th><th>회전</th><th>용량(L)</th><th>폭×길이×깊이(mm)</th></tr></thead><tbody>'
       +R.stgTanks.map(function(t){
           var nm=['1차','2차','3차헹굼'][t.idx];
           if(!t.active) return '<tr style="opacity:.4;"><td>'+nm+'</td><td colspan="4" style="color:#999;">미사용 (저수조·펌프 불필요)</td></tr>';
           var volCell, dimCell;
-          var st='width:56px;border:1.5px solid #c5d5e5;border-radius:5px;padding:3px 4px;font-size:13px;font-family:inherit;';
+          var stI='width:56px;border:1.5px solid #c5d5e5;border-radius:5px;padding:3px 4px;font-size:13px;font-family:inherit;';
           if(S.stgTankMode==='auto'){
             volCell='<span class="hi">'+t.tankL+'L</span>';
             dimCell='<span style="font-size:12px;color:#5a7088;">'+t.dimW+'×'+t.dimD+'×'+t.dimH+'</span>';
           } else if(S.stgTankMode==='volume'){
-            volCell='<input type="number" id="stgTank'+t.idx+'" value="'+t.tankL+'" style="'+st+'">';
+            volCell='<input type="number" id="stgTank'+t.idx+'" value="'+t.tankL+'" style="'+stI+'">';
             dimCell='<span style="font-size:12px;color:#43a047;font-weight:700;">'+t.dimW+'×'+t.dimD+'×'+t.dimH+'(자동)</span>';
           } else {
             volCell='<span class="hi" style="color:#43a047;">'+t.tankL+'L(자동)</span>';
-            dimCell='<input type="number" id="stgTankW'+t.idx+'" value="'+t.dimW+'" style="'+st+'">×<input type="number" id="stgTankD'+t.idx+'" value="'+t.dimD+'" style="'+st+'">×<input type="number" id="stgTankH'+t.idx+'" value="'+t.dimH+'" style="'+st+'">';
+            dimCell='<input type="number" id="stgTankW'+t.idx+'" value="'+t.dimW+'" style="'+stI+'">×<input type="number" id="stgTankD'+t.idx+'" value="'+t.dimD+'" style="'+stI+'">×<input type="number" id="stgTankH'+t.idx+'" value="'+t.dimH+'" style="'+stI+'">';
           }
           var overMark = t.tankLenOver ? ' <span style="color:#c62828;font-weight:700;font-size:11px;">⚠️세척조('+S.washDryLen+')초과</span>' : '';
           var turnMark = t.actTurnover<1.5?'⚠️짧음':t.actTurnover>4?'⚠️과대':'✅';
           return '<tr><td style="font-weight:700;">'+nm+'</td><td>'+(t.flow?t.flow.toFixed(0):'—')+'LPM</td><td style="font-size:12px;">'+t.actTurnover.toFixed(1)+'분'+turnMark+'</td><td>'+volCell+'</td><td>'+dimCell+overMark+'</td></tr>';
         }).join('')
       +'</tbody></table>'
-      +'<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">💧 <b>각 단 독립 저수조</b> '+R.actStages.length+'개 · 총 <b>'+R.tankL+'L</b><br>'
-      +'📐 <b>치수↔용량 양방향</b>: 용량 입력 시 치수 자동(깊이 기준 정사각), 치수 입력 시 용량 자동 계산.<br>'
-      +'🔄 <b>회전시간</b> = 저수조÷펌프유량. 적정 2~3분. <b>저수조 길이 ≤ 세척조 길이('+S.washDryLen+'mm)</b> — 초과 시 깊이·폭으로 흡수. 폭은 세척부에 맞춰 고정. 오염도 다르므로 물 안 섞고 캐스케이드 오버플로우로만 연결(3→2→1).</div>'
-      +'<div class="st">배수 · 단열</div>'
+      +'<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">💧 저수조 '+R.actStages.length+'개 · 총 <b>'+R.tankL+'L</b> · 폭 고정, 용량은 길이·깊이로 흡수. 저수조 길이 ≤ 세척조('+S.washDryLen+'mm). 캐스케이드 오버플로우(3→2→1).</div>'
+
+      // ══ ⑥ 배수 · 단열 ══
+      +'<div class="st">⑤ 배수 · 단열</div>'
       +'<div class="g2">'+sel('drainMode','배수 방식',[['single','공통 배수조(캐스케이드)'],['perstage','단별 독립 배수']],S.drainMode)
       +'<div class="fl"><label>세척조 단열</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="wTankIns" '+(S.wTankIns?'checked':'')+'> 단열재</label></div></div>'
-      +'<div class="chbox">🚰 배수조 <b>'+R.drainCount+'개</b> ('+(S.drainMode==='single'?'캐스케이드 → 최오염 1단만 최종배수 → 공통 1개로 충분':'단별 독립 배수 → 오염 분리')+')</div>'
-      +'<div class="st">세척수 여과 시스템 (1·2차 세척조)</div>'
-      +'<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">🧹 순환수 이물 제거로 <b>세척력·노즐·펌프 수명 유지</b>. 3단 여과: ①조 하단 금속망(조대) ②슬러지 필터(미세) ③펌프 흡입 스트레이너.</div>'
-      +'<div style="border:1.5px solid #cde3f0;border-radius:9px;padding:9px;margin-bottom:7px;background:#f5fafc;">'
-      +'<label style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#0d7fa8;margin-bottom:6px;"><input type="checkbox" id="meshFilter" '+(S.meshFilter?'checked':'')+'> ① 금속망 필터 (조 하단, 조대 여과)</label>'
-      +(S.meshFilter?'<div class="g2">'+sel('meshSize','메시',[['20','20# (0.85mm)'],['30','30# (0.55mm)'],['40','40# (0.42mm)']],String(S.meshSize))+'<div class="fl"><label>재질/방식</label><input type="text" value="SUS316 서랍식" readonly style="background:#eef;border:1px solid #ccd;border-radius:6px;padding:5px;font-size:13px;font-family:inherit;color:#456;"></div></div>':'')
+      +'<div class="chbox">🚰 배수조 <b>'+R.drainCount+'개</b> ('+(S.drainMode==='single'?'캐스케이드 최오염 1단만 최종배수':'단별 독립')+')</div>'
+
+      // ══ ⑦ 여과 시스템 ══
+      +'<div class="st">⑥ 세척수 여과 (1·2차)</div>'
+      +'<div style="border:1.5px solid #cde3f0;border-radius:9px;padding:9px;margin-bottom:6px;background:#f5fafc;">'
+      +'<label style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#0d7fa8;"><input type="checkbox" id="meshFilter" '+(S.meshFilter?'checked':'')+'> ① 금속망(조 하단, 조대) </label>'
+      +'<label style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#0d7fa8;margin-top:5px;"><input type="checkbox" id="sludgeFilter" '+(S.sludgeFilter?'checked':'')+'> ② 슬러지 필터(미세)</label>'
+      +'<label style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#0d7fa8;margin-top:5px;"><input type="checkbox" id="pumpStrainer" '+(S.pumpStrainer?'checked':'')+'> ③ 펌프 흡입 스트레이너</label>'
       +'</div>'
-      +'<div style="border:1.5px solid #cde3f0;border-radius:9px;padding:9px;margin-bottom:7px;background:#f5fafc;">'
-      +'<label style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#0d7fa8;margin-bottom:6px;"><input type="checkbox" id="sludgeFilter" '+(S.sludgeFilter?'checked':'')+'> ② 슬러지 필터 (미세 침전물)</label>'
-      +(S.sludgeFilter?'<div class="g2">'+sel('sludgeMesh','메시',[['80','80# (0.18mm)'],['100','100# (0.15mm)'],['150','150# (0.10mm)']],String(S.sludgeMesh))+'<div class="fl"><label>방식</label><input type="text" value="백필터/침전조" readonly style="background:#eef;border:1px solid #ccd;border-radius:6px;padding:5px;font-size:13px;font-family:inherit;color:#456;"></div></div>':'')
-      +'</div>'
-      +'<div style="border:1.5px solid #cde3f0;border-radius:9px;padding:9px;margin-bottom:7px;background:#f5fafc;">'
-      +'<label style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#0d7fa8;margin-bottom:6px;"><input type="checkbox" id="pumpStrainer" '+(S.pumpStrainer?'checked':'')+'> ③ 펌프 흡입 스트레이너 (임펠러 보호)</label>'
-      +(S.pumpStrainer?'<div class="g2">'+sel('strainerMesh','메시',[['40','40# (0.42mm)'],['50','50# (0.30mm)'],['60','60# (0.25mm)']],String(S.strainerMesh))+'<div class="fl"><label>방식</label><input type="text" value="Y형/바스켓+차압계" readonly style="background:#eef;border:1px solid #ccd;border-radius:6px;padding:5px;font-size:13px;font-family:inherit;color:#456;"></div></div>':'')
-      +'</div>'
-      +'<div class="g2"><div class="fl"><label>자동 역세척</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="autoBackwash" '+(S.autoBackwash?'checked':'')+'> 백워시(무인)</label></div>'
-      +'<div class="fl"><label>물 교체주기 연장</label><input type="text" value="'+(filterScore(S)>=2?'양호(여과 충실)':'주의(여과 부족)')+'" readonly style="background:'+(filterScore(S)>=2?'#e8f5e9':'#fff3e0')+';border:1px solid #ccd;border-radius:6px;padding:5px;font-size:13px;font-family:inherit;color:#456;"></div></div>'
+
+      // ══ ⑧ 생산·인력 (하단) ══
+      +'<div class="st">⑦ 생산 목표 · 인력 (관통식 2명)</div>'
+      +'<div class="g3">'+fld('targetMonth','목표 월수량','매',S.targetMonth)+fld('hours','일 근무','h',S.hours)+fld('days','월 일수','일',S.days)+'</div>'
+      +'<div class="g2" style="margin-top:6px;">'+fld('workers','투입 인원','명',S.workers)+fld('wage','시급','원',S.wage)+'</div>'
+      +'<div class="chbox" style="background:'+(R.capaEnough?'#e8f5e9':'#ffebee')+';border-color:'+(R.capaEnough?'#a5d6a7':'#ef9a9a')+';color:'+(R.capaEnough?'#1b5e20':'#b71c1c')+';">'
+      +'📅 최대능력 '+R.monthlyCapa.toLocaleString()+'매 · 목표 '+S.targetMonth.toLocaleString()+'매 '+(R.capaEnough?'✅':'⚠️부족')+'<br>'
+      +'👥 <b>관통식 '+S.workers+'명</b>: 목표를 일 <b>'+R.workHoursPerDay.toFixed(1)+'h</b>에 완료 → <b>'+R.freeHoursPerDay.toFixed(1)+'h 다른업무</b>'+(R.freeManHourMonth>0?' (월 '+Math.round(R.freeManHourMonth)+'인시)':'')+'<br>🚀 빨리 세척하고 다른 일 하는 것이 유리</div>'
       +'</div></div>';
 
   }else if(_tab==='dewat'){
