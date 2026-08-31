@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v3.4 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v3.5 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -153,7 +153,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v3.4</span>
+    <span class="vb">v3.5</span>
   </div>
 </div>
 </div>
@@ -196,13 +196,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v3.4 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v3.5 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v3.4
+// 트레이 세척·탈수·건조 시뮬레이터 v3.5
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='3.4';
+const VER='3.5';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -706,26 +706,43 @@ function renderLeft(){
   if(_tab==='wash'){
     calcAll();
     var stgHtml='';
-    var stgNames=['1차 세척','2차 세척','3차 헹굼','4차'];
-    for(var i=0;i<S.wZones;i++){
+    var stgNames=['1차 세척','2차 세척','3차 헹굼'];
+    // 1·2·3단 항상 표시, 미사용 단은 비활성화, 가로 3열 배치
+    stgHtml='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">';
+    for(var i=0;i<3;i++){
       var isRinse=(S.stgType[i]==='rinse');
-      var d=R.stgDetail[i]||{};
-      stgHtml+='<div style="border:1.5px solid '+(isRinse?'#4dd0e1':'#90caf9')+';border-radius:10px;padding:10px;margin-bottom:8px;background:'+(isRinse?'#e0f7fa':'#e3f2fd')+';">'
-        +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
-        +'<span style="font-weight:800;font-size:15px;color:'+(isRinse?'#00838f':'#1565c0')+';">'+(i+1)+'단 — '+stgNames[i]+'</span>'
-        +'<select id="stgType'+i+'" style="border:1.5px solid #b0bec5;border-radius:6px;padding:3px 8px;font-size:13px;font-family:inherit;font-weight:700;">'
+      var active=(R.actStages.indexOf(i)>=0);
+      var d=(R.stgDetail&&R.stgDetail[i])||{};
+      var bg=active?(isRinse?'#e0f7fa':'#e3f2fd'):'#f0f2f5';
+      var bd=active?(isRinse?'#4dd0e1':'#90caf9'):'#d0d5db';
+      var tc=active?(isRinse?'#00838f':'#1565c0'):'#999';
+      var dis=active?'':' disabled';
+      var opacity=active?'':'opacity:.5;';
+      var inpBg=active?'#fff':'#eceff1';
+      stgHtml+='<div style="border:1.5px solid '+bd+';border-radius:9px;padding:8px;background:'+bg+';'+opacity+'">'
+        +'<div style="font-weight:800;font-size:13px;color:'+tc+';margin-bottom:5px;text-align:center;">'+(i+1)+'단</div>'
+        +'<div style="font-size:11px;color:'+tc+';text-align:center;margin-bottom:6px;">'+(active?stgNames[i]:'미사용')+'</div>'
+        +'<label style="font-size:11px;color:#5a7088;">세척/헹굼</label>'
+        +'<select id="stgType'+i+'"'+dis+' style="width:100%;border:1.5px solid #b0bec5;border-radius:5px;padding:3px;font-size:12px;font-family:inherit;font-weight:700;background:'+inpBg+';margin-bottom:5px;">'
         +'<option value="wash"'+(!isRinse?' selected':'')+'>세척</option>'
-        +'<option value="rinse"'+(isRinse?' selected':'')+'>헹굼(청수)</option></select></div>'
-        +'<div class="g2" style="margin-bottom:6px;">'
-        +'<div class="fl"><label>분사압력</label><input type="number" id="stgPress'+i+'" value="'+S.stgPress[i]+'" style="border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:14px;font-family:inherit;font-weight:600;"><span class="un">kPa</span></div>'
-        +'<div class="fl"><label>펌프 출력</label><input type="text" value="'+(d.pkw?d.pkw.toFixed(2):'—')+'kW" readonly style="border:1.5px solid #a5d6a7;background:#e8f5e9;border-radius:6px;padding:5px 8px;font-size:14px;font-family:inherit;font-weight:700;color:#1b5e20;"></div></div>'
-        +'<div class="g2">'
-        +'<div class="fl"><label>가로 노즐수 <span style="color:#0d7fa8;font-size:11px;">(면당)</span></label><input type="number" id="stgCol'+i+'" value="'+S.stgCol[i]+'" style="border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:14px;font-family:inherit;font-weight:600;"><span class="un">개</span></div>'
-        +'<div class="fl"><label>세로 노즐수 <span style="color:#0d7fa8;font-size:11px;">(면당)</span></label><input type="number" id="stgRow'+i+'" value="'+S.stgRow[i]+'" style="border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:14px;font-family:inherit;font-weight:600;"><span class="un">개</span></div></div>'
-        +'<div style="margin-top:6px;font-size:13px;color:'+(isRinse?'#00838f':'#1565c0')+';font-weight:600;">→ <b>'+(d.nPerFace||'—')+'개/면</b> × 2면(외벽+격벽) × 2CH = <b>총 '+(d.nPerFace?d.nPerFace*4:'—')+'개</b> · 유량 '+(d.flow?d.flow.toFixed(0):'—')+'LPM · '+(isRinse?'청수':'순환')+' '+(d.water?d.water.toFixed(0):'—')+'L/h</div>'
+        +'<option value="rinse"'+(isRinse?' selected':'')+'>헹굼</option></select>'
+        +'<label style="font-size:11px;color:#5a7088;">분사압력(kPa)</label>'
+        +'<input type="number" id="stgPress'+i+'" value="'+S.stgPress[i]+'"'+dis+' style="width:100%;border:1.5px solid #c5d5e5;border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:'+inpBg+';margin-bottom:5px;">'
+        +'<label style="font-size:11px;color:#5a7088;">가로×세로 노즐(면당)</label>'
+        +'<div style="display:flex;gap:4px;margin-bottom:5px;">'
+        +'<input type="number" id="stgCol'+i+'" value="'+S.stgCol[i]+'"'+dis+' style="width:50%;border:1.5px solid #c5d5e5;border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:'+inpBg+';">'
+        +'<input type="number" id="stgRow'+i+'" value="'+S.stgRow[i]+'"'+dis+' style="width:50%;border:1.5px solid #c5d5e5;border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:'+inpBg+';"></div>'
+        +(active
+          ?'<div style="font-size:11px;color:'+tc+';font-weight:600;line-height:1.5;border-top:1px dashed '+bd+';padding-top:5px;">'
+            +'펌프 <b>'+(d.pkw?d.pkw.toFixed(2):'—')+'kW</b><br>'
+            +'노즐 '+(d.nPerFace||'—')+'/면 ×4 = <b>'+(d.nPerFace?d.nPerFace*4:'—')+'개</b><br>'
+            +'유량 '+(d.flow?d.flow.toFixed(0):'—')+'LPM</div>'
+          :'<div style="font-size:11px;color:#999;text-align:center;border-top:1px dashed #d0d5db;padding-top:5px;">저수조·펌프<br>불필요</div>')
         +'</div>';
     }
-    h='<div class="card"><div class="ch"><span class="ci">💧</span><span class="cl">세척부 설계 (단계별 독립)</span><span class="cq">실시간 연동</span></div><div class="cb">'
+    stgHtml+='</div>';
+
+        h='<div class="card"><div class="ch"><span class="ci">💧</span><span class="cl">세척부 설계 (단계별 독립)</span><span class="cq">실시간 연동</span></div><div class="cb">'
       // ══ ① 상단 실시간 요약 대시보드 (항상 최상단 고정) ══
       +'<div style="background:linear-gradient(135deg,#e3f2fd,#e8f5e9);border:2px solid #90caf9;border-radius:11px;padding:11px 13px;margin-bottom:11px;">'
       +'<div style="font-size:14px;font-weight:800;color:#0d2137;margin-bottom:8px;">📊 실시간 세척 성능 (값 변경 시 즉시 반영)</div>'
