@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v3.2 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v3.3 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -153,7 +153,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v3.2</span>
+    <span class="vb">v3.3</span>
   </div>
 </div>
 </div>
@@ -196,13 +196,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v3.2 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v3.3 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v3.2
+// 트레이 세척·탈수·건조 시뮬레이터 v3.3
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='3.2';
+const VER='3.3';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -619,6 +619,40 @@ function calcAll(){
   const washEff=Math.min(99,100-dirt);
   const dewatEff=Math.min(99,(1-residual/(qtyH*0.03))*100);
   const dryEff=Math.min(99,65+S.dryTemp*0.28+S.dryRecirc*0.12);
+
+  // ═══ 추천값 산출 (설정값과 비교용) ═══
+  // 목표 세척효율 (사용자 목표 or 기본 95%)
+  const tgtWashEff = 95;
+  const nActive = actStages.length;
+  // 1) 추천 세척조 길이 = 사용단수 × 단위체류길이 (오염도·속도 반영)
+  //    각 단 필요 체류시간 = 6 + 오염도×2초, 속도 기반 길이
+  const needDwellPerStage = 6 + S.dlv*2; // 초/단
+  const speedMminRec = S.qty*(S.trayPitch/1000)/60;
+  const speedMsRec = speedMminRec/60;
+  const recWashLen = Math.ceil(nActive * needDwellPerStage * speedMsRec * 1000 * 1.2 / 100)*100;
+  // 2) 단수 줄면 남은 단 강화 필요 → 추천 압력 (효율 부족분 보상)
+  //    3단 대비 부족한 효율을 압력으로 보상
+  const effGap = Math.max(0, tgtWashEff - washEff);
+  const recPress1 = Math.min(400, 280 + effGap*8); // 1차 추천 압력
+  // 3) 추천 노즐수 (트레이 면적 기반, 오염도 가중)
+  const faceArea = S.trayD * S.trayW / 1e6; // m²
+  const recNozPerFace = Math.max(6, Math.round(faceArea * (30 + S.dlv*8)));
+  // 4) 추천 온도 (오염도 높으면 상향)
+  const recTemp = Math.min(75, 55 + S.dlv*2);
+  // 5) 추천 컨베이어 속도 (목표 CAPA 달성 최소)
+  const recSpeed = speedMminRec; // 현재 처리량 기준
+  // 설정값
+  const setWashLen = S.washDryLen;
+  const setPress1 = S.stgPress[0];
+  const setNozPerFace = (S.stgCol[0]||4)*(S.stgRow[0]||4);
+  const setTemp = S.wTemp;
+  // 편차 판정
+  const lenDiff = setWashLen - recWashLen;
+  const recommend = {
+    washLen:recWashLen, press1:recPress1, nozPerFace:recNozPerFace, temp:recTemp, speed:recSpeed, washEff:tgtWashEff,
+    setWashLen, setPress1, setNozPerFace, setTemp, setSpeed:speedMminRec, setWashEff:washEff,
+    lenDiff, effGap
+  };
   // ── 컨베이어 속도·길이·체류시간 연동 ──
   // 총길이 = 모듈합 + 조 사이 간격 2곳(세척↔탈수, 탈수↔건조) + 입출구
   const nGaps = 2; // 조 사이 간격 지점 수
@@ -653,7 +687,7 @@ function calcAll(){
   const dwellDewat = speedMs>0 ? (S.dewatLen/1000)/speedMs : 0;
   const dwellDry = speedMs>0 ? (S.dryLen/1000)/speedMs : 0;
   // 필요 최소 체류시간 (공정 강도 기반)
-  const needWash = 6 + S.dlv*2; // 오염도 높을수록 더 필요
+  const needWash = (6 + S.dlv*2) * activeStages(S.stageCombo,zn).length; // 사용단수 × 단위체류
   const needDewat = Math.max(3, S.knifePass*1.2);
   const needDry = 8 + (S.dryTemp<80?4:0);
   // 최적(최단) 길이 = 필요체류 × 속도 × 여유20%
@@ -663,7 +697,7 @@ function calcAll(){
   // 체류 충분성 판정
   const washOK = dwellWash>=needWash, dewatOK=dwellDewat>=needDewat, dryOK=dwellDry>=needDry;
 
-  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,nPerFace,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist};
+  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nPerFace,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist};
 }
 
 // ── 좌측 렌더 ──
@@ -701,14 +735,14 @@ function renderLeft(){
       +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:19px;font-weight:900;color:#6a1b9a;">'+R.washPumpTotal.toFixed(1)+'</div><div style="font-size:12px;color:#5a7088;">순환펌프 kW</div></div>'
       +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:17px;font-weight:900;color:#00695c;">'+R.actStages.length+'단</div><div style="font-size:12px;color:#5a7088;">세척조 구성</div></div>'
       +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:17px;font-weight:900;color:#e65100;">'+R.tankL+'L</div><div style="font-size:12px;color:#5a7088;">총 저수량</div></div>'
-      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:17px;font-weight:900;color:#c62828;">'+R.optWashLen+'</div><div style="font-size:12px;color:#5a7088;">최적 조길이 mm</div></div>'
+      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:17px;font-weight:900;color:#c62828;">'+R.recommend.washLen+'</div><div style="font-size:12px;color:#5a7088;">추천 세척조 mm</div></div>'
       +'</div>'
       +'<div style="margin-top:7px;font-size:12px;color:#37474f;line-height:1.6;">⏱️ 투입 '+R.feedIntervalSec.toFixed(1)+'초/2개 · 컨베이어 '+R.speedMmin.toFixed(2)+'m/min · 체류 '+R.dwellWash.toFixed(0)+'s(필요'+R.needWash.toFixed(0)+'s '+(R.washOK?'✅':'⚠️')+')</div>'
       +'</div>'
 
       // ══ ② 사용 단 조합 (최상단 - 이걸 바꾸면 아래 전부 연동) ══
       +'<div class="st">① 사용 단 조합 <span style="color:#c62828;font-size:12px;">(변경 시 저수조·노즐·효율·CAPA 전체 연동)</span></div>'
-      +'<div class="g2">'+sel('stageCombo','사용 단',[['all','1·2·3단 전체 (예세척+본세척+헹굼)'],['13','1·3단만 (세척+헹굼, 2단 생략)'],['1','1단만 (간이 세척)']],S.stageCombo)+fld('dlv','오염도','1~5',S.dlv)+'</div>'
+      +'<div class="g2">'+sel('stageCombo','사용 단',[['all','1·2·3단 전체 (예세척+본세척+헹굼)'],['13','1·3단만 (세척+헹굼, 2단 생략)'],['1','1단만 (간이 세척)']],S.stageCombo)+sel('dlv','오염도',[['1','① 경미'],['2','② 보통'],['3','③ 중간'],['4','④ 심함'],['5','⑤ 극심']],String(S.dlv))+'</div>'
       +'<div class="chbox" style="background:#fff8f0;border-color:#ffd9a8;color:#8a5a00;">🎯 <b>'+(S.stageCombo==='all'?'3단 전체':S.stageCombo==='13'?'1·3단만':'1단만')+'</b> 선택됨 → 저수조 '+R.actStages.length+'개, 노즐·펌프·효율이 이 조합에 맞춰 자동 재계산됩니다. 오염도가 낮으면 단수를 줄여 투자·운전비 절감.</div>'
 
       // ══ ③ 공통 조건 ══
@@ -914,11 +948,12 @@ function renderLeft(){
       onChange(el.id);
     });
     el.addEventListener('change',()=>{
+      if(el.id==='stageCombo'){ syncState(); calcAll(); if(R.recommend){S.washDryLen=R.recommend.washLen;} calcAll(); renderLeft(); renderRight(); return; }
       // 입력 완료(포커스 아웃/엔터) 시 재렌더 — 연동 필드 최신화
       const needRerender =
         el.id==='boilerType'||el.id==='containerType'||el.id==='supplyMode'||el.id==='aux1st'
         ||el.id==='meshFilter'||el.id==='sludgeFilter'||el.id==='pumpStrainer'
-        ||el.id==='stageCombo'||el.id==='drainMode'||el.id==='stgTankMode'
+        ||el.id==='drainMode'||el.id==='stgTankMode'||el.id==='dlv'
         ||(el.id&&el.id.startsWith('stgType'))||el.id==='wZones'
         ||['washDryLen','dewatLen','dryLen','ioLen','moduleGap','trayPitch','qty','tempSensor','rinseTemp','rinseWater','hours','days','targetMonth','workers','wage'].indexOf(el.id)>=0||(el.id&&el.id.startsWith('directValve'))
         ||(el.id&&el.id.startsWith('stg'));
@@ -953,6 +988,43 @@ function renderRight(){
     +'</tbody></table>'
     +(R.gasLoad>0?'<div class="note">※ 가스보일러 '+R.gasLoad.toFixed(1)+'kW는 가스비로 별도 계산</div>':'')
     +'</div></div>';
+  // 세척 탭이면 추천 vs 설정 비교 카드
+  if(_tab==='wash' && R.recommend){
+    const rc=R.recommend;
+    function cmpRow(label,set,rec,unit,goodWhenClose){
+      const diff=set-rec;
+      const pct=rec!==0?Math.abs(diff/rec*100):0;
+      const st=pct<=10?'#2e7d32':pct<=25?'#e65100':'#c62828';
+      const mark=pct<=10?'✅적정':(diff>0?'↑초과':'↓부족');
+      return '<tr><td style="text-align:left;font-weight:700;">'+label+'</td>'
+        +'<td style="color:#0d47a1;font-weight:700;">'+set+unit+'</td>'
+        +'<td style="color:#2e7d32;font-weight:700;">'+rec+unit+'</td>'
+        +'<td style="color:'+st+';font-size:12px;">'+mark+'</td></tr>';
+    }
+    // 막대 비교 (설정 vs 추천 정규화)
+    function cmpBar(label,set,rec,max){
+      const setPct=Math.min(100,set/max*100), recPct=Math.min(100,rec/max*100);
+      return '<div style="margin-bottom:7px;"><div style="font-size:12px;font-weight:600;color:#37474f;margin-bottom:2px;">'+label+'</div>'
+        +'<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;"><span style="width:38px;font-size:11px;color:#0d47a1;">설정</span><div style="flex:1;background:#e3eaf0;border-radius:5px;height:16px;"><div style="width:'+setPct+'%;height:100%;background:#1565c0;border-radius:5px;"></div></div><span style="width:60px;font-size:11px;text-align:right;color:#0d47a1;">'+set+'</span></div>'
+        +'<div style="display:flex;align-items:center;gap:5px;"><span style="width:38px;font-size:11px;color:#2e7d32;">추천</span><div style="flex:1;background:#e8f5e9;border-radius:5px;height:16px;"><div style="width:'+recPct+'%;height:100%;background:#43a047;border-radius:5px;"></div></div><span style="width:60px;font-size:11px;text-align:right;color:#2e7d32;">'+rec+'</span></div></div>';
+    }
+    h+='<div class="card"><div class="ch"><span class="ci">📊</span><span class="cl">추천값 vs 설정값 비교</span><span class="cq">단수·오염도 연동</span></div><div class="cb">'
+      +'<div class="chbox" style="background:#f3e5f5;border-color:#ce93d8;color:#6a1b9a;">🎯 사용 단수·오염도·처리량을 바꾸면 <b>추천값이 재계산</b>됩니다. 설정값(파랑)과 추천값(초록)을 비교해 최적 설계에 근접시키세요.</div>'
+      +cmpBar('세척조 길이 (mm)',rc.setWashLen,rc.washLen,Math.max(rc.setWashLen,rc.washLen)*1.1)
+      +cmpBar('1차 분사압력 (kPa)',rc.setPress1,rc.press1,400)
+      +cmpBar('노즐수 (개/면)',rc.setNozPerFace,rc.nozPerFace,Math.max(rc.setNozPerFace,rc.nozPerFace)*1.2)
+      +cmpBar('세척온도 (°C)',rc.setTemp,rc.temp,90)
+      +cmpBar('세척효율 (%)',rc.setWashEff.toFixed(0),rc.washEff,100)
+      +'<table class="tbl" style="margin-top:8px;"><thead><tr><th>항목</th><th style="color:#0d47a1;">설정</th><th style="color:#2e7d32;">추천</th><th>판정</th></tr></thead><tbody>'
+      +cmpRow('세척조 길이',rc.setWashLen,rc.washLen,'mm')
+      +cmpRow('1차 압력',rc.setPress1,rc.press1,'kPa')
+      +cmpRow('노즐/면',rc.setNozPerFace,rc.nozPerFace,'개')
+      +cmpRow('세척온도',rc.setTemp,rc.temp,'°C')
+      +'</tbody></table>'
+      +(rc.effGap>3?'<div class="chbox" style="background:#fff3e0;border-color:#ffcc80;color:#e65100;">⚠️ <b>세척효율 '+rc.setWashEff.toFixed(0)+'% (목표 95% 대비 '+rc.effGap.toFixed(0)+'% 부족)</b> → 단수를 줄였다면 1차 압력을 '+rc.press1+'kPa로, 노즐을 '+rc.nozPerFace+'개/면으로, 온도를 '+rc.temp+'°C로 강화하면 보상됩니다.</div>':'<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">✅ <b>세척효율 '+rc.setWashEff.toFixed(0)+'%</b> — 목표 달성. 설정이 추천값에 근접합니다.</div>')
+      +(Math.abs(rc.lenDiff)>500?'<div class="chbox" style="background:'+(rc.lenDiff>0?'#fff3e0':'#ffebee')+';border-color:#ffcc80;color:#e65100;">📏 <b>세척조 길이</b>: 설정 '+rc.setWashLen+'mm vs 추천 '+rc.washLen+'mm ('+(rc.lenDiff>0?'약 '+rc.lenDiff+'mm 과다 → 단축 가능':'약 '+Math.abs(rc.lenDiff)+'mm 부족 → 체류 부족 위험')+'). 사용 단수 '+R.actStages.length+'단 기준.</div>':'')
+      +'</div></div>';
+  }
   h+='<div class="card"><div class="ch"><span class="ci">🎯</span><span class="cl">효율·투자비 최적화 권장</span></div><div class="cb">'+buildRec()+'</div></div>';
   Rc.innerHTML=h;
   if(_tab==='result')renderCost();
