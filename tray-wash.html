@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v3.6 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v3.7 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -130,14 +130,16 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 .tradeoff-b{font-size:13px;color:#6a4a2a;line-height:1.6;}
 .note{font-size:13px;color:#9aabb8;margin-top:5px;line-height:1.5;}
 footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
-.flowbar{display:flex;align-items:stretch;gap:4px;margin-bottom:10px;overflow-x:auto;}
-.flowstep{flex:1;min-width:72px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 5px;text-align:center;font-size:13px;}
-.flowstep .fe{font-size:17px;display:block;}
-.flowstep .fn{font-weight:700;color:var(--navy);margin-top:1px;}
-.flowstep .fv{font-size:13px;color:var(--teal);font-weight:700;margin-top:1px;}
-.flowstep.aw{border-top:3px solid var(--wash);}
-.flowstep.ad{border-top:3px solid var(--dewat);}
-.flowstep.ar{border-top:3px solid var(--dry);}
+.flowbar{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:11px;}
+@media(min-width:768px){.flowbar{grid-template-columns:repeat(8,1fr);}}
+.flowstep{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 4px;text-align:center;}
+
+.flowstep .fn{font-size:12px;font-weight:700;color:var(--steel);line-height:1.2;}
+.flowstep .fsub{font-size:10px;color:#9aabb8;line-height:1.1;margin-bottom:3px;}
+.flowstep .fv{font-size:16px;color:var(--navy);font-weight:900;line-height:1.2;}
+.flowstep.aw{border-top:3px solid var(--wash);}.flowstep.aw .fv{color:var(--wash);}
+.flowstep.ad{border-top:3px solid var(--dewat);}.flowstep.ad .fv{color:var(--dewat);}
+.flowstep.ar{border-top:3px solid var(--dry);}.flowstep.ar .fv{color:var(--dry);}
 .chbox{background:#eef6fb;border:1px solid #cde3f0;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:13px;color:#0b5a80;line-height:1.6;}
 </style>
 </head>
@@ -153,7 +155,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v3.6</span>
+    <span class="vb">v3.7</span>
   </div>
 </div>
 </div>
@@ -196,13 +198,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v3.6 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v3.7 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v3.6
+// 트레이 세척·탈수·건조 시뮬레이터 v3.7
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='3.6';
+const VER='3.7';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -645,19 +647,21 @@ function calcAll(){
   // 효율 (트레이 특성 반영: 평판이라 탈수·건조 우수)
   // 세척효율: 단계 누적 (각 단계가 잔류오염 제거, 헹굼은 마무리)
   let dirt=100;
-  for(let i=0;i<zn;i++){
+  // 오염도별 저항 (극심할수록 제거 어려움) → 오염도에 민감
+  const dirtHardness=[0,1.0,1.15,1.35,1.6,2.0][S.dlv]||1.35;
+  // 사용 단만 누적 계산 (미사용 단 제외)
+  actStages.forEach(function(i){
     const isRinse=(S.stgType[i]==='rinse');
     const press=S.stgPress[i]||200;
-    // 제거율: 압력·노즐수·온도 기반, 헹굼은 잔류 마무리
     const nP=(S.stgCol[i]||4)*(S.stgRow[i]||4);
-    const pressF=Math.min(1,press/280);
-    const nozF=Math.min(1,nP/24);
-    const baseRem=isRinse?0.88:(0.5+0.25*pressF+0.15*nozF);
-    const tempF=isRinse?1:(1+(S.wTemp-40)*0.004);
-    const dirtF=isRinse?1:(1-(S.dlv-1)*0.05);
-    dirt=dirt*(1-Math.min(0.95,baseRem*tempF*dirtF));
-  }
-  const washEff=Math.min(99,100-dirt);
+    const pressF=Math.min(1,press/350);
+    const nozF=Math.min(1,nP/20);
+    let baseRem=isRinse?0.85:(0.45+0.3*pressF+0.15*nozF);
+    const tempF=isRinse?1:(0.85+(S.wTemp-40)*0.006);
+    baseRem=baseRem/dirtHardness; // 오염 저항 반영
+    dirt=dirt*(1-Math.min(0.9,baseRem*tempF));
+  });
+  const washEff=Math.min(99,Math.max(30,100-dirt));
   const dewatEff=Math.min(99,(1-residual/(qtyH*0.03))*100);
   const dryEff=Math.min(99,65+S.dryTemp*0.28+S.dryRecirc*0.12);
   // 노즐 배열 정보 (분사각·이격 연동)
@@ -1110,21 +1114,18 @@ function renderRight(){
 function kc(c,v,l){return '<div class="kc '+c+'"><div class="kv">'+v+'</div><div class="kl">'+l+'</div></div>';}
 function row(p,e,r,rl){return '<tr><td>'+p+'</td><td>'+e+'</td><td class="hi">'+r.toFixed(1)+'</td><td>'+rl.toFixed(1)+'</td></tr>';}
 function renderFlow(){
-  // 전체 탭 핵심값 실시간 취합 대시보드
+  // 전체 탭 핵심값 실시간 취합 (라벨 위 / 값 아래 줄바꿈, 카드형)
   gi('flowbar').innerHTML=
-    fs('aw','💧','세척효율',R.washEff.toFixed(0)+'%')
-    +fs('ad','💨','탈수효율',R.dewatEff.toFixed(0)+'%')
-    +fs('ar','🔥','건조효율',R.dryEff.toFixed(0)+'%')
-    +fs('','🔪','나이프',R.knifeTotal+'개')
-    +fs('','💨','블로어',R.blowerSel.unit.kw+'kW×'+R.blowerSel.count)
-    +fs('','⚡','전기',R.elecReal.toFixed(1)+'kW')
-    +fs('','♨️','온수',R.gasLoad>0?'가스':'전기')
-    +fs('','💦','청수',R.supplyFresh.toFixed(0)+'L/h')
-    +fs('','🍽️','CAPA',R.capa2ch+'매/h')
-    +fs('','📅','목표시간',R.needHours.toFixed(1)+'h/일')
-    +fs('','👥','여유인력',R.freeManHourMonth>0?Math.round(R.freeManHourMonth)+'인시':'—');
+    fs('aw','세척','효율',R.washEff.toFixed(0)+'%')
+    +fs('ad','탈수','효율',R.dewatEff.toFixed(0)+'%')
+    +fs('ar','건조','효율',R.dryEff.toFixed(0)+'%')
+    +fs('','전기','실운전',R.elecReal.toFixed(0)+'kW')
+    +fs('','CAPA','2CH',R.capa2ch+'매/h')
+    +fs('','월생산','능력',(R.monthlyCapa/10000).toFixed(1)+'만매')
+    +fs('','목표','달성',R.needHours.toFixed(1)+'h/일')
+    +fs('','여유','인력',R.freeManHourMonth>0?Math.round(R.freeManHourMonth)+'인시':'—');
 }
-function fs(c,e,n,v){return '<div class="flowstep '+c+'"><span class="fe">'+e+'</span><span class="fn">'+n+'</span><span class="fv">'+v+'</span></div>';}
+function fs(c,n,sub,v){return '<div class="flowstep '+c+'"><div class="fn">'+n+'</div><div class="fsub">'+sub+'</div><div class="fv">'+v+'</div></div>';}
 function renderBlowerInfo(){
   const el=gi('blowerInfo'); if(!el)return;
   calcAll();
