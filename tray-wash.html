@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v2.8 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v3.1 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -153,7 +153,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v2.8</span>
+    <span class="vb">v3.1</span>
   </div>
 </div>
 </div>
@@ -196,13 +196,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v2.8 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v3.1 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v2.8
+// 트레이 세척·탈수·건조 시뮬레이터 v3.1
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='2.8';
+const VER='3.1';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -238,10 +238,13 @@ const S={
   // 온수/유틸
   boilerType:'gas',boilerTankL:1000,boilerIns:true,inletTemp:15,convKW:1.5,
   // 급수 방식: cascade(역류) or direct(직공급), 헹굼 청수량, 1차 보조급수
-  supplyMode:'cascade', rinseWater:200, aux1st:false, aux1stWater:100,
-  rinseTemp:50,
+  supplyMode:'hybrid', rinseWater:200, aux1st:false, aux1stWater:100,
+  rinseTemp:60,  // 전 조 60°C (헹굼 포함)
+  // 하이브리드 밸브 제어: 각 조 직공급 밸브 개도(%) [1,2,헹굼]
+  directValve:[20,20,0], tempSensor:58, boilerType2:'gas',
   // 전기료
-  hours:8,days:22,rate:130,gasRate:900,
+  hours:8,days:22,rate:130,gasRate:900, targetMonth:110000,
+  workers:2, wage:12000, convType:'through',
   // 기구·구조
   convLen:12000,clipPitch:500,guideRod:true,trayWeight:50,
   washDryLen:4000,dewatLen:2000,dryLen:4000,ioLen:500,moduleGap:500,trayPitch:450,
@@ -420,7 +423,7 @@ function bindSlider(id){
   el.addEventListener('input',()=>{rg.value=el.value;el.classList.add('s-user');onChange(id);});
 }
 function syncState(){
-  ['trayW','trayD','trayT','qty','dlv','wZones','wHole','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeAttack','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','convKW','hours','days','rate','gasRate','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','ioLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
+  ['trayW','trayD','trayT','qty','dlv','wZones','wHole','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeAttack','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','ioLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
   const bt=gi('boilerType');if(bt)S.boilerType=bt.value;
   const wi=gi('wTankIns');if(wi)S.wTankIns=wi.checked;
   const bi=gi('boilerIns');if(bi)S.boilerIns=bi.checked;
@@ -429,6 +432,8 @@ function syncState(){
   const ct=gi('containerType');if(ct)S.containerType=ct.value;
   const sm=gi('supplyMode');if(sm)S.supplyMode=sm.value;
   const a1=gi('aux1st');if(a1)S.aux1st=a1.checked;
+  const ts=gi('tempSensor');if(ts&&ts.value!=='')S.tempSensor=+ts.value;
+  for(let i=0;i<3;i++){const dv=gi('directValve'+i);if(dv&&dv.value!=='')S.directValve[i]=+dv.value;}
   const sc=gi('stageCombo');if(sc)S.stageCombo=sc.value;
   const dm=gi('drainMode');if(dm)S.drainMode=dm.value;
   const ta=gi('stgTankAuto');if(ta)S.stgTankAuto=ta.checked;
@@ -551,29 +556,46 @@ function calcAll(){
   const dryKW=dryerKW(residual,S.dryAirVol,S.dryTemp-20,S.dryRecirc);
   // ── 급수 방식별 물·가열 에너지 계산 ──
   const rinseW = S.rinseWater;      // 헹굼 청수 L/h
-  let freshWater, boilerHeatKW;
-  if(S.supplyMode==='cascade'){
-    // 캐스케이드: 청수는 헹굼에만, 오버플로우로 2·1차 재사용
-    // 신규 청수 = 헹굼 보충분 (+ 1차 보조급수 옵션)
+  let freshWater, boilerHeatKW, boilerRunKW, boilerRatedKW, cascadeRatio, directRatio;
+  const target = S.rinseTemp; // 전 조 목표온도 60°C
+  const dT = target - S.inletTemp;
+  // 전체 저수량 (사용 단 합계)
+  const actTankL = totalTankL;
+  if(S.supplyMode==='hybrid' || S.supplyMode==='cascade'){
+    // 캐스케이드: 헹굼 청수 신규 + 직공급 밸브(부족분)
     const aux = S.aux1st ? S.aux1stWater : 0;
-    freshWater = rinseW + aux;
-    // 가열: 헹굼(청수 15→헹굼온도) + 1·2차 추가가열(역류수 헹굼온도→세척온도)
-    const qRinse = rinseW*4.18*(S.rinseTemp-S.inletTemp)/3600;
-    const qWashExtra = rinseW*4.18*(S.wTemp-S.rinseTemp)/3600; // 역류수 추가가열
-    const qAux = aux*4.18*(S.wTemp-S.inletTemp)/3600; // 보조급수 가열
-    boilerHeatKW = qRinse + qWashExtra + qAux;
+    // 직공급 밸브 총량 (각 조 개도 기반)
+    const directTotal = S.directValve.reduce(function(a,b,i){ return a + (actStages.indexOf(i)>=0 ? b : 0); },0);
+    const directWater = S.rinseWater * directTotal/100; // 개도 비율만큼 직공급
+    freshWater = S.rinseWater + aux + directWater;
+    // 가열: 전 조 60°C이므로 모든 보충수 15→60
+    const qMakeup = freshWater*4.18*dT/3600;
+    // 열손실 보상 (전 조 60°C 유지)
+    let qLoss=0;
+    for(let i=0;i<zn;i++){ if(actStages.indexOf(i)>=0){ const tk=stgTanks[i]?stgTanks[i].tankL:300; qLoss += heaterMaintainKW(tk,target,S.wTankIns); } }
+    boilerRunKW = qMakeup + qLoss;
+    boilerHeatKW = boilerRunKW;
+    // 초기 급속가열 (기동 1시간)
+    const qInit = actTankL*4.18*dT/3600;
+    boilerRatedKW = Math.max(qInit, boilerRunKW*1.3);
+    // 캐스케이드/직공급 비율
+    directRatio = freshWater>0 ? Math.round(directWater/freshWater*100) : 0;
+    cascadeRatio = 100 - directRatio;
   } else {
-    // 직공급: 각 조 개별 청수 보충 + 개별 가열
-    const w1=150, w2=120; // 1·2차 개별 보충 근사
-    freshWater = rinseW + w1 + w2;
-    const q1=w1*4.18*(S.wTemp-S.inletTemp)/3600;
-    const q2=w2*4.18*(S.wTemp-S.inletTemp)/3600;
-    const q3=rinseW*4.18*(S.rinseTemp-S.inletTemp)/3600;
-    boilerHeatKW = q1+q2+q3;
+    // 직공급: 각 조 개별 청수 15→60
+    const w1=150, w2=120;
+    freshWater = S.rinseWater + w1 + w2;
+    const qMakeup = freshWater*4.18*dT/3600;
+    let qLoss=0;
+    for(let i=0;i<zn;i++){ if(actStages.indexOf(i)>=0){ const tk=stgTanks[i]?stgTanks[i].tankL:300; qLoss += heaterMaintainKW(tk,target,S.wTankIns); } }
+    boilerRunKW = qMakeup + qLoss;
+    boilerHeatKW = boilerRunKW;
+    boilerRatedKW = Math.max(actTankL*4.18*dT/3600, boilerRunKW*1.3);
+    cascadeRatio = 0; directRatio = 100;
   }
-  const supplyFresh = freshWater;
-  const boilerLossKW=heaterMaintainKW(S.boilerTankL,S.wTemp,S.boilerIns);
-  const boilerTotalKW=boilerHeatKW+boilerLossKW;
+    const supplyFresh = freshWater;
+  const boilerLossKW=heaterMaintainKW(S.boilerTankL,target,S.boilerIns);
+  const boilerTotalKW=boilerRunKW; // 하이브리드 운전 용량 (보충+손실)
   const elecHeater=(S.boilerType==='electric')?boilerTotalKW:0;
   const gasLoad=(S.boilerType==='gas')?boilerTotalKW:0;
   const washHeatElec=washHeaterTotal*0.4; // 외부보일러 공급 시 세척조 보조 유지만
@@ -610,6 +632,21 @@ function calcAll(){
   const capa2ch = capa1ch * CH;       // 2CH 합계 매/h
   // 투입: 2CH이므로 좌우 2개씩 동시 투입, 간격(초) = 3600 / (1CH 시간당 개수)
   const feedIntervalSec = capa1ch>0 ? 3600/capa1ch : 0; // 2개씩 투입 간격
+  // 월 세척 수량 = 시간당 CAPA(2CH) × 일근무 × 월일수
+  const monthlyCapa = capa2ch * S.hours * S.days;
+  // 목표 달성 판정 (±5% 허용)
+  const tgt = S.targetMonth;
+  const targetMet = monthlyCapa>=tgt*0.95;
+  const targetOver = monthlyCapa>tgt*1.1;
+  // 목표 달성 필요 시간/일 (현재 일수 기준)
+  const needHours = capa2ch>0 ? tgt/(capa2ch*S.days) : 0;
+  // ── 인력 효율 (관통식 2명) ──
+  // 목표를 needHours만에 끝내면 나머지 시간 다른 업무
+  const workHoursPerDay = Math.min(S.hours, needHours);
+  const freeHoursPerDay = Math.max(0, S.hours - needHours);
+  const freeManHourMonth = freeHoursPerDay * S.workers * S.days; // 여유 인시
+  const laborCostMonth = S.workers * workHoursPerDay * S.wage * S.days; // 세척 인건비
+  const capaEnough = needHours <= S.hours;
   const traysPerMin = speedMs*1000/S.trayPitch; // 분당 트레이(1CH)
   // 각 구간 체류시간 = 길이/속도
   const dwellWash = speedMs>0 ? (S.washDryLen/1000)/speedMs : 0;
@@ -626,7 +663,7 @@ function calcAll(){
   // 체류 충분성 판정
   const washOK = dwellWash>=needWash, dewatOK=dwellDewat>=needDewat, dryOK=dwellDry>=needDry;
 
-  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,nPerFace,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist};
+  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,nPerFace,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist};
 }
 
 // ── 좌측 렌더 ──
@@ -664,6 +701,16 @@ function renderLeft(){
       +'⏱️ 투입: <b>'+R.feedIntervalSec.toFixed(1)+'초</b>마다 좌우 <b>2개씩</b> 동시 투입<br>'
       +'🏃 컨베이어 속도: <b>'+R.speedMmin.toFixed(2)+' m/min</b> (트레이 '+R.traysPerMin.toFixed(1)+'매/분/CH)<br>'
       +'🍽️ <b>시간당 세척량: 1CH '+R.capa1ch+'매 × 2CH = <span style="font-size:17px;">'+R.capa2ch+'매/h</span></b></div>'
+      +'<div class="g3" style="margin-top:6px;">'+fld('targetMonth','목표 월수량','매',S.targetMonth)+fld('hours','일 근무시간','h',S.hours)+fld('days','월 근무일수','일',S.days)+'</div>'
+      +'<div class="chbox" style="background:'+(R.capaEnough?'#e8f5e9':'#ffebee')+';border-color:'+(R.capaEnough?'#a5d6a7':'#ef9a9a')+';color:'+(R.capaEnough?'#1b5e20':'#b71c1c')+';">'
+      +'📅 <b>최대 월 생산능력 = '+R.capa2ch+'매/h × '+S.hours+'h × '+S.days+'일 = '+R.monthlyCapa.toLocaleString()+'매</b><br>'
+      +'🎯 <b>목표 '+S.targetMonth.toLocaleString()+'매</b> → '+(R.capaEnough?'✅ 달성 가능 (일 <b>'+R.needHours.toFixed(1)+'시간</b>만 세척)':'⚠️ 능력 부족 (처리량↑ 또는 근무↑ 필요)')+'</div>'
+      +'<div class="st">인력 투입 효율 (관통식 2명)</div>'
+      +'<div class="g3">'+fld('workers','투입 인원','명',S.workers)+fld('wage','시급','원',S.wage)+'<div class="fl"><label>설비 방식</label><input type="text" value="관통식(직선)" readonly style="background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#1b5e20;font-family:inherit;"></div></div>'
+      +'<div class="chbox" style="background:#e1f5fe;border-color:#81d4fa;color:#01579b;">👥 <b>관통식 '+S.workers+'명 투입</b> (기존 리턴식은 1명 순환대기)<br>'
+      +'⏱️ 목표 '+S.targetMonth.toLocaleString()+'매를 <b>일 '+R.workHoursPerDay.toFixed(1)+'시간</b>만에 완료 → 나머지 <b>'+R.freeHoursPerDay.toFixed(1)+'시간</b> 다른 업무 전환<br>'
+      +'💰 세척 인건비 <b>'+Math.round(R.laborCostMonth).toLocaleString()+'원/월</b>'+(R.freeManHourMonth>0?' · 여유 인력 <b>'+Math.round(R.freeManHourMonth)+'인시/월</b> 확보':'')+'<br>'
+      +'🚀 <b>빨리 세척하고 다른 일 하는 것이 유리</b> — CAPA(처리량)를 높이면 세척시간↓ 인력전환↑</div>'
       +sliderHTML('wHole','💧 홀 직경(공통)','mm',0.5,10,0.1,S.wHole,2,3)
       +sliderHTML('wTemp','🌡️ 세척온도(공통)','°C',20,90,1,S.wTemp,50,65)
       +'<div class="st">단계별 설정 (압력·노즐수 개별)</div>'
@@ -767,13 +814,34 @@ function renderLeft(){
       +'<div class="g2">'+sel('boilerType','열원',[['gas','가스보일러'],['electric','전기보일러']],S.boilerType)
       +'<div class="fl"><label>보일러 탱크 단열</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="boilerIns" '+(S.boilerIns?'checked':'')+'> 단열재 적용</label></div></div>'
       +'<div class="g3" style="margin-top:6px;">'+fld('boilerTankL','보일러탱크','L',S.boilerTankL)+fld('inletTemp','유입수온','°C',S.inletTemp)+fld('rinseTemp','헹굼온도','°C',S.rinseTemp)+'</div>'
-      +'<div class="st">급수 방식 (물·에너지 절감 핵심)</div>'
-      +'<div class="g2">'+sel('supplyMode','급수 방식',[['cascade','캐스케이드(역류)'],['direct','보일러 직공급']],S.supplyMode)+fld('rinseWater','헹굼 청수량','L/h',S.rinseWater)+'</div>'
-      +(S.supplyMode==='cascade'?'<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">♻️ <b>캐스케이드(권장)</b>: 청수 → 3차 헹굼 → 오버플로우 → 2차 → 1차 → 배수. 물·에너지 모두 절감. 가장 깨끗한 물이 헹굼, 오염수가 1차로.<br><b>1차 보조급수</b> 옵션으로 심한 오염 대응.</div>'
-        +'<div class="g2" style="margin-top:6px;"><div class="fl"><label>1차 보조급수</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="aux1st" '+(S.aux1st?'checked':'')+'> 보일러 온수 보조</label></div>'+(S.aux1st?fld('aux1stWater','보조 급수량','L/h',S.aux1stWater):'<div></div>')+'</div>'
-        :'<div class="chbox" style="background:#fff3e0;border-color:#ffcc80;color:#e65100;">⚠️ <b>직공급</b>: 각 조에 보일러 온수 개별 공급. 캐스케이드 대비 청수 57%·에너지 53% 더 소비. 오염이 매우 심하거나 조별 온도 편차가 클 때만 권장.</div>')
-      +'<div class="st">기타</div><div class="g2">'+fld('convKW','컨베이어','kW',S.convKW)+'</div>'
-      +'<div class="note">💡 외부 보일러+단열탱크로 온수 집중공급 시 세척조 개별 히터는 유지열손실만 부담.</div>'
+      +'<div class="st">온수 공급 방식 (전 조 60°C)</div>'
+      +'<div class="g2">'+sel('supplyMode','공급 방식',[['hybrid','하이브리드(캐스케이드+직공급)'],['cascade','캐스케이드만'],['direct','전 조 직공급']],S.supplyMode)+fld('rinseWater','헹굼 청수량','L/h',S.rinseWater)+'</div>'
+      +'<div class="chbox" style="background:#e1f5fe;border-color:#81d4fa;color:#01579b;">♨️ <b>전 조 '+S.rinseTemp+'°C 온수 공급</b> (세척1·2 + 헹굼 모두)<br>'
+      +'① 보일러 → <b>헹굼탱크</b> 공급 → 오버플로우 → 2조 → 1조 (캐스케이드)<br>'
+      +'② 동시에 <b>1·2조 직공급 밸브·배관</b> 설치 → 온도센서 기반 전자밸브 자동 제어<br>'
+      +'③ 각 조 <b>'+S.tempSensor+'°C 미만 시 직공급 밸브 개방</b>으로 60°C 유지</div>'
+      +'<div class="st">전자밸브 직공급 개도 (온도 유지 보조)</div>'
+      +'<table class="tbl"><thead><tr><th>조</th><th>직공급 밸브 개도</th><th>공급 경로</th></tr></thead><tbody>'
+      +[0,1,2].map(function(i){
+          var nm=['1차','2차','헹굼'][i];
+          if(R.actStages.indexOf(i)<0) return '<tr style="opacity:.4;"><td>'+nm+'</td><td colspan="2" style="color:#999;">미사용</td></tr>';
+          var vv = i===2 ? '<span style="color:#0277bd;">보일러 직결</span>' : '<input type="number" id="directValve'+i+'" value="'+S.directValve[i]+'" min="0" max="100" style="width:56px;border:1.5px solid #c5d5e5;border-radius:5px;padding:3px 5px;font-size:13px;font-family:inherit;">%';
+          var path = i===2 ? '보일러→헹굼' : (i===1?'캐스케이드(헹굼→2) + 직공급':'캐스케이드(2→1) + 직공급');
+          return '<tr><td style="font-weight:700;">'+nm+'</td><td>'+vv+'</td><td style="font-size:12px;">'+path+'</td></tr>';
+        }).join('')
+      +'</tbody></table>'
+      +'<div class="g2" style="margin-top:6px;">'+fld('tempSensor','밸브개방 온도','°C',S.tempSensor)+fld('rinseTemp','목표온도','°C',S.rinseTemp)+'</div>'
+      +'<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">🔄 <b>공급 비율</b>: 캐스케이드 '+R.cascadeRatio+'% + 직공급 '+R.directRatio+'% · 신규 청수 <b>'+R.supplyFresh.toFixed(0)+'L/h</b></div>'
+      +'<div class="st">보일러 용량 산출</div>'
+      +'<div class="g2">'+sel('boilerType','열원',[['gas','가스보일러'],['electric','전기보일러']],S.boilerType)+fld('convKW','컨베이어','kW',S.convKW)+'</div>'
+      +'<table class="tbl" style="margin-top:6px;"><tbody>'
+      +'<tr><td style="text-align:left;font-weight:700;">목표 온도</td><td class="hi">'+S.rinseTemp+'°C</td><td style="text-align:left;font-size:12px;color:#7a90a4;">전 조 (ΔT'+(S.rinseTemp-S.inletTemp)+')</td></tr>'
+      +'<tr><td style="text-align:left;font-weight:700;">보충수 가열</td><td class="hi">'+(R.supplyFresh*4.18*(S.rinseTemp-S.inletTemp)/3600).toFixed(1)+'kW</td><td style="text-align:left;font-size:12px;color:#7a90a4;">'+R.supplyFresh.toFixed(0)+'L/h × ΔT</td></tr>'
+      +'<tr><td style="text-align:left;font-weight:700;">열손실 보상</td><td class="hi">'+(R.boilerRunKW-R.supplyFresh*4.18*(S.rinseTemp-S.inletTemp)/3600).toFixed(1)+'kW</td><td style="text-align:left;font-size:12px;color:#7a90a4;">전 조 60°C 유지</td></tr>'
+      +'<tr style="background:#fff3cd;"><td style="text-align:left;font-weight:800;">보일러 운전용량</td><td class="hi" style="font-size:16px;">'+R.boilerRunKW.toFixed(1)+'kW</td><td style="text-align:left;font-size:12px;color:#7a90a4;">보충+손실</td></tr>'
+      +'<tr><td style="text-align:left;font-weight:700;">보일러 정격</td><td class="hi">'+R.boilerRatedKW.toFixed(1)+'kW</td><td style="text-align:left;font-size:12px;color:#7a90a4;">초기 급속가열 포함</td></tr>'
+      +'</tbody></table>'
+      +'<div class="note">💡 보일러는 헹굼탱크에 직결, 캐스케이드로 2·1조 공급 + 전자밸브 직공급으로 전 조 60°C 유지.</div>'
       +'</div></div>';
   }else if(_tab==='mech'){
     h=buildMech();
@@ -798,9 +866,12 @@ function renderLeft(){
       +srow('탈수','에어나이프',R.knifeTotal+'개('+S.knifePass+'패스) · 설치'+S.knifeAng+'°/공격'+S.knifeAttack+'°('+(R.attackEff*100).toFixed(0)+'%) · '+S.knifeVel+'m/s · 이격'+S.knifeGap+'mm')
       +srow('탈수','링블로어',R.blowerSel.unit.kw+'kW×'+R.blowerSel.count+'대 · 배관'+R.mainDuctSpec)
       +srow('건조','열풍',S.dryTemp+'°C · '+S.dryAirVol+'m³/min · 순환'+S.dryRecirc+'%')
-      +srow('온수','보일러',(S.boilerType==='gas'?'가스':'전기')+'·'+S.boilerTankL+'L·단열'+(S.boilerIns?'O':'X'))
-      +srow('급수','방식',(S.supplyMode==='cascade'?'캐스케이드(역류)':'직공급')+' · 청수'+R.supplyFresh.toFixed(0)+'L/h'+(S.aux1st?'·1차보조':''))
-      +srow('CAPA','2CH 합계','1CH '+R.capa1ch+'매 × 2CH = '+R.capa2ch+'매/h · '+R.feedIntervalSec.toFixed(1)+'초마다 2개 투입')
+      
+      +srow('온수','공급',(S.supplyMode==='hybrid'?'하이브리드':S.supplyMode==='cascade'?'캐스케이드':'직공급')+' · 전조'+S.rinseTemp+'°C · 캐스'+R.cascadeRatio+'%+직'+R.directRatio+'% · 청수'+R.supplyFresh.toFixed(0)+'L/h')
+      +srow('보일러','용량',(S.boilerType==='gas'?'가스':'전기')+' · 운전'+R.boilerRunKW.toFixed(1)+'kW · 정격'+R.boilerRatedKW.toFixed(1)+'kW')
+      +srow('CAPA','시간당','1CH '+R.capa1ch+' × 2CH = '+R.capa2ch+'매/h · '+R.feedIntervalSec.toFixed(1)+'초마다 2개')
+      +srow('CAPA','월 능력/목표','최대 '+R.monthlyCapa.toLocaleString()+'매 · 목표 '+S.targetMonth.toLocaleString()+'매 '+(R.capaEnough?'✅':'⚠️부족'))
+      +srow('인력','관통식 '+S.workers+'명','목표 일'+R.workHoursPerDay.toFixed(1)+'h 세척 · 여유'+R.freeHoursPerDay.toFixed(1)+'h · 인건비'+Math.round(R.laborCostMonth/10000)+'만원/월')
       +srow('컨베이어','속도/길이',R.speedMmin.toFixed(2)+'m/min · 총'+R.convTotalLen+'mm (세척'+S.washDryLen+'+탈수'+S.dewatLen+'+건조'+S.dryLen+'+입출'+S.ioLen+'+간격'+R.gapTotal+')')
       +srow('기구','고정/운송','클립'+S.clipPitch+'mm·가이드봉'+(S.guideRod?'O':'X')+' · '+S.containerType+'·모듈분할'+(S.moduleSplit?'O':'X'))
       +'</tbody></table>'
@@ -843,7 +914,7 @@ function renderLeft(){
         ||el.id==='meshFilter'||el.id==='sludgeFilter'||el.id==='pumpStrainer'
         ||el.id==='stageCombo'||el.id==='drainMode'||el.id==='stgTankMode'
         ||(el.id&&el.id.startsWith('stgType'))||el.id==='wZones'
-        ||['washDryLen','dewatLen','dryLen','ioLen','moduleGap','trayPitch','qty'].indexOf(el.id)>=0
+        ||['washDryLen','dewatLen','dryLen','ioLen','moduleGap','trayPitch','qty','tempSensor','rinseTemp','rinseWater','hours','days','targetMonth','workers','wage'].indexOf(el.id)>=0||(el.id&&el.id.startsWith('directValve'))
         ||(el.id&&el.id.startsWith('stg'));
       if(needRerender){ syncState(); calcAll(); renderLeft(); renderRight(); }
       else onChange(el.id);
@@ -893,7 +964,9 @@ function renderFlow(){
     +fs('','⚡','전기',R.elecReal.toFixed(1)+'kW')
     +fs('','♨️','온수',R.gasLoad>0?'가스':'전기')
     +fs('','💦','청수',R.supplyFresh.toFixed(0)+'L/h')
-    +fs('','🍽️','CAPA(2CH)',R.capa2ch+'매/h');
+    +fs('','🍽️','CAPA',R.capa2ch+'매/h')
+    +fs('','📅','목표시간',R.needHours.toFixed(1)+'h/일')
+    +fs('','👥','여유인력',R.freeManHourMonth>0?Math.round(R.freeManHourMonth)+'인시':'—');
 }
 function fs(c,e,n,v){return '<div class="flowstep '+c+'"><span class="fe">'+e+'</span><span class="fn">'+n+'</span><span class="fv">'+v+'</span></div>';}
 function renderBlowerInfo(){
@@ -928,8 +1001,9 @@ function buildRec(){
   if(S.knifeAttack>=0)r.push('🎯 <b>공격각 '+S.knifeAttack+'° ('+(S.knifeAttack===0?'수직':'순방향')+')</b> → 역방향(-30~-45°)으로 조정 시 물 제거효율 대폭↑ (현재 '+(R.attackEff*100).toFixed(0)+'%)');
   r.push('💨 <b>링블로어 '+R.blowerSel.unit.kw+'kW × '+R.blowerSel.count+'대</b> (총'+R.blowerSel.totalKW.toFixed(1)+'kW) — 나이프 '+S.blowerPerN+'개당 1대 배분');
   r.push('🔧 <b>이격거리 조정 구조</b>: LM가이드+눈금핸들로 트레이 기종별 거리를 손쉽게 재현');
-  if(S.supplyMode==='direct')r.push('♻️ <b>직공급 사용 중</b> → 캐스케이드(역류)로 전환 시 청수 57%·가열에너지 53% 절감 (월 약 41만원)');
-  else r.push('✅ <b>캐스케이드 급수</b> 적용 중 — 청수·에너지 최적. 1차 오염 심하면 보조급수 활용');
+  if(S.supplyMode==='direct')r.push('♻️ <b>전 조 직공급</b> → 하이브리드로 전환 시 캐스케이드 활용해 청수·가열에너지 절감');
+  else if(S.supplyMode==='hybrid')r.push('✅ <b>하이브리드 온수공급</b> 적용 — 캐스케이드 '+R.cascadeRatio+'%로 절감 + 직공급 '+R.directRatio+'%로 전 조 60°C 유지');
+  r.push('♨️ <b>보일러 운전용량 '+R.boilerRunKW.toFixed(1)+'kW / 정격 '+R.boilerRatedKW.toFixed(1)+'kW</b> (전 조 '+S.rinseTemp+'°C · '+(S.boilerType==='gas'?'가스':'전기')+')');
   if(S.stageCombo==='all'&&S.dlv<=2)r.push('💧 <b>오염도 낮음(1·2·3단 전체 사용)</b> → 1·3단만으로 줄이면 2단 저수조·펌프 생략, 투자·운전비↓');
   R.stgTanks.forEach(function(t){ if(t.active&&t.actTurnover<1.5)r.push('⚠️ <b>'+['1차','2차','3차'][t.idx]+' 저수조 회전 '+t.actTurnover.toFixed(1)+'분(짧음)</b> → 용량↑ 필요 (펌프 캐비테이션·수온급변 방지)'); });
   if(S.stgTankMode==='auto')r.push('📦 <b>저수조 자동 최적(회전율 기반)</b> 적용 중 — 용량/치수 직접 입력하려면 입력모드 변경');
@@ -944,7 +1018,9 @@ function renderCost(){
   const cr=gi('costResult');if(!cr)return;
   const daily=R.elecReal*S.hours,monthly=daily*S.days,cost=monthly*S.rate;
   let gasCost=0,gasNote='';
-  if(R.gasLoad>0){const gM3H=R.gasLoad/(10.4*0.9),gM3M=gM3H*S.hours*S.days;gasCost=gM3M*S.gasRate;gasNote='<div class="cost-it"><div class="cl2">월 가스</div><div class="cv">'+Math.round(gM3M).toLocaleString()+' m³</div></div>';}
+  // 보일러 가스/전기 비용
+  if(S.boilerType==='gas'){const gM3H=R.boilerRunKW/(10.4*0.9),gM3M=gM3H*S.hours*S.days;gasCost=gM3M*S.gasRate;gasNote='<div class="cost-it"><div class="cl2">월 가스(보일러)</div><div class="cv">'+Math.round(gM3M).toLocaleString()+' m³</div></div>';}
+  else {const bKwh=R.boilerRunKW*S.hours*S.days;gasCost=bKwh*S.rate;gasNote='<div class="cost-it"><div class="cl2">월 전기(보일러)</div><div class="cv">'+Math.round(bKwh).toLocaleString()+' kWh</div></div>';}
   cr.innerHTML='<div class="cost-res">'
     +'<div class="cost-it"><div class="cl2">일 전력</div><div class="cv">'+Math.round(daily)+' kWh</div></div>'
     +'<div class="cost-it"><div class="cl2">월 전력</div><div class="cv">'+Math.round(monthly).toLocaleString()+' kWh</div></div>'
