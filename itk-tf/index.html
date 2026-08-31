@@ -180,7 +180,7 @@
       <h1>화재복구 TF 통합관리</h1>
       <div class="sub">인시스 AI혁신 연구개발실</div>
     </div>
-    <div class="meta">v1.8<br>ys.kim@in-sys.co.kr</div>
+    <div class="meta">v1.9<br>ys.kim@in-sys.co.kr</div>
   </div>
 </header>
 
@@ -188,6 +188,7 @@
   <div class="inner">
     <button class="active" data-view="dashboard">트랙현황</button>
     <button data-view="photos">사진 타임라인</button>
+    <button data-view="construction">공사진행</button>
     <button data-view="files">파일함</button>
     <button data-view="kakao">카톡 정리</button>
     <button data-view="schedule">일정관리</button>
@@ -210,7 +211,11 @@
         <select id="photoCat">
           <option value="화재현장">화재현장</option>
           <option value="철거">철거</option>
-          <option value="공사진행">공사진행</option>
+          <option value="기초">기초</option>
+          <option value="골조">골조</option>
+          <option value="외부마감">외부마감</option>
+          <option value="내부마감">내부마감</option>
+          <option value="준공">준공</option>
           <option value="기타">기타</option>
         </select>
         <input type="text" id="photoMemo" placeholder="한줄 메모 (예: 3층 골조 철거 완료)">
@@ -219,6 +224,25 @@
       <div class="progress" id="photoProgress"></div>
     </div>
     <div class="photo-grid" id="photoGrid"></div>
+  </div>
+
+  <!-- 공사진행: 단계별 진도율 + 날짜별 타임라인 -->
+  <div class="view" id="view-construction">
+    <div class="section-title">공정단계별 진도율</div>
+    <div class="grid4" id="stageGrid" style="margin-bottom:8px;"></div>
+    <div class="section-title">날짜별 공사일지</div>
+    <div class="upload-row" style="margin-bottom:14px;">
+      <select id="constructionFilter" onchange="loadConstructionTimeline()">
+        <option value="">전체 단계</option>
+        <option value="철거">철거</option>
+        <option value="기초">기초</option>
+        <option value="골조">골조</option>
+        <option value="외부마감">외부마감</option>
+        <option value="내부마감">내부마감</option>
+        <option value="준공">준공</option>
+      </select>
+    </div>
+    <div id="constructionTimeline"></div>
   </div>
 
   <!-- 파일함 -->
@@ -272,6 +296,15 @@
           <option value="고객사보상">고객사보상</option>
           <option value="공장신축">공장신축</option>
         </select>
+        <select id="schedStage">
+          <option value="">공정단계(해당없음)</option>
+          <option value="철거">철거</option>
+          <option value="기초">기초</option>
+          <option value="골조">골조</option>
+          <option value="외부마감">외부마감</option>
+          <option value="내부마감">내부마감</option>
+          <option value="준공">준공</option>
+        </select>
         <input type="text" id="schedTitle" placeholder="마일스톤/일정 내용" style="min-width:220px;">
         <input type="text" id="schedDate" placeholder="날짜 (예: 2026-08-20)" style="max-width:150px;">
         <select id="schedStatus">
@@ -284,7 +317,7 @@
     </div>
     <div class="card" style="padding:0;overflow-x:auto;">
       <table class="sched" id="schedTable">
-        <thead><tr><th>트랙</th><th>내용</th><th>일정</th><th>상태</th><th></th></tr></thead>
+        <thead><tr><th>트랙</th><th>공정단계</th><th>내용</th><th>일정</th><th>상태</th><th></th></tr></thead>
         <tbody id="schedBody"></tbody>
       </table>
     </div>
@@ -345,12 +378,14 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "1.8";
+const APP_VERSION = "1.9";
 
 async function boot(){
   initNav();
   loadTracks();
   loadPhotos();
+  loadStageProgress();
+  loadConstructionTimeline();
   loadFiles();
   loadKakao();
   loadSchedule();
@@ -635,23 +670,25 @@ window.delKakao = async function(id){
 // ==== 일정관리 ====
 async function addSchedule(){
   const track = document.getElementById('schedTrack').value;
+  const stage = document.getElementById('schedStage').value;
   const title = document.getElementById('schedTitle').value;
   const date = document.getElementById('schedDate').value;
   const status = document.getElementById('schedStatus').value;
   if(!title){ alert('일정 내용을 입력해주세요.'); return; }
-  await addDoc(collection(db,'schedule'), {track, title, date, status, createdAt: serverTimestamp()});
+  await addDoc(collection(db,'schedule'), {track, stage, title, date, status, createdAt: serverTimestamp()});
   document.getElementById('schedTitle').value = '';
   document.getElementById('schedDate').value = '';
+  document.getElementById('schedStage').value = '';
   loadSchedule();
 }
 window.addSchedule = addSchedule;
 
 async function loadSchedule(){
   const body = document.getElementById('schedBody');
-  body.innerHTML = '<tr><td colspan="5" class="empty">불러오는 중...</td></tr>';
+  body.innerHTML = '<tr><td colspan="6" class="empty">불러오는 중...</td></tr>';
   const q = query(collection(db,'schedule'), orderBy('date','asc'));
   const snap = await getDocs(q);
-  if(snap.empty){ body.innerHTML = '<tr><td colspan="5" class="empty">등록된 일정이 없습니다.</td></tr>'; return; }
+  if(snap.empty){ body.innerHTML = '<tr><td colspan="6" class="empty">등록된 일정이 없습니다.</td></tr>'; return; }
   body.innerHTML = '';
   snap.forEach(d=>{
     const s = d.data();
@@ -659,6 +696,7 @@ async function loadSchedule(){
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${s.track}</td>
+      <td>${s.stage||'-'}</td>
       <td>${s.title}</td>
       <td>${s.date||'-'}</td>
       <td><span class="badge ${badgeClass}">${s.status}</span></td>
@@ -673,6 +711,95 @@ window.delSchedule = async function(id){
   await deleteDoc(doc(db,'schedule',id));
   loadSchedule();
 };
+
+// ==== 공사진행: 단계별 진도율 ====
+const CONSTRUCTION_STAGES = ['철거','기초','골조','외부마감','내부마감','준공'];
+
+async function loadStageProgress(){
+  const grid = document.getElementById('stageGrid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  for(const stage of CONSTRUCTION_STAGES){
+    const snap = await getDoc(doc(db,'constructionStages',stage));
+    const data = snap.exists() ? snap.data() : {progress:0};
+    const pct = data.progress || 0;
+    const card = document.createElement('div');
+    card.className = 'track-card';
+    card.innerHTML = `
+      <div class="label">${stage}</div>
+      <div class="status" style="font-size:1.3em;">${pct}%</div>
+      <div style="background:var(--border);border-radius:6px;height:8px;overflow:hidden;margin-bottom:8px;">
+        <div style="background:var(--accent);height:100%;width:${pct}%;"></div>
+      </div>
+      <div class="row">
+        <input type="text" id="stageInput-${stage}" placeholder="0-100" value="${pct}" style="width:60px;">
+        <button class="save" onclick="saveStageProgress('${stage}')">저장</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+}
+
+window.saveStageProgress = async function(stage){
+  let val = parseInt(document.getElementById('stageInput-'+stage).value, 10);
+  if(isNaN(val)) val = 0;
+  val = Math.max(0, Math.min(100, val));
+  await setDoc(doc(db,'constructionStages',stage), {progress: val, updatedAt: serverTimestamp()});
+  loadStageProgress();
+};
+
+// ==== 공사진행: 날짜별 타임라인 (사진 데이터 재활용, 단계별 필터) ====
+async function loadConstructionTimeline(){
+  const wrap = document.getElementById('constructionTimeline');
+  const filter = document.getElementById('constructionFilter').value;
+  wrap.innerHTML = '<div class="empty">불러오는 중...</div>';
+  const q = query(collection(db,'photos'), orderBy('createdAt','desc'));
+  const snap = await getDocs(q);
+  let items = [];
+  snap.forEach(d=>{
+    const p = d.data();
+    if(CONSTRUCTION_STAGES.includes(p.category) && (!filter || p.category===filter)){
+      items.push({id:d.id, ...p});
+    }
+  });
+  if(items.length===0){ wrap.innerHTML = '<div class="empty">해당 단계의 공사 사진이 없습니다.</div>'; return; }
+
+  // 날짜별 그룹핑
+  const groups = {};
+  items.forEach(p=>{
+    const dateKey = p.createdAt ? formatTs(p.createdAt).split(' ')[0] : '날짜미상';
+    if(!groups[dateKey]) groups[dateKey] = [];
+    groups[dateKey].push(p);
+  });
+
+  wrap.innerHTML = '';
+  Object.keys(groups).forEach(dateKey=>{
+    const dayBlock = document.createElement('div');
+    dayBlock.style.marginBottom = '18px';
+    const dayTitle = document.createElement('div');
+    dayTitle.style.cssText = 'font-weight:700;color:var(--navy);font-size:var(--fs-min);margin-bottom:8px;';
+    dayTitle.textContent = dateKey;
+    dayBlock.appendChild(dayTitle);
+    const grid = document.createElement('div');
+    grid.className = 'photo-grid';
+    groups[dateKey].forEach(p=>{
+      const el = document.createElement('div');
+      el.className = 'photo-item';
+      el.innerHTML = `
+        <img src="${p.url}" onclick="openLightbox('${p.url}')">
+        <div class="meta">
+          <span class="del" onclick="delPhoto('${p.id}','${p.storagePath}')">삭제</span>
+          <span class="tag">${p.category}</span>
+          <div class="memo">${p.memo||''}</div>
+        </div>
+      `;
+      grid.appendChild(el);
+    });
+    dayBlock.appendChild(grid);
+    wrap.appendChild(dayBlock);
+  });
+}
+window.loadConstructionTimeline = loadConstructionTimeline;
 
 // ==== 법률의견 AI분석 ====
 async function uploadLegal(){
