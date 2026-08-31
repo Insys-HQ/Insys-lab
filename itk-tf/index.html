@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>화재복구 TF 통합관리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#16233F;
+    --navy2:#223655;
+    --accent:#3B6EA5;
+    --accent-light:#DCE8F5;
+    --bg:#F3F5F8;
+    --card:#FFFFFF;
+    --text:#22262B;
+    --text-sub:#5B6472;
+    --border:#E1E5EB;
+    --ok:#2E7D5B;
+    --warn:#B4741E;
+    --danger:#B23B3B;
+    --fs-min:0.875rem; /* 모바일 기본 최소 폰트: 14px */
+  }
+  @media (min-width:768px){
+    :root{ --fs-min:1rem; } /* PC(768px~): 16px로 확대 */
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Noto Sans KR',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    font-size:var(--fs-min);
+    line-height:1.6;
+  }
+  #gate{display:none;}
+
+  #updateBanner{
+    display:none;position:fixed;top:0;left:0;right:0;z-index:500;
+    background:var(--accent);color:#fff;padding:10px 16px;font-size:var(--fs-min);
+    align-items:center;justify-content:center;gap:14px;
+  }
+  #updateBanner button{
+    background:#fff;color:var(--accent);border:none;border-radius:6px;padding:5px 12px;font-size:var(--fs-min);font-weight:700;cursor:pointer;font-family:inherit;
+  }
+
+  header{
+    background:var(--navy);color:#fff;padding:22px 0;
+  }
+  header .inner{
+    max-width:1100px;margin:0 auto;padding:0 20px;display:flex;justify-content:space-between;align-items:center;
+  }
+  header h1{font-size:19px;font-weight:700;letter-spacing:-0.3px;}
+  header .sub{font-size:var(--fs-min);color:#B9C4D6;margin-top:3px;}
+  header .meta{font-size:var(--fs-min);color:#B9C4D6;text-align:right;}
+
+  nav{
+    background:var(--navy2);position:sticky;top:0;z-index:50;
+  }
+  nav .inner{
+    max-width:1100px;margin:0 auto;padding:0 20px;display:flex;gap:4px;overflow-x:auto;
+  }
+  nav button{
+    background:transparent;border:none;color:#C9D4E4;padding:13px 16px;font-size:var(--fs-min);cursor:pointer;font-family:inherit;
+    border-bottom:3px solid transparent;white-space:nowrap;font-weight:500;
+  }
+  nav button.active{color:#fff;border-bottom-color:var(--accent);}
+
+  main{max-width:1100px;margin:0 auto;padding:24px 20px 60px;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+  @media(max-width:800px){.grid4{grid-template-columns:repeat(2,1fr);}}
+  .track-card{
+    background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;
+  }
+  .track-card .label{font-size:var(--fs-min);color:var(--text-sub);font-weight:500;margin-bottom:6px;}
+  .track-card .status{font-size:var(--fs-min);font-weight:700;color:var(--navy);margin-bottom:8px;min-height:20px;}
+  .track-card textarea{
+    width:100%;border:1px solid var(--border);border-radius:6px;padding:8px;font-size:var(--fs-min);font-family:inherit;resize:vertical;min-height:60px;color:var(--text);
+  }
+  .track-card .row{display:flex;gap:6px;margin-top:8px;}
+  .track-card input[type=text]{
+    flex:1;border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:var(--fs-min);font-family:inherit;
+  }
+  .track-card button.save{
+    background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:var(--fs-min);cursor:pointer;font-family:inherit;
+  }
+  .track-card .updated{font-size:var(--fs-min);color:#98A2AF;margin-top:6px;}
+
+  .section-title{font-size:15px;font-weight:700;color:var(--navy);margin:26px 0 12px;display:flex;align-items:center;gap:8px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px;}
+
+  .upload-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
+  .upload-row input[type=file]{font-size:var(--fs-min);}
+  .upload-row input[type=text]{
+    flex:1;min-width:180px;border:1px solid var(--border);border-radius:6px;padding:9px 10px;font-size:var(--fs-min);font-family:inherit;
+  }
+  .upload-row select{
+    border:1px solid var(--border);border-radius:6px;padding:9px 10px;font-size:var(--fs-min);font-family:inherit;background:#fff;
+  }
+  .upload-row button{
+    background:var(--navy);color:#fff;border:none;border-radius:6px;padding:9px 16px;font-size:var(--fs-min);cursor:pointer;font-family:inherit;font-weight:500;
+  }
+  .progress{font-size:var(--fs-min);color:var(--accent);margin-bottom:12px;}
+
+  .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+  .photo-item{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .photo-item img{width:100%;height:150px;object-fit:cover;display:block;background:#eee;cursor:pointer;}
+  .photo-item .meta{padding:10px;}
+  .photo-item .tag{
+    display:inline-block;font-size:var(--fs-min);background:var(--accent-light);color:var(--accent);padding:2px 8px;border-radius:10px;margin-bottom:6px;font-weight:500;
+  }
+  .photo-item .memo{font-size:var(--fs-min);color:var(--text);margin-bottom:4px;}
+  .photo-item .date{font-size:var(--fs-min);color:var(--text-sub);}
+  .photo-item .del{font-size:var(--fs-min);color:var(--danger);cursor:pointer;float:right;}
+
+  .file-list{border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .file-row{
+    display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);background:var(--card);font-size:var(--fs-min);
+  }
+  .file-row:last-child{border-bottom:none;}
+  .file-row .ftag{
+    font-size:var(--fs-min);background:var(--accent-light);color:var(--accent);padding:2px 8px;border-radius:10px;font-weight:500;flex-shrink:0;
+  }
+  .file-row .fname{flex:1;color:var(--text);}
+  .file-row a{color:var(--accent);text-decoration:none;font-size:var(--fs-min);font-weight:500;}
+  .file-row .fdate{font-size:var(--fs-min);color:var(--text-sub);flex-shrink:0;}
+  .file-row .del{font-size:var(--fs-min);color:var(--danger);cursor:pointer;flex-shrink:0;}
+
+  table.sched{width:100%;border-collapse:collapse;font-size:var(--fs-min);}
+  table.sched th{
+    background:var(--accent-light);color:var(--navy);text-align:left;padding:9px 10px;font-weight:700;font-size:var(--fs-min);
+  }
+  table.sched td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text);}
+  table.sched tr:last-child td{border-bottom:none;}
+  .badge{padding:2px 8px;border-radius:10px;font-size:var(--fs-min);font-weight:600;}
+  .badge.done{background:#DFF3E8;color:var(--ok);}
+  .badge.prog{background:#FDF0DC;color:var(--warn);}
+  .badge.plan{background:#E7ECF2;color:var(--text-sub);}
+  .del-cell{color:var(--danger);cursor:pointer;font-size:var(--fs-min);}
+
+  .empty{color:var(--text-sub);font-size:var(--fs-min);padding:20px;text-align:center;}
+
+  .legal-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;}
+  .legal-item .top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .legal-item .fname{flex:1;font-size:var(--fs-min);font-weight:500;color:var(--text);}
+  .legal-item .fdate{font-size:var(--fs-min);color:var(--text-sub);}
+  .legal-item .actions{display:flex;gap:10px;align-items:center;margin-top:6px;}
+  .legal-item .actions a, .legal-item .actions span{font-size:var(--fs-min);cursor:pointer;color:var(--accent);}
+  .legal-item .actions .del{color:var(--danger);}
+  .legal-item .analysis{
+    margin-top:10px;padding:12px;background:var(--accent-light);border-radius:8px;font-size:var(--fs-min);color:var(--text);white-space:pre-wrap;line-height:1.7;
+  }
+  .legal-item .analysis-label{font-size:var(--fs-min);font-weight:700;color:var(--accent);margin-bottom:4px;}
+  .badge.pending{background:#E7ECF2;color:var(--text-sub);}
+  .badge.error{background:#F7DEDE;color:var(--danger);}
+
+  #lightbox{
+    display:none;position:fixed;inset:0;background:rgba(10,14,22,0.9);z-index:200;align-items:center;justify-content:center;padding:20px;
+  }
+  #lightbox img{max-width:90%;max-height:90%;border-radius:6px;}
+  #lightbox .close{position:absolute;top:20px;right:26px;color:#fff;font-size:28px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div id="gate" style="display:none;"></div>
+
+<div id="updateBanner">
+  새 버전이 배포되었습니다.
+  <button onclick="location.reload(true)">새로고침</button>
+</div>
+
+
+<header>
+  <div class="inner">
+    <div>
+      <h1>화재복구 TF 통합관리</h1>
+      <div class="sub">인시스 AI혁신 연구개발실</div>
+    </div>
+    <div class="meta">v1.8<br>ys.kim@in-sys.co.kr</div>
+  </div>
+</header>
+
+<nav>
+  <div class="inner">
+    <button class="active" data-view="dashboard">트랙현황</button>
+    <button data-view="photos">사진 타임라인</button>
+    <button data-view="files">파일함</button>
+    <button data-view="kakao">카톡 정리</button>
+    <button data-view="schedule">일정관리</button>
+    <button data-view="legal">법률의견 AI분석</button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- 대시보드: 4대 트랙 현황 -->
+  <div class="view active" id="view-dashboard">
+    <div class="grid4" id="trackGrid"></div>
+  </div>
+
+  <!-- 사진 타임라인 -->
+  <div class="view" id="view-photos">
+    <div class="card">
+      <div class="upload-row">
+        <input type="file" id="photoFile" accept="image/*">
+        <select id="photoCat">
+          <option value="화재현장">화재현장</option>
+          <option value="철거">철거</option>
+          <option value="공사진행">공사진행</option>
+          <option value="기타">기타</option>
+        </select>
+        <input type="text" id="photoMemo" placeholder="한줄 메모 (예: 3층 골조 철거 완료)">
+        <button onclick="uploadPhoto()">업로드</button>
+      </div>
+      <div class="progress" id="photoProgress"></div>
+    </div>
+    <div class="photo-grid" id="photoGrid"></div>
+  </div>
+
+  <!-- 파일함 -->
+  <div class="view" id="view-files">
+    <div class="card">
+      <div class="upload-row">
+        <input type="file" id="docFile">
+        <select id="docCat">
+          <option value="화재보상">화재보상</option>
+          <option value="지자체지원">지자체지원</option>
+          <option value="고객사보상">고객사보상</option>
+          <option value="공장신축">공장신축</option>
+          <option value="기타">기타</option>
+        </select>
+        <button onclick="uploadFile()">업로드</button>
+      </div>
+      <div class="progress" id="fileProgress"></div>
+    </div>
+    <div class="file-list" id="fileList"></div>
+  </div>
+
+  <!-- 카톡 정리 -->
+  <div class="view" id="view-kakao">
+    <div class="card">
+      <div class="upload-row">
+        <select id="kakaoCat">
+          <option value="화재보상">화재보상</option>
+          <option value="지자체지원">지자체지원</option>
+          <option value="고객사보상">고객사보상</option>
+          <option value="공장신축">공장신축</option>
+          <option value="기타">기타</option>
+        </select>
+        <input type="text" id="kakaoMemo" placeholder="한줄 요약 (선택, 예: 소방서 화재조사 결과 회신)">
+      </div>
+      <textarea id="kakaoText" placeholder="카톡 대화 내용을 복사해서 여기에 붙여넣으세요" style="width:100%;min-height:130px;border:1px solid var(--border);border-radius:6px;padding:10px;font-size:var(--fs-min);font-family:inherit;resize:vertical;margin-bottom:10px;color:var(--text);"></textarea>
+      <div class="upload-row" style="margin-bottom:0;">
+        <button onclick="uploadKakao()">저장</button>
+      </div>
+      <div class="progress" id="kakaoProgress"></div>
+    </div>
+    <div id="kakaoList"></div>
+  </div>
+
+  <!-- 일정관리 -->
+  <div class="view" id="view-schedule">
+    <div class="card">
+      <div class="upload-row">
+        <select id="schedTrack">
+          <option value="화재보상">화재보상</option>
+          <option value="지자체지원">지자체지원</option>
+          <option value="고객사보상">고객사보상</option>
+          <option value="공장신축">공장신축</option>
+        </select>
+        <input type="text" id="schedTitle" placeholder="마일스톤/일정 내용" style="min-width:220px;">
+        <input type="text" id="schedDate" placeholder="날짜 (예: 2026-08-20)" style="max-width:150px;">
+        <select id="schedStatus">
+          <option value="계획">계획</option>
+          <option value="진행중">진행중</option>
+          <option value="완료">완료</option>
+        </select>
+        <button onclick="addSchedule()">추가</button>
+      </div>
+    </div>
+    <div class="card" style="padding:0;overflow-x:auto;">
+      <table class="sched" id="schedTable">
+        <thead><tr><th>트랙</th><th>내용</th><th>일정</th><th>상태</th><th></th></tr></thead>
+        <tbody id="schedBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 법률의견 AI분석 -->
+  <div class="view" id="view-legal">
+    <div class="card">
+      <div class="upload-row">
+        <input type="file" id="legalFile" accept=".pdf,.doc,.docx">
+        <select id="legalCat">
+          <option value="화재보상">화재보상</option>
+          <option value="지자체지원">지자체지원</option>
+          <option value="고객사보상">고객사보상</option>
+          <option value="공장신축">공장신축</option>
+          <option value="기타">기타</option>
+        </select>
+        <button onclick="uploadLegal()">업로드 후 AI분석 요청</button>
+      </div>
+      <div class="progress" id="legalProgress"></div>
+    </div>
+    <div id="legalList"></div>
+  </div>
+
+</main>
+
+<div id="lightbox" onclick="this.style.display='none'">
+  <span class="close">&times;</span>
+  <img id="lightboxImg" src="">
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, getDocs, deleteDoc, doc,
+  setDoc, getDoc, query, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getStorage, ref, uploadBytes, getDownloadURL, deleteObject
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+// ==== Firebase 설정 (전달받은 값 반영) ====
+const firebaseConfig = {
+  apiKey: "AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",
+  authDomain: "insys-work.firebaseapp.com",
+  projectId: "insys-work",
+  storageBucket: "insys-work.firebasestorage.app",
+  messagingSenderId: "225275784859",
+  appId: "1:225275784859:web:bd12815c6dc47c0c49e03e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getStorage ? getFirestore(app) : null;
+const storage = getStorage(app);
+
+// Cloud Console에서 함수 배포 후 뜨는 URL을 여기에 붙여넣으세요.
+// 예: https://analyzelegaldoc-abc123xyz-du.a.run.app
+const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
+
+// 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
+const APP_VERSION = "1.8";
+
+async function boot(){
+  initNav();
+  loadTracks();
+  loadPhotos();
+  loadFiles();
+  loadKakao();
+  loadSchedule();
+  loadLegal();
+  checkForUpdate();
+}
+
+async function checkForUpdate(){
+  try{
+    const resp = await fetch('./version.json?t=' + Date.now(), {cache:'no-store'});
+    const data = await resp.json();
+    if(data.version && data.version !== APP_VERSION){
+      document.getElementById('updateBanner').style.display = 'flex';
+    }
+  }catch(e){
+    // version.json이 없거나 접근 실패해도 무시(치명적이지 않음)
+  }
+}
+
+// ==== 탭 네비게이션 ====
+function initNav(){
+  document.querySelectorAll('nav button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('view-'+btn.dataset.view).classList.add('active');
+    });
+  });
+}
+
+// ==== 트랙 현황 (대시보드) ====
+const TRACKS = [
+  {id:'fire', label:'화재보상 진행'},
+  {id:'gov', label:'지방자치단체 지원'},
+  {id:'customer', label:'고객사 보상안'},
+  {id:'construction', label:'공장 신축'}
+];
+
+async function loadTracks(){
+  const grid = document.getElementById('trackGrid');
+  grid.innerHTML = '';
+  for(const t of TRACKS){
+    const snap = await getDoc(doc(db,'trackStatus',t.id));
+    const data = snap.exists() ? snap.data() : {status:'', updatedAt:null};
+    const card = document.createElement('div');
+    card.className = 'track-card';
+    card.innerHTML = `
+      <div class="label">${t.label}</div>
+      <textarea id="status-${t.id}" placeholder="현재 상태 / 다음 액션 / 담당·기한">${data.status||''}</textarea>
+      <div class="row">
+        <button class="save" onclick="saveTrack('${t.id}')">저장</button>
+      </div>
+      <div class="updated" id="upd-${t.id}">${data.updatedAt ? '업데이트: '+formatTs(data.updatedAt) : '아직 업데이트 없음'}</div>
+    `;
+    grid.appendChild(card);
+  }
+}
+
+window.saveTrack = async function(id){
+  const val = document.getElementById('status-'+id).value;
+  await setDoc(doc(db,'trackStatus',id), {status:val, updatedAt: serverTimestamp()});
+  document.getElementById('upd-'+id).textContent = '업데이트: 방금 전';
+};
+
+function formatTs(ts){
+  try{ return ts.toDate().toLocaleString('ko-KR'); }catch(e){ return ''; }
+}
+
+// ==== 사진 타임라인 ====
+async function uploadPhoto(){
+  const fileInput = document.getElementById('photoFile');
+  const file = fileInput.files[0];
+  if(!file){ alert('사진을 선택해주세요.'); return; }
+  const cat = document.getElementById('photoCat').value;
+  const memo = document.getElementById('photoMemo').value;
+  const progEl = document.getElementById('photoProgress');
+  progEl.textContent = '업로드 중...';
+  try{
+    const path = `photos/${Date.now()}_${file.name}`;
+    const sref = ref(storage, path);
+    await uploadBytes(sref, file);
+    const url = await getDownloadURL(sref);
+    await addDoc(collection(db,'photos'), {
+      url, storagePath: path, category: cat, memo,
+      createdAt: serverTimestamp()
+    });
+    progEl.textContent = '업로드 완료';
+    fileInput.value = ''; document.getElementById('photoMemo').value = '';
+    loadPhotos();
+  }catch(e){
+    console.error(e);
+    progEl.textContent = '업로드 실패: ' + e.message;
+  }
+}
+window.uploadPhoto = uploadPhoto;
+
+async function loadPhotos(){
+  const grid = document.getElementById('photoGrid');
+  grid.innerHTML = '<div class="empty">불러오는 중...</div>';
+  const q = query(collection(db,'photos'), orderBy('createdAt','desc'));
+  const snap = await getDocs(q);
+  if(snap.empty){ grid.innerHTML = '<div class="empty">등록된 사진이 없습니다.</div>'; return; }
+  grid.innerHTML = '';
+  snap.forEach(d=>{
+    const p = d.data();
+    const el = document.createElement('div');
+    el.className = 'photo-item';
+    el.innerHTML = `
+      <img src="${p.url}" onclick="openLightbox('${p.url}')">
+      <div class="meta">
+        <span class="del" onclick="delPhoto('${d.id}','${p.storagePath}')">삭제</span>
+        <span class="tag">${p.category||'기타'}</span>
+        <div class="memo">${p.memo||''}</div>
+        <div class="date">${p.createdAt ? formatTs(p.createdAt) : ''}</div>
+      </div>
+    `;
+    grid.appendChild(el);
+  });
+}
+
+window.delPhoto = async function(id, path){
+  if(!confirm('삭제하시겠습니까?')) return;
+  await deleteDoc(doc(db,'photos',id));
+  try{ await deleteObject(ref(storage, path)); }catch(e){}
+  loadPhotos();
+};
+
+window.openLightbox = function(url){
+  document.getElementById('lightboxImg').src = url;
+  document.getElementById('lightbox').style.display = 'flex';
+};
+
+// ==== 파일함 ====
+async function uploadFile(){
+  const fileInput = document.getElementById('docFile');
+  const file = fileInput.files[0];
+  if(!file){ alert('파일을 선택해주세요.'); return; }
+  const cat = document.getElementById('docCat').value;
+  const progEl = document.getElementById('fileProgress');
+  progEl.textContent = '업로드 중...';
+  try{
+    const path = `files/${Date.now()}_${file.name}`;
+    const sref = ref(storage, path);
+    await uploadBytes(sref, file);
+    const url = await getDownloadURL(sref);
+    await addDoc(collection(db,'files'), {
+      url, storagePath: path, filename: file.name, category: cat,
+      uploadedAt: serverTimestamp()
+    });
+    progEl.textContent = '업로드 완료';
+    fileInput.value = '';
+    loadFiles();
+  }catch(e){
+    console.error(e);
+    progEl.textContent = '업로드 실패: ' + e.message;
+  }
+}
+window.uploadFile = uploadFile;
+
+async function loadFiles(){
+  const list = document.getElementById('fileList');
+  list.innerHTML = '<div class="empty">불러오는 중...</div>';
+  const q = query(collection(db,'files'), orderBy('uploadedAt','desc'));
+  const snap = await getDocs(q);
+  if(snap.empty){ list.innerHTML = '<div class="empty">등록된 파일이 없습니다.</div>'; return; }
+  list.innerHTML = '';
+  snap.forEach(d=>{
+    const f = d.data();
+    const row = document.createElement('div');
+    row.className = 'file-row';
+    row.innerHTML = `
+      <span class="ftag">${f.category||'기타'}</span>
+      <span class="fname">${f.filename}</span>
+      <span class="fdate">${f.uploadedAt ? formatTs(f.uploadedAt) : ''}</span>
+      <a href="${f.url}" target="_blank">열기</a>
+      <span class="del" onclick="delFile('${d.id}','${f.storagePath}')">삭제</span>
+    `;
+    list.appendChild(row);
+  });
+}
+
+window.delFile = async function(id, path){
+  if(!confirm('삭제하시겠습니까?')) return;
+  await deleteDoc(doc(db,'files',id));
+  try{ await deleteObject(ref(storage, path)); }catch(e){}
+  loadFiles();
+};
+
+// ==== 카톡 정리 (텍스트 붙여넣기) ====
+async function uploadKakao(){
+  const textEl = document.getElementById('kakaoText');
+  const text = textEl.value.trim();
+  if(!text){ alert('카톡 대화 내용을 붙여넣어주세요.'); return; }
+  const cat = document.getElementById('kakaoCat').value;
+  const memo = document.getElementById('kakaoMemo').value;
+  const progEl = document.getElementById('kakaoProgress');
+  progEl.textContent = '저장 중...';
+  try{
+    await addDoc(collection(db,'kakao'), {
+      category: cat, memo, text,
+      createdAt: serverTimestamp()
+    });
+    progEl.textContent = '저장 완료';
+    textEl.value = ''; document.getElementById('kakaoMemo').value = '';
+    loadKakao();
+  }catch(e){
+    console.error(e);
+    progEl.textContent = '저장 실패: ' + e.message;
+  }
+}
+window.uploadKakao = uploadKakao;
+
+let kakaoCache = {};
+
+async function loadKakao(){
+  const list = document.getElementById('kakaoList');
+  list.innerHTML = '<div class="empty">불러오는 중...</div>';
+  const q = query(collection(db,'kakao'), orderBy('createdAt','desc'));
+  const snap = await getDocs(q);
+  if(snap.empty){ list.innerHTML = '<div class="empty">등록된 카톡 내용이 없습니다.</div>'; return; }
+  list.innerHTML = '';
+  kakaoCache = {};
+  snap.forEach(d=>{
+    const p = d.data();
+    kakaoCache[d.id] = p;
+    const el = document.createElement('div');
+    el.className = 'legal-item';
+    el.id = 'kakao-' + d.id;
+    renderKakaoView(el, d.id, p);
+    list.appendChild(el);
+  });
+}
+
+function renderKakaoView(el, id, p){
+  el.innerHTML = `
+    <div class="top">
+      <span class="ftag" style="background:var(--accent-light);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:var(--fs-min);font-weight:500;">${p.category||'기타'}</span>
+      <span class="fname">${p.memo||'(요약 없음)'}</span>
+    </div>
+    <div class="fdate">${p.createdAt ? formatTs(p.createdAt) : ''}</div>
+    <div class="analysis">${(p.text||'').replace(/</g,'&lt;')}</div>
+    <div class="actions">
+      <span onclick="editKakao('${id}')">수정</span>
+      <span class="del" onclick="delKakao('${id}')">삭제</span>
+    </div>
+  `;
+}
+
+window.editKakao = function(id){
+  const p = kakaoCache[id];
+  const el = document.getElementById('kakao-' + id);
+  const cats = ['화재보상','지자체지원','고객사보상','공장신축','기타'];
+  const options = cats.map(c => `<option value="${c}" ${p.category===c?'selected':''}>${c}</option>`).join('');
+  el.innerHTML = `
+    <div class="upload-row" style="margin-bottom:8px;">
+      <select id="editCat-${id}">${options}</select>
+      <input type="text" id="editMemo-${id}" value="${(p.memo||'').replace(/"/g,'&quot;')}" placeholder="한줄 요약">
+    </div>
+    <textarea id="editText-${id}" style="width:100%;min-height:120px;border:1px solid var(--border);border-radius:6px;padding:10px;font-size:var(--fs-min);font-family:inherit;resize:vertical;color:var(--text);">${(p.text||'')}</textarea>
+    <div class="actions" style="margin-top:8px;">
+      <span onclick="saveKakaoEdit('${id}')" style="color:var(--accent);font-weight:600;">저장</span>
+      <span onclick="loadKakao()">취소</span>
+    </div>
+  `;
+};
+
+window.saveKakaoEdit = async function(id){
+  const category = document.getElementById('editCat-'+id).value;
+  const memo = document.getElementById('editMemo-'+id).value;
+  const text = document.getElementById('editText-'+id).value;
+  await setDoc(doc(db,'kakao',id), {category, memo, text}, {merge:true});
+  loadKakao();
+};
+
+window.delKakao = async function(id){
+  if(!confirm('삭제하시겠습니까?')) return;
+  await deleteDoc(doc(db,'kakao',id));
+  loadKakao();
+};
+
+// ==== 일정관리 ====
+async function addSchedule(){
+  const track = document.getElementById('schedTrack').value;
+  const title = document.getElementById('schedTitle').value;
+  const date = document.getElementById('schedDate').value;
+  const status = document.getElementById('schedStatus').value;
+  if(!title){ alert('일정 내용을 입력해주세요.'); return; }
+  await addDoc(collection(db,'schedule'), {track, title, date, status, createdAt: serverTimestamp()});
+  document.getElementById('schedTitle').value = '';
+  document.getElementById('schedDate').value = '';
+  loadSchedule();
+}
+window.addSchedule = addSchedule;
+
+async function loadSchedule(){
+  const body = document.getElementById('schedBody');
+  body.innerHTML = '<tr><td colspan="5" class="empty">불러오는 중...</td></tr>';
+  const q = query(collection(db,'schedule'), orderBy('date','asc'));
+  const snap = await getDocs(q);
+  if(snap.empty){ body.innerHTML = '<tr><td colspan="5" class="empty">등록된 일정이 없습니다.</td></tr>'; return; }
+  body.innerHTML = '';
+  snap.forEach(d=>{
+    const s = d.data();
+    const badgeClass = s.status === '완료' ? 'done' : (s.status === '진행중' ? 'prog' : 'plan');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${s.track}</td>
+      <td>${s.title}</td>
+      <td>${s.date||'-'}</td>
+      <td><span class="badge ${badgeClass}">${s.status}</span></td>
+      <td class="del-cell" onclick="delSchedule('${d.id}')">삭제</td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+window.delSchedule = async function(id){
+  if(!confirm('삭제하시겠습니까?')) return;
+  await deleteDoc(doc(db,'schedule',id));
+  loadSchedule();
+};
+
+// ==== 법률의견 AI분석 ====
+async function uploadLegal(){
+  const fileInput = document.getElementById('legalFile');
+  const file = fileInput.files[0];
+  if(!file){ alert('법률의견 문서를 선택해주세요.'); return; }
+  const cat = document.getElementById('legalCat').value;
+  const progEl = document.getElementById('legalProgress');
+  progEl.textContent = '업로드 중...';
+  try{
+    const path = `legal/${Date.now()}_${file.name}`;
+    const sref = ref(storage, path);
+    await uploadBytes(sref, file);
+    const url = await getDownloadURL(sref);
+    const docRef = await addDoc(collection(db,'legalOpinions'), {
+      url, storagePath: path, filename: file.name, category: cat,
+      analysis: '', analysisStatus: 'pending',
+      uploadedAt: serverTimestamp()
+    });
+    progEl.textContent = 'AI 분석 요청 중... (문서 길이에 따라 30초~1분 소요)';
+    fileInput.value = '';
+    loadLegal();
+    await requestAnalysis(docRef.id);
+    progEl.textContent = '분석 완료';
+  }catch(e){
+    console.error(e);
+    progEl.textContent = '업로드 실패: ' + e.message;
+  }
+}
+window.uploadLegal = uploadLegal;
+
+async function requestAnalysis(docId){
+  if(!LEGAL_ANALYZE_URL || LEGAL_ANALYZE_URL.includes('여기에')){
+    alert('아직 AI 분석 함수 URL이 설정되지 않았습니다. 관리자에게 문의해주세요.');
+    return;
+  }
+  try{
+    const resp = await fetch(LEGAL_ANALYZE_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ docId })
+    });
+    const data = await resp.json();
+    if(!resp.ok) throw new Error(data.error || '분석 실패');
+    await setDoc(doc(db,'legalOpinions',docId), {
+      analysis: data.analysis, analysisStatus: 'done'
+    }, {merge:true});
+  }catch(e){
+    console.error(e);
+    await setDoc(doc(db,'legalOpinions',docId), {
+      analysis: 'AI 분석 실패: ' + e.message, analysisStatus: 'error'
+    }, {merge:true});
+  }
+  loadLegal();
+}
+window.requestAnalysis = requestAnalysis;
+
+async function loadLegal(){
+  const list = document.getElementById('legalList');
+  list.innerHTML = '<div class="empty">불러오는 중...</div>';
+  const q = query(collection(db,'legalOpinions'), orderBy('uploadedAt','desc'));
+  const snap = await getDocs(q);
+  if(snap.empty){ list.innerHTML = '<div class="empty">등록된 법률의견 문서가 없습니다.</div>'; return; }
+  list.innerHTML = '';
+  snap.forEach(d=>{
+    const f = d.data();
+    const badgeClass = f.analysisStatus === 'done' ? 'done' : (f.analysisStatus === 'error' ? 'error' : 'pending');
+    const badgeLabel = f.analysisStatus === 'done' ? '분석완료' : (f.analysisStatus === 'error' ? '분석실패' : '분석대기');
+    const el = document.createElement('div');
+    el.className = 'legal-item';
+    el.innerHTML = `
+      <div class="top">
+        <span class="ftag" style="background:var(--accent-light);color:var(--accent);padding:2px 8px;border-radius:10px;font-size:var(--fs-min);font-weight:500;">${f.category||'기타'}</span>
+        <span class="fname">${f.filename}</span>
+        <span class="badge ${badgeClass}">${badgeLabel}</span>
+      </div>
+      <div class="fdate">${f.uploadedAt ? formatTs(f.uploadedAt) : ''}</div>
+      ${f.analysis ? `<div class="analysis"><div class="analysis-label">AI 분석 결과</div>${f.analysis}</div>` : ''}
+      <div class="actions">
+        <a href="${f.url}" target="_blank">원문 열기</a>
+        <span onclick="requestAnalysis('${d.id}')">재분석</span>
+        <span class="del" onclick="delLegal('${d.id}','${f.storagePath}')">삭제</span>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+window.delLegal = async function(id, path){
+  if(!confirm('삭제하시겠습니까?')) return;
+  await deleteDoc(doc(db,'legalOpinions',id));
+  try{ await deleteObject(ref(storage, path)); }catch(e){}
+  loadLegal();
+};
+
+// 모든 함수/상수 선언이 끝난 뒤 실행 (초기화 순서 오류 방지)
+boot();
+</script>
+</body>
+</html>
