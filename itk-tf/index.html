@@ -189,7 +189,7 @@
       <h1>화재복구·공장신축 TF 통합관리</h1>
       <div class="sub">인시스 AI혁신 연구개발실</div>
     </div>
-    <div class="meta">v2.9<br>ys.kim@in-sys.co.kr</div>
+    <div class="meta">v3.0<br>ys.kim@in-sys.co.kr</div>
   </div>
 </header>
 
@@ -398,7 +398,7 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "2.9";
+const APP_VERSION = "3.0";
 
 async function boot(){
   initNav();
@@ -693,7 +693,10 @@ async function loadPhotos(){
         <div class="meta">
           <span class="del" onclick="delPhoto('${p.id}','${p.storagePath}')">삭제</span>
           <span class="tag">${p.category||'기타'}</span>
-          <div class="memo">${p.memo||''}</div>
+          <div class="memo" id="photo-memo-${p.id}">
+            ${p.memo||'<span style="color:var(--text-sub);">(메모 없음)</span>'}
+            <span onclick="editPhotoMemo('${p.id}')" style="color:var(--accent);cursor:pointer;margin-left:4px;">수정</span>
+          </div>
           <div class="date" id="photo-date-${p.id}">
             📅 ${photoDateLabel(p)}
             <span onclick="editPhotoDate('${p.id}')" style="color:var(--accent);cursor:pointer;margin-left:4px;">수정</span>
@@ -793,6 +796,39 @@ window.savePhotoDate = async function(id){
   }catch(e){
     console.error('촬영일자 저장 실패', e);
     alert('촬영일자 저장에 실패했습니다: ' + e.message);
+  }
+};
+
+window.editPhotoMemo = function(id){
+  const p = photoCache[id];
+  const wrap = document.getElementById('photo-memo-' + id);
+  wrap.innerHTML = `
+    <input type="text" id="photoMemoInput-${id}" value="${(p.memo||'').replace(/"/g,'&quot;')}" style="width:100%;font-size:var(--fs-min);padding:4px 6px;box-sizing:border-box;">
+    <div style="margin-top:4px;">
+      <span onclick="savePhotoMemo('${id}')" style="color:var(--accent);cursor:pointer;font-weight:600;">저장</span>
+      &nbsp;|&nbsp;
+      <span onclick="loadPhotos()" style="color:var(--text-sub);cursor:pointer;">취소</span>
+    </div>
+  `;
+};
+
+window.savePhotoMemo = async function(id){
+  const input = document.getElementById('photoMemoInput-' + id);
+  const val = input ? input.value : '';
+  try{
+    await setDoc(doc(db,'photos',id), {memo: val}, {merge:true});
+    const check = await getDoc(doc(db,'photos',id));
+    if(!check.exists() || check.data().memo !== val){
+      alert('저장이 반영되지 않았습니다. 네트워크 상태를 확인하고 다시 시도해주세요.');
+      return;
+    }
+    photoCache[id] = check.data();
+    loadPhotos();
+    loadConstructionTimeline();
+    if(val) suggestProgressFromText(val); // 수정된 메모도 진도율 자동감지 재실행
+  }catch(e){
+    console.error('메모 저장 실패', e);
+    alert('메모 저장에 실패했습니다: ' + e.message);
   }
 };
 
