@@ -173,6 +173,11 @@
   <button onclick="location.reload(true)">새로고침</button>
 </div>
 
+<div id="progressSuggestBanner" style="display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:400;background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:14px 18px;box-shadow:0 4px 16px rgba(0,0,0,0.15);max-width:90%;width:420px;">
+  <div style="font-weight:700;color:var(--navy);margin-bottom:8px;">📋 진도율 자동 감지</div>
+  <div id="progressSuggestBody"></div>
+</div>
+
 
 <header>
   <div class="inner">
@@ -180,7 +185,7 @@
       <h1>화재복구·공장신축 TF 통합관리</h1>
       <div class="sub">인시스 AI혁신 연구개발실</div>
     </div>
-    <div class="meta">v2.1<br>ys.kim@in-sys.co.kr</div>
+    <div class="meta">v2.2<br>ys.kim@in-sys.co.kr</div>
   </div>
 </header>
 
@@ -384,7 +389,7 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "2.1";
+const APP_VERSION = "2.2";
 
 async function boot(){
   initNav();
@@ -509,6 +514,7 @@ async function uploadPhoto(){
     progEl.textContent = `업로드 완료 (${files.length}개)`;
     bar.style.width = '100%';
     setTimeout(()=>{ barWrap.style.display = 'none'; }, 800);
+    if(memo) suggestProgressFromText(memo);
     fileInput.value = ''; document.getElementById('photoMemo').value = '';
     loadPhotos();
   }catch(e){
@@ -518,6 +524,45 @@ async function uploadPhoto(){
   }
 }
 window.uploadPhoto = uploadPhoto;
+
+// ==== 진도율 자동 감지 (카톡/사진메모 텍스트 → AI 추출 → 확인 후 반영) ====
+async function suggestProgressFromText(text){
+  if(!text || !text.trim()) return;
+  if(!LEGAL_ANALYZE_URL || LEGAL_ANALYZE_URL.includes('여기에')) return;
+  try{
+    const resp = await fetch(LEGAL_ANALYZE_URL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ action: 'extractProgress', text })
+    });
+    const data = await resp.json();
+    if(!resp.ok || !data.extractions || data.extractions.length===0) return;
+    showProgressSuggestions(data.extractions);
+  }catch(e){
+    console.error('진도율 자동감지 실패', e);
+  }
+}
+
+function showProgressSuggestions(extractions){
+  const banner = document.getElementById('progressSuggestBanner');
+  const body = document.getElementById('progressSuggestBody');
+  body.innerHTML = extractions.map((ex, i) => `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:var(--fs-min);">
+      <span style="flex:1;">${ex.stage} → <b>${ex.progress}%</b> <span style="color:var(--text-sub);">(${ex.reason||''})</span></span>
+      <button onclick="applyProgressSuggestion('${ex.stage}', ${ex.progress}, ${i})" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:var(--fs-min);cursor:pointer;">반영</button>
+    </div>
+  `).join('') + `<div style="text-align:right;"><span onclick="document.getElementById('progressSuggestBanner').style.display='none';" style="font-size:var(--fs-min);color:var(--text-sub);cursor:pointer;">닫기</span></div>`;
+  banner.style.display = 'block';
+}
+
+window.applyProgressSuggestion = async function(stage, progress, idx){
+  await setDoc(doc(db,'constructionStages',stage), {progress, updatedAt: serverTimestamp()}, {merge:true});
+  loadStageProgress();
+  const rows = document.querySelectorAll('#progressSuggestBody > div');
+  if(rows[idx]) rows[idx].style.opacity = '0.4';
+  const btn = rows[idx] ? rows[idx].querySelector('button') : null;
+  if(btn){ btn.textContent = '반영됨'; btn.disabled = true; }
+};
 
 async function loadPhotos(){
   const grid = document.getElementById('photoGrid');
@@ -638,6 +683,7 @@ async function uploadKakao(){
       createdAt: serverTimestamp()
     });
     progEl.textContent = '저장 완료';
+    suggestProgressFromText(text);
     textEl.value = ''; document.getElementById('kakaoMemo').value = '';
     loadKakao();
   }catch(e){
