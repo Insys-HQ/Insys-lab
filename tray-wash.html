@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v6.2 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v7.0 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -213,7 +213,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
 // 트레이 세척·탈수·건조 시뮬레이터 v6.2
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='6.2';
+const VER='7.0';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -227,6 +227,7 @@ const S={
   // 단계별 독립 설정 [1차, 2차, 3차헹굼]
   stgPress:[280,200,120], stgCol:[3,3,2], stgRow:[4,4,2], stgType:['wash','wash','rinse'],
   stgLen:[1200,1200,800],  // 단별 조 길이 (세척·세척·헹굼)
+  stgLenAuto:true,  // ★v7.0 조길이 자동: 세로줄 노즐수×줄간격 연동
   wTankL:1500,wTankW:800,wTankD:600,wTankIns:true,
   // 사용 단 조합: 'all'(1·2·3), '13'(1·3), '1'(1단만)
   stageCombo:'all',
@@ -398,6 +399,8 @@ function activeStages(combo, zn){
   if(combo==='13') return zn>=3?[0,2]:[0];
   return Array.from({length:zn},(_, i)=>i); // all
 }
+// ★v7.0 단별 필요 체류시간(초) — 효율·추천·판정 공통 기준 (공식 통일)
+function stageNeedSec(i){ return (S.stgType[i]==='rinse') ? (5+S.dlv) : (8+S.dlv*3); }
 function heaterMaintainKW(t,temp,ins){return t*(ins?0.022:0.045)*(Math.max(0,temp-20)/40);}
 // 에어나이프 1개 풍량 (m³/min): 슬롯길이 × 슬롯폭 × 풍속
 function knifeFlow1(lenMm, slotMm, velMs){ return (lenMm/1000)*(slotMm/1000)*velMs*60; }
@@ -543,12 +546,13 @@ function syncState(){
   }
   ['meshFilter','sludgeFilter','pumpStrainer','autoBackwash'].forEach(id=>{const e=gi(id);if(e)S[id]=e.checked;});
   ['meshSize','sludgeMesh','strainerMesh'].forEach(id=>{const e=gi(id);if(e&&e.value)S[id]=+e.value;});
+  const la=gi('stgLenAuto'); if(la)S.stgLenAuto=la.checked;
   // 단계별 배열 동기화
   for(let i=0;i<4;i++){
     const p=gi('stgPress'+i); if(p&&p.value!=='') S.stgPress[i]=Math.round(+p.value*100);
     const c=gi('stgCol'+i); if(c&&c.value!=='' && !S.wAutoArray) S.stgCol[i]=+c.value;
     const r=gi('stgRow'+i); if(r&&r.value!=='') S.stgRow[i]=+r.value;
-    const sl=gi('stgLen'+i); if(sl&&sl.value!=='') S.stgLen[i]=+sl.value;
+    const sl=gi('stgLen'+i); if(sl&&sl.value!==''&&!S.stgLenAuto) S.stgLen[i]=+sl.value;
   }
 }
 let _tab='wash';
@@ -590,6 +594,12 @@ function calcAll(){
       const arr = nozzleArray(S.trayD, S.trayW, S.wSprayAngle, S.wNozzleDist);
       colI = arr.nc; rowI = arr.nr;
       S.stgCol[i]=colI; S.stgRow[i]=rowI;
+    }
+    // ★v7.0 조길이 자동: 세로줄(진행방향) 노즐 수 × 줄간격 + 전후여유 → 줄↑=조길이↑=체류↑
+    if(S.stgLenAuto){
+      const effG = coverWidth(S.wSprayAngle,S.wNozzleDist)*0.85;
+      const rowPitch = Math.max(250, Math.round(effG/10)*10);
+      S.stgLen[i] = Math.round((rowI*rowPitch + 250)/50)*50;
     }
     const nPerFace = colI*rowI;
     const qE = nozzleQ(S.wHole, press);
@@ -742,13 +752,16 @@ function calcAll(){
   // 오염도별 저항 (극심할수록 제거 어려움) → 오염도에 민감
   const dirtHardness=[0,1.0,1.15,1.35,1.6,2.0][S.dlv]||1.35;
   // 사용 단만 누적 계산 (미사용 단 제외)
+  // ★v7.0 포화 상한 제거: 압력·노즐수 증가가 체감곡선(√·^0.6)으로 계속 효율에 반영
+  const faceAreaEff = S.trayD*S.trayW/1e6;
+  const refNoz = Math.max(6, faceAreaEff*(30+S.dlv*8)); // 추천 노즐수와 동일 밀도 기준
   actStages.forEach(function(i){
     const isRinse=(S.stgType[i]==='rinse');
     const press=S.stgPress[i]||200;
     const nP=(S.stgCol[i]||4)*(S.stgRow[i]||4);
-    const pressF=Math.min(1,press/350);
-    const nozF=Math.min(1,nP/20);
-    let baseRem=isRinse?0.85:(0.45+0.3*pressF+0.15*nozF);
+    const pressF=Math.min(1.7,Math.pow(press/280,0.6));
+    const nozF=Math.min(1.7,Math.pow(nP/refNoz,0.5));
+    let baseRem=isRinse?0.85:(0.40+0.28*pressF+0.17*nozF);
     const tempF=isRinse?1:(0.85+(S.wTemp-40)*0.006);
     baseRem=baseRem/dirtHardness; // 오염 저항 반영
     dirt=dirt*(1-Math.min(0.9,baseRem*tempF));
@@ -763,17 +776,20 @@ function calcAll(){
     const isRinse=(S.stgType[i]==='rinse');
     const stageLen = S.stgLen[i]||1000;
     const dwell = washSpeed>0 ? (stageLen/1000)/washSpeed : 0; // 초
-    const need = isRinse ? (5+S.dlv) : (8+S.dlv*3); // 헹굼은 짧게, 세척은 오염도 비례
+    const need = stageNeedSec(i); // 공통 기준 (헹굼 짧게, 세척은 오염도 비례)
     dwellFactorSum += Math.min(1, dwell/need);
     dwellCount++;
   });
   const dwellFactor = dwellCount>0 ? dwellFactorSum/dwellCount : 1;
   // 체류 부족 시 효율 저하 (체류계수 곱)
-  const pocketPen = pocketPenalty(S.pocketCount);
+  // ★v7.0 교차배치는 포켓 측면 직접 세척 → 패널티 60% 완화 (목표 95% 도달 가능)
+  const pocketPen = pocketPenalty(S.pocketCount) * (S.nozzleLayout==='cross'?0.4:1);
   const distFactor = distWashFactor(S.wNozzleDist);
   const washEff = Math.min(99, washEffBase * (layoutEff/0.9) * (0.4+0.6*dwellFactor) * (1-pocketPen) * distFactor);
-  const dewatEff=Math.min(99,(1-residual/(qtyH*0.03))*100);
-  const dryEff=Math.min(99,65+S.dryTemp*0.28+S.dryRecirc*0.12);
+  const dewatEff=Math.min(99,Math.max(0,(1-residual/(qtyH*0.03))*100)); // ★v7.0 음수 방지
+  // ★v7.0 건조효율: 온도·풍량·순환 + 잔수(탈수 결과) 연동 — 세척→탈수→건조 체인 연결
+  const resPen = 1 - Math.min(0.30, Math.max(0, residual/(qtyH*0.03)-0.05)*0.5);
+  const dryEff=Math.min(99,Math.max(30,(55+S.dryTemp*0.25+S.dryAirVol*0.35+S.dryRecirc*0.06)*resPen));
   // 노즐 배열 정보 (분사각·이격 연동)
   const nozArr = nozzleArray(S.trayD, S.trayW, S.wSprayAngle, S.wNozzleDist);
   const nozDistOpt = optDist(S.wSprayAngle);
@@ -791,10 +807,10 @@ function calcAll(){
   const nActive = actStages.length;
   // 1) 추천 세척조 길이 = 사용단수 × 단위체류길이 (오염도·속도 반영)
   //    각 단 필요 체류시간 = 6 + 오염도×2초, 속도 기반 길이
-  const needDwellPerStage = 6 + S.dlv*2; // 초/단
+  let needDwellSum=0; actStages.forEach(function(i){ needDwellSum += stageNeedSec(i); }); // ★v7.0 공통 기준
   const speedMminRec = S.qty*(S.trayPitch/1000)/60;
   const speedMsRec = speedMminRec/60;
-  const recWashLen = Math.ceil(nActive * needDwellPerStage * speedMsRec * 1000 * 1.2 / 100)*100;
+  const recWashLen = Math.ceil(needDwellSum * speedMsRec * 1000 * 1.2 / 100)*100;
   // 2) 단수 줄면 남은 단 강화 필요 → 추천 압력 (효율 부족분 보상)
   //    3단 대비 부족한 효율을 압력으로 보상
   const effGap = Math.max(0, tgtWashEff - washEff);
@@ -879,9 +895,9 @@ function calcAll(){
   const dwellDewat = speedMs>0 ? (S.dewatLen/1000)/speedMs : 0;
   const dwellDry = speedMs>0 ? (S.dryLen/1000)/speedMs : 0;
   // 필요 최소 체류시간 (공정 강도 기반)
-  const needWash = (6 + S.dlv*2) * activeStages(S.stageCombo,zn).length; // 사용단수 × 단위체류
+  const needWash = needDwellSum; // ★v7.0 효율 계산과 동일 기준 (판정 모순 제거)
   const needDewat = Math.max(3, S.knifePass*1.2);
-  const needDry = 8 + (S.dryTemp<80?4:0);
+  const needDry = dryNeedDwell; // ★v7.0 건조기 길이 산정과 동일 기준
   // 최적(최단) 길이 = 필요체류 × 속도 × 여유20%
   const optWashLen = Math.ceil(needWash*speedMs*1000*1.2/100)*100;
   const optDewatLen = Math.ceil(needDewat*speedMs*1000*1.2/100)*100;
@@ -900,7 +916,8 @@ function renderLeft(){
     var stgHtml='';
     var stgNames=['1차 세척','2차 세척','3차 헹굼'];
     // 1·2·3단 항상 표시, 미사용 단은 비활성화, 가로 3열 배치
-    stgHtml='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">';
+    stgHtml='<label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1565c0;margin-bottom:6px;cursor:pointer;"><input type="checkbox" id="stgLenAuto" '+(S.stgLenAuto?'checked':'')+'> 📏 조 길이 자동 산정 — 세로줄 노즐 수×줄간격 연동 (줄 추가 → 조길이↑ → 체류·효율↑)</label>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">';
     for(var i=0;i<3;i++){
       var isRinse=(S.stgType[i]==='rinse');
       var active=(R.actStages.indexOf(i)>=0);
@@ -915,8 +932,8 @@ function renderLeft(){
         +'<div style="font-weight:800;font-size:13px;color:'+tc+';margin-bottom:5px;text-align:center;">'+(i+1)+'단</div>'
         +'<div style="font-size:11px;color:'+tc+';text-align:center;margin-bottom:6px;">'+(active?stgNames[i]:'미사용')+'</div>'
         +'<div style="text-align:center;font-size:12px;font-weight:800;padding:3px;border-radius:5px;background:'+(isRinse?'#b2ebf2':'#bbdefb')+';color:'+(isRinse?'#00838f':'#1565c0')+';margin-bottom:5px;">'+(isRinse?'헹굼(고정)':'세척(고정)')+'</div>'
-        +'<label style="font-size:11px;color:#5a7088;">조 길이(mm)</label>'
-        +'<input type="number" id="stgLen'+i+'" value="'+S.stgLen[i]+'"'+dis+' style="width:100%;border:1.5px solid #c5d5e5;border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:'+inpBg+';margin-bottom:5px;">'
+        +'<label style="font-size:11px;color:#5a7088;">조 길이(mm)'+(S.stgLenAuto?' <span style="color:#1b5e20;font-weight:800;">자동</span>':'')+'</label>'
+        +'<input type="number" id="stgLen'+i+'" value="'+S.stgLen[i]+'"'+(S.stgLenAuto?' disabled':dis)+' style="width:100%;border:1.5px solid '+(S.stgLenAuto?'#a5d6a7':'#c5d5e5')+';border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:'+(S.stgLenAuto&&active?'#e8f5e9':inpBg)+';margin-bottom:5px;">'
         +'<label style="font-size:11px;color:#5a7088;">분사압력(bar)</label>'
         +'<input type="number" step="0.1" id="stgPress'+i+'" value="'+(S.stgPress[i]/100).toFixed(1)+'"'+dis+' style="width:100%;border:1.5px solid #c5d5e5;border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:'+inpBg+';margin-bottom:5px;">'
         +'<label style="font-size:11px;color:#5a7088;">가로×세로 노즐(면당)</label>'
