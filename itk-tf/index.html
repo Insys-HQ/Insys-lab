@@ -106,7 +106,11 @@
   .progress{font-size:var(--fs-min);color:var(--accent);margin-bottom:12px;}
 
   .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
-  .photo-item{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  .photo-item{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;}
+  .photo-item .sel-check{
+    position:absolute;top:8px;left:8px;width:20px;height:20px;z-index:5;cursor:pointer;accent-color:var(--accent);
+  }
+  .photo-item.selected{outline:2px solid var(--accent);}
   .photo-item img{width:100%;height:150px;object-fit:cover;display:block;background:#eee;cursor:pointer;}
   .photo-item .meta{padding:10px;}
   .photo-item .tag{
@@ -185,7 +189,7 @@
       <h1>화재복구·공장신축 TF 통합관리</h1>
       <div class="sub">인시스 AI혁신 연구개발실</div>
     </div>
-    <div class="meta">v2.2<br>ys.kim@in-sys.co.kr</div>
+    <div class="meta">v2.4<br>ys.kim@in-sys.co.kr</div>
   </div>
 </header>
 
@@ -230,6 +234,10 @@
       <div style="background:var(--border);border-radius:6px;height:6px;overflow:hidden;display:none;" id="photoProgressBarWrap">
         <div id="photoProgressBar" style="background:var(--accent);height:100%;width:0%;transition:width .2s;"></div>
       </div>
+    </div>
+    <div class="upload-row" style="margin-bottom:10px;">
+      <button onclick="toggleSelectAllPhotos()" style="background:var(--card);color:var(--navy);border:1px solid var(--border);">전체선택/해제</button>
+      <button onclick="deleteSelectedPhotos()" style="background:var(--danger);">선택삭제 (<span id="photoSelCount">0</span>)</button>
     </div>
     <div class="photo-grid" id="photoGrid"></div>
   </div>
@@ -389,7 +397,7 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "2.2";
+const APP_VERSION = "2.4";
 
 async function boot(){
   initNav();
@@ -468,6 +476,48 @@ function formatTs(ts){
 
 // ==== 사진 타임라인 ====
 // 업로드 진행률 콜백을 지원하는 공통 업로드 함수
+// 이미지 자동 압축 (긴 변 1920px 기준, JPEG 품질 80%)
+function compressImage(file, maxDim=1920, quality=0.8){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onerror = ()=> reject(new Error('파일 읽기 실패'));
+    reader.onload = (e)=>{
+      const img = new Image();
+      img.onerror = ()=> reject(new Error('이미지 로드 실패'));
+      img.onload = ()=>{
+        let { width, height } = img;
+        if(width > maxDim || height > maxDim){
+          if(width > height){ height = Math.round(height * maxDim / width); width = maxDim; }
+          else { width = Math.round(width * maxDim / height); height = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob)=>{
+          if(!blob){ reject(new Error('압축 실패')); return; }
+          resolve(blob);
+        }, 'image/jpeg', quality);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function toUploadFile(file){
+  if(!file.type || !file.type.startsWith('image/')) return file; // 이미지가 아니면 그대로
+  try{
+    const blob = await compressImage(file);
+    if(blob.size >= file.size) return file; // 압축 효과 없으면 원본 유지
+    const newName = file.name.replace(/\.[^.]+$/, '') + '.jpg';
+    return new File([blob], newName, { type: 'image/jpeg' });
+  }catch(e){
+    console.warn('이미지 압축 실패, 원본으로 업로드', e);
+    return file;
+  }
+}
+
 function uploadWithProgress(sref, file, onProgress){
   return new Promise((resolve, reject)=>{
     const task = uploadBytesResumable(sref, file);
@@ -497,7 +547,9 @@ async function uploadPhoto(){
   barWrap.style.display = 'block';
   try{
     for(let i=0; i<files.length; i++){
-      const file = files[i];
+      let file = files[i];
+      progEl.textContent = `압축 중... (${i+1}/${files.length})`;
+      file = await toUploadFile(file);
       progEl.textContent = `업로드 중... (${i+1}/${files.length}) 0%`;
       bar.style.width = '0%';
       const path = `photos/${Date.now()}_${file.name}`;
@@ -564,18 +616,27 @@ window.applyProgressSuggestion = async function(stage, progress, idx){
   if(btn){ btn.textContent = '반영됨'; btn.disabled = true; }
 };
 
+let photoCache = {};
+let selectedPhotoIds = new Set();
+
 async function loadPhotos(){
   const grid = document.getElementById('photoGrid');
   grid.innerHTML = '<div class="empty">불러오는 중...</div>';
   const q = query(collection(db,'photos'), orderBy('createdAt','desc'));
   const snap = await getDocs(q);
+  photoCache = {};
+  selectedPhotoIds.clear();
+  updateSelCount();
   if(snap.empty){ grid.innerHTML = '<div class="empty">등록된 사진이 없습니다.</div>'; return; }
   grid.innerHTML = '';
   snap.forEach(d=>{
     const p = d.data();
+    photoCache[d.id] = p;
     const el = document.createElement('div');
     el.className = 'photo-item';
+    el.id = 'photo-item-' + d.id;
     el.innerHTML = `
+      <input type="checkbox" class="sel-check" onclick="event.stopPropagation(); togglePhotoSelect('${d.id}')">
       <img src="${p.url}" onclick="openLightbox('${p.url}')">
       <div class="meta">
         <span class="del" onclick="delPhoto('${d.id}','${p.storagePath}')">삭제</span>
@@ -587,6 +648,51 @@ async function loadPhotos(){
     grid.appendChild(el);
   });
 }
+
+window.togglePhotoSelect = function(id){
+  const el = document.getElementById('photo-item-' + id);
+  if(selectedPhotoIds.has(id)){
+    selectedPhotoIds.delete(id);
+    el.classList.remove('selected');
+  } else {
+    selectedPhotoIds.add(id);
+    el.classList.add('selected');
+  }
+  updateSelCount();
+};
+
+function updateSelCount(){
+  const el = document.getElementById('photoSelCount');
+  if(el) el.textContent = selectedPhotoIds.size;
+}
+
+window.toggleSelectAllPhotos = function(){
+  const allIds = Object.keys(photoCache);
+  const allSelected = allIds.length > 0 && allIds.every(id => selectedPhotoIds.has(id));
+  if(allSelected){
+    selectedPhotoIds.clear();
+  } else {
+    allIds.forEach(id => selectedPhotoIds.add(id));
+  }
+  allIds.forEach(id=>{
+    const el = document.getElementById('photo-item-' + id);
+    const cb = el ? el.querySelector('.sel-check') : null;
+    if(el) el.classList.toggle('selected', selectedPhotoIds.has(id));
+    if(cb) cb.checked = selectedPhotoIds.has(id);
+  });
+  updateSelCount();
+};
+
+window.deleteSelectedPhotos = async function(){
+  if(selectedPhotoIds.size === 0){ alert('삭제할 사진을 먼저 선택해주세요.'); return; }
+  if(!confirm(`선택한 ${selectedPhotoIds.size}장을 삭제하시겠습니까?`)) return;
+  for(const id of selectedPhotoIds){
+    const p = photoCache[id];
+    await deleteDoc(doc(db,'photos',id));
+    if(p && p.storagePath){ try{ await deleteObject(ref(storage, p.storagePath)); }catch(e){} }
+  }
+  loadPhotos();
+};
 
 window.delPhoto = async function(id, path){
   if(!confirm('삭제하시겠습니까?')) return;
@@ -612,7 +718,8 @@ async function uploadFile(){
   barWrap.style.display = 'block';
   try{
     for(let i=0; i<files.length; i++){
-      const file = files[i];
+      let file = files[i];
+      file = await toUploadFile(file);
       progEl.textContent = `업로드 중... (${i+1}/${files.length}) ${file.name} 0%`;
       bar.style.width = '0%';
       const path = `files/${Date.now()}_${file.name}`;
