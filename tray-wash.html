@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v4.9 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v5.1 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -162,7 +162,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v4.9</span>
+    <span class="vb">v5.1</span>
   </div>
 </div>
 </div>
@@ -205,25 +205,25 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v4.9 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v5.1 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v4.9
+// 트레이 세척·탈수·건조 시뮬레이터 v5.1
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='4.9';
+const VER='5.1';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
 const S={
   // 트레이 규격 (세워서 투입)
-  trayW:600,trayD:400,trayT:50,pocketDepth:50,qty:500,dlv:3,
+  trayW:430,trayD:330,trayT:150,pocketDepth:45,qty:500,dlv:3,
   nozzleLayout:'cross',  // vertical(수직)/cross(교차각도)/horizontal(수평)
   // 세척 (2CH 고정)
   wZones:3,wHole:2.5,wTemp:60,
-  wSprayAngle:60, wNozzleDist:100, wAutoArray:false,
+  wSprayAngle:60, wNozzleDist:80, wAutoArray:false,
   // 단계별 독립 설정 [1차, 2차, 3차헹굼]
-  stgPress:[280,200,120], stgCol:[4,4,2], stgRow:[4,4,2], stgType:['wash','wash','rinse'],
+  stgPress:[280,200,120], stgCol:[3,3,2], stgRow:[4,4,2], stgType:['wash','wash','rinse'],
   wTankL:1500,wTankW:800,wTankD:600,wTankIns:true,
   // 사용 단 조합: 'all'(1·2·3), '13'(1·3), '1'(1단만)
   stageCombo:'all',
@@ -235,7 +235,7 @@ const S={
   // 순환 회전시간(분) [세척, 세척, 헹굼]
   stgTurnover:[1.5,1.5,1.5],
   // 저수조 폭 고정(세척부 폭 기준), 용량은 길이·깊이로 흡수
-  stgTankFixW:1200,
+  stgTankFixW:800,
   // 배수조: 'single'(공통1) or 'perstage'(단별)
   drainMode:'single',
   drainCount:1,drainHead:8,
@@ -258,7 +258,7 @@ const S={
   workers:2, wage:12000, convType:'through',
   // 기구·구조
   convLen:12000,clipPitch:500,guideRod:true,trayWeight:50,
-  washDryLen:4000,dewatLen:2000,dryLen:4000,inLen:500,outLen:500,moduleGap:500,trayPitch:450,
+  washDryLen:4000,dewatLen:2000,dryLen:4000,inLen:500,outLen:500,moduleGap:500,trayPitch:380,
   containerType:'40ft',moduleSplit:true
 };
 const CH=2; // 트레이는 좌우 2CH 고정
@@ -938,12 +938,14 @@ function renderLeft(){
       +'<div style="background:#f5f8fc;border:1px solid #dde5ee;border-radius:8px;padding:8px 10px;">' // 우: 규격 범위
       +'<div style="font-size:12px;font-weight:800;color:#0d2137;margin-bottom:5px;">📏 표준 규격 범위 (W×D×H)</div>'
       +'<div style="font-size:12px;color:#37474f;line-height:1.7;">'
-      +'<b>트레이</b>: 최대 600×400×150<br>'
-      +'<b>박스</b>:<br>'
-      +'&nbsp;· 최소 450×280×125<br>'
-      +'&nbsp;· 480×380×110 / 150<br>'
-      +'&nbsp;· 575×368×310<br>'
-      +'&nbsp;· 최대 720×480×200<br>'
+      +'<b>트레이 규격</b><br>'
+      +'&nbsp;· 대형 430×330×150 (포켓45)<br>'
+      +'&nbsp;· 소형 320×210×50<br><br>'
+      +'<b>투입:</b> 세워서, 짧은변(330) 진행<br>&nbsp;→ 피치 380mm<br><br>'
+      +'<b>여유 감안 기본값</b><br>'
+      +'&nbsp;· 대형 기준 설정<br>'
+      +'&nbsp;· 설비높이 ~1630<br>'
+      +'&nbsp;· 설비폭 ~1060<br>'
       +'<span style="color:#7a90a4;font-size:11px;">단위 mm</span></div>'
       +'</div></div>'
       +'<div class="g2" style="margin-top:6px;">'+fld('qty','처리량(1CH)','매/h',S.qty)+'<div class="fl"><label>세척 단수 (조합 자동)</label><input type="text" value="'+(S.stageCombo==='all'?'3단 (1·2·3)':S.stageCombo==='13'?'2단 (1·3)':'1단')+'" readonly style="background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#1b5e20;font-family:inherit;"></div></div>'
