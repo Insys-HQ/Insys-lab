@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v3.8 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v4.4 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -52,6 +52,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 .st:first-child{margin-top:0;}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.g3 input{min-width:0;width:100%;}
 @media(max-width:520px){.g3{grid-template-columns:1fr 1fr;}}
 .fl{display:flex;flex-direction:column;gap:3px;}
 .fl label{font-size:13px;font-weight:600;color:#5a7088;}
@@ -154,7 +155,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v3.8</span>
+    <span class="vb">v4.4</span>
   </div>
 </div>
 </div>
@@ -197,13 +198,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v3.8 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v4.4 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v3.8
+// 트레이 세척·탈수·건조 시뮬레이터 v4.4
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='3.8';
+const VER='4.4';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -249,22 +250,35 @@ const S={
   workers:2, wage:12000, convType:'through',
   // 기구·구조
   convLen:12000,clipPitch:500,guideRod:true,trayWeight:50,
-  washDryLen:4000,dewatLen:2000,dryLen:4000,ioLen:500,moduleGap:500,trayPitch:450,
+  washDryLen:4000,dewatLen:2000,dryLen:4000,inLen:500,outLen:500,moduleGap:500,trayPitch:450,
   containerType:'40ft',moduleSplit:true
 };
 const CH=2; // 트레이는 좌우 2CH 고정
 const FACES_PER_CH=2; // 채널당 외벽+격벽 2면
 
 // 링블로어 표준 사양 (kW, 풍량 m³/min, 정압 kPa)
+// 실제 링블로어 사양 (인하글로텍·황해전기 기준)
+// kW, 풍량 m³/min, 정압 kPa, 토출구경 A(mm)
 const BLOWERS=[
-  {kw:2.2, flow:3.5,  press:20},
-  {kw:4.0, flow:6.0,  press:25},
-  {kw:5.5, flow:8.5,  press:28},
-  {kw:7.5, flow:12.0, press:30},
-  {kw:11,  flow:18.0, press:32},
-  {kw:15,  flow:24.0, press:35},
-  {kw:22,  flow:36.0, press:38},
+  {kw:0.75, flow:2.1,  press:15, port:25},
+  {kw:1.5,  flow:3.3,  press:18, port:32},
+  {kw:2.2,  flow:4.2,  press:20, port:40},
+  {kw:3.7,  flow:6.5,  press:22, port:40},
+  {kw:5.5,  flow:9.0,  press:24, port:50},
+  {kw:7.5,  flow:12.0, press:26, port:50},
+  {kw:11,   flow:17.0, press:28, port:65},
+  {kw:15,   flow:23.0, press:30, port:80},
 ];
+// 링블로어 연결 사양 (호스·연결구는 토출구경 기준 매칭, 계산 아님)
+// Y분기 나이프측 = 토출구경 한 단계 아래
+const PORT_STEP_DOWN={25:20, 32:25, 40:32, 50:40, 65:50, 80:65, 100:80};
+function blowerConnSpec(unit, knifePerBlower){
+  const port = unit.port;              // 실제 토출구경
+  const mainSpec = port;               // 메인호스 = 토출구경 동일
+  // Y분기 나이프측: 나이프 2개 이상 분기 시 한 단계 아래, 1개면 동일
+  const knifePort = (knifePerBlower>=2) ? (PORT_STEP_DOWN[port]||port) : port;
+  return { port, mainSpec, knifePort, knifePerBlower };
+}
 // 필요 풍량·압력 → 링블로어 자동 선정 (대수 포함)
 function selectBlower(needAirM3min, needPressKPa){
   // 압력 충족하는 것 중 풍량 감당 최소 규격 찾기
@@ -372,7 +386,9 @@ function slantGap(gapMm, attackDeg){
   return gapMm / Math.cos(Math.abs(attackDeg)*Math.PI/180);
 }
 function impactVel(v0, slotMm, gapMm){
-  const core = slotMm * 5.2; // 핵심영역 길이
+  // 슬롯제트 핵심영역 = 슬롯폭 × 120 (에어나이프 실측 근사, 점제트 5.2와 다름)
+  // 실제 에어나이프는 이격 100mm까지 초기속도 유지
+  const core = slotMm * 120;
   if(gapMm <= core) return v0;
   return v0 * Math.sqrt(core/gapMm);
 }
@@ -391,19 +407,36 @@ function dryerKW(res,airVol,dT,recirc){const evap=res*2260/3600;const airH=(airV
 // 트레이 잔류수분 — 평판이라 탈수 효율 좋음 (개당 30g 기준)
 // 트레이 잔류수분 — 면당 4패스 순차 제거 모델
 // 각 pass가 남은 물의 일정 비율 제거, 성능(속도·이격·슬롯)에 따라 제거율 결정
-function residualWater(qty, pass, attack, vel, slotMm, gapMm){
+// 블로어 정압(kPa) → 에어나이프 토출속도(m/s) [베르누이, 실효 60%]
+function knifeExitVel(pressKPa){ return Math.sqrt(2*pressKPa*1000/1.2)*0.6; }
+// 충돌 동압(Pa) = 0.5 × ρ × v² (이격거리 감쇠 반영)
+function impactPressure(pressKPa, slotMm, gapMm){
+  const v0 = knifeExitVel(pressKPa);
+  const vImp = impactVel(v0, slotMm, gapMm); // 이격 감쇠
+  return 0.5*1.2*vImp*vImp; // Pa
+}
+// 실제 탈수 잔류수분 (충돌압 vs 물막 제거 임계압 기반)
+// blowerOK: 블로어가 필요 풍량을 감당하는지 (부족 시 풍속·탈수 저하)
+function residualWater(qty, pass, attack, pressKPa, slotMm, gapMm, blowerRatio){
   const base = qty*0.03; // 개당 30g 초기 잔류
-  // 공격각별 실제 경로거리 → 충돌 풍속
-  const slant = slantGap(gapMm, attack);
-  const vImpact = impactVel(vel, slotMm, slant);
-  const eVel = Math.min(1, vImpact/25);        // 충돌 25m/s 이상 양호
-  // 공격각 방향 효율 (역방향 권장)
+  const THRESHOLD = 3000; // 물막 제거 임계 동압 3kPa
+  // 충돌 동압 (블로어 풍량 부족 시 비례 감소)
+  const ratio = Math.min(1, blowerRatio||1); // 공급/필요 풍량비
+  const qImpact = impactPressure(pressKPa, slotMm, gapMm) * ratio;
+  // 임계압 대비 여유 → 제거율
+  const margin = qImpact/THRESHOLD;
+  if(margin < 1){
+    // 충돌압 부족 → 탈수 크게 저하
+    const weakRem = 0.15*margin;
+    let w=base; for(let i=0;i<pass;i++){ w=w*(1-weakRem); }
+    return w;
+  }
+  // 공격각·이격 보정
   const eAttack = attackEfficiency(attack);
-  // 이격거리 적정성
   const go = gapOptimal(slotMm);
-  const eGap = (gapMm>=go.lo && gapMm<=go.hi) ? 1 : 0.75;
-  // pass당 제거율: 방향효율 × 풍속 × 이격
-  const removePerPass = Math.min(0.85, eAttack * (0.6+0.4*eVel) * eGap);
+  const eGap = (gapMm>=go.lo && gapMm<=go.hi) ? 1 : 0.8;
+  // pass당 제거율 (충돌압 여유·방향·이격)
+  const removePerPass = Math.min(0.68, (0.35 + 0.12*Math.min(3,margin)) * eAttack * eGap);
   let w = base;
   for(let i=0;i<pass;i++){ w = w*(1-removePerPass); }
   return w;
@@ -442,7 +475,7 @@ function bindSlider(id){
   el.addEventListener('input',()=>{rg.value=el.value;el.classList.add('s-user');onChange(id);});
 }
 function syncState(){
-  ['trayW','trayD','trayT','qty','dlv','wHole','wSprayAngle','wNozzleDist','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeAttack','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','ioLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
+  ['trayW','trayD','trayT','qty','dlv','wHole','wSprayAngle','wNozzleDist','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeAttack','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
   const bt=gi('boilerType');if(bt)S.boilerType=bt.value;
   const wi=gi('wTankIns');if(wi)S.wTankIns=wi.checked;
   const bi=gi('boilerIns');if(bi)S.boilerIns=bi.checked;
@@ -575,26 +608,37 @@ function calcAll(){
   // ── 탈수: 면당 4패스 × 앞뒤 2면 × 2CH ──
   const knifeTotal = totalKnives(S.knifePass); // 패스×앞뒤×CH = 16개(4패스)
   const knifeLen = knifeLength(S.trayD, S.knifeAng); // 비스듬 설치 실제 길이
-  const flow1 = knifeFlow1(knifeLen, S.knifeSlot, S.knifeVel); // 나이프1개 풍량
-  const airFlow = flow1 * knifeTotal; // 총 풍량 m³/min
-  // 충돌 풍속·이격 판정
-  const vImpact = impactVel(S.knifeVel, S.knifeSlot, S.knifeGap);
+  // 나이프 1개 실제 풍량 (블로어 정압 기반 토출속도)
+  const knifeVelReal = knifeExitVel(S.knifePress); // 정압→토출속도 m/s
+  const flow1 = knifeFlow1(knifeLen, S.knifeSlot, knifeVelReal); // 나이프1개 풍량
+  const airFlow = flow1 * knifeTotal; // 총 필요 풍량 m³/min
   const gapOpt = gapOptimal(S.knifeSlot);
   const gapOK = (S.knifeGap>=gapOpt.lo && S.knifeGap<=gapOpt.hi);
   // 링블로어 배분: 나이프 blowerPerN개당 1대
   const blowerCount = Math.ceil(knifeTotal / S.blowerPerN);
   const flowPerBlower = flow1 * S.blowerPerN;
+  // 블로어 규격 선정 (풍량·정압 충족)
   const blowerUnit = selectBlower(flowPerBlower, S.knifePress).unit;
   const blowKW = blowerUnit.kw * blowerCount;
-  const blowerSel = {unit:blowerUnit, count:blowerCount, totalKW:blowKW, flowPerBlower};
-  // 공급 배관: 메인(블로어→헤더 18m/s), 분기(나이프당 15m/s)
+  // ★ 블로어 공급 풍량 vs 필요 풍량 감당률 (부족 시 탈수 저하)
+  const supplyAir = blowerUnit.flow * blowerCount; // 블로어 총 공급 풍량
+  const blowerRatio = airFlow>0 ? Math.min(1.5, supplyAir/airFlow) : 1;
+  const blowerShortage = blowerRatio < 0.95; // 풍량 부족 경고
+  // 링블로어 연결 사양 (토출구·호스·Y분기·나이프연결구)
+  const connSpec = blowerConnSpec(blowerUnit, S.blowerPerN);
+  const blowerSel = {unit:blowerUnit, count:blowerCount, totalKW:blowKW, flowPerBlower, supplyAir, blowerRatio, blowerShortage, conn:connSpec};
+  // 충돌 동압 (실제 탈수력 판정)
+  const impactKPa = impactPressure(S.knifePress, S.knifeSlot, S.knifeGap)*Math.min(1,blowerRatio)/1000;
+  const vImpact = knifeVelReal;
+  // 공급 배관
   const mainDuctID = ductDia(flowPerBlower, 18);
   const mainDuctSpec = ductSpec(mainDuctID);
   const branchDuctID = ductDia(flow1, 15);
   const branchDuctSpec = ductSpec(branchDuctID);
   const attackEff = attackEfficiency(S.knifeAttack);
   const slantDist = slantGap(S.knifeGap, S.knifeAttack);
-  const residual = residualWater(qtyH, S.knifePass, S.knifeAttack, S.knifeVel, S.knifeSlot, S.knifeGap);
+  // 탈수: 충돌압·블로어 감당률 반영
+  const residual = residualWater(qtyH, S.knifePass, S.knifeAttack, S.knifePress, S.knifeSlot, S.knifeGap, blowerRatio);
   const dryKW=dryerKW(residual,S.dryAirVol,S.dryTemp-20,S.dryRecirc);
   // ── 급수 방식별 물·가열 에너지 계산 ──
   const rinseW = S.rinseWater;      // 헹굼 청수 L/h
@@ -708,10 +752,31 @@ function calcAll(){
     lenDiff, effGap
   };
   // ── 컨베이어 속도·길이·체류시간 연동 ──
-  // 총길이 = 모듈합 + 조 사이 간격 2곳(세척↔탈수, 탈수↔건조) + 입출구
-  const nGaps = 2; // 조 사이 간격 지점 수
+  // 총길이 = 입구 + 세척 + 간격 + 탈수 + 간격 + 건조 + 출구
+  // 관통식(직선): 입구·출구가 양 끝에 각각, 조 사이 상부 분리 간격 2곳
+  const nGaps = 2; // 세척↔탈수, 탈수↔건조 상부 분리 간격
   const gapTotal = S.moduleGap * nGaps;
-  const convTotalLen = S.washDryLen + S.dewatLen + S.dryLen + S.ioLen + gapTotal;
+  const convTotalLen = S.inLen + S.washDryLen + S.dewatLen + S.dryLen + S.outLen + gapTotal;
+  // ── 설비 각부 치수 (트레이·설계값 연동) ──
+  // 폭 = 2CH × 트레이깊이 + 격벽100 + 양측프레임150×2
+  const equipWidth = 2*S.trayD + 100 + 300;
+  // 높이 = 트레이높이 + 상부(노즐헤더400) + 하부(저수조깊이+프레임)
+  const tankMaxDepth = Math.max.apply(null, stgTanks.filter(function(t){return t.active;}).map(function(t){return t.dimH||600;}).concat([600]));
+  const equipHeight = S.trayW + 400 + (tankMaxDepth + 300);
+  // 모듈별 치수
+  const modules = [
+    {nm:'입구', L:S.inLen, W:equipWidth, H:equipHeight, note:'투입부'},
+    {nm:'세척조', L:S.washDryLen, W:equipWidth, H:equipHeight, note:'세척단수 연동 · 상부독립'},
+    {nm:'탈수조', L:S.dewatLen, W:equipWidth, H:equipHeight, note:'나이프 패스 · 상부독립'},
+    {nm:'건조기', L:S.dryLen, W:equipWidth, H:equipHeight, note:'건조 연동 · 상부독립'},
+    {nm:'출구', L:S.outLen, W:equipWidth, H:equipHeight, note:'배출부'}
+  ];
+  // 컨테이너 판정
+  const contW=2352, contH=2393, contL=12032;
+  const fitW = equipWidth<=contW-100;
+  const fitH = equipHeight<=contH-100;
+  const fitL = convTotalLen<=contL;
+  const equipDim = {equipWidth, equipHeight, modules, fitW, fitH, fitL, contW, contH, contL};
   const speedMmin = S.qty * (S.trayPitch/1000) / 60; // 처리량→속도 m/min
   const speedMs = speedMmin/60;
   // ── 세척 CAPA (2CH 합계) 및 투입 간격 ──
@@ -751,7 +816,7 @@ function calcAll(){
   // 체류 충분성 판정
   const washOK = dwellWash>=needWash, dewatOK=dwellDewat>=needDewat, dryOK=dwellDry>=needDry;
 
-  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,nPerFace,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist};
+  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,nPerFace,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
 }
 
 // ── 좌측 렌더 ──
@@ -985,7 +1050,8 @@ function renderLeft(){
       +srow('세척','저수조',R.stgTanks.filter(function(t){return t.active;}).map(function(t){return ['1차','2차','3차'][t.idx]+' '+t.tankL+'L('+t.dimW+'×'+t.dimD+'×'+t.dimH+')';}).join(' / ')+' 총'+R.tankL+'L')
       +srow('세척','펌프/배수',R.washPumpTotal.toFixed(1)+'kW · '+S.wTemp+'°C · 배수조'+R.drainCount+'개 · 단열'+(S.wTankIns?'O':'X'))
       +srow('탈수','에어나이프',R.knifeTotal+'개('+S.knifePass+'패스) · 설치'+S.knifeAng+'°/공격'+S.knifeAttack+'°('+(R.attackEff*100).toFixed(0)+'%) · '+S.knifeVel+'m/s · 이격'+S.knifeGap+'mm')
-      +srow('탈수','링블로어',R.blowerSel.unit.kw+'kW×'+R.blowerSel.count+'대 · 배관'+R.mainDuctSpec)
+      +srow('탈수','링블로어',R.blowerSel.unit.kw+'kW×'+R.blowerSel.count+'대 · 토출'+R.blowerSel.conn.port+'mm')
+      +srow('탈수','호스·연결구','토출'+R.blowerSel.conn.port+'A · 메인호스'+R.blowerSel.conn.mainSpec+'A · 나이프연결'+R.blowerSel.conn.knifePort+'A')
       +srow('건조','열풍',S.dryTemp+'°C · '+S.dryAirVol+'m³/min · 순환'+S.dryRecirc+'%')
       
       +srow('온수','공급',(S.supplyMode==='hybrid'?'하이브리드':S.supplyMode==='cascade'?'캐스케이드':'직공급')+' · 전조'+S.rinseTemp+'°C · 캐스'+R.cascadeRatio+'%+직'+R.directRatio+'% · 청수'+R.supplyFresh.toFixed(0)+'L/h')
@@ -993,7 +1059,8 @@ function renderLeft(){
       +srow('CAPA','시간당','1CH '+R.capa1ch+' × 2CH = '+R.capa2ch+'매/h · '+R.feedIntervalSec.toFixed(1)+'초마다 2개')
       +srow('CAPA','월 능력/목표','최대 '+R.monthlyCapa.toLocaleString()+'매 · 목표 '+S.targetMonth.toLocaleString()+'매 '+(R.capaEnough?'✅':'⚠️부족'))
       +srow('인력','관통식 '+S.workers+'명','목표 일'+R.workHoursPerDay.toFixed(1)+'h 세척 · 여유'+R.freeHoursPerDay.toFixed(1)+'h · 인건비'+Math.round(R.laborCostMonth/10000)+'만원/월')
-      +srow('컨베이어','속도/길이',R.speedMmin.toFixed(2)+'m/min · 총'+R.convTotalLen+'mm (세척'+S.washDryLen+'+탈수'+S.dewatLen+'+건조'+S.dryLen+'+입출'+S.ioLen+'+간격'+R.gapTotal+')')
+      +srow('설비','전체 치수','길이'+R.convTotalLen+' × 폭'+R.equipDim.equipWidth+' × 높이'+R.equipDim.equipHeight+'mm')
+      +srow('컨베이어','속도/길이',R.speedMmin.toFixed(2)+'m/min · 총'+R.convTotalLen+'mm (세척'+S.washDryLen+'+탈수'+S.dewatLen+'+건조'+S.dryLen+'+입구'+S.inLen+'+출구'+S.outLen+'+간격'+R.gapTotal+')')
       +srow('기구','고정/운송','클립'+S.clipPitch+'mm·가이드봉'+(S.guideRod?'O':'X')+' · '+S.containerType+'·모듈분할'+(S.moduleSplit?'O':'X'))
       +'</tbody></table>'
       +'<div class="kpi" style="margin-top:10px;">'
@@ -1036,7 +1103,7 @@ function renderLeft(){
         ||el.id==='meshFilter'||el.id==='sludgeFilter'||el.id==='pumpStrainer'
         ||el.id==='drainMode'||el.id==='stgTankMode'||el.id==='dlv'||el.id==='wAutoArray'
         ||(el.id&&el.id.startsWith('stgType'))
-        ||['washDryLen','dewatLen','dryLen','ioLen','moduleGap','trayPitch','qty','tempSensor','rinseTemp','rinseWater','hours','days','targetMonth','workers','wage'].indexOf(el.id)>=0||(el.id&&el.id.startsWith('directValve'))
+        ||['washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch','qty','tempSensor','rinseTemp','rinseWater','hours','days','targetMonth','workers','wage'].indexOf(el.id)>=0||(el.id&&el.id.startsWith('directValve'))
         ||(el.id&&el.id.startsWith('stg'));
       if(needRerender){ syncState(); calcAll(); renderLeft(); renderRight(); }
       else onChange(el.id);
@@ -1122,7 +1189,7 @@ function renderFlow(){
     +fs('','CAPA 2CH',R.capa2ch+'매/h')
     +fs('','월생산 능력',(R.monthlyCapa/10000).toFixed(1)+'만매')
     +fs('','목표 달성',R.needHours.toFixed(1)+'h/일')
-    +fs('','여유 인력',R.freeManHourMonth>0?Math.round(R.freeManHourMonth)+'인시':'—');
+    +fs('','투입 인력',S.workers+'명');
 }
 function fs(c,n,v){return '<div class="flowstep '+c+'"><div class="fn">'+n+'</div><div class="fv">'+v+'</div></div>';}
 function renderBlowerInfo(){
@@ -1140,10 +1207,25 @@ function renderBlowerInfo(){
     +'<tr><td style="text-align:left;font-weight:700;">링블로어 배분</td><td class="hi">나이프'+S.blowerPerN+'개당 1대</td><td style="text-align:left;font-size:13px;color:#7a90a4;">'+kt+'÷'+S.blowerPerN+'='+bs.count+'대</td></tr>'
     +'<tr><td style="text-align:left;font-weight:700;">링블로어 규격</td><td class="hi">'+bs.unit.kw+'kW × '+bs.count+'대</td><td style="text-align:left;font-size:13px;color:#7a90a4;">대당 '+bs.unit.flow+'m³/min</td></tr>'
     +'<tr><td style="text-align:left;font-weight:700;">총 블로어 전력</td><td class="hi">'+bs.totalKW.toFixed(1)+' kW</td><td style="text-align:left;font-size:13px;color:#7a90a4;">탈수 소비전력</td></tr>'
-    +'<tr><td style="text-align:left;font-weight:700;">메인 공급배관</td><td class="hi">'+R.mainDuctSpec+'</td><td style="text-align:left;font-size:13px;color:#7a90a4;">블로어→헤더 18m/s</td></tr>'
-    +'<tr><td style="text-align:left;font-weight:700;">나이프 분기관</td><td class="hi">'+R.branchDuctSpec+'</td><td style="text-align:left;font-size:13px;color:#7a90a4;">헤더→나이프 15m/s</td></tr>'
+    +'<tr style="background:#f3e5f5;"><td colspan="3" style="text-align:left;font-weight:800;color:#6a1b9a;">🔗 링블로어 연결 사양 (기종 연동)</td></tr>'
+    +'<tr><td style="text-align:left;font-weight:700;">블로어 토출구</td><td class="hi">'+R.blowerSel.conn.port+'A</td><td style="text-align:left;font-size:13px;color:#7a90a4;">'+R.blowerSel.unit.kw+'kW 표준 · '+R.blowerSel.unit.flow+'㎥/min</td></tr>'
+    +'<tr><td style="text-align:left;font-weight:700;">고압호스(메인)</td><td class="hi">'+R.blowerSel.conn.mainSpec+'A</td><td style="text-align:left;font-size:13px;color:#7a90a4;">토출구경 동일, 블로어→Y분기</td></tr>'
+    +'<tr><td style="text-align:left;font-weight:700;">Y분기</td><td class="hi">'+R.blowerSel.conn.port+'A → '+R.blowerSel.conn.knifePort+'A×'+S.blowerPerN+'</td><td style="text-align:left;font-size:13px;color:#7a90a4;">1입력 → '+S.blowerPerN+'출력</td></tr>'
+    +'<tr style="background:#e8f5e9;"><td style="text-align:left;font-weight:800;">에어나이프 연결구</td><td class="hi" style="font-size:15px;">'+R.blowerSel.conn.knifePort+'A</td><td style="text-align:left;font-size:13px;color:#7a90a4;">Y분기 나이프측과 일치</td></tr>'
     +'</tbody></table>'
-    +'<div style="margin-top:8px;padding:9px 11px;border-radius:8px;font-weight:700;font-size:14px;background:#ede7f6;color:#4527a0;">💨 총 '+kt+'개 나이프 → 링블로어 <b>'+bs.unit.kw+'kW × '+bs.count+'대</b> (합계 '+bs.totalKW.toFixed(1)+'kW)</div>';
+    +'<div style="margin-top:8px;padding:9px 11px;border-radius:8px;font-weight:700;font-size:14px;background:#ede7f6;color:#4527a0;">💨 총 '+kt+'개 나이프 → 링블로어 <b>'+bs.unit.kw+'kW × '+bs.count+'대</b> (합계 '+bs.totalKW.toFixed(1)+'kW)</div>'
+    +'<div style="margin-top:8px;padding:10px 12px;border-radius:8px;background:'+(bs.blowerShortage?'#ffebee':R.dewatEff>=95?'#e8f5e9':'#fff3e0')+';border:2px solid '+(bs.blowerShortage?'#ef5350':R.dewatEff>=95?'#66bb6a':'#ffb300')+';">'
+    +'<div style="font-size:14px;font-weight:800;color:'+(bs.blowerShortage?'#b71c1c':R.dewatEff>=95?'#1b5e20':'#e65100')+';margin-bottom:5px;">'+(bs.blowerShortage?'🔴 탈수 검증: 블로어 풍량 부족!':'✅ 탈수 검증 결과')+'</div>'
+    +'<table class="tbl"><tbody>'
+    +'<tr><td style="text-align:left;">필요 풍량</td><td class="hi">'+R.airFlow.toFixed(1)+' m³/min</td></tr>'
+    +'<tr><td style="text-align:left;">블로어 공급</td><td class="hi">'+bs.supplyAir.toFixed(1)+' m³/min ('+bs.unit.flow+'×'+bs.count+'대)</td></tr>'
+    +'<tr><td style="text-align:left;">풍량 감당률</td><td class="hi" style="color:'+(bs.blowerRatio>=1?'#2e7d32':'#c62828')+';">'+(bs.blowerRatio*100).toFixed(0)+'%</td></tr>'
+    +'<tr><td style="text-align:left;">충돌 동압</td><td class="hi">'+R.impactKPa.toFixed(1)+' kPa (임계 3.0)</td></tr>'
+    +'<tr><td style="text-align:left;">토출 속도</td><td class="hi">'+R.knifeVelReal.toFixed(0)+' m/s</td></tr>'
+    +'<tr style="background:'+(R.dewatEff>=95?'#e8f5e9':'#fff3e0')+';"><td style="text-align:left;font-weight:800;">탈수율</td><td class="hi" style="font-size:16px;">'+R.dewatEff.toFixed(0)+'%</td></tr>'
+    +'</tbody></table>'
+    +(bs.blowerShortage?'<div style="margin-top:6px;font-size:12px;color:#b71c1c;font-weight:700;">⚠️ 블로어 공급이 필요 풍량의 '+(bs.blowerRatio*100).toFixed(0)+'%뿐 → 충돌압↓ → 탈수율 '+R.dewatEff.toFixed(0)+'%로 저하! 블로어 대수↑ 또는 나이프↓ 또는 정압↑ 필요</div>':'<div style="margin-top:6px;font-size:12px;color:#1b5e20;">✅ 블로어 풍량 충분, 충돌압 임계 초과 → 탈수 정상</div>')
+    +'</div>';
 }
 
 function buildRec(){
@@ -1155,6 +1237,7 @@ function buildRec(){
   if(S.knifePass<4)r.push('🔪 <b>면당 '+S.knifePass+'패스</b> → 4패스 권장 (완전 탈수 → 건조부하 급감)');
   if(!R.gapOK)r.push('↔️ <b>이격거리 '+S.knifeGap+'mm 부적정</b> → 슬릿 '+S.knifeSlot+'mm 기준 '+R.gapOpt.lo+'~'+R.gapOpt.hi+'mm로 조정 (충돌풍속 확보)');
   if(S.knifeAttack>=0)r.push('🎯 <b>공격각 '+S.knifeAttack+'° ('+(S.knifeAttack===0?'수직':'순방향')+')</b> → 역방향(-30~-45°)으로 조정 시 물 제거효율 대폭↑ (현재 '+(R.attackEff*100).toFixed(0)+'%)');
+  if(R.blowerSel.blowerShortage)r.push('🔴 <b>탈수 위험: 블로어 풍량 부족('+(R.blowerSel.blowerRatio*100).toFixed(0)+'%)</b> → 탈수율 '+R.dewatEff.toFixed(0)+'%로 저하. 블로어 대수↑ 또는 나이프 수↓ 또는 나이프 정압↑ 필수 (설비 재제작 방지)');
   r.push('💨 <b>링블로어 '+R.blowerSel.unit.kw+'kW × '+R.blowerSel.count+'대</b> (총'+R.blowerSel.totalKW.toFixed(1)+'kW) — 나이프 '+S.blowerPerN+'개당 1대 배분');
   r.push('🔧 <b>이격거리 조정 구조</b>: LM가이드+눈금핸들로 트레이 기종별 거리를 손쉽게 재현');
   if(S.supplyMode==='direct')r.push('♻️ <b>전 조 직공급</b> → 하이브리드로 전환 시 캐스케이드 활용해 청수·가열에너지 절감');
@@ -1271,7 +1354,7 @@ function buildMech(){
   const nClips = Math.floor(R.convTotalLen/S.clipPitch);
   const totalLen = R.convTotalLen;
   const cont = {'40ft':{L:12032,W:2352,H:2393,nm:"40ft 컨테이너"},'20ft':{L:5898,W:2352,H:2393,nm:"20ft 컨테이너"}}[S.containerType];
-  const lenFit = totalLen<=cont.L;
+  const lenFit = totalLen<=cont.L && R.equipDim.fitW && R.equipDim.fitH;
   var h='<div class="card"><div class="ch"><span class="ci">⚙️</span><span class="cl">기구·구조 설계</span><span class="cq">고정·분리·운송</span></div><div class="cb">';
 
   h+='<div class="chbox" style="background:#e0f7fa;border-color:#80deea;color:#006064;">🍽️ 트레이는 <b>수십 g 경량</b>이라 고압수·에어탈수·열풍 과정에서 체인 컨베이어 이탈 위험이 큽니다. 클립 고정 + 가이드봉 + 조 분리 구조가 필수입니다.</div>';
@@ -1284,6 +1367,16 @@ function buildMech(){
   h+='<div class="st">② 조(槽) 분리 구조</div>';
   h+='<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">💧 <b>세척조 ↔ 탈수조 분리</b>: 세척조 하단 수분이 탈수조로 넘어가지 않도록 방수 격벽 + 드립트레이(물받이).<br>💨 <b>탈수조 ↔ 열풍건조기 분리</b>: 몸체는 분리, <b>체인만 관통</b>. 조 사이 실링(브러시/래버린스)으로 수분·열 차단.</div>';
 
+  // 설비 각부 치수표
+  h+='<div class="st">설비 각부 구성 치수 (입력 연동)</div>';
+  h+='<div class="chbox" style="background:#e1f5fe;border-color:#81d4fa;color:#01579b;">📐 <b>설비 폭 '+R.equipDim.equipWidth+'mm</b> (2CH×트레이깊이'+S.trayD+' + 격벽 + 프레임) · <b>높이 '+R.equipDim.equipHeight+'mm</b> (트레이'+S.trayW+' + 상부 + 하부저수조)<br>트레이 깊이·높이, 세척단수, 저수조 깊이를 바꾸면 치수가 연동됩니다.</div>';
+  h+='<table class="tbl"><thead><tr><th>모듈</th><th>길이(mm)</th><th>폭(mm)</th><th>높이(mm)</th><th>연동</th></tr></thead><tbody>';
+  R.equipDim.modules.forEach(function(m){
+    h+='<tr><td style="font-weight:700;">'+m.nm+'</td><td class="hi">'+m.L+'</td><td>'+m.W+'</td><td>'+m.H+'</td><td style="font-size:11px;color:#7a90a4;">'+m.note+'</td></tr>';
+  });
+  h+='<tr style="background:#f0f7ff;"><td style="font-weight:800;">전체</td><td class="hi" style="font-size:15px;">'+R.convTotalLen+'</td><td class="hi">'+R.equipDim.equipWidth+'</td><td class="hi">'+R.equipDim.equipHeight+'</td><td style="font-size:11px;">조간격 '+R.gapTotal+' 포함</td></tr>';
+  h+='</tbody></table>';
+
   h+='<div class="st">③ 40ft 컨테이너 운송·현장 조립</div>';
   h+='<div class="g2">'+sel('containerType','컨테이너',[["40ft","40ft (12032mm)"],["20ft","20ft (5898mm)"]],S.containerType)+'<div class="fl"><label>모듈 분할</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="moduleSplit" '+(S.moduleSplit?'checked':'')+'> 조별 분할 제작</label></div></div>';
   h+='<div class="st" style="font-size:13px;">모듈별 길이 (최적 추천 = 필요 체류시간 기준 최단)</div>';
@@ -1293,9 +1386,10 @@ function buildMech(){
     +'<tr><td style="font-weight:700;">건조기</td><td><input type="number" id="dryLen" value="'+S.dryLen+'" style="width:70px;border:1.5px solid #c5d5e5;border-radius:5px;padding:3px 5px;font-size:13px;font-family:inherit;"></td><td>'+R.dwellDry.toFixed(0)+'/'+R.needDry.toFixed(0)+'s</td><td class="hi">'+R.optDryLen+'</td><td>'+(R.dryOK?'✅':'⚠️')+'</td></tr>'
 
     +'</tbody></table>';
-  h+='<div class="g2" style="margin-top:6px;">'+fld('moduleGap','조 사이 간격','mm',S.moduleGap)+fld('ioLen','입출구','mm',S.ioLen)+'</div>';
-  h+='<div class="chbox" style="background:#fff8e1;border-color:#ffe082;color:#e65100;">📐 <b>조 사이 간격</b>: 세척조↔탈수조, 탈수조↔건조로 상부 구조가 각 <b>'+S.moduleGap+'mm씩 2곳 = '+R.gapTotal+'mm</b> 벌어짐 (컨베이어만 연결). 몸체 분리로 수분·열 차단.</div>';
-  h+='<div class="chbox" style="background:#e3f2fd;border-color:#90caf9;color:#1565c0;">🔧 <b>컨베이어 총길이 = 모듈합 + 조간격 = <span style="font-size:16px;">'+R.convTotalLen+'mm</span></b><br>&nbsp;&nbsp;(세척'+S.washDryLen+' + 탈수'+S.dewatLen+' + 건조'+S.dryLen+' + 입출'+S.ioLen+' + 간격'+R.gapTotal+')<br>⚙️ <b>속도 = '+S.qty+'매/h × 피치'+S.trayPitch+'mm = <span style="font-size:16px;">'+R.speedMmin.toFixed(2)+'m/min</span></b></div>';
+  h+='<div class="g3" style="margin-top:6px;">'+fld('inLen','입구(투입)','mm',S.inLen)+fld('outLen','출구(배출)','mm',S.outLen)+fld('moduleGap','조 상부간격','mm',S.moduleGap)+'</div>';
+  h+='<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">🔗 <b>관통식(직선)</b>: 입구(투입) ↔ 출구(배출)가 양 끝에 분리. 컨베이어는 전체 관통하지만, <b>세척·탈수·건조 상부 구조는 '+S.moduleGap+'mm씩 분리</b>(수분·열 차단, 몸체 독립).</div>';
+  h+='<div class="chbox" style="background:#fff8e1;border-color:#ffe082;color:#e65100;">📐 <b>상부 구조 분리</b>: 세척조↔탈수조, 탈수조↔건조 <b>상부가 각 '+S.moduleGap+'mm씩 2곳 = '+R.gapTotal+'mm</b> 분리(몸체 독립·수분/열 차단). <b>컨베이어(체인)만 하부로 관통 연결.</b></div>';
+  h+='<div class="chbox" style="background:#e3f2fd;border-color:#90caf9;color:#1565c0;">🔧 <b>컨베이어 총길이 = 모듈합 + 조간격 = <span style="font-size:16px;">'+R.convTotalLen+'mm</span></b><br>&nbsp;&nbsp;(입구'+S.inLen+' + 세척'+S.washDryLen+' + 탈수'+S.dewatLen+' + 건조'+S.dryLen+' + 출구'+S.outLen+' + 상부간격'+R.gapTotal+')<br>⚙️ <b>속도 = '+S.qty+'매/h × 피치'+S.trayPitch+'mm = <span style="font-size:16px;">'+R.speedMmin.toFixed(2)+'m/min</span></b></div>';
   h+='<div class="g2" style="margin-top:6px;">'+fld('trayPitch','트레이 피치','mm',S.trayPitch)+'<div class="fl"><label>컨베이어 총길이(자동)</label><input type="text" value="'+R.convTotalLen+'mm" readonly style="background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#1b5e20;font-family:inherit;"></div></div>';
   h+='<div class="chbox" style="background:'+(lenFit?'#e8f5e9':'#fff3e0')+';border-color:'+(lenFit?'#a5d6a7':'#ffcc80')+';color:'+(lenFit?'#1b5e20':'#e65100')+';">📦 <b>총 라인 '+totalLen+'mm</b> / '+cont.nm+' 내부 '+cont.L+'mm '+(lenFit?'✅ 단일 적재 가능':'⚠️ 초과 → 조별 분할 운송 필수')+'<br>몸체 폭·높이 <b>'+(cont.W-100)+'×'+(cont.H-100)+'mm 이내</b> 제작 (여유 100mm). '+(S.moduleSplit?'조별 분할 → 컨테이너 적재 → <b>현장 조립</b> (플랜지·볼팅 + 체인 재연결)':'⚠️ 일체형 — 40ft 초과 시 운송 불가')+'</div>';
 
