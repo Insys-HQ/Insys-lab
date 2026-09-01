@@ -5,21 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>화재복구·공장신축 TF 통합관리</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --navy:#16233F;
-    --navy2:#223655;
-    --accent:#3B6EA5;
-    --accent-light:#DCE8F5;
-    --bg:#F3F5F8;
+    --navy:#0D1B2A;
+    --navy2:#1A4F8A;
+    --accent:#2D8CCC;
+    --accent-light:#EBF4FF;
+    --bg:#F4F6F9;
     --card:#FFFFFF;
-    --text:#22262B;
-    --text-sub:#5B6472;
-    --border:#E1E5EB;
-    --ok:#2E7D5B;
-    --warn:#B4741E;
-    --danger:#B23B3B;
+    --text:#1A2332;
+    --text-sub:#6B7A8D;
+    --border:#E2E6EC;
+    --ok:#2E7D52;
+    --warn:#E8961A;
+    --danger:#D94F3A;
+    --shadow:0 2px 12px rgba(13,27,42,0.08);
+    --radius:10px;
     --fs-min:0.875rem; /* 모바일 기본 최소 폰트: 14px */
   }
   @media (min-width:768px){
@@ -46,49 +48,52 @@
   }
 
   header{
-    background:var(--navy);color:#fff;padding:18px 0;
+    background:var(--navy);color:#fff;padding:16px 20px;
+    box-shadow:0 2px 16px rgba(0,0,0,0.25);
   }
   header .inner{
-    max-width:1100px;margin:0 auto;padding:0 20px;
+    max-width:1100px;margin:0 auto;padding:0;
   }
   .header-top{display:flex;justify-content:space-between;align-items:center;}
   .header-title{display:flex;align-items:center;gap:10px;}
-  .icon-header{width:22px;height:22px;flex-shrink:0;color:var(--accent);}
+  .icon-header{width:20px;height:20px;flex-shrink:0;color:var(--accent);}
   header h1{font-size:18px;font-weight:700;letter-spacing:-0.3px;}
   .ver-badge{
-    font-size:11px;color:#9FB2D4;background:rgba(255,255,255,0.08);
-    padding:2px 8px;border-radius:10px;font-weight:500;
+    font-size:11px;color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.08);
+    padding:2px 8px;border-radius:10px;font-weight:600;font-family:'JetBrains Mono',monospace;
   }
-  .header-date{font-size:var(--fs-min);color:#AEBBD6;white-space:nowrap;}
+  .header-date{font-size:12px;color:rgba(255,255,255,0.55);white-space:nowrap;font-family:'JetBrains Mono',monospace;}
 
-  #statusBar{background:var(--navy2);border-top:1px solid rgba(255,255,255,0.07);}
+  #statusBar{background:var(--navy);border-top:1px solid rgba(255,255,255,0.08);}
   .status-row{
-    display:flex;flex-wrap:wrap;align-items:center;
-    padding-top:9px;padding-bottom:9px;font-size:var(--fs-min);color:#C7D2E8;gap:10px;
+    display:flex;flex-wrap:wrap;align-items:center;padding:0;
+    padding-top:9px;padding-bottom:12px;font-size:12px;color:rgba(255,255,255,0.62);gap:10px;
+    font-family:'JetBrains Mono',monospace;
   }
   .status-item{display:flex;align-items:center;gap:6px;white-space:nowrap;}
-  .icon-sm{width:14px;height:14px;flex-shrink:0;color:#8CA2C9;}
+  .icon-sm{width:13px;height:13px;flex-shrink:0;color:rgba(255,255,255,0.4);}
   .status-progress{color:#fff;font-weight:600;}
   .status-progress .icon-sm{color:var(--accent);}
-  .status-div{width:1px;height:13px;background:rgba(255,255,255,0.12);}
-  .status-email{margin-left:auto;color:#5E6E8F;font-size:11px;}
+  .status-div{width:1px;height:12px;background:rgba(255,255,255,0.15);}
+  .status-email{margin-left:auto;color:rgba(255,255,255,0.3);font-size:11px;}
   @media(max-width:700px){
     .status-email{display:none;}
     .status-row{gap:8px;}
   }
 
   nav{
-    background:var(--navy2);position:sticky;top:0;z-index:50;
-    border-top:1px solid rgba(255,255,255,0.07);
+    background:var(--card);position:sticky;top:0;z-index:50;
+    border-bottom:2px solid var(--border);
   }
   nav .inner{
-    max-width:1100px;margin:0 auto;padding:0 20px;display:flex;gap:4px;overflow-x:auto;
+    max-width:1100px;margin:0 auto;padding:0 20px;display:flex;gap:0;overflow-x:auto;
   }
   nav button{
-    background:transparent;border:none;color:#C9D4E4;padding:13px 16px;font-size:var(--fs-min);cursor:pointer;font-family:inherit;
-    border-bottom:3px solid transparent;white-space:nowrap;font-weight:500;
+    background:transparent;border:none;color:var(--text-sub);padding:14px 18px;font-size:13px;cursor:pointer;font-family:inherit;
+    border-bottom:3px solid transparent;white-space:nowrap;font-weight:500;margin-bottom:-2px;transition:color .15s;
   }
-  nav button.active{color:#fff;border-bottom-color:var(--accent);}
+  nav button:hover{color:var(--navy2);}
+  nav button.active{color:var(--navy2);border-bottom-color:var(--navy2);font-weight:700;}
 
   main{max-width:1100px;margin:0 auto;padding:24px 20px 60px;}
   .view{display:none;}
@@ -113,8 +118,8 @@
   }
   .track-card .updated{font-size:var(--fs-min);color:#98A2AF;margin-top:6px;}
 
-  .section-title{font-size:15px;font-weight:700;color:var(--navy);margin:26px 0 12px;display:flex;align-items:center;gap:8px;}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px;}
+  .section-title{font-size:16px;font-weight:700;color:var(--navy);margin:26px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px;}
+  .card{background:var(--card);border:none;box-shadow:var(--shadow);border-radius:var(--radius);padding:18px;margin-bottom:16px;}
 
   .upload-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
   .upload-row input[type=file]{font-size:var(--fs-min);}
@@ -148,13 +153,14 @@
   .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px;}
   @media(max-width:700px){.stat-grid{grid-template-columns:1fr;}}
   .stat-card{
-    background:var(--card);border-radius:10px;padding:16px 18px;
-    box-shadow:0 2px 10px rgba(22,35,63,0.06);border-left:4px solid var(--accent);
+    background:var(--card);border-radius:var(--radius);padding:18px 20px;
+    box-shadow:var(--shadow);border-left:4px solid var(--accent);
   }
   .stat-card.sky{border-left-color:#2D8CCC;}
-  .stat-card.amber{border-left-color:#E8961A;}
-  .stat-num{font-size:26px;font-weight:900;color:var(--navy);line-height:1.2;}
-  .stat-label{font-size:var(--fs-min);color:var(--text-sub);margin-top:2px;}
+  .stat-card.amber{border-left-color:var(--warn);}
+  .stat-card.green{border-left-color:var(--ok);}
+  .stat-num{font-size:22px;font-weight:700;color:var(--text);line-height:1.2;}
+  .stat-label{font-size:11px;color:var(--text-sub);text-transform:uppercase;letter-spacing:0.5px;margin-top:6px;}
   .photo-item{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;}
   .photo-item .sel-check{
     position:absolute;top:8px;left:8px;width:20px;height:20px;z-index:5;cursor:pointer;accent-color:var(--accent);
@@ -237,7 +243,7 @@
     <div class="header-title">
       <svg class="icon-header" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V9l6-4 6 4v12M9 21v-6h6v6M9 12h.01M13.5 12h.01"/></svg>
       <h1>화재복구·공장신축 TF 통합관리</h1>
-      <span class="ver-badge">v3.6</span>
+      <span class="ver-badge">v3.7</span>
     </div>
     <div id="wxDate" class="header-date">-</div>
   </div>
@@ -487,7 +493,7 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "3.6";
+const APP_VERSION = "3.7";
 
 async function boot(){
   initNav();
