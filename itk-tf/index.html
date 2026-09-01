@@ -166,7 +166,7 @@
 
   /* jeju 스타일 사진 업로드 박스 */
   .upload-box{
-    background:linear-gradient(135deg,var(--accent) 0%,var(--navy2) 100%);
+    background:var(--accent);
     border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;color:#fff;
   }
   .upload-box-title{
@@ -186,7 +186,7 @@
     padding:12px;font-size:var(--fs-min);font-weight:700;cursor:pointer;font-family:inherit;
   }
   .upload-action-btn svg{width:17px;height:17px;}
-  .upload-action-btn.light{background:rgba(255,255,255,0.18);color:#fff;}
+  .upload-action-btn.light{background:rgba(255,255,255,0.22);color:#fff;}
   .photo-item{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;}
   .photo-item .sel-check{
     position:absolute;top:8px;left:8px;width:20px;height:20px;z-index:5;cursor:pointer;accent-color:var(--accent);
@@ -269,7 +269,7 @@
     <div class="header-title">
       <svg class="icon-header" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V9l6-4 6 4v12M9 21v-6h6v6M9 12h.01M13.5 12h.01"/></svg>
       <h1>화재복구·공장신축 TF 통합관리</h1>
-      <span class="ver-badge">v4.1</span>
+      <span class="ver-badge">v4.2</span>
     </div>
     <div id="wxDate" class="header-date">-</div>
   </div>
@@ -316,19 +316,6 @@
         <span class="upload-box-label">날짜</span>
         <input type="date" id="photoShotDate" class="upload-date-input">
       </div>
-      <div class="upload-box-row">
-        <span class="upload-box-label">단계</span>
-        <select id="photoCat" class="upload-date-input">
-          <option value="화재현장">화재현장</option>
-          <option value="철거">철거</option>
-          <option value="기초">기초</option>
-          <option value="골조">골조</option>
-          <option value="외부마감">외부마감</option>
-          <option value="내부마감">내부마감</option>
-          <option value="준공">준공</option>
-          <option value="기타">기타</option>
-        </select>
-      </div>
       <div class="upload-box-actions">
         <button class="upload-action-btn" onclick="document.getElementById('photoFileCamera').click()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8a2 2 0 0 1 2-2h1l1.2-2h7.6L17 6h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z"/><circle cx="12" cy="13" r="3.2"/></svg>
@@ -345,6 +332,19 @@
       <div style="background:rgba(255,255,255,0.25);border-radius:6px;height:6px;overflow:hidden;display:none;" id="photoProgressBarWrap">
         <div id="photoProgressBar" style="background:#fff;height:100%;width:0%;transition:width .2s;"></div>
       </div>
+    </div>
+    <div class="upload-row" style="margin-bottom:10px;">
+      <span style="font-size:var(--fs-min);color:var(--text-sub);">업로드할 사진의 공정단계</span>
+      <select id="photoCat">
+        <option value="화재현장">화재현장</option>
+        <option value="철거">철거</option>
+        <option value="기초">기초</option>
+        <option value="골조">골조</option>
+        <option value="외부마감">외부마감</option>
+        <option value="내부마감">내부마감</option>
+        <option value="준공">준공</option>
+        <option value="기타">기타</option>
+      </select>
     </div>
     <div class="upload-row" style="margin-bottom:10px;">
       <select id="photoFilter" onchange="loadPhotos()">
@@ -528,7 +528,7 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "4.1";
+const APP_VERSION = "4.2";
 
 async function boot(){
   initNav();
