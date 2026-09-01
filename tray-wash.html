@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v7.0 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v7.1 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -213,7 +213,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
 // 트레이 세척·탈수·건조 시뮬레이터 v6.2
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='7.0';
+const VER='7.1';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -228,6 +228,8 @@ const S={
   stgPress:[280,200,120], stgCol:[3,3,2], stgRow:[4,4,2], stgType:['wash','wash','rinse'],
   stgLen:[1200,1200,800],  // 단별 조 길이 (세척·세척·헹굼)
   stgLenAuto:true,  // ★v7.0 조길이 자동: 세로줄 노즐수×줄간격 연동
+  // ★v7.1 최적화 목표 효율 (%)
+  optTgtWash:95, optTgtDewat:95, optTgtDry:95, optResult:null,
   wTankL:1500,wTankW:800,wTankD:600,wTankIns:true,
   // 사용 단 조합: 'all'(1·2·3), '13'(1·3), '1'(1단만)
   stageCombo:'all',
@@ -247,7 +249,7 @@ const S={
   meshFilter:true, meshSize:30, sludgeFilter:true, sludgeMesh:100,
   pumpStrainer:true, strainerMesh:50, autoBackwash:false, filterWaterSave:true,
   // 탈수
-  knifePass:4,knifeAng:50,knifeVel:60,knifePress:20,knifeSlot:1.0,knifeGap:60,knifeLen:600,blowerPerN:2,
+  knifePass:4,knifeAng:50,knifeVel:110,knifePress:20,knifeSlot:1.0,knifeGap:60,knifeLen:600,blowerPerN:2,
   // 건조
   dryTemp:75,dryAirVol:25,dryRecirc:70,heaterCount:2,
   // 온수/유틸
@@ -400,6 +402,77 @@ function activeStages(combo, zn){
   return Array.from({length:zn},(_, i)=>i); // all
 }
 // ★v7.0 단별 필요 체류시간(초) — 효율·추천·판정 공통 기준 (공식 통일)
+// ★v7.1 최적조건 자동 산출 — 목표 효율(세척·탈수·건조)을 최소 에너지로 만족하는 조건 탐색
+function optimizeAll(){
+  syncState();
+  const tgtW=S.optTgtWash, tgtD=S.optTgtDewat, tgtR=S.optTgtDry;
+  _noSync=true; // 탐색 중 DOM 역동기화 차단
+  // 0) 공통 전제: 교차배치·최적 이격·여과 3단 (효율 손실 요인 제거)
+  S.nozzleLayout='cross'; S.stgLenAuto=true;
+  S.wNozzleDist=Math.min(150,Math.max(80,optDist(S.wSprayAngle).opt));
+  S.meshFilter=true; S.sludgeFilter=true; S.pumpStrainer=true;
+  // 1) 세척: 전 조합 평가 후 "목표 달성 조합 중 최소 전력" 선택 (미달 시 최대 효율 중 최소 전력)
+  let best=null;
+  for(let row=3; row<=9; row++){
+    for(let col=3; col<=7; col++){
+      for(let tmp=55; tmp<=70; tmp+=5){
+        for(let bar=20; bar<=40; bar+=4){
+          S.stgRow=[row,row,Math.max(2,Math.round(row*0.5))];
+          S.stgCol=[col,col,Math.max(2,Math.round(col*0.6))];
+          S.wTemp=tmp;
+          S.stgPress=[bar*10, Math.round(bar*10*0.72), 120];
+          calcAll();
+          const cand={row,col,tmp,bar,eff:R.washEff,kw:R.elecTotal,len:R.convTotalLen,fit:R.equipDim.fitL};
+          if(!best){ best=cand; continue; }
+          const hitC=cand.eff>=tgtW, hitB=best.eff>=tgtW;
+          if(hitC&&!hitB){ best=cand; }
+          else if(hitC&&hitB){ if(cand.fit&&!best.fit) best=cand; else if(cand.fit===best.fit&&cand.kw<best.kw) best=cand; }
+          else if(!hitC&&!hitB){ if(cand.eff>best.eff+0.05) best=cand; else if(Math.abs(cand.eff-best.eff)<=0.05&&cand.kw<best.kw) best=cand; }
+        }
+      }
+    }
+  }
+  S.stgRow=[best.row,best.row,Math.max(2,Math.round(best.row*0.5))];
+  S.stgCol=[best.col,best.col,Math.max(2,Math.round(best.col*0.6))];
+  S.wTemp=best.tmp;
+  S.stgPress=[best.bar*10, Math.round(best.bar*10*0.72), 120];
+  calcAll();
+  const washHit = R.washEff>=tgtW;
+  // 2) 탈수: 입사각 최적(50°)·이격 최적 고정 후 정압→패스 순 증가
+  S.knifeAng=50; S.knifeGap=Math.round((gapOptimal(S.knifeSlot).lo+gapOptimal(S.knifeSlot).hi)/2);
+  let dewatHit=false;
+  for(let pass=2; pass<=6 && !dewatHit; pass++){
+    for(let kp=12; kp<=40 && !dewatHit; kp+=2){
+      S.knifePass=pass; S.knifePress=kp; S.knifeVel=Math.round(knifeExitVel(kp)/5)*5;
+      calcAll();
+      if(R.dewatEff>=tgtD && !R.blowerSel.blowerShortage) dewatHit=true;
+    }
+  }
+  // 3) 건조: 잔수 확정 후 풍량 → 온도 순 (열보다 풍량이 저에너지)
+  let dryHit=false;
+  for(let av=20; av<=60 && !dryHit; av+=5){
+    for(let dt=70; dt<=110 && !dryHit; dt+=5){
+      S.dryAirVol=av; S.dryTemp=dt;
+      calcAll();
+      if(R.dryEff>=tgtR) dryHit=true;
+    }
+  }
+  // 4) 열풍기 대수: 대당 20kW 이하가 되도록 자동 산정
+  S.heaterCount=Math.max(1,Math.ceil(R.dryKW/20));
+  calcAll();
+  const ok = washHit&&dewatHit&&dryHit;
+  if(!ok){
+    // 목표 미달 항목은 원복하지 않고 최대 도달치를 유지 (사용자가 목표 조정 판단)
+  }
+  S.optResult = {ok, washHit, dewatHit, dryHit,
+    washEff:R.washEff, dewatEff:R.dewatEff, dryEff:R.dryEff,
+    press:S.stgPress.slice(0,3).join('/'), col:S.stgCol[0], row:S.stgRow[0], temp:S.wTemp,
+    washLen:S.washDryLen, knifePass:S.knifePass, knifePress:S.knifePress,
+    dryTemp:S.dryTemp, dryAirVol:S.dryAirVol, heaterCount:S.heaterCount,
+    elec:R.elecTotal, totalLen:R.convTotalLen, fitL:R.equipDim.fitL};
+  renderLeft(); renderRight();   // 새 S 기준으로 DOM 재작성
+  _noSync=false;                 // DOM 갱신 완료 후에만 역동기화 재개
+}
 function stageNeedSec(i){ return (S.stgType[i]==='rinse') ? (5+S.dlv) : (8+S.dlv*3); }
 function heaterMaintainKW(t,temp,ins){return t*(ins?0.022:0.045)*(Math.max(0,temp-20)/40);}
 // 에어나이프 1개 풍량 (m³/min): 슬롯길이 × 슬롯폭 × 풍속
@@ -453,6 +526,8 @@ function dryerKW(res,airVol,dT,recirc){const evap=res*2260/3600;const airH=(airV
 // 트레이 잔류수분 — 면당 4패스 순차 제거 모델
 // 각 pass가 남은 물의 일정 비율 제거, 성능(속도·이격·슬롯)에 따라 제거율 결정
 // 블로어 정압(kPa) → 에어나이프 토출속도(m/s) [베르누이, 실효 60%]
+// ★v7.1 목표 토출속도 → 필요 나이프 정압 역산 (knifeExitVel의 역함수)
+function velToPress(velMs){ const v0=velMs/0.6; return Math.max(3, Math.round(v0*v0*1.2/2/1000)); }
 function knifeExitVel(pressKPa){ return Math.sqrt(2*pressKPa*1000/1.2)*0.6; }
 // 충돌 동압(Pa) = 0.5 × ρ × v² (이격거리 감쇠 반영)
 function impactPressure(pressKPa, slotMm, gapMm){
@@ -547,6 +622,7 @@ function syncState(){
   ['meshFilter','sludgeFilter','pumpStrainer','autoBackwash'].forEach(id=>{const e=gi(id);if(e)S[id]=e.checked;});
   ['meshSize','sludgeMesh','strainerMesh'].forEach(id=>{const e=gi(id);if(e&&e.value)S[id]=+e.value;});
   const la=gi('stgLenAuto'); if(la)S.stgLenAuto=la.checked;
+  ['optTgtWash','optTgtDewat','optTgtDry'].forEach(k=>{const e=gi(k); if(e&&e.value!=='')S[k]=+e.value;});
   // 단계별 배열 동기화
   for(let i=0;i<4;i++){
     const p=gi('stgPress'+i); if(p&&p.value!=='') S.stgPress[i]=Math.round(+p.value*100);
@@ -558,6 +634,9 @@ function syncState(){
 let _tab='wash';
 function onChange(id){
   syncState();
+  // ★v7.1 토출속도 조작 → 필요 정압 역산 / 정압 조작 → 실토출속도 반영 (양방향 연동)
+  if(id==='knifeVel'){ S.knifePress=velToPress(S.knifeVel); const pe=gi('knifePress'); if(pe){pe.value=S.knifePress; const pr=gi('rg-knifePress'); if(pr)pr.value=S.knifePress;} }
+  else if(id==='knifePress'){ S.knifeVel=Math.round(knifeExitVel(S.knifePress)/5)*5; const ve=gi('knifeVel'); if(ve){ve.value=S.knifeVel; const vr=gi('rg-knifeVel'); if(vr)vr.value=S.knifeVel;} }
   if(id&&gi(id))updateSlider(id);
   calcAll();
   // 분사각·이격·홀직경은 좌측 요약(커버폭·배열)에 영향 → 좌측도 재렌더
@@ -579,8 +658,9 @@ function filterScore(s){
   return (s.meshFilter?1:0)+(s.sludgeFilter?1:0)+(s.pumpStrainer?1:0);
 }
 let R={};
+let _noSync=false; // ★v7.1 최적화 탐색 중 DOM 역동기화 차단 (탐색값 덮어쓰기 방지)
 function calcAll(){
-  syncState();
+  if(!_noSync) syncState();
   const qtyH=S.qty;
   // ── 세척부 단계별 계산 (1차/2차/3차헹굼) ──
   const zn = S.wZones;
@@ -699,6 +779,13 @@ function calcAll(){
   const pocketWater = 1 + S.pocketCount*0.02; // 포켓당 잔수 2%↑
   const residual = residualWater(qtyH, S.knifePass, S.knifeAng, S.knifePress, S.knifeSlot, S.knifeGap, blowerRatio) * pocketWater;
   const dryKW=dryerKW(residual,S.dryAirVol,S.dryTemp-20,S.dryRecirc);
+  // ★v7.1 열풍기 대수 → 대당 부하(20kW 상한) 판정, 부족 시 건조효율 저하 연동
+  const heaterPerUnit = dryKW/Math.max(1,S.heaterCount);
+  const heaterOK = heaterPerUnit<=20;
+  const heaterFactor = heaterOK ? 1 : Math.max(0.70, 20/heaterPerUnit);
+  // ★v7.1 여과 3단 → 순환수 청정도 → 세척효율 연동 (노즐막힘·오염 재부착)
+  const fScore = filterScore(S);
+  const filterFactor = Math.min(1, 0.90 + fScore*0.033 + (S.autoBackwash?0.01:0));
   // ── 급수 방식별 물·가열 에너지 계산 ──
   const rinseW = S.rinseWater;      // 헹굼 청수 L/h
   let freshWater, boilerHeatKW, boilerRunKW, boilerRatedKW, cascadeRatio, directRatio;
@@ -744,8 +831,8 @@ function calcAll(){
   const elecHeater=(S.boilerType==='electric')?boilerTotalKW:0;
   const gasLoad=(S.boilerType==='gas')?boilerTotalKW:0;
   const washHeatElec=washHeaterTotal*0.4; // 외부보일러 공급 시 세척조 보조 유지만
-  const elecTotal=washPumpTotal+drainKW+blowKW+dryKW+washHeatElec+elecHeater+S.convKW;
-  const elecReal=washPumpTotal+drainKW+blowKW+dryKW*0.7+washHeatElec*0.35+elecHeater*0.35+S.convKW;
+  const elecBase=washPumpTotal+drainKW+blowKW+dryKW+washHeatElec+elecHeater;
+  const elecRealBase=washPumpTotal+drainKW+blowKW+dryKW*0.7+washHeatElec*0.35+elecHeater*0.35;
   // 효율 (트레이 특성 반영: 평판이라 탈수·건조 우수)
   // 세척효율: 단계 누적 (각 단계가 잔류오염 제거, 헹굼은 마무리)
   let dirt=100;
@@ -763,7 +850,8 @@ function calcAll(){
     const nozF=Math.min(1.7,Math.pow(nP/refNoz,0.5));
     let baseRem=isRinse?0.85:(0.40+0.28*pressF+0.17*nozF);
     const tempF=isRinse?1:(0.85+(S.wTemp-40)*0.006);
-    baseRem=baseRem/dirtHardness; // 오염 저항 반영
+    // ★v7.1 헹굼은 이미 세척된 표면의 잔류물 제거 → 오염저항 영향 40%만 적용
+    baseRem = baseRem / (isRinse ? (1+(dirtHardness-1)*0.4) : dirtHardness);
     dirt=dirt*(1-Math.min(0.9,baseRem*tempF));
   });
   // 노즐 배치·포켓 개수 반영
@@ -785,11 +873,11 @@ function calcAll(){
   // ★v7.0 교차배치는 포켓 측면 직접 세척 → 패널티 60% 완화 (목표 95% 도달 가능)
   const pocketPen = pocketPenalty(S.pocketCount) * (S.nozzleLayout==='cross'?0.4:1);
   const distFactor = distWashFactor(S.wNozzleDist);
-  const washEff = Math.min(99, washEffBase * (layoutEff/0.9) * (0.4+0.6*dwellFactor) * (1-pocketPen) * distFactor);
+  const washEff = Math.min(99, washEffBase * (layoutEff/0.9) * (0.4+0.6*dwellFactor) * (1-pocketPen) * distFactor * filterFactor);
   const dewatEff=Math.min(99,Math.max(0,(1-residual/(qtyH*0.03))*100)); // ★v7.0 음수 방지
   // ★v7.0 건조효율: 온도·풍량·순환 + 잔수(탈수 결과) 연동 — 세척→탈수→건조 체인 연결
   const resPen = 1 - Math.min(0.30, Math.max(0, residual/(qtyH*0.03)-0.05)*0.5);
-  const dryEff=Math.min(99,Math.max(30,(55+S.dryTemp*0.25+S.dryAirVol*0.35+S.dryRecirc*0.06)*resPen));
+  const dryEff=Math.min(99,Math.max(30,(55+S.dryTemp*0.25+S.dryAirVol*0.35+S.dryRecirc*0.06)*resPen*heaterFactor));
   // 노즐 배열 정보 (분사각·이격 연동)
   const nozArr = nozzleArray(S.trayD, S.trayW, S.wSprayAngle, S.wNozzleDist);
   const nozDistOpt = optDist(S.wSprayAngle);
@@ -904,8 +992,18 @@ function calcAll(){
   const optDryLen = Math.ceil(needDry*speedMs*1000*1.2/100)*100;
   // 체류 충분성 판정
   const washOK = dwellWash>=needWash, dewatOK=dwellDewat>=needDewat, dryOK=dwellDry>=needDry;
+  // ★v7.1 컨베이어 부하 자동 산출 — 트레이 무게·클립 간격·피치·속도·총길이 연동
+  const nClipPairs = Math.max(1, Math.floor(convTotalLen/Math.max(50,S.clipPitch)));
+  const trayOnLine = Math.max(1, Math.floor(convTotalLen/Math.max(50,S.trayPitch))*CH);
+  const loadKg = trayOnLine*(S.trayWeight/1000) + nClipPairs*0.6 + convTotalLen/1000*8; // 트레이+클립+체인자중
+  // 체인 슬라이딩 마찰 0.35 · 감속기효율 0.6 · 습윤저항 가산
+  const convLoadKW = Math.round((loadKg*9.81*0.35*speedMs/0.6/1000 + 0.25)*1000)/1000;
+  const convMotorKW = [0.4,0.75,1.5,2.2,3.7,5.5].find(function(k){return k>=convLoadKW*2.5;})||7.5;
+  S.convKW = convMotorKW;
+  const elecTotal = elecBase + convMotorKW;
+  const elecReal = elecRealBase + convLoadKW;
 
-  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
+  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,filterFactor,fScore,heaterPerUnit,heaterOK,heaterFactor,convLoadKW,nClipPairs,trayOnLine,loadKg,convMotorKW,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
 }
 
 // ── 좌측 렌더 ──
@@ -916,6 +1014,22 @@ function renderLeft(){
     var stgHtml='';
     var stgNames=['1차 세척','2차 세척','3차 헹굼'];
     // 1·2·3단 항상 표시, 미사용 단은 비활성화, 가로 3열 배치
+    var orv=S.optResult;
+    var optHtml='<div style="border:2px solid #1565c0;border-radius:10px;padding:9px;background:#e8f1fb;margin-bottom:8px;">'
+      +'<div style="font-size:14px;font-weight:800;color:#0d47a1;margin-bottom:6px;">🎯 최적조건 자동 산출 — 목표 효율을 최소 에너지 조건으로 역산</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;align-items:end;">'
+      +'<div><label style="font-size:11px;color:#5a7088;">목표 세척(%)</label><input type="number" id="optTgtWash" value="'+S.optTgtWash+'" style="width:100%;border:1.5px solid #90caf9;border-radius:5px;padding:5px;font-size:13px;font-family:inherit;font-weight:700;"></div>'
+      +'<div><label style="font-size:11px;color:#5a7088;">목표 탈수(%)</label><input type="number" id="optTgtDewat" value="'+S.optTgtDewat+'" style="width:100%;border:1.5px solid #90caf9;border-radius:5px;padding:5px;font-size:13px;font-family:inherit;font-weight:700;"></div>'
+      +'<div><label style="font-size:11px;color:#5a7088;">목표 건조(%)</label><input type="number" id="optTgtDry" value="'+S.optTgtDry+'" style="width:100%;border:1.5px solid #90caf9;border-radius:5px;padding:5px;font-size:13px;font-family:inherit;font-weight:700;"></div>'
+      +'<button id="btnOptimize" style="background:#1565c0;color:#fff;border:0;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;">최적조건 적용</button>'
+      +'</div>'
+      +(orv?'<div style="margin-top:7px;padding:7px 9px;border-radius:7px;background:'+(orv.ok?'#e8f5e9':'#fff3e0')+';border:1.5px solid '+(orv.ok?'#a5d6a7':'#ffcc80')+';color:'+(orv.ok?'#1b5e20':'#e65100')+';font-size:12px;font-weight:600;line-height:1.6;">'
+        +(orv.ok?'✅ <b>목표 달성 조건 확정</b>':'⚠️ <b>일부 목표 미달 — 도달 가능한 최대치 적용</b>')+'<br>'
+        +'세척 <b>'+orv.washEff.toFixed(1)+'%</b>'+(orv.washHit?'✅':'⚠️')+' / 탈수 <b>'+orv.dewatEff.toFixed(1)+'%</b>'+(orv.dewatHit?'✅':'⚠️')+' / 건조 <b>'+orv.dryEff.toFixed(1)+'%</b>'+(orv.dryHit?'✅':'⚠️')+'<br>'
+        +'세척: 압력 '+orv.press+'kPa · 노즐 '+orv.col+'×'+orv.row+'/면 · '+orv.temp+'°C · 세척조 '+orv.washLen+'mm<br>'
+        +'탈수: '+orv.knifePass+'패스 · '+orv.knifePress+'kPa / 건조: '+orv.dryTemp+'°C · '+orv.dryAirVol+'m³/min · 열풍기 '+orv.heaterCount+'대<br>'
+        +'전기 <b>'+orv.elec.toFixed(1)+'kW</b> · 총길이 <b>'+orv.totalLen+'mm</b> ('+(orv.fitL?'40ft 적재 가능':'⚠️ 40ft 초과')+')</div>':'')
+      +'</div>';
     stgHtml='<label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1565c0;margin-bottom:6px;cursor:pointer;"><input type="checkbox" id="stgLenAuto" '+(S.stgLenAuto?'checked':'')+'> 📏 조 길이 자동 산정 — 세로줄 노즐 수×줄간격 연동 (줄 추가 → 조길이↑ → 체류·효율↑)</label>'
       +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">';
     for(var i=0;i<3;i++){
@@ -950,6 +1064,7 @@ function renderLeft(){
         +'</div>';
     }
     stgHtml+='</div>';
+    stgHtml = optHtml + stgHtml;
 
         h='<div class="card"><div class="ch"><span class="ci">💧</span><span class="cl">세척부 설계 (단계별 독립)</span><span class="cq">실시간 연동</span></div><div class="cb">'
       // ══ ① 상단 실시간 요약 대시보드 (항상 최상단 고정) ══
@@ -1078,8 +1193,9 @@ function renderLeft(){
       +'• <b>90°(수직)</b>: 물이 사방으로 튀어 재부착 위험<br>'
       +'• <b>30°이하</b>: 스치듯 지나가 힘 부족<br>'
       +'📏 입사각 '+S.knifeAng+'° → 나이프 길이 <b>'+R.knifeLen.toFixed(0)+'mm</b> (면높이 '+S.trayD+'mm 커버) · 에어 경로 '+R.slantDist.toFixed(0)+'mm</div>'
-      +sliderHTML('knifeVel','💨 토출 속도','m/s',30,120,5,S.knifeVel,55,80)
+      +sliderHTML('knifeVel','💨 토출 속도','m/s',40,180,5,S.knifeVel,90,130)
       +sliderHTML('knifePress','🔧 나이프 압력','kPa',5,40,1,S.knifePress,15,25)
+      +'<div class="chbox" style="background:#eef6fb;border-color:#cde3f0;color:#0b5a80;">🔗 <b>토출속도 ↔ 정압 양방향 연동</b> — 속도를 올리면 필요 정압('+velToPress(S.knifeVel)+'kPa)이, 정압을 올리면 실토출속도('+R.knifeVelReal.toFixed(0)+'m/s)가 자동 계산됩니다.</div>'
       +'<div class="st">이격거리 (나이프 끝 ↔ 트레이 면)</div>'
       +sliderHTML('knifeGap','↔️ 이격거리','mm',20,150,5,S.knifeGap,go.lo,go.hi)
       +'<div class="chbox" style="background:'+(R.gapOK?'#e8f5e9':'#fff3e0')+';border-color:'+(R.gapOK?'#a5d6a7':'#ffcc80')+';color:'+(R.gapOK?'#1b5e20':'#e65100')+';">'
@@ -1122,10 +1238,10 @@ function renderLeft(){
           return '<tr><td style="font-weight:700;">'+nm+'</td><td>'+vv+'</td><td style="font-size:12px;">'+path+'</td></tr>';
         }).join('')
       +'</tbody></table>'
-      +'<div class="g2" style="margin-top:6px;">'+fld('tempSensor','밸브개방 온도','°C',S.tempSensor)+fld('rinseTemp','목표온도','°C',S.rinseTemp)+'</div>'
+      +'<div class="g2" style="margin-top:6px;">'+fld('tempSensor','밸브개방 온도','°C',S.tempSensor)+'<div class="fl"><label>전 조 목표온도</label><input type="text" value="'+S.rinseTemp+' °C" readonly style="background:#eef4fa;border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#0b5a80;font-family:inherit;"></div></div>'
       +'<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">🔄 <b>공급 비율</b>: 캐스케이드 '+R.cascadeRatio+'% + 직공급 '+R.directRatio+'% · 신규 청수 <b>'+R.supplyFresh.toFixed(0)+'L/h</b></div>'
       +'<div class="st">보일러 용량 산출</div>'
-      +'<div class="g2">'+sel('boilerType','열원',[['gas','가스보일러'],['electric','전기보일러']],S.boilerType)+fld('convKW','컨베이어','kW',S.convKW)+'</div>'
+      +'<div class="g2"><div class="fl"><label>열원(위에서 선택)</label><input type="text" value="'+(S.boilerType==='gas'?'가스보일러':'전기보일러')+'" readonly style="background:#eef4fa;border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#0b5a80;font-family:inherit;"></div><div class="fl"><label>컨베이어 모터(자동)</label><input type="text" value="'+S.convKW+' kW" readonly style="background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#1b5e20;font-family:inherit;"></div></div>'
       +'<table class="tbl" style="margin-top:6px;"><tbody>'
       +'<tr><td style="text-align:left;font-weight:700;">목표 온도</td><td class="hi">'+S.rinseTemp+'°C</td><td style="text-align:left;font-size:12px;color:#7a90a4;">전 조 (ΔT'+(S.rinseTemp-S.inletTemp)+')</td></tr>'
       +'<tr><td style="text-align:left;font-weight:700;">보충수 가열</td><td class="hi">'+(R.supplyFresh*4.18*(S.rinseTemp-S.inletTemp)/3600).toFixed(1)+'kW</td><td style="text-align:left;font-size:12px;color:#7a90a4;">'+R.supplyFresh.toFixed(0)+'L/h × ΔT</td></tr>'
@@ -1192,6 +1308,7 @@ function renderLeft(){
   if(_tab==='dewat' && gi('blowerInfo')) renderBlowerInfo();
   if(_tab==='balance' && gi('balanceChart')) setTimeout(drawBalanceChart,30);
   L.querySelectorAll('.sv-n').forEach(el=>{updateSlider(el.id);bindSlider(el.id);});
+  const ob=gi('btnOptimize'); if(ob) ob.addEventListener('click',()=>{ ob.textContent='계산 중…'; ob.disabled=true; setTimeout(optimizeAll,10); });
   L.querySelectorAll('input:not(.sv-n):not(.sv-range),select').forEach(el=>{
     // 텍스트/숫자 입력 필드: input 중에는 재렌더 금지(커서 유지), 우측 결과만 갱신
     const isTextNum = (el.tagName==='INPUT' && (el.type==='number'||el.type==='text'));
@@ -1410,7 +1527,7 @@ function buildBalance(){
   var h='<div class="card"><div class="ch"><span class="ci">📉</span><span class="cl">밸런스 최적화 그래프</span><span class="cq">링블로어 ↔ 건조 연동</span></div><div class="cb">';
   h+='<div class="chbox" style="background:#fbe9e7;border-color:#ffab91;color:#bf360c;">📊 <b>링블로어 용량을 키우면</b> 탈수↑ → 잔류수분↓ → 건조부하↓. 하지만 블로어 전력↑. <b>탈수+건조 합계 전력이 최소가 되는 지점</b>이 최적입니다. 슬라이더를 움직이면 그래프가 실시간 변합니다.</div>';
   h+=sliderHTML('blowerPerN','🔗 나이프 N개당 블로어','개',1,4,1,S.blowerPerN,2,2);
-  h+=sliderHTML('knifeVel','💨 나이프 토출속도','m/s',30,120,5,S.knifeVel,55,80);
+  h+=sliderHTML('knifeVel','💨 나이프 토출속도','m/s',40,180,5,S.knifeVel,90,130);
   h+=sliderHTML('dryTemp','🌡️ 건조온도','°C',40,140,5,S.dryTemp,65,95);
   h+='<div class="st">탈수↔건조 전력 밸런스</div>';
   h+='<canvas id="balanceChart" style="width:100%;height:240px;border:1px solid #eee;border-radius:8px;"></canvas>';
@@ -1494,7 +1611,7 @@ function buildMech(){
 
   h+='<div class="st">① 트레이 고정 (이탈 방지)</div>';
   h+='<div class="g2">'+fld('trayWeight','트레이 무게','g',S.trayWeight)+fld('clipPitch','클립 간격','mm',S.clipPitch)+'</div>';
-  h+='<div class="g2" style="margin-top:6px;">'+fld('clipPitch','클립 간격','mm',S.clipPitch)+'<div class="fl"><label>가이드봉</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="guideRod" '+(S.guideRod?'checked':'')+'> 중간·상단 설치</label></div></div>';
+  h+='<div class="g2" style="margin-top:6px;"><div class="fl"><label>컨베이어 부하→모터(자동)</label><input type="text" value="'+R.convLoadKW.toFixed(2)+' → '+R.convMotorKW+'kW" readonly style="background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#1b5e20;font-family:inherit;"></div><div class="fl"><label>가이드봉</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="guideRod" '+(S.guideRod?'checked':'')+'> 중간·상단 설치</label></div></div>';
   h+='<div class="chbox">🔧 <b>긴 클립 + 짧은 클립을 '+S.clipPitch+'mm 간격 교대 배치</b> → 컨베이어 '+R.convTotalLen+'mm에 <b>'+nClips+'쌍</b> ('+(nClips*2)+'개). '+(S.guideRod?'중간·상단 <b>가이드봉</b>으로 상하 이탈 방지.':'⚠️ 가이드봉 미설치 — 상단 이탈 위험')+'</div>';
 
   h+='<div class="st">② 조(槽) 분리 구조</div>';
