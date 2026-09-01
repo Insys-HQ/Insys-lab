@@ -26,6 +26,7 @@
     :root{ --fs-min:1rem; } /* PC(768px~): 16px로 확대 */
   }
   *{box-sizing:border-box;margin:0;padding:0;}
+  .inner{max-width:1100px;margin:0 auto;padding:0 20px;}
   body{
     font-family:'Noto Sans KR',sans-serif;
     background:var(--bg);
@@ -63,7 +64,7 @@
   #statusBar{background:var(--navy2);border-top:1px solid rgba(255,255,255,0.07);}
   .status-row{
     display:flex;flex-wrap:wrap;align-items:center;
-    padding:9px 20px;font-size:var(--fs-min);color:#C7D2E8;gap:10px;
+    padding-top:9px;padding-bottom:9px;font-size:var(--fs-min);color:#C7D2E8;gap:10px;
   }
   .status-item{display:flex;align-items:center;gap:6px;white-space:nowrap;}
   .icon-sm{width:14px;height:14px;flex-shrink:0;color:#8CA2C9;}
@@ -136,8 +137,24 @@
   }
   .day-group-header .day-date{font-weight:700;color:var(--navy);}
   .day-group-header .day-count{color:var(--accent);background:var(--accent-light);padding:1px 8px;border-radius:10px;font-size:var(--fs-min);}
-  .day-group-header .day-memo{flex:1;min-width:120px;color:var(--text);}
+  .day-group-header .day-memo-box{
+    flex:1;min-width:140px;color:var(--text);background:var(--bg);border-radius:8px;
+    padding:6px 12px;cursor:pointer;display:flex;align-items:center;gap:6px;
+  }
+  .day-group-header .day-memo-box:hover{background:var(--accent-light);}
+  .day-group-header .day-memo-box .pencil{width:13px;height:13px;flex-shrink:0;color:var(--text-sub);}
   .statusbar-sep{color:#4A5A7A;}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px;}
+  @media(max-width:700px){.stat-grid{grid-template-columns:1fr;}}
+  .stat-card{
+    background:var(--card);border-radius:10px;padding:16px 18px;
+    box-shadow:0 2px 10px rgba(22,35,63,0.06);border-left:4px solid var(--accent);
+  }
+  .stat-card.sky{border-left-color:#2D8CCC;}
+  .stat-card.amber{border-left-color:#E8961A;}
+  .stat-num{font-size:26px;font-weight:900;color:var(--navy);line-height:1.2;}
+  .stat-label{font-size:var(--fs-min);color:var(--text-sub);margin-top:2px;}
   .photo-item{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;}
   .photo-item .sel-check{
     position:absolute;top:8px;left:8px;width:20px;height:20px;z-index:5;cursor:pointer;accent-color:var(--accent);
@@ -220,7 +237,7 @@
     <div class="header-title">
       <svg class="icon-header" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V9l6-4 6 4v12M9 21v-6h6v6M9 12h.01M13.5 12h.01"/></svg>
       <h1>화재복구·공장신축 TF 통합관리</h1>
-      <span class="ver-badge">v3.5</span>
+      <span class="ver-badge">v3.6</span>
     </div>
     <div id="wxDate" class="header-date">-</div>
   </div>
@@ -235,8 +252,6 @@
     <span class="status-item"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2.7s6 6.6 6 11a6 6 0 1 1-12 0c0-4.4 6-11 6-11z"/></svg><span id="wxHumidity">-</span></span>
     <span class="status-div"></span>
     <span class="status-item"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10a3 3 0 1 0-3-3M3 16h13a3 3 0 1 1-3 3M3 12h16a2.5 2.5 0 1 0-2.5-2.5"/></svg><span id="wxWind">-</span></span>
-    <span class="status-div"></span>
-    <span class="status-item status-progress"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V9l6-4 6 4v12M9 21v-6h6v6"/></svg><span id="wxProgress">공사진행 -%</span></span>
     <span class="status-email">ys.kim@in-sys.co.kr</span>
   </div>
 </div>
@@ -282,6 +297,11 @@
 
   <!-- 사진 타임라인 -->
   <div class="view" id="view-photos">
+    <div class="stat-grid" id="photoStatGrid">
+      <div class="stat-card"><div class="stat-num" id="statElapsed">-</div><div class="stat-label">착공 경과일</div></div>
+      <div class="stat-card sky"><div class="stat-num" id="statTotalPhotos">-</div><div class="stat-label">누적 사진</div></div>
+      <div class="stat-card amber"><div class="stat-num" id="statRecordDays">-</div><div class="stat-label">기록일수</div></div>
+    </div>
     <div class="card">
       <div class="upload-row">
         <input type="file" id="photoFile" accept="image/*" multiple>
@@ -323,6 +343,9 @@
 
   <!-- 공사진행: 단계별 진도율 -->
   <div class="view" id="view-construction">
+    <div class="stat-grid" style="grid-template-columns:1fr;margin-bottom:16px;">
+      <div class="stat-card sky"><div class="stat-num" id="wxProgress">-%</div><div class="stat-label">전체 공사 진행률 (6단계 평균)</div></div>
+    </div>
     <div class="section-title">공정단계별 진도율</div>
     <div class="grid4" id="stageGrid" style="margin-bottom:8px;"></div>
     <div class="empty" style="margin-top:8px;">공사 사진은 "사진 타임라인" 탭에서 날짜별로 확인하실 수 있습니다.</div>
@@ -464,7 +487,7 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "3.5";
+const APP_VERSION = "3.6";
 
 async function boot(){
   initNav();
@@ -614,7 +637,7 @@ async function loadOverallProgress(){
       total += snap.exists() ? (snap.data().progress || 0) : 0;
     }
     const avg = Math.round(total / CONSTRUCTION_STAGES.length);
-    document.getElementById('wxProgress').textContent = `공사진행 ${avg}%`;
+    document.getElementById('wxProgress').textContent = `${avg}%`;
   }catch(e){
     console.error('전체 진도율 계산 실패', e);
   }
@@ -796,13 +819,39 @@ let photoCache = {};
 let selectedPhotoIds = new Set();
 let dayLogCache = {};
 
+async function updateElapsedDaysStat(){
+  const el = document.getElementById('statElapsed');
+  try{
+    const snap = await getDoc(doc(db,'siteInfo','main'));
+    const startDate = snap.exists() ? snap.data().startDate : '';
+    if(!startDate){ el.textContent = '-'; return; }
+    const start = new Date(startDate);
+    if(isNaN(start.getTime())){ el.textContent = '-'; return; }
+    const diffDays = Math.floor((new Date() - start) / (1000*60*60*24));
+    el.textContent = diffDays >= 0 ? diffDays : '-';
+  }catch(e){
+    el.textContent = '-';
+  }
+}
+
+function formatDayLabel(dateKey){
+  // dateKey: "YYYY-MM-DD" → "M월 D일 (요일)"
+  const parts = (dateKey||'').split('-');
+  if(parts.length!==3) return dateKey;
+  const d = new Date(Number(parts[0]), Number(parts[1])-1, Number(parts[2]));
+  const days = ['일','월','화','수','목','금','토'];
+  return `${Number(parts[1])}월 ${Number(parts[2])}일 (${days[d.getDay()]})`;
+}
+
 function renderDayLogView(el, dateKey, photoCount){
   const memo = dayLogCache[dateKey] || '';
   el.innerHTML = `
-    <span class="day-date">${dateKey}</span>
+    <span class="day-date">${formatDayLabel(dateKey)}</span>
     <span class="day-count">${photoCount}장</span>
-    <span class="day-memo">${memo ? memo : '<span style="color:var(--text-sub);">메모 없음</span>'}</span>
-    <span onclick="editDayLog('${dateKey}', ${photoCount})" style="color:var(--accent);cursor:pointer;flex-shrink:0;">수정</span>
+    <span class="day-memo-box" onclick="editDayLog('${dateKey}', ${photoCount})">
+      <svg class="pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+      ${memo ? memo : '<span style="color:var(--text-sub);">메모를 입력하세요</span>'}
+    </span>
   `;
 }
 
@@ -810,8 +859,9 @@ window.editDayLog = function(dateKey, photoCount){
   const el = document.getElementById('daylog-' + dateKey);
   const current = dayLogCache[dateKey] || '';
   el.innerHTML = `
-    <span class="day-date">${dateKey}</span>
-    <input type="text" id="dayLogInput-${dateKey}" value="${current.replace(/"/g,'&quot;')}" placeholder="이 날짜 작업 내용 한줄 메모" style="flex:1;min-width:160px;font-size:var(--fs-min);padding:4px 8px;border:1px solid var(--border);border-radius:6px;">
+    <span class="day-date">${formatDayLabel(dateKey)}</span>
+    <span class="day-count">${photoCount}장</span>
+    <input type="text" id="dayLogInput-${dateKey}" value="${current.replace(/"/g,'&quot;')}" placeholder="이 날짜 작업 내용 한줄 메모" style="flex:1;min-width:160px;font-size:var(--fs-min);padding:6px 10px;border:1px solid var(--border);border-radius:8px;">
     <span onclick="saveDayLog('${dateKey}')" style="color:var(--accent);cursor:pointer;font-weight:600;flex-shrink:0;">저장</span>
     <span onclick="loadPhotos()" style="color:var(--text-sub);cursor:pointer;flex-shrink:0;">취소</span>
   `;
@@ -846,16 +896,29 @@ async function loadPhotos(){
   photoCache = {};
   selectedPhotoIds.clear();
   updateSelCount();
-  if(snap.empty){ grid.innerHTML = '<div class="empty">등록된 사진이 없습니다.</div>'; return; }
+  if(snap.empty){
+    grid.innerHTML = '<div class="empty">등록된 사진이 없습니다.</div>';
+    document.getElementById('statTotalPhotos').textContent = '0';
+    document.getElementById('statRecordDays').textContent = '0';
+    await updateElapsedDaysStat();
+    return;
+  }
 
   const items = [];
+  const allDates = new Set();
   snap.forEach(d=>{
     const p = d.data();
     photoCache[d.id] = p;
+    allDates.add(photoDateLabel(p));
     if(!filter || p.category === filter){
       items.push({ id: d.id, ...p });
     }
   });
+
+  // 통계 카드 갱신 (필터와 무관하게 전체 기준)
+  document.getElementById('statTotalPhotos').textContent = snap.size;
+  document.getElementById('statRecordDays').textContent = allDates.size;
+  await updateElapsedDaysStat();
 
   if(items.length===0){ grid.innerHTML = '<div class="empty">해당 단계의 사진이 없습니다.</div>'; return; }
 
