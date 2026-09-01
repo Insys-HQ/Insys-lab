@@ -189,7 +189,7 @@
       <h1>화재복구·공장신축 TF 통합관리</h1>
       <div class="sub">인시스 AI혁신 연구개발실</div>
     </div>
-    <div class="meta">v3.0<br>ys.kim@in-sys.co.kr</div>
+    <div class="meta">v3.1<br>ys.kim@in-sys.co.kr</div>
   </div>
 </header>
 
@@ -237,29 +237,28 @@
       </div>
     </div>
     <div class="upload-row" style="margin-bottom:10px;">
-      <button onclick="toggleSelectAllPhotos()" style="background:var(--card);color:var(--navy);border:1px solid var(--border);">전체선택/해제</button>
-      <button onclick="deleteSelectedPhotos()" style="background:var(--danger);">선택삭제 (<span id="photoSelCount">0</span>)</button>
-    </div>
-    <div class="photo-grid" id="photoGrid"></div>
-  </div>
-
-  <!-- 공사진행: 단계별 진도율 + 날짜별 타임라인 -->
-  <div class="view" id="view-construction">
-    <div class="section-title">공정단계별 진도율</div>
-    <div class="grid4" id="stageGrid" style="margin-bottom:8px;"></div>
-    <div class="section-title">날짜별 공사일지</div>
-    <div class="upload-row" style="margin-bottom:14px;">
-      <select id="constructionFilter" onchange="loadConstructionTimeline()">
+      <select id="photoFilter" onchange="loadPhotos()">
         <option value="">전체 단계</option>
+        <option value="화재현장">화재현장</option>
         <option value="철거">철거</option>
         <option value="기초">기초</option>
         <option value="골조">골조</option>
         <option value="외부마감">외부마감</option>
         <option value="내부마감">내부마감</option>
         <option value="준공">준공</option>
+        <option value="기타">기타</option>
       </select>
+      <button onclick="toggleSelectAllPhotos()" style="background:var(--card);color:var(--navy);border:1px solid var(--border);">전체선택/해제</button>
+      <button onclick="deleteSelectedPhotos()" style="background:var(--danger);">선택삭제 (<span id="photoSelCount">0</span>)</button>
     </div>
-    <div id="constructionTimeline"></div>
+    <div class="photo-grid" id="photoGrid"></div>
+  </div>
+
+  <!-- 공사진행: 단계별 진도율 -->
+  <div class="view" id="view-construction">
+    <div class="section-title">공정단계별 진도율</div>
+    <div class="grid4" id="stageGrid" style="margin-bottom:8px;"></div>
+    <div class="empty" style="margin-top:8px;">공사 사진은 "사진 타임라인" 탭에서 날짜별로 확인하실 수 있습니다.</div>
   </div>
 
   <!-- 파일함 -->
@@ -398,7 +397,7 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "3.0";
+const APP_VERSION = "3.1";
 
 async function boot(){
   initNav();
@@ -406,7 +405,6 @@ async function boot(){
   loadTracks();
   loadPhotos();
   loadStageProgress();
-  loadConstructionTimeline();
   loadFiles();
   loadKakao();
   loadSchedule();
@@ -650,6 +648,8 @@ let selectedPhotoIds = new Set();
 
 async function loadPhotos(){
   const grid = document.getElementById('photoGrid');
+  const filterEl = document.getElementById('photoFilter');
+  const filter = filterEl ? filterEl.value : '';
   grid.innerHTML = '<div class="empty">불러오는 중...</div>';
   const q = query(collection(db,'photos'), orderBy('createdAt','desc'));
   const snap = await getDocs(q);
@@ -662,8 +662,12 @@ async function loadPhotos(){
   snap.forEach(d=>{
     const p = d.data();
     photoCache[d.id] = p;
-    items.push({ id: d.id, ...p });
+    if(!filter || p.category === filter){
+      items.push({ id: d.id, ...p });
+    }
   });
+
+  if(items.length===0){ grid.innerHTML = '<div class="empty">해당 단계의 사진이 없습니다.</div>'; return; }
 
   // 촬영일자(shotDate) 기준으로 그룹핑, 같은 날짜는 한 곳에 모두 배치
   const groups = {};
@@ -792,7 +796,6 @@ window.savePhotoDate = async function(id){
     }
     photoCache[id] = check.data();
     loadPhotos();
-    loadConstructionTimeline();
   }catch(e){
     console.error('촬영일자 저장 실패', e);
     alert('촬영일자 저장에 실패했습니다: ' + e.message);
@@ -824,7 +827,6 @@ window.savePhotoMemo = async function(id){
     }
     photoCache[id] = check.data();
     loadPhotos();
-    loadConstructionTimeline();
     if(val) suggestProgressFromText(val); // 수정된 메모도 진도율 자동감지 재실행
   }catch(e){
     console.error('메모 저장 실패', e);
@@ -1127,62 +1129,6 @@ window.saveStageProgress = async function(stage){
   await setDoc(doc(db,'constructionStages',stage), {progress: val, updatedAt: serverTimestamp()});
   loadStageProgress();
 };
-
-// ==== 공사진행: 날짜별 타임라인 (사진 데이터 재활용, 단계별 필터) ====
-async function loadConstructionTimeline(){
-  const wrap = document.getElementById('constructionTimeline');
-  const filter = document.getElementById('constructionFilter').value;
-  wrap.innerHTML = '<div class="empty">불러오는 중...</div>';
-  const q = query(collection(db,'photos'), orderBy('createdAt','desc'));
-  const snap = await getDocs(q);
-  let items = [];
-  snap.forEach(d=>{
-    const p = d.data();
-    if(CONSTRUCTION_STAGES.includes(p.category) && (!filter || p.category===filter)){
-      items.push({id:d.id, ...p});
-    }
-  });
-  if(items.length===0){ wrap.innerHTML = '<div class="empty">해당 단계의 공사 사진이 없습니다.</div>'; return; }
-
-  // 날짜별 그룹핑 (촬영일자 기준)
-  const groups = {};
-  items.forEach(p=>{
-    const dateKey = photoDateLabel(p);
-    if(!groups[dateKey]) groups[dateKey] = [];
-    groups[dateKey].push(p);
-  });
-
-  // 최신 날짜가 위로 오도록 정렬
-  const sortedKeys = Object.keys(groups).sort((a,b)=> a < b ? 1 : -1);
-
-  wrap.innerHTML = '';
-  sortedKeys.forEach(dateKey=>{
-    const dayBlock = document.createElement('div');
-    dayBlock.style.marginBottom = '18px';
-    const dayTitle = document.createElement('div');
-    dayTitle.style.cssText = 'font-weight:700;color:var(--navy);font-size:var(--fs-min);margin-bottom:8px;';
-    dayTitle.textContent = dateKey;
-    dayBlock.appendChild(dayTitle);
-    const grid = document.createElement('div');
-    grid.className = 'photo-grid';
-    groups[dateKey].forEach(p=>{
-      const el = document.createElement('div');
-      el.className = 'photo-item';
-      el.innerHTML = `
-        <img src="${p.url}" onclick="openLightbox('${p.url}')">
-        <div class="meta">
-          <span class="del" onclick="delPhoto('${p.id}','${p.storagePath}')">삭제</span>
-          <span class="tag">${p.category}</span>
-          <div class="memo">${p.memo||''}</div>
-        </div>
-      `;
-      grid.appendChild(el);
-    });
-    dayBlock.appendChild(grid);
-    wrap.appendChild(dayBlock);
-  });
-}
-window.loadConstructionTimeline = loadConstructionTimeline;
 
 // ==== 법률의견 AI분석 ====
 async function uploadLegal(){
