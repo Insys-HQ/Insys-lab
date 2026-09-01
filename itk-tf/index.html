@@ -189,13 +189,21 @@
       <h1>화재복구·공장신축 TF 통합관리</h1>
       <div class="sub">인시스 AI혁신 연구개발실</div>
     </div>
-    <div class="meta">v3.1<br>ys.kim@in-sys.co.kr</div>
+    <div class="meta">v3.2<br>ys.kim@in-sys.co.kr</div>
+  </div>
+  <div class="inner" id="weatherBar" style="padding-top:10px;font-size:var(--fs-min);color:#C9D4E4;display:flex;gap:14px;flex-wrap:wrap;">
+    <span id="wxDate">-</span>
+    <span>·</span>
+    <span id="wxWeather">날씨 불러오는 중...</span>
+    <span id="wxTemp"></span>
+    <span id="wxHumidity"></span>
   </div>
 </header>
 
 <nav>
   <div class="inner">
-    <button class="active" data-view="dashboard">트랙현황</button>
+    <button class="active" data-view="permit">인허가</button>
+    <button data-view="siteinfo">현장정보</button>
     <button data-view="photos">사진 타임라인</button>
     <button data-view="construction">공사진행</button>
     <button data-view="files">파일함</button>
@@ -207,9 +215,28 @@
 
 <main>
 
-  <!-- 대시보드: 4대 트랙 현황 -->
-  <div class="view active" id="view-dashboard">
-    <div class="grid4" id="trackGrid"></div>
+  <!-- 인허가 현황 -->
+  <div class="view active" id="view-permit">
+    <div class="section-title">인허가 진행 현황</div>
+    <div class="grid4" id="permitGrid"></div>
+  </div>
+
+  <!-- 현장정보 (공사 허가 전, 추후 입력 예정) -->
+  <div class="view" id="view-siteinfo">
+    <div class="section-title">현장정보</div>
+    <div class="card">
+      <div class="empty" style="padding:10px 0;">아직 공사 허가 전이라 등록된 현장정보가 없습니다. 허가 이후 추가될 예정입니다.</div>
+      <div class="upload-row" style="flex-direction:column;align-items:stretch;gap:10px;">
+        <input type="text" id="siteAddress" placeholder="현장 주소">
+        <input type="text" id="siteLandArea" placeholder="대지면적 (㎡)">
+        <input type="text" id="siteFloorArea" placeholder="연면적 (㎡)">
+        <input type="text" id="siteFloors" placeholder="층수">
+        <input type="text" id="siteBuilder" placeholder="시공사">
+        <input type="text" id="siteStartDate" placeholder="착공(예정)일">
+        <input type="text" id="siteEndDate" placeholder="준공(예정)일">
+        <button onclick="saveSiteInfo()">저장</button>
+      </div>
+    </div>
   </div>
 
   <!-- 사진 타임라인 -->
@@ -397,12 +424,14 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "3.1";
+const APP_VERSION = "3.2";
 
 async function boot(){
   initNav();
   document.getElementById('photoShotDate').value = todayStr();
-  loadTracks();
+  loadWeather();
+  loadPermits();
+  loadSiteInfo();
   loadPhotos();
   loadStageProgress();
   loadFiles();
@@ -436,39 +465,99 @@ function initNav(){
   });
 }
 
-// ==== 트랙 현황 (대시보드) ====
-const TRACKS = [
-  {id:'fire', label:'화재보상 진행'},
-  {id:'gov', label:'지방자치단체 지원'},
-  {id:'customer', label:'고객사 보상안'},
-  {id:'construction', label:'공장 신축'}
+// ==== 인허가 진행 현황 ====
+const PERMITS = [
+  {id:'building', label:'건축허가'},
+  {id:'fire', label:'소방허가'},
+  {id:'environment', label:'환경/오수 인허가'},
+  {id:'govSupport', label:'지자체 신축지원 접수'}
 ];
 
-async function loadTracks(){
-  const grid = document.getElementById('trackGrid');
+async function loadPermits(){
+  const grid = document.getElementById('permitGrid');
   grid.innerHTML = '';
-  for(const t of TRACKS){
-    const snap = await getDoc(doc(db,'trackStatus',t.id));
+  for(const t of PERMITS){
+    const snap = await getDoc(doc(db,'permits',t.id));
     const data = snap.exists() ? snap.data() : {status:'', updatedAt:null};
     const card = document.createElement('div');
     card.className = 'track-card';
     card.innerHTML = `
       <div class="label">${t.label}</div>
-      <textarea id="status-${t.id}" placeholder="현재 상태 / 다음 액션 / 담당·기한">${data.status||''}</textarea>
+      <textarea id="permit-${t.id}" placeholder="현재 상태 / 다음 액션 / 담당·기한">${data.status||''}</textarea>
       <div class="row">
-        <button class="save" onclick="saveTrack('${t.id}')">저장</button>
+        <button class="save" onclick="savePermit('${t.id}')">저장</button>
       </div>
-      <div class="updated" id="upd-${t.id}">${data.updatedAt ? '업데이트: '+formatTs(data.updatedAt) : '아직 업데이트 없음'}</div>
+      <div class="updated" id="permit-upd-${t.id}">${data.updatedAt ? '업데이트: '+formatTs(data.updatedAt) : '아직 업데이트 없음'}</div>
     `;
     grid.appendChild(card);
   }
 }
 
-window.saveTrack = async function(id){
-  const val = document.getElementById('status-'+id).value;
-  await setDoc(doc(db,'trackStatus',id), {status:val, updatedAt: serverTimestamp()});
-  document.getElementById('upd-'+id).textContent = '업데이트: 방금 전';
+window.savePermit = async function(id){
+  const val = document.getElementById('permit-'+id).value;
+  await setDoc(doc(db,'permits',id), {status:val, updatedAt: serverTimestamp()});
+  document.getElementById('permit-upd-'+id).textContent = '업데이트: 방금 전';
 };
+
+// ==== 현장정보 (허가 전에는 비어있음, 추후 입력) ====
+async function loadSiteInfo(){
+  const snap = await getDoc(doc(db,'siteInfo','main'));
+  if(!snap.exists()) return;
+  const d = snap.data();
+  const map = {
+    siteAddress:'address', siteLandArea:'landArea', siteFloorArea:'floorArea',
+    siteFloors:'floors', siteBuilder:'builder', siteStartDate:'startDate', siteEndDate:'endDate'
+  };
+  Object.keys(map).forEach(elId=>{
+    const el = document.getElementById(elId);
+    if(el && d[map[elId]]) el.value = d[map[elId]];
+  });
+}
+
+window.saveSiteInfo = async function(){
+  const data = {
+    address: document.getElementById('siteAddress').value,
+    landArea: document.getElementById('siteLandArea').value,
+    floorArea: document.getElementById('siteFloorArea').value,
+    floors: document.getElementById('siteFloors').value,
+    builder: document.getElementById('siteBuilder').value,
+    startDate: document.getElementById('siteStartDate').value,
+    endDate: document.getElementById('siteEndDate').value,
+    updatedAt: serverTimestamp()
+  };
+  await setDoc(doc(db,'siteInfo','main'), data, {merge:true});
+  alert('현장정보를 저장했습니다.');
+};
+
+// ==== 헤더: 날짜 / 날씨 / 온습도 ====
+function formatKoreanDate(d){
+  const days = ['일','월','화','수','목','금','토'];
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
+}
+
+const WEATHER_CODE_MAP = {
+  0:'맑음',1:'대체로 맑음',2:'구름 조금',3:'흐림',45:'안개',48:'서리안개',
+  51:'약한 이슬비',53:'이슬비',55:'강한 이슬비',61:'약한 비',63:'비',65:'강한 비',
+  66:'약한 언비',67:'강한 언비',71:'약한 눈',73:'눈',75:'강한 눈',77:'싸락눈',
+  80:'약한 소나기',81:'소나기',82:'강한 소나기',85:'약한 눈소나기',86:'강한 눈소나기',
+  95:'뇌우',96:'뇌우(우박)',99:'강한 뇌우(우박)'
+};
+
+async function loadWeather(){
+  document.getElementById('wxDate').textContent = formatKoreanDate(new Date());
+  try{
+    // 안산시 좌표
+    const resp = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.3236&longitude=126.8219&current=temperature_2m,relative_humidity_2m,weather_code&timezone=Asia%2FSeoul');
+    const data = await resp.json();
+    const c = data.current;
+    document.getElementById('wxWeather').textContent = '안산 ' + (WEATHER_CODE_MAP[c.weather_code] || '-');
+    document.getElementById('wxTemp').textContent = Math.round(c.temperature_2m) + '℃';
+    document.getElementById('wxHumidity').textContent = '습도 ' + Math.round(c.relative_humidity_2m) + '%';
+  }catch(e){
+    console.error('날씨 조회 실패', e);
+    document.getElementById('wxWeather').textContent = '날씨 정보를 불러올 수 없습니다';
+  }
+}
 
 function formatTs(ts){
   try{ return ts.toDate().toLocaleString('ko-KR'); }catch(e){ return ''; }
