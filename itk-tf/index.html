@@ -106,6 +106,15 @@
   .progress{font-size:var(--fs-min);color:var(--accent);margin-bottom:12px;}
 
   .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+  .day-group-header{
+    grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    background:var(--card);border:1px solid var(--border);border-radius:8px;
+    padding:9px 12px;margin:14px 0 2px;font-size:var(--fs-min);
+  }
+  .day-group-header .day-date{font-weight:700;color:var(--navy);}
+  .day-group-header .day-count{color:var(--accent);background:var(--accent-light);padding:1px 8px;border-radius:10px;font-size:var(--fs-min);}
+  .day-group-header .day-memo{flex:1;min-width:120px;color:var(--text);}
+  .statusbar-sep{color:#4A5A7A;}
   .photo-item{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;}
   .photo-item .sel-check{
     position:absolute;top:8px;left:8px;width:20px;height:20px;z-index:5;cursor:pointer;accent-color:var(--accent);
@@ -184,20 +193,30 @@
 
 
 <header>
-  <div class="inner">
-    <div>
-      <h1>화재복구·공장신축 TF 통합관리</h1>
-      <div class="sub">인시스 AI혁신 연구개발실</div>
+  <div class="inner" style="display:flex;justify-content:space-between;align-items:baseline;">
+    <div style="display:flex;align-items:baseline;gap:8px;">
+      <h1>🏗️ 화재복구·공장신축 TF 통합관리</h1>
+      <span style="font-size:var(--fs-min);color:#8FA3C4;">v3.3</span>
     </div>
-    <div class="meta">v3.2<br>ys.kim@in-sys.co.kr</div>
+    <div id="wxDate" style="font-size:var(--fs-min);color:#C9D4E4;white-space:nowrap;">-</div>
   </div>
-  <div class="inner" id="weatherBar" style="padding-top:10px;font-size:var(--fs-min);color:#C9D4E4;display:flex;gap:14px;flex-wrap:wrap;">
-    <span id="wxDate">-</span>
-    <span>·</span>
-    <span id="wxWeather">날씨 불러오는 중...</span>
-    <span id="wxTemp"></span>
-    <span id="wxHumidity"></span>
+</header>
+
+<div id="statusBar" style="background:var(--navy2);border-top:1px solid rgba(255,255,255,0.08);">
+  <div class="inner" style="display:flex;flex-wrap:wrap;align-items:center;gap:0;padding-top:9px;padding-bottom:9px;font-size:var(--fs-min);color:#DCE5F2;">
+    <span id="wxLocation">📍 안산시</span>
+    <span class="statusbar-sep">|</span>
+    <span id="wxWeather">☁️ 불러오는 중...</span>
+    <span class="statusbar-sep">|</span>
+    <span id="wxHumidity">💧 -</span>
+    <span class="statusbar-sep">|</span>
+    <span id="wxWind">💨 -</span>
+    <span class="statusbar-sep">|</span>
+    <span id="wxProgress" style="font-weight:700;">🏗️ 공사진행 -%</span>
+    <span style="margin-left:auto;color:#7C8BA8;font-size:var(--fs-min);">ys.kim@in-sys.co.kr</span>
   </div>
+</div>
+
 </header>
 
 <nav>
@@ -424,7 +443,7 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "3.2";
+const APP_VERSION = "3.3";
 
 async function boot(){
   initNav();
@@ -434,6 +453,7 @@ async function boot(){
   loadSiteInfo();
   loadPhotos();
   loadStageProgress();
+  loadOverallProgress();
   loadFiles();
   loadKakao();
   loadSchedule();
@@ -543,19 +563,48 @@ const WEATHER_CODE_MAP = {
   95:'뇌우',96:'뇌우(우박)',99:'강한 뇌우(우박)'
 };
 
+const WEATHER_ICON_MAP = {
+  0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',
+  51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',
+  66:'🌧️',67:'🌧️',71:'🌨️',73:'🌨️',75:'❄️',77:'❄️',
+  80:'🌦️',81:'🌧️',82:'⛈️',85:'🌨️',86:'❄️',
+  95:'⛈️',96:'⛈️',99:'⛈️'
+};
+
+function windDirLabel(deg){
+  const dirs = ['북','북동','동','남동','남','남서','서','북서'];
+  return dirs[Math.round(deg/45) % 8];
+}
+
 async function loadWeather(){
   document.getElementById('wxDate').textContent = formatKoreanDate(new Date());
   try{
     // 안산시 좌표
-    const resp = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.3236&longitude=126.8219&current=temperature_2m,relative_humidity_2m,weather_code&timezone=Asia%2FSeoul');
+    const resp = await fetch('https://api.open-meteo.com/v1/forecast?latitude=37.3236&longitude=126.8219&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m&timezone=Asia%2FSeoul');
     const data = await resp.json();
     const c = data.current;
-    document.getElementById('wxWeather').textContent = '안산 ' + (WEATHER_CODE_MAP[c.weather_code] || '-');
-    document.getElementById('wxTemp').textContent = Math.round(c.temperature_2m) + '℃';
-    document.getElementById('wxHumidity').textContent = '습도 ' + Math.round(c.relative_humidity_2m) + '%';
+    const icon = WEATHER_ICON_MAP[c.weather_code] || '🌡️';
+    const label = WEATHER_CODE_MAP[c.weather_code] || '-';
+    document.getElementById('wxWeather').textContent = `${icon} ${Math.round(c.temperature_2m)}℃ ${label}`;
+    document.getElementById('wxHumidity').textContent = `💧 습도 ${Math.round(c.relative_humidity_2m)}%`;
+    document.getElementById('wxWind').textContent = `💨 ${windDirLabel(c.wind_direction_10m)} ${Math.round(c.wind_speed_10m)}km/h`;
   }catch(e){
     console.error('날씨 조회 실패', e);
     document.getElementById('wxWeather').textContent = '날씨 정보를 불러올 수 없습니다';
+  }
+}
+
+async function loadOverallProgress(){
+  try{
+    let total = 0;
+    for(const stage of CONSTRUCTION_STAGES){
+      const snap = await getDoc(doc(db,'constructionStages',stage));
+      total += snap.exists() ? (snap.data().progress || 0) : 0;
+    }
+    const avg = Math.round(total / CONSTRUCTION_STAGES.length);
+    document.getElementById('wxProgress').textContent = `🏗️ 공사진행 ${avg}%`;
+  }catch(e){
+    console.error('전체 진도율 계산 실패', e);
   }
 }
 
@@ -709,6 +758,7 @@ function showProgressSuggestions(extractions){
 window.applyProgressSuggestion = async function(stage, progress, idx){
   await setDoc(doc(db,'constructionStages',stage), {progress, updatedAt: serverTimestamp()}, {merge:true});
   loadStageProgress();
+  loadOverallProgress();
   await syncScheduleStatusForStage(stage, progress);
   const rows = document.querySelectorAll('#progressSuggestBody > div');
   if(rows[idx]) rows[idx].style.opacity = '0.4';
@@ -734,6 +784,47 @@ async function syncScheduleStatusForStage(stage, progress){
 
 let photoCache = {};
 let selectedPhotoIds = new Set();
+let dayLogCache = {};
+
+function renderDayLogView(el, dateKey, photoCount){
+  const memo = dayLogCache[dateKey] || '';
+  el.innerHTML = `
+    <span class="day-date">📅 ${dateKey}</span>
+    <span class="day-count">🖼️ ${photoCount}장</span>
+    <span class="day-memo">${memo ? '✏️ ' + memo : '<span style="color:var(--text-sub);">메모 없음</span>'}</span>
+    <span onclick="editDayLog('${dateKey}', ${photoCount})" style="color:var(--accent);cursor:pointer;flex-shrink:0;">수정</span>
+  `;
+}
+
+window.editDayLog = function(dateKey, photoCount){
+  const el = document.getElementById('daylog-' + dateKey);
+  const current = dayLogCache[dateKey] || '';
+  el.innerHTML = `
+    <span class="day-date">📅 ${dateKey}</span>
+    <input type="text" id="dayLogInput-${dateKey}" value="${current.replace(/"/g,'&quot;')}" placeholder="이 날짜 작업 내용 한줄 메모" style="flex:1;min-width:160px;font-size:var(--fs-min);padding:4px 8px;border:1px solid var(--border);border-radius:6px;">
+    <span onclick="saveDayLog('${dateKey}')" style="color:var(--accent);cursor:pointer;font-weight:600;flex-shrink:0;">저장</span>
+    <span onclick="loadPhotos()" style="color:var(--text-sub);cursor:pointer;flex-shrink:0;">취소</span>
+  `;
+};
+
+window.saveDayLog = async function(dateKey){
+  const input = document.getElementById('dayLogInput-' + dateKey);
+  const val = input ? input.value : '';
+  try{
+    await setDoc(doc(db,'dailyLogs',dateKey), {memo: val, updatedAt: serverTimestamp()}, {merge:true});
+    const check = await getDoc(doc(db,'dailyLogs',dateKey));
+    if(!check.exists() || check.data().memo !== val){
+      alert('저장이 반영되지 않았습니다. 다시 시도해주세요.');
+      return;
+    }
+    dayLogCache[dateKey] = val;
+    loadPhotos();
+    if(val) suggestProgressFromText(val); // 일자별 메모도 진도율 자동감지 대상
+  }catch(e){
+    console.error('일자별 메모 저장 실패', e);
+    alert('메모 저장에 실패했습니다: ' + e.message);
+  }
+};
 
 async function loadPhotos(){
   const grid = document.getElementById('photoGrid');
@@ -769,11 +860,17 @@ async function loadPhotos(){
   // 날짜 문자열(YYYY-MM-DD) 내림차순 정렬 → 최신 날짜가 항상 맨 위
   const sortedKeys = Object.keys(groups).sort((a,b)=> a < b ? 1 : -1);
 
+  // 일자별 작업일지 메모 불러오기
+  const logSnap = await getDocs(collection(db,'dailyLogs'));
+  dayLogCache = {};
+  logSnap.forEach(d=>{ dayLogCache[d.id] = d.data().memo || ''; });
+
   grid.innerHTML = '';
   sortedKeys.forEach(dateKey=>{
     const dayHeader = document.createElement('div');
-    dayHeader.style.cssText = 'grid-column:1/-1;font-weight:700;color:var(--navy);font-size:var(--fs-min);margin:14px 0 4px;';
-    dayHeader.textContent = '📅 ' + dateKey;
+    dayHeader.className = 'day-group-header';
+    dayHeader.id = 'daylog-' + dateKey;
+    renderDayLogView(dayHeader, dateKey, groups[dateKey].length);
     grid.appendChild(dayHeader);
 
     groups[dateKey].forEach(p=>{
@@ -1217,6 +1314,7 @@ window.saveStageProgress = async function(stage){
   val = Math.max(0, Math.min(100, val));
   await setDoc(doc(db,'constructionStages',stage), {progress: val, updatedAt: serverTimestamp()});
   loadStageProgress();
+  loadOverallProgress();
 };
 
 // ==== 법률의견 AI분석 ====
