@@ -243,7 +243,7 @@
     <div class="header-title">
       <svg class="icon-header" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V9l6-4 6 4v12M9 21v-6h6v6M9 12h.01M13.5 12h.01"/></svg>
       <h1>화재복구·공장신축 TF 통합관리</h1>
-      <span class="ver-badge">v3.7</span>
+      <span class="ver-badge">v4.0</span>
     </div>
     <div id="wxDate" class="header-date">-</div>
   </div>
@@ -264,45 +264,18 @@
 
 <nav>
   <div class="inner">
-    <button class="active" data-view="permit">인허가</button>
+    <button class="active" data-view="photos">사진일지</button>
+    <button data-view="log">일지</button>
+    <button data-view="permit">인허가</button>
+    <button data-view="files">문서</button>
     <button data-view="siteinfo">현장정보</button>
-    <button data-view="photos">사진 타임라인</button>
-    <button data-view="construction">공사진행</button>
-    <button data-view="files">파일함</button>
-    <button data-view="kakao">카톡 정리</button>
-    <button data-view="schedule">일정관리</button>
-    <button data-view="legal">법률의견 AI분석</button>
   </div>
 </nav>
 
 <main>
 
-  <!-- 인허가 현황 -->
-  <div class="view active" id="view-permit">
-    <div class="section-title">인허가 진행 현황</div>
-    <div class="grid4" id="permitGrid"></div>
-  </div>
-
-  <!-- 현장정보 (공사 허가 전, 추후 입력 예정) -->
-  <div class="view" id="view-siteinfo">
-    <div class="section-title">현장정보</div>
-    <div class="card">
-      <div class="empty" style="padding:10px 0;">아직 공사 허가 전이라 등록된 현장정보가 없습니다. 허가 이후 추가될 예정입니다.</div>
-      <div class="upload-row" style="flex-direction:column;align-items:stretch;gap:10px;">
-        <input type="text" id="siteAddress" placeholder="현장 주소">
-        <input type="text" id="siteLandArea" placeholder="대지면적 (㎡)">
-        <input type="text" id="siteFloorArea" placeholder="연면적 (㎡)">
-        <input type="text" id="siteFloors" placeholder="층수">
-        <input type="text" id="siteBuilder" placeholder="시공사">
-        <input type="text" id="siteStartDate" placeholder="착공(예정)일">
-        <input type="text" id="siteEndDate" placeholder="준공(예정)일">
-        <button onclick="saveSiteInfo()">저장</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 사진 타임라인 -->
-  <div class="view" id="view-photos">
+  <!-- 사진일지: 통계카드 + 업로드 + 날짜별 사진 + 공정 진도율 -->
+  <div class="view active" id="view-photos">
     <div class="stat-grid" id="photoStatGrid">
       <div class="stat-card"><div class="stat-num" id="statElapsed">-</div><div class="stat-label">착공 경과일</div></div>
       <div class="stat-card sky"><div class="stat-num" id="statTotalPhotos">-</div><div class="stat-label">누적 사진</div></div>
@@ -345,42 +318,17 @@
       <button onclick="deleteSelectedPhotos()" style="background:var(--danger);">선택삭제 (<span id="photoSelCount">0</span>)</button>
     </div>
     <div class="photo-grid" id="photoGrid"></div>
-  </div>
 
-  <!-- 공사진행: 단계별 진도율 -->
-  <div class="view" id="view-construction">
+    <div class="section-title">공정단계별 진도율</div>
     <div class="stat-grid" style="grid-template-columns:1fr;margin-bottom:16px;">
       <div class="stat-card sky"><div class="stat-num" id="wxProgress">-%</div><div class="stat-label">전체 공사 진행률 (6단계 평균)</div></div>
     </div>
-    <div class="section-title">공정단계별 진도율</div>
     <div class="grid4" id="stageGrid" style="margin-bottom:8px;"></div>
-    <div class="empty" style="margin-top:8px;">공사 사진은 "사진 타임라인" 탭에서 날짜별로 확인하실 수 있습니다.</div>
   </div>
 
-  <!-- 파일함 -->
-  <div class="view" id="view-files">
-    <div class="card">
-      <div class="upload-row">
-        <input type="file" id="docFile" multiple>
-        <select id="docCat">
-          <option value="화재보상">화재보상</option>
-          <option value="지자체지원">지자체지원</option>
-          <option value="고객사보상">고객사보상</option>
-          <option value="공장신축">공장신축</option>
-          <option value="기타">기타</option>
-        </select>
-        <button onclick="uploadFile()">업로드</button>
-      </div>
-      <div class="progress" id="fileProgress"></div>
-      <div style="background:var(--border);border-radius:6px;height:6px;overflow:hidden;display:none;" id="fileProgressBarWrap">
-        <div id="fileProgressBar" style="background:var(--accent);height:100%;width:0%;transition:width .2s;"></div>
-      </div>
-    </div>
-    <div class="file-list" id="fileList"></div>
-  </div>
-
-  <!-- 카톡 정리 -->
-  <div class="view" id="view-kakao">
+  <!-- 일지: 카톡 정리 + 일정관리 -->
+  <div class="view" id="view-log">
+    <div class="section-title">카톡 정리</div>
     <div class="card">
       <div class="upload-row">
         <select id="kakaoCat">
@@ -399,10 +347,8 @@
       <div class="progress" id="kakaoProgress"></div>
     </div>
     <div id="kakaoList"></div>
-  </div>
 
-  <!-- 일정관리 -->
-  <div class="view" id="view-schedule">
+    <div class="section-title">일정관리</div>
     <div class="card">
       <div class="upload-row">
         <select id="schedTrack">
@@ -438,8 +384,35 @@
     </div>
   </div>
 
-  <!-- 법률의견 AI분석 -->
-  <div class="view" id="view-legal">
+  <!-- 인허가 현황 -->
+  <div class="view" id="view-permit">
+    <div class="section-title">인허가 진행 현황</div>
+    <div class="grid4" id="permitGrid"></div>
+  </div>
+
+  <!-- 문서: 파일함 + 법률의견 AI분석 -->
+  <div class="view" id="view-files">
+    <div class="section-title">문서함</div>
+    <div class="card">
+      <div class="upload-row">
+        <input type="file" id="docFile" multiple>
+        <select id="docCat">
+          <option value="화재보상">화재보상</option>
+          <option value="지자체지원">지자체지원</option>
+          <option value="고객사보상">고객사보상</option>
+          <option value="공장신축">공장신축</option>
+          <option value="기타">기타</option>
+        </select>
+        <button onclick="uploadFile()">업로드</button>
+      </div>
+      <div class="progress" id="fileProgress"></div>
+      <div style="background:var(--border);border-radius:6px;height:6px;overflow:hidden;display:none;" id="fileProgressBarWrap">
+        <div id="fileProgressBar" style="background:var(--accent);height:100%;width:0%;transition:width .2s;"></div>
+      </div>
+    </div>
+    <div class="file-list" id="fileList"></div>
+
+    <div class="section-title">법률의견 AI분석</div>
     <div class="card">
       <div class="upload-row">
         <input type="file" id="legalFile" accept=".pdf,.doc,.docx">
@@ -455,6 +428,24 @@
       <div class="progress" id="legalProgress"></div>
     </div>
     <div id="legalList"></div>
+  </div>
+
+  <!-- 현장정보 (공사 허가 전, 추후 입력 예정) -->
+  <div class="view" id="view-siteinfo">
+    <div class="section-title">현장정보</div>
+    <div class="card">
+      <div class="empty" style="padding:10px 0;">아직 공사 허가 전이라 등록된 현장정보가 없습니다. 허가 이후 추가될 예정입니다.</div>
+      <div class="upload-row" style="flex-direction:column;align-items:stretch;gap:10px;">
+        <input type="text" id="siteAddress" placeholder="현장 주소">
+        <input type="text" id="siteLandArea" placeholder="대지면적 (㎡)">
+        <input type="text" id="siteFloorArea" placeholder="연면적 (㎡)">
+        <input type="text" id="siteFloors" placeholder="층수">
+        <input type="text" id="siteBuilder" placeholder="시공사">
+        <input type="text" id="siteStartDate" placeholder="착공(예정)일">
+        <input type="text" id="siteEndDate" placeholder="준공(예정)일">
+        <button onclick="saveSiteInfo()">저장</button>
+      </div>
+    </div>
   </div>
 
 </main>
@@ -493,7 +484,7 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "3.7";
+const APP_VERSION = "4.0";
 
 async function boot(){
   initNav();
