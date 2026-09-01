@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v5.6 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v5.7 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -162,7 +162,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v5.6</span>
+    <span class="vb">v5.7</span>
   </div>
 </div>
 </div>
@@ -205,13 +205,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v5.6 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v5.7 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v5.6
+// 트레이 세척·탈수·건조 시뮬레이터 v5.7
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='5.6';
+const VER='5.7';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -1217,10 +1217,7 @@ function sel(id,l,o,c){return '<div class="fl"><label>'+l+'</label><select id="'
 function renderRight(){
   calcAll();renderFlow();
   const Rc=gi('rightCol');
-  let h='<div class="card"><div class="ch"><span class="ci">📈</span><span class="cl">통합 성능·에너지 (2CH)</span></div><div class="cb"><div class="kpi">'
-    +kc('k1',R.washEff.toFixed(0)+'%','세척 효율')
-    +kc('k2',R.dewatEff.toFixed(0)+'%','탈수 효율')
-    +kc('k3',R.dryEff.toFixed(0)+'%','건조 효율')
+  let h='<div class="card"><div class="ch"><span class="ci">⚡</span><span class="cl">전력·에너지 (2CH)</span></div><div class="cb"><div class="kpi">'
     +kc('k4',R.elecTotal.toFixed(1),'전기정격(kW)')
     +kc('k5',R.elecReal.toFixed(1),'전기실운전(kW)')
     +kc('k6',R.gasLoad>0?R.gasLoad.toFixed(1)+'kW':'—','가스부하')
