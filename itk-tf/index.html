@@ -220,7 +220,7 @@
     <div class="header-title">
       <svg class="icon-header" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V9l6-4 6 4v12M9 21v-6h6v6M9 12h.01M13.5 12h.01"/></svg>
       <h1>화재복구·공장신축 TF 통합관리</h1>
-      <span class="ver-badge">v3.4</span>
+      <span class="ver-badge">v3.5</span>
     </div>
     <div id="wxDate" class="header-date">-</div>
   </div>
@@ -295,7 +295,6 @@
           <option value="준공">준공</option>
           <option value="기타">기타</option>
         </select>
-        <input type="text" id="photoMemo" placeholder="한줄 메모 (예: 3층 골조 철거 완료)">
         <input type="date" id="photoShotDate" title="촬영일자">
         <button onclick="uploadPhoto()">업로드</button>
       </div>
@@ -465,7 +464,7 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "3.4";
+const APP_VERSION = "3.5";
 
 async function boot(){
   initNav();
@@ -691,7 +690,6 @@ async function uploadPhoto(){
   const files = Array.from(fileInput.files);
   if(files.length===0){ alert('사진을 선택해주세요.'); return; }
   const cat = document.getElementById('photoCat').value;
-  const memo = document.getElementById('photoMemo').value;
   const shotDateInput = document.getElementById('photoShotDate').value;
   const shotDate = shotDateInput || todayStr();
   const progEl = document.getElementById('photoProgress');
@@ -712,15 +710,14 @@ async function uploadPhoto(){
         bar.style.width = pct + '%';
       });
       await addDoc(collection(db,'photos'), {
-        url, storagePath: path, category: cat, memo, shotDate,
+        url, storagePath: path, category: cat, shotDate,
         createdAt: serverTimestamp()
       });
     }
     progEl.textContent = `업로드 완료 (${files.length}개)`;
     bar.style.width = '100%';
     setTimeout(()=>{ barWrap.style.display = 'none'; }, 800);
-    if(memo) suggestProgressFromText(memo);
-    fileInput.value = ''; document.getElementById('photoMemo').value = '';
+    fileInput.value = '';
     loadPhotos();
   }catch(e){
     console.error(e);
@@ -896,10 +893,6 @@ async function loadPhotos(){
         <div class="meta">
           <span class="del" onclick="delPhoto('${p.id}','${p.storagePath}')">삭제</span>
           <span class="tag">${p.category||'기타'}</span>
-          <div class="memo" id="photo-memo-${p.id}">
-            ${p.memo||'<span style="color:var(--text-sub);">(메모 없음)</span>'}
-            <span onclick="editPhotoMemo('${p.id}')" style="color:var(--accent);cursor:pointer;margin-left:4px;">수정</span>
-          </div>
           <div class="date" id="photo-date-${p.id}">
             ${photoDateLabel(p)}
             <span onclick="editPhotoDate('${p.id}')" style="color:var(--accent);cursor:pointer;margin-left:4px;">수정</span>
@@ -998,38 +991,6 @@ window.savePhotoDate = async function(id){
   }catch(e){
     console.error('촬영일자 저장 실패', e);
     alert('촬영일자 저장에 실패했습니다: ' + e.message);
-  }
-};
-
-window.editPhotoMemo = function(id){
-  const p = photoCache[id];
-  const wrap = document.getElementById('photo-memo-' + id);
-  wrap.innerHTML = `
-    <input type="text" id="photoMemoInput-${id}" value="${(p.memo||'').replace(/"/g,'&quot;')}" style="width:100%;font-size:var(--fs-min);padding:4px 6px;box-sizing:border-box;">
-    <div style="margin-top:4px;">
-      <span onclick="savePhotoMemo('${id}')" style="color:var(--accent);cursor:pointer;font-weight:600;">저장</span>
-      &nbsp;|&nbsp;
-      <span onclick="loadPhotos()" style="color:var(--text-sub);cursor:pointer;">취소</span>
-    </div>
-  `;
-};
-
-window.savePhotoMemo = async function(id){
-  const input = document.getElementById('photoMemoInput-' + id);
-  const val = input ? input.value : '';
-  try{
-    await setDoc(doc(db,'photos',id), {memo: val}, {merge:true});
-    const check = await getDoc(doc(db,'photos',id));
-    if(!check.exists() || check.data().memo !== val){
-      alert('저장이 반영되지 않았습니다. 네트워크 상태를 확인하고 다시 시도해주세요.');
-      return;
-    }
-    photoCache[id] = check.data();
-    loadPhotos();
-    if(val) suggestProgressFromText(val); // 수정된 메모도 진도율 자동감지 재실행
-  }catch(e){
-    console.error('메모 저장 실패', e);
-    alert('메모 저장에 실패했습니다: ' + e.message);
   }
 };
 
