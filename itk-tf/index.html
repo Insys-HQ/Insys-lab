@@ -189,7 +189,7 @@
       <h1>화재복구·공장신축 TF 통합관리</h1>
       <div class="sub">인시스 AI혁신 연구개발실</div>
     </div>
-    <div class="meta">v2.6<br>ys.kim@in-sys.co.kr</div>
+    <div class="meta">v2.7<br>ys.kim@in-sys.co.kr</div>
   </div>
 </header>
 
@@ -398,7 +398,7 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "2.6";
+const APP_VERSION = "2.7";
 
 async function boot(){
   initNav();
@@ -640,27 +640,51 @@ async function loadPhotos(){
   selectedPhotoIds.clear();
   updateSelCount();
   if(snap.empty){ grid.innerHTML = '<div class="empty">등록된 사진이 없습니다.</div>'; return; }
-  grid.innerHTML = '';
+
+  const items = [];
   snap.forEach(d=>{
     const p = d.data();
     photoCache[d.id] = p;
-    const el = document.createElement('div');
-    el.className = 'photo-item';
-    el.id = 'photo-item-' + d.id;
-    el.innerHTML = `
-      <input type="checkbox" class="sel-check" onclick="event.stopPropagation(); togglePhotoSelect('${d.id}')">
-      <img src="${p.url}" onclick="openLightbox('${p.url}')">
-      <div class="meta">
-        <span class="del" onclick="delPhoto('${d.id}','${p.storagePath}')">삭제</span>
-        <span class="tag">${p.category||'기타'}</span>
-        <div class="memo">${p.memo||''}</div>
-        <div class="date" id="photo-date-${d.id}">
-          📅 ${photoDateLabel(p)}
-          <span onclick="editPhotoDate('${d.id}')" style="color:var(--accent);cursor:pointer;margin-left:4px;">수정</span>
+    items.push({ id: d.id, ...p });
+  });
+
+  // 촬영일자(shotDate) 기준으로 그룹핑, 같은 날짜는 한 곳에 모두 배치
+  const groups = {};
+  items.forEach(p=>{
+    const dateKey = photoDateLabel(p);
+    if(!groups[dateKey]) groups[dateKey] = [];
+    groups[dateKey].push(p);
+  });
+
+  // 날짜 문자열(YYYY-MM-DD) 내림차순 정렬 → 최신 날짜가 항상 맨 위
+  const sortedKeys = Object.keys(groups).sort((a,b)=> a < b ? 1 : -1);
+
+  grid.innerHTML = '';
+  sortedKeys.forEach(dateKey=>{
+    const dayHeader = document.createElement('div');
+    dayHeader.style.cssText = 'grid-column:1/-1;font-weight:700;color:var(--navy);font-size:var(--fs-min);margin:14px 0 4px;';
+    dayHeader.textContent = '📅 ' + dateKey;
+    grid.appendChild(dayHeader);
+
+    groups[dateKey].forEach(p=>{
+      const el = document.createElement('div');
+      el.className = 'photo-item';
+      el.id = 'photo-item-' + p.id;
+      el.innerHTML = `
+        <input type="checkbox" class="sel-check" onclick="event.stopPropagation(); togglePhotoSelect('${p.id}')">
+        <img src="${p.url}" onclick="openLightbox('${p.url}')">
+        <div class="meta">
+          <span class="del" onclick="delPhoto('${p.id}','${p.storagePath}')">삭제</span>
+          <span class="tag">${p.category||'기타'}</span>
+          <div class="memo">${p.memo||''}</div>
+          <div class="date" id="photo-date-${p.id}">
+            📅 ${photoDateLabel(p)}
+            <span onclick="editPhotoDate('${p.id}')" style="color:var(--accent);cursor:pointer;margin-left:4px;">수정</span>
+          </div>
         </div>
-      </div>
-    `;
-    grid.appendChild(el);
+      `;
+      grid.appendChild(el);
+    });
   });
 }
 
