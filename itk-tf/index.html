@@ -189,7 +189,7 @@
       <h1>화재복구·공장신축 TF 통합관리</h1>
       <div class="sub">인시스 AI혁신 연구개발실</div>
     </div>
-    <div class="meta">v2.8<br>ys.kim@in-sys.co.kr</div>
+    <div class="meta">v2.9<br>ys.kim@in-sys.co.kr</div>
   </div>
 </header>
 
@@ -373,7 +373,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getFirestore, collection, addDoc, getDocs, deleteDoc, doc,
-  setDoc, getDoc, query, orderBy, serverTimestamp
+  setDoc, getDoc, query, orderBy, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject
@@ -398,7 +398,7 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "2.8";
+const APP_VERSION = "2.9";
 
 async function boot(){
   initNav();
@@ -622,11 +622,28 @@ function showProgressSuggestions(extractions){
 window.applyProgressSuggestion = async function(stage, progress, idx){
   await setDoc(doc(db,'constructionStages',stage), {progress, updatedAt: serverTimestamp()}, {merge:true});
   loadStageProgress();
+  await syncScheduleStatusForStage(stage, progress);
   const rows = document.querySelectorAll('#progressSuggestBody > div');
   if(rows[idx]) rows[idx].style.opacity = '0.4';
   const btn = rows[idx] ? rows[idx].querySelector('button') : null;
   if(btn){ btn.textContent = '반영됨'; btn.disabled = true; }
 };
+
+// 공정단계 진도율이 반영될 때, "공장신축" 트랙의 같은 공정단계 일정 상태도 함께 갱신
+async function syncScheduleStatusForStage(stage, progress){
+  const newStatus = progress >= 100 ? '완료' : (progress > 0 ? '진행중' : '계획');
+  const q = query(
+    collection(db,'schedule'),
+    where('track','==','공장신축'),
+    where('stage','==',stage)
+  );
+  const snap = await getDocs(q);
+  if(snap.empty) return;
+  for(const d of snap.docs){
+    await setDoc(doc(db,'schedule',d.id), {status:newStatus}, {merge:true});
+  }
+  loadSchedule();
+}
 
 let photoCache = {};
 let selectedPhotoIds = new Set();
@@ -962,28 +979,76 @@ async function addSchedule(){
 }
 window.addSchedule = addSchedule;
 
+let scheduleCache = {};
+
 async function loadSchedule(){
   const body = document.getElementById('schedBody');
   body.innerHTML = '<tr><td colspan="6" class="empty">불러오는 중...</td></tr>';
   const q = query(collection(db,'schedule'), orderBy('date','asc'));
   const snap = await getDocs(q);
+  scheduleCache = {};
   if(snap.empty){ body.innerHTML = '<tr><td colspan="6" class="empty">등록된 일정이 없습니다.</td></tr>'; return; }
   body.innerHTML = '';
   snap.forEach(d=>{
     const s = d.data();
-    const badgeClass = s.status === '완료' ? 'done' : (s.status === '진행중' ? 'prog' : 'plan');
+    scheduleCache[d.id] = s;
     const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${s.track}</td>
-      <td>${s.stage||'-'}</td>
-      <td>${s.title}</td>
-      <td>${s.date||'-'}</td>
-      <td><span class="badge ${badgeClass}">${s.status}</span></td>
-      <td class="del-cell" onclick="delSchedule('${d.id}')">삭제</td>
-    `;
+    tr.id = 'sched-row-' + d.id;
+    renderScheduleRow(tr, d.id, s);
     body.appendChild(tr);
   });
 }
+
+function renderScheduleRow(tr, id, s){
+  const badgeClass = s.status === '완료' ? 'done' : (s.status === '진행중' ? 'prog' : 'plan');
+  tr.innerHTML = `
+    <td>${s.track}</td>
+    <td>${s.stage||'-'}</td>
+    <td>${s.title}</td>
+    <td>${s.date||'-'}</td>
+    <td><span class="badge ${badgeClass}">${s.status}</span></td>
+    <td class="del-cell">
+      <span onclick="editSchedule('${id}')" style="color:var(--accent);">수정</span>
+      &nbsp;|&nbsp;
+      <span onclick="delSchedule('${id}')">삭제</span>
+    </td>
+  `;
+}
+
+const SCHED_TRACKS = ['화재보상','지자체지원','고객사보상','공장신축'];
+const SCHED_STAGES = ['','철거','기초','골조','외부마감','내부마감','준공'];
+const SCHED_STATUSES = ['계획','진행중','완료'];
+
+window.editSchedule = function(id){
+  const s = scheduleCache[id];
+  const tr = document.getElementById('sched-row-' + id);
+  const trackOpts = SCHED_TRACKS.map(t=>`<option value="${t}" ${s.track===t?'selected':''}>${t}</option>`).join('');
+  const stageOpts = SCHED_STAGES.map(st=>`<option value="${st}" ${((s.stage||'')===st)?'selected':''}>${st||'해당없음'}</option>`).join('');
+  const statusOpts = SCHED_STATUSES.map(st=>`<option value="${st}" ${s.status===st?'selected':''}>${st}</option>`).join('');
+  tr.innerHTML = `
+    <td><select id="editTrack-${id}">${trackOpts}</select></td>
+    <td><select id="editStage-${id}">${stageOpts}</select></td>
+    <td><input type="text" id="editTitle-${id}" value="${(s.title||'').replace(/"/g,'&quot;')}" style="width:100%;"></td>
+    <td><input type="text" id="editDate-${id}" value="${s.date||''}" style="width:110px;"></td>
+    <td><select id="editStatus-${id}">${statusOpts}</select></td>
+    <td class="del-cell">
+      <span onclick="saveScheduleEdit('${id}')" style="color:var(--accent);font-weight:600;">저장</span>
+      &nbsp;|&nbsp;
+      <span onclick="loadSchedule()">취소</span>
+    </td>
+  `;
+};
+
+window.saveScheduleEdit = async function(id){
+  const track = document.getElementById('editTrack-'+id).value;
+  const stage = document.getElementById('editStage-'+id).value;
+  const title = document.getElementById('editTitle-'+id).value;
+  const date = document.getElementById('editDate-'+id).value;
+  const status = document.getElementById('editStatus-'+id).value;
+  if(!title){ alert('내용을 입력해주세요.'); return; }
+  await setDoc(doc(db,'schedule',id), {track, stage, title, date, status}, {merge:true});
+  loadSchedule();
+};
 
 window.delSchedule = async function(id){
   if(!confirm('삭제하시겠습니까?')) return;
