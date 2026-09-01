@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v3.7 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v3.8 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -134,8 +134,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
 @media(min-width:768px){.flowbar{grid-template-columns:repeat(8,1fr);}}
 .flowstep{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 4px;text-align:center;}
 
-.flowstep .fn{font-size:12px;font-weight:700;color:var(--steel);line-height:1.2;}
-.flowstep .fsub{font-size:10px;color:#9aabb8;line-height:1.1;margin-bottom:3px;}
+.flowstep .fn{font-size:12px;font-weight:700;color:var(--steel);line-height:1.2;white-space:nowrap;margin-bottom:4px;}
 .flowstep .fv{font-size:16px;color:var(--navy);font-weight:900;line-height:1.2;}
 .flowstep.aw{border-top:3px solid var(--wash);}.flowstep.aw .fv{color:var(--wash);}
 .flowstep.ad{border-top:3px solid var(--dewat);}.flowstep.ad .fv{color:var(--dewat);}
@@ -155,7 +154,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v3.7</span>
+    <span class="vb">v3.8</span>
   </div>
 </div>
 </div>
@@ -198,13 +197,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v3.7 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v3.8 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v3.7
+// 트레이 세척·탈수·건조 시뮬레이터 v3.8
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='3.7';
+const VER='3.8';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -1114,18 +1113,18 @@ function renderRight(){
 function kc(c,v,l){return '<div class="kc '+c+'"><div class="kv">'+v+'</div><div class="kl">'+l+'</div></div>';}
 function row(p,e,r,rl){return '<tr><td>'+p+'</td><td>'+e+'</td><td class="hi">'+r.toFixed(1)+'</td><td>'+rl.toFixed(1)+'</td></tr>';}
 function renderFlow(){
-  // 전체 탭 핵심값 실시간 취합 (라벨 위 / 값 아래 줄바꿈, 카드형)
+  // 전체 탭 핵심값 실시간 취합 (라벨 한 줄, 값만 아래 줄바꿈)
   gi('flowbar').innerHTML=
-    fs('aw','세척','효율',R.washEff.toFixed(0)+'%')
-    +fs('ad','탈수','효율',R.dewatEff.toFixed(0)+'%')
-    +fs('ar','건조','효율',R.dryEff.toFixed(0)+'%')
-    +fs('','전기','실운전',R.elecReal.toFixed(0)+'kW')
-    +fs('','CAPA','2CH',R.capa2ch+'매/h')
-    +fs('','월생산','능력',(R.monthlyCapa/10000).toFixed(1)+'만매')
-    +fs('','목표','달성',R.needHours.toFixed(1)+'h/일')
-    +fs('','여유','인력',R.freeManHourMonth>0?Math.round(R.freeManHourMonth)+'인시':'—');
+    fs('aw','세척효율',R.washEff.toFixed(0)+'%')
+    +fs('ad','탈수효율',R.dewatEff.toFixed(0)+'%')
+    +fs('ar','건조효율',R.dryEff.toFixed(0)+'%')
+    +fs('','전기 실운전',R.elecReal.toFixed(0)+'kW')
+    +fs('','CAPA 2CH',R.capa2ch+'매/h')
+    +fs('','월생산 능력',(R.monthlyCapa/10000).toFixed(1)+'만매')
+    +fs('','목표 달성',R.needHours.toFixed(1)+'h/일')
+    +fs('','여유 인력',R.freeManHourMonth>0?Math.round(R.freeManHourMonth)+'인시':'—');
 }
-function fs(c,n,sub,v){return '<div class="flowstep '+c+'"><div class="fn">'+n+'</div><div class="fsub">'+sub+'</div><div class="fv">'+v+'</div></div>';}
+function fs(c,n,v){return '<div class="flowstep '+c+'"><div class="fn">'+n+'</div><div class="fv">'+v+'</div></div>';}
 function renderBlowerInfo(){
   const el=gi('blowerInfo'); if(!el)return;
   calcAll();
