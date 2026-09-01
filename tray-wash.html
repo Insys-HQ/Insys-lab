@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v5.8 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v5.9 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -65,7 +65,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 .fl label{font-size:13px;font-weight:600;color:#5a7088;}
 .fl input,.fl select{border:1.5px solid #c5d5e5;border-radius:7px;padding:6px 8px;font-size:14px;font-family:inherit;font-weight:600;color:var(--ink);background:#fff;}
 .fl input:focus,.fl select:focus{outline:none;border-color:var(--teal);}
-.fl .un{font-size:13px;color:#9aabb8;}
+.fl-in{display:flex;align-items:center;gap:5px;}
+.fl-in input{flex:1;min-width:0;}
+.fl .un{font-size:13px;color:#9aabb8;white-space:nowrap;flex-shrink:0;}
 .s-rec{background:#e3f4fd !important;border-color:#0d7fa8 !important;}
 .s-auto{background:#e8f5e9 !important;border-color:#43a047 !important;}
 .sv{background:#f8fafc;border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin-bottom:7px;}
@@ -162,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v5.8</span>
+    <span class="vb">v5.9</span>
   </div>
 </div>
 </div>
@@ -205,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v5.8 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v5.9 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v5.8
+// 트레이 세척·탈수·건조 시뮬레이터 v5.9
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='5.8';
+const VER='5.9';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -1199,7 +1201,7 @@ function renderLeft(){
     });
   });
 }
-function fld(id,l,u,v){return '<div class="fl"><label>'+l+'</label><input type="number" id="'+id+'" value="'+v+'"><span class="un">'+u+'</span></div>';}
+function fld(id,l,u,v){return '<div class="fl"><label>'+l+'</label><div class="fl-in"><input type="number" id="'+id+'" value="'+v+'"><span class="un">'+u+'</span></div></div>';}
 function sel(id,l,o,c){return '<div class="fl"><label>'+l+'</label><select id="'+id+'">'+o.map(x=>'<option value="'+x[0]+'"'+(x[0]===c?' selected':'')+'>'+x[1]+'</option>').join('')+'</select></div>';}
 
 // ── 우측 결과 ──
