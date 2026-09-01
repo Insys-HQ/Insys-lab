@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v5.3 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v5.4 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -162,7 +162,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v5.3</span>
+    <span class="vb">v5.4</span>
   </div>
 </div>
 </div>
@@ -205,19 +205,19 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v5.3 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v5.4 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v5.3
+// 트레이 세척·탈수·건조 시뮬레이터 v5.4
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='5.3';
+const VER='5.4';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
 const S={
   // 트레이 규격 (세워서 투입)
-  trayW:430,trayD:330,trayT:150,pocketDepth:45,qty:500,dlv:3,
+  trayW:430,trayD:330,trayT:150,pocketCount:6,qty:500,dlv:3,
   nozzleLayout:'cross',  // vertical(수직)/cross(교차각도)/horizontal(수평)
   // 세척 (2CH 고정)
   wZones:3,wHole:2.5,wTemp:60,
@@ -316,21 +316,23 @@ function ductSpec(idMm){
 
 // ── 물리 계산 ──
 function nozzleQ(h,p){const Cd=0.62,r=h/1000/2,A=Math.PI*r*r;return Cd*Math.sqrt(2*p*1000/1000)*A*1000*60;}
-// 노즐 배치별 세척 효율 계수 (포켓 깊이 반영)
+// 노즐 배치별 세척 효율 계수 (포켓 개수 반영)
 // vertical: 바닥100%·측면40%, cross: 바닥90%·측면85%, horizontal: 폭커버
-function layoutEfficiency(layout, pocketDepth){
-  // 포켓 깊을수록 측면 세척 중요 → 수직배치 불리, 교차 유리
-  const deepFactor = Math.min(1, pocketDepth/100); // 깊이 100mm+ 완전 깊음
+// 포켓 개수별 세척효율 계수 (많을수록 사각지대·잔류↑ → 효율↓)
+function pocketPenalty(pocketCount){
+  return Math.min(0.30, Math.log(Math.max(1,pocketCount))*0.08); // 최대 30% 저하
+}
+// 노즐 배치별 세척 효율 (포켓 개수 반영)
+function layoutEfficiency(layout, pocketCount){
+  const pFactor = Math.min(1, pocketCount/12); // 포켓 12개+ 완전 복잡
   if(layout==='cross'){
-    // 교차 각도: 측면까지 세척, 깊어도 유지
-    return 0.90 + 0.05*(1-deepFactor);
+    return 0.90 + 0.05*(1-pFactor); // 교차: 포켓 많아도 측면 세척 유지
   } else if(layout==='horizontal'){
-    return 0.78 - 0.05*deepFactor; // 수평: 폭 커버, 깊으면 측면 부족
+    return 0.78 - 0.05*pFactor;
   } else if(layout==='vertical_arr'){
-    return 0.80 - 0.03*deepFactor; // 수직배치: 진행방향
-  } else { // vertical (전체 수직 분사)
-    // 얕으면 좋고 깊으면 측면 못 닿아 급감
-    return 0.95 - 0.35*deepFactor;
+    return 0.80 - 0.03*pFactor;
+  } else { // vertical
+    return 0.90 - 0.30*pFactor; // 수직: 포켓 많으면 사각지대 급증
   }
 }
 // 커버폭 = 2 × 이격 × tan(분사각/2)
@@ -507,7 +509,7 @@ function bindSlider(id){
   el.addEventListener('input',()=>{rg.value=el.value;el.classList.add('s-user');onChange(id);});
 }
 function syncState(){
-  ['trayW','trayD','trayT','pocketDepth','qty','dlv','wHole','wSprayAngle','wNozzleDist','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
+  ['trayW','trayD','trayT','pocketCount','qty','dlv','wHole','wSprayAngle','wNozzleDist','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
   const bt=gi('boilerType');if(bt)S.boilerType=bt.value;
   const wi=gi('wTankIns');if(wi)S.wTankIns=wi.checked;
   const bi=gi('boilerIns');if(bi)S.boilerIns=bi.checked;
@@ -675,7 +677,9 @@ function calcAll(){
   const attackEff = attackEfficiency(S.knifeAng);
   const slantDist = slantGap(S.knifeGap, S.knifeAng);
   // 탈수: 충돌압·블로어 감당률 반영
-  const residual = residualWater(qtyH, S.knifePass, S.knifeAng, S.knifePress, S.knifeSlot, S.knifeGap, blowerRatio);
+  // 포켓 개수 → 트레이당 잔수 증가 (탈수 부담)
+  const pocketWater = 1 + S.pocketCount*0.02; // 포켓당 잔수 2%↑
+  const residual = residualWater(qtyH, S.knifePass, S.knifeAng, S.knifePress, S.knifeSlot, S.knifeGap, blowerRatio) * pocketWater;
   const dryKW=dryerKW(residual,S.dryAirVol,S.dryTemp-20,S.dryRecirc);
   // ── 급수 방식별 물·가열 에너지 계산 ──
   const rinseW = S.rinseWater;      // 헹굼 청수 L/h
@@ -741,8 +745,8 @@ function calcAll(){
     baseRem=baseRem/dirtHardness; // 오염 저항 반영
     dirt=dirt*(1-Math.min(0.9,baseRem*tempF));
   });
-  // 노즐 배치·포켓 깊이 반영
-  const layoutEff = layoutEfficiency(S.nozzleLayout, S.pocketDepth);
+  // 노즐 배치·포켓 개수 반영
+  const layoutEff = layoutEfficiency(S.nozzleLayout, S.pocketCount);
   const washEffBase = Math.min(99,Math.max(30,100-dirt));
   // ★ 체류시간 반영: 각 단 조길이/속도 = 체류, 부족하면 효율 저하
   const washSpeed = (S.qty*(S.trayPitch/1000)/60)/60; // m/s
@@ -757,7 +761,8 @@ function calcAll(){
   });
   const dwellFactor = dwellCount>0 ? dwellFactorSum/dwellCount : 1;
   // 체류 부족 시 효율 저하 (체류계수 곱)
-  const washEff = Math.min(99, washEffBase * (layoutEff/0.9) * (0.4+0.6*dwellFactor));
+  const pocketPen = pocketPenalty(S.pocketCount);
+  const washEff = Math.min(99, washEffBase * (layoutEff/0.9) * (0.4+0.6*dwellFactor) * (1-pocketPen));
   const dewatEff=Math.min(99,(1-residual/(qtyH*0.03))*100);
   const dryEff=Math.min(99,65+S.dryTemp*0.28+S.dryRecirc*0.12);
   // 노즐 배열 정보 (분사각·이격 연동)
@@ -875,7 +880,7 @@ function calcAll(){
   // 체류 충분성 판정
   const washOK = dwellWash>=needWash, dewatOK=dwellDewat>=needDewat, dryOK=dwellDry>=needDry;
 
-  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,nPerFace,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
+  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,nPerFace,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
 }
 
 // ── 좌측 렌더 ──
@@ -944,14 +949,14 @@ function renderLeft(){
       +'<div class="st">② 트레이 · 공통 조건</div>'
       +'<div style="display:grid;grid-template-columns:1.1fr 1fr;gap:10px;align-items:start;">'
       +'<div>' // 좌: 입력 (컴팩트)
-      +'<div class="g4c">'+fld('trayW','폭(높이)','mm',S.trayW)+fld('trayD','깊이','mm',S.trayD)+fld('trayT','두께','mm',S.trayT)+fld('pocketDepth','포켓깊이','mm',S.pocketDepth)+'</div>'
-      +'<div style="margin-top:5px;font-size:12px;padding:4px 8px;border-radius:6px;background:'+(S.pocketDepth>30?'#fff3e0':'#e8f5e9')+';color:'+(S.pocketDepth>30?'#e65100':'#1b5e20')+';font-weight:700;">측면 세척 '+(S.pocketDepth>30?'필요(깊은포켓)':'불필요(얕음)')+'</div>'
+      +'<div class="g4c">'+fld('trayW','폭(높이)','mm',S.trayW)+fld('trayD','깊이','mm',S.trayD)+fld('trayT','두께','mm',S.trayT)+fld('pocketCount','포켓 개수','칸',S.pocketCount)+'</div>'
+      +'<div style="margin-top:5px;font-size:12px;padding:4px 8px;border-radius:6px;background:'+(S.pocketCount>=6?'#fff3e0':'#e8f5e9')+';color:'+(S.pocketCount>=6?'#e65100':'#1b5e20')+';font-weight:700;">포켓 '+S.pocketCount+'칸 → 세척효율 '+(R.pocketPen*100).toFixed(0)+'%↓ · 권장노즐 '+Math.round(S.pocketCount*1.5)+'개/면</div>'
       +'</div>'
       +'<div style="background:#f5f8fc;border:1px solid #dde5ee;border-radius:8px;padding:8px 10px;">' // 우: 규격 범위
       +'<div style="font-size:12px;font-weight:800;color:#0d2137;margin-bottom:5px;">📏 표준 규격 범위 (W×D×H)</div>'
       +'<div style="font-size:12px;color:#37474f;line-height:1.7;">'
       +'<b>트레이 규격</b><br>'
-      +'&nbsp;· 대형 430×330×150 (포켓45)<br>'
+      +'&nbsp;· 대형 430×330×150 (포켓6칸)<br>'
       +'&nbsp;· 소형 320×210×50<br><br>'
       +'<b>투입:</b> 세워서 진행<br>&nbsp;→ 피치 400mm(포켓형상 대응)<br><br>'
       +'<b>여유 감안 기본값</b><br>'
@@ -973,9 +978,9 @@ function renderLeft(){
       +'<div class="g2"><div class="fl"><label>노즐 배열</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="wAutoArray" '+(S.wAutoArray?'checked':'')+'> 분사각·이격 자동 배열</label></div><div></div></div>'
       +'<div class="st">노즐 각도 배치 <span style="color:#0d7fa8;font-size:12px;">(포켓 측면 세척)</span></div>'
       +'<div class="g2">'+sel('nozzleLayout','배치 방식',[['cross','교차각도(±) — 포켓 측면 세척'],['vertical','전체 수직 — 바닥 세척'],['horizontal','수평 배치 — 폭방향'],['vertical_arr','수직 배치 — 진행방향']],S.nozzleLayout)+'<div class="fl"><label>배치 효율</label><input type="text" value="'+(R.layoutEff*100).toFixed(0)+'%" readonly style="background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#1b5e20;font-family:inherit;"></div></div>'
-      +'<div class="chbox" style="background:'+(S.nozzleLayout==='cross'?'#e8f5e9':S.pocketDepth>30&&S.nozzleLayout==='vertical'?'#ffebee':'#fff8e1')+';border-color:'+(S.nozzleLayout==='cross'?'#a5d6a7':'#ffcc80')+';color:'+(S.nozzleLayout==='cross'?'#1b5e20':'#e65100')+';">'
-      +(S.nozzleLayout==='cross'?'🔀 <b>교차 각도 배치</b>: 노즐 열마다 각도를 반대로(±) → 홀수열은 우측벽, 짝수열은 좌측벽 타격. <b>깊은 포켓('+S.pocketDepth+'mm) 측면까지 세척</b> (효율 '+(R.layoutEff*100).toFixed(0)+'%)'
-        :S.nozzleLayout==='vertical'?'⬇️ <b>전체 수직 분사</b>: 바닥 세척 우수. '+(S.pocketDepth>30?'⚠️ 포켓 '+S.pocketDepth+'mm 측면에 안 닿음 → 효율 '+(R.layoutEff*100).toFixed(0)+'%로 저하. 교차 배치 권장':'얕은 트레이엔 충분')
+      +'<div class="chbox" style="background:'+(S.nozzleLayout==='cross'?'#e8f5e9':S.pocketCount>=6&&S.nozzleLayout==='vertical'?'#ffebee':'#fff8e1')+';border-color:'+(S.nozzleLayout==='cross'?'#a5d6a7':'#ffcc80')+';color:'+(S.nozzleLayout==='cross'?'#1b5e20':'#e65100')+';">'
+      +(S.nozzleLayout==='cross'?'🔀 <b>교차 각도 배치</b>: 노즐 열마다 각도를 반대로(±) → 홀수열은 우측벽, 짝수열은 좌측벽 타격. <b>포켓 '+S.pocketCount+'칸 측면까지 세척</b> (효율 '+(R.layoutEff*100).toFixed(0)+'%)'
+        :S.nozzleLayout==='vertical'?'⬇️ <b>전체 수직 분사</b>: 바닥 세척 우수. '+(S.pocketCount>=6?'⚠️ 포켓 '+S.pocketCount+'칸 측면에 안 닿음 → 효율 '+(R.layoutEff*100).toFixed(0)+'%로 저하. 교차 배치 권장':'포켓 적어 충분')
         :S.nozzleLayout==='horizontal'?'↔️ <b>수평 배치</b>: 컨베이어 진행방향 직각으로 폭 커버. 측면 세척은 부족'
         :'⬆️ <b>수직 배치</b>: 진행방향과 나란히 연속 타격. 폭 커버는 양호')+'</div>'
       +sliderHTML('wTemp','🌡️ 세척온도(공통)','°C',20,90,1,S.wTemp,50,65)
@@ -1125,7 +1130,7 @@ function renderLeft(){
       +srow('세척','여과 시스템','금속망'+(S.meshFilter?S.meshSize+'#':'X')+' · 슬러지'+(S.sludgeFilter?S.sludgeMesh+'#':'X')+' · 펌프흡입'+(S.pumpStrainer?S.strainerMesh+'#':'X')+(S.autoBackwash?' · 자동역세':''))
       +srow('노즐','직경/각도/이격','Ø'+S.wHole+'mm · '+S.wSprayAngle+'° · 이격'+S.wNozzleDist+'mm · 커버'+R.nozzleInfo.coverW.toFixed(0)+'mm')
       +srow('노즐','배열',R.nozzleInfo.nc+'×'+R.nozzleInfo.nr+'개/면 × 4 = 총 '+(R.nozzleInfo.nc*R.nozzleInfo.nr*4)+'개')
-      +srow('노즐','각도배치',(S.nozzleLayout==='cross'?'교차각도(±)':S.nozzleLayout==='vertical'?'전체수직':S.nozzleLayout==='horizontal'?'수평':'수직배치')+' · 포켓'+S.pocketDepth+'mm · 배치효율'+(R.layoutEff*100).toFixed(0)+'%')
+      +srow('노즐','각도배치',(S.nozzleLayout==='cross'?'교차각도(±)':S.nozzleLayout==='vertical'?'전체수직':S.nozzleLayout==='horizontal'?'수평':'수직배치')+' · 포켓'+S.pocketCount+'칸 · 배치효율'+(R.layoutEff*100).toFixed(0)+'%')
       +srow('세척','사용 단',(S.stageCombo==='all'?'1·2·3단 전체':S.stageCombo==='13'?'1·3단만':'1단만')+' · 저수조 '+R.actStages.length+'개')
       +srow('세척','저수조',R.stgTanks.filter(function(t){return t.active;}).map(function(t){return ['1차','2차','3차'][t.idx]+' '+t.tankL+'L('+t.dimW+'×'+t.dimD+'×'+t.dimH+')';}).join(' / ')+' 총'+R.tankL+'L')
       +srow('세척','펌프/배수',R.washPumpTotal.toFixed(1)+'kW · '+S.wTemp+'°C · 배수조'+R.drainCount+'개 · 단열'+(S.wTankIns?'O':'X'))
@@ -1181,7 +1186,7 @@ function renderLeft(){
       const needRerender =
         el.id==='boilerType'||el.id==='containerType'||el.id==='supplyMode'||el.id==='aux1st'
         ||el.id==='meshFilter'||el.id==='sludgeFilter'||el.id==='pumpStrainer'
-        ||el.id==='drainMode'||el.id==='stgTankMode'||el.id==='dlv'||el.id==='wAutoArray'||el.id==='nozzleLayout'||el.id==='pocketDepth'
+        ||el.id==='drainMode'||el.id==='stgTankMode'||el.id==='dlv'||el.id==='wAutoArray'||el.id==='nozzleLayout'||el.id==='pocketCount'
         ||(el.id&&el.id.startsWith('stgType'))
         ||['washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch','qty','tempSensor','rinseTemp','rinseWater','hours','days','targetMonth','workers','wage'].indexOf(el.id)>=0||(el.id&&el.id.startsWith('directValve'))
         ||(el.id&&el.id.startsWith('stg'));
@@ -1316,7 +1321,7 @@ function buildRec(){
   if(S.knifeAng<45||S.knifeAng>60)r.push('📐 <b>에어나이프 '+S.knifeAng+'°</b> → 45~60°로 조정 시 물 제거↑');
   if(S.knifePass<4)r.push('🔪 <b>면당 '+S.knifePass+'패스</b> → 4패스 권장 (완전 탈수 → 건조부하 급감)');
   if(!R.gapOK)r.push('↔️ <b>이격거리 '+S.knifeGap+'mm 부적정</b> → 슬릿 '+S.knifeSlot+'mm 기준 '+R.gapOpt.lo+'~'+R.gapOpt.hi+'mm로 조정 (충돌풍속 확보)');
-  if(S.pocketDepth>30 && S.nozzleLayout==='vertical')r.push('🔀 <b>깊은 포켓('+S.pocketDepth+'mm) + 전체 수직 분사</b> → 측면 세척 부족(효율 '+(R.layoutEff*100).toFixed(0)+'%). 교차각도 배치로 바꾸면 측벽까지 세척');
+  if(S.pocketCount>=6 && S.nozzleLayout==='vertical')r.push('🔀 <b>포켓 '+S.pocketCount+'칸 + 전체 수직 분사</b> → 측면 세척 부족(효율 '+(R.layoutEff*100).toFixed(0)+'%). 교차각도 배치로 바꾸면 측벽까지 세척');
   if(S.knifeAng<45||S.knifeAng>60)r.push('🎯 <b>에어나이프 입사각 '+S.knifeAng+'°</b> → 45~60°로 조정 시 물 제거효율↑ (현재 '+(R.attackEff*100).toFixed(0)+'%). 수직(90°)은 물 튐, 30°이하는 힘 부족');
   if(R.blowerSel.blowerShortage)r.push('🔴 <b>탈수 위험: 블로어 풍량 부족('+(R.blowerSel.blowerRatio*100).toFixed(0)+'%)</b> → 탈수율 '+R.dewatEff.toFixed(0)+'%로 저하. 블로어 대수↑ 또는 나이프 수↓ 또는 나이프 정압↑ 필수 (설비 재제작 방지)');
   r.push('💨 <b>링블로어 '+R.blowerSel.unit.kw+'kW × '+R.blowerSel.count+'대</b> (총'+R.blowerSel.totalKW.toFixed(1)+'kW) — 나이프 '+S.blowerPerN+'개당 1대 배분');
