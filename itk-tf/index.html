@@ -189,7 +189,7 @@
       <h1>화재복구·공장신축 TF 통합관리</h1>
       <div class="sub">인시스 AI혁신 연구개발실</div>
     </div>
-    <div class="meta">v2.5<br>ys.kim@in-sys.co.kr</div>
+    <div class="meta">v2.6<br>ys.kim@in-sys.co.kr</div>
   </div>
 </header>
 
@@ -228,6 +228,7 @@
           <option value="기타">기타</option>
         </select>
         <input type="text" id="photoMemo" placeholder="한줄 메모 (예: 3층 골조 철거 완료)">
+        <input type="date" id="photoShotDate" title="촬영일자">
         <button onclick="uploadPhoto()">업로드</button>
       </div>
       <div class="progress" id="photoProgress"></div>
@@ -397,10 +398,11 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "2.5";
+const APP_VERSION = "2.6";
 
 async function boot(){
   initNav();
+  document.getElementById('photoShotDate').value = todayStr();
   loadTracks();
   loadPhotos();
   loadStageProgress();
@@ -541,6 +543,8 @@ async function uploadPhoto(){
   if(files.length===0){ alert('사진을 선택해주세요.'); return; }
   const cat = document.getElementById('photoCat').value;
   const memo = document.getElementById('photoMemo').value;
+  const shotDateInput = document.getElementById('photoShotDate').value;
+  const shotDate = shotDateInput || todayStr();
   const progEl = document.getElementById('photoProgress');
   const barWrap = document.getElementById('photoProgressBarWrap');
   const bar = document.getElementById('photoProgressBar');
@@ -559,7 +563,7 @@ async function uploadPhoto(){
         bar.style.width = pct + '%';
       });
       await addDoc(collection(db,'photos'), {
-        url, storagePath: path, category: cat, memo,
+        url, storagePath: path, category: cat, memo, shotDate,
         createdAt: serverTimestamp()
       });
     }
@@ -574,6 +578,14 @@ async function uploadPhoto(){
     progEl.textContent = '업로드 실패: ' + e.message;
     barWrap.style.display = 'none';
   }
+}
+
+function todayStr(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
 }
 window.uploadPhoto = uploadPhoto;
 
@@ -642,7 +654,10 @@ async function loadPhotos(){
         <span class="del" onclick="delPhoto('${d.id}','${p.storagePath}')">삭제</span>
         <span class="tag">${p.category||'기타'}</span>
         <div class="memo">${p.memo||''}</div>
-        <div class="date">${p.createdAt ? formatTs(p.createdAt) : ''}</div>
+        <div class="date" id="photo-date-${d.id}">
+          📅 ${photoDateLabel(p)}
+          <span onclick="editPhotoDate('${d.id}')" style="color:var(--accent);cursor:pointer;margin-left:4px;">수정</span>
+        </div>
       </div>
     `;
     grid.appendChild(el);
@@ -699,6 +714,32 @@ window.delPhoto = async function(id, path){
   await deleteDoc(doc(db,'photos',id));
   try{ await deleteObject(ref(storage, path)); }catch(e){}
   loadPhotos();
+};
+
+// 촬영일자 표시(년월일만) - shotDate가 없는 기존 사진은 업로드일(createdAt)의 날짜만 사용
+function photoDateLabel(p){
+  if(p.shotDate) return p.shotDate;
+  if(p.createdAt) return formatTs(p.createdAt).split(' ')[0];
+  return '날짜미상';
+}
+
+window.editPhotoDate = function(id){
+  const p = photoCache[id];
+  const wrap = document.getElementById('photo-date-' + id);
+  const current = p.shotDate || (p.createdAt ? formatTs(p.createdAt).split(' ')[0] : todayStr());
+  wrap.innerHTML = `
+    <input type="date" id="photoDateInput-${id}" value="${current}" style="font-size:var(--fs-min);padding:2px 4px;">
+    <span onclick="savePhotoDate('${id}')" style="color:var(--accent);cursor:pointer;margin-left:4px;">저장</span>
+    <span onclick="loadPhotos()" style="color:var(--text-sub);cursor:pointer;margin-left:4px;">취소</span>
+  `;
+};
+
+window.savePhotoDate = async function(id){
+  const val = document.getElementById('photoDateInput-' + id).value;
+  if(!val) return;
+  await setDoc(doc(db,'photos',id), {shotDate: val}, {merge:true});
+  loadPhotos();
+  loadConstructionTimeline();
 };
 
 window.openLightbox = function(url){
@@ -965,16 +1006,19 @@ async function loadConstructionTimeline(){
   });
   if(items.length===0){ wrap.innerHTML = '<div class="empty">해당 단계의 공사 사진이 없습니다.</div>'; return; }
 
-  // 날짜별 그룹핑
+  // 날짜별 그룹핑 (촬영일자 기준)
   const groups = {};
   items.forEach(p=>{
-    const dateKey = p.createdAt ? formatTs(p.createdAt).split(' ')[0] : '날짜미상';
+    const dateKey = photoDateLabel(p);
     if(!groups[dateKey]) groups[dateKey] = [];
     groups[dateKey].push(p);
   });
 
+  // 최신 날짜가 위로 오도록 정렬
+  const sortedKeys = Object.keys(groups).sort((a,b)=> a < b ? 1 : -1);
+
   wrap.innerHTML = '';
-  Object.keys(groups).forEach(dateKey=>{
+  sortedKeys.forEach(dateKey=>{
     const dayBlock = document.createElement('div');
     dayBlock.style.marginBottom = '18px';
     const dayTitle = document.createElement('div');
