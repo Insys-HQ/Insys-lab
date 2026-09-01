@@ -189,7 +189,7 @@
       <h1>화재복구·공장신축 TF 통합관리</h1>
       <div class="sub">인시스 AI혁신 연구개발실</div>
     </div>
-    <div class="meta">v2.7<br>ys.kim@in-sys.co.kr</div>
+    <div class="meta">v2.8<br>ys.kim@in-sys.co.kr</div>
   </div>
 </header>
 
@@ -398,7 +398,7 @@ const storage = getStorage(app);
 const LEGAL_ANALYZE_URL = "https://insys-legal-225275784859.asia-northeast3.run.app";
 
 // 앱 버전 (배포할 때마다 이 값과 version.json을 함께 올려야 업데이트 배너가 뜹니다)
-const APP_VERSION = "2.7";
+const APP_VERSION = "2.8";
 
 async function boot(){
   initNav();
@@ -759,11 +759,24 @@ window.editPhotoDate = function(id){
 };
 
 window.savePhotoDate = async function(id){
-  const val = document.getElementById('photoDateInput-' + id).value;
-  if(!val) return;
-  await setDoc(doc(db,'photos',id), {shotDate: val}, {merge:true});
-  loadPhotos();
-  loadConstructionTimeline();
+  const input = document.getElementById('photoDateInput-' + id);
+  const val = input ? input.value : '';
+  if(!val){ alert('날짜를 선택해주세요.'); return; }
+  try{
+    await setDoc(doc(db,'photos',id), {shotDate: val}, {merge:true});
+    // 저장이 실제로 반영됐는지 즉시 재확인
+    const check = await getDoc(doc(db,'photos',id));
+    if(!check.exists() || check.data().shotDate !== val){
+      alert('저장이 반영되지 않았습니다. 네트워크 상태를 확인하고 다시 시도해주세요.');
+      return;
+    }
+    photoCache[id] = check.data();
+    loadPhotos();
+    loadConstructionTimeline();
+  }catch(e){
+    console.error('촬영일자 저장 실패', e);
+    alert('촬영일자 저장에 실패했습니다: ' + e.message);
+  }
 };
 
 window.openLightbox = function(url){
