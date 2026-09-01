@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v5.1 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v5.2 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -162,7 +162,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v5.1</span>
+    <span class="vb">v5.2</span>
   </div>
 </div>
 </div>
@@ -205,13 +205,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v5.1 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v5.2 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v5.1
+// 트레이 세척·탈수·건조 시뮬레이터 v5.2
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='5.1';
+const VER='5.2';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -258,7 +258,7 @@ const S={
   workers:2, wage:12000, convType:'through',
   // 기구·구조
   convLen:12000,clipPitch:500,guideRod:true,trayWeight:50,
-  washDryLen:4000,dewatLen:2000,dryLen:4000,inLen:500,outLen:500,moduleGap:500,trayPitch:380,
+  washDryLen:4000,dewatLen:2000,dryLen:4000,inLen:500,outLen:500,moduleGap:500,trayPitch:400,
   containerType:'40ft',moduleSplit:true
 };
 const CH=2; // 트레이는 좌우 2CH 고정
@@ -941,7 +941,7 @@ function renderLeft(){
       +'<b>트레이 규격</b><br>'
       +'&nbsp;· 대형 430×330×150 (포켓45)<br>'
       +'&nbsp;· 소형 320×210×50<br><br>'
-      +'<b>투입:</b> 세워서, 짧은변(330) 진행<br>&nbsp;→ 피치 380mm<br><br>'
+      +'<b>투입:</b> 세워서 진행<br>&nbsp;→ 피치 400mm(포켓형상 대응)<br><br>'
       +'<b>여유 감안 기본값</b><br>'
       +'&nbsp;· 대형 기준 설정<br>'
       +'&nbsp;· 설비높이 ~1630<br>'
