@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v8.1 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v8.2 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -56,9 +56,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 .g5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
 .g4c{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
 .g4c input{min-width:0;width:100%;padding:4px 5px;font-size:13px;}
-.g4c label{font-size:11px;}
+.g4c label{font-size:13px;}
 .g5 input{min-width:0;width:100%;padding:5px 4px;font-size:13px;}
-.g5 label{font-size:12px;}
+.g5 label{font-size:13px;}
 @media(max-width:600px){.g5{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:520px){.g3{grid-template-columns:1fr 1fr;}}
 .fl{display:flex;flex-direction:column;gap:3px;}
@@ -144,7 +144,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
 @media(min-width:768px){.flowbar{grid-template-columns:repeat(8,1fr);}}
 .flowstep{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 4px;text-align:center;}
 
-.flowstep .fn{font-size:12px;font-weight:700;color:var(--steel);line-height:1.2;white-space:nowrap;margin-bottom:4px;}
+.flowstep .fn{font-size:13px;font-weight:700;color:var(--steel);line-height:1.2;white-space:nowrap;margin-bottom:4px;}
 .flowstep .fv{font-size:16px;color:var(--navy);font-weight:900;line-height:1.2;}
 .flowstep.aw{border-top:3px solid var(--wash);}.flowstep.aw .fv{color:var(--wash);}
 .flowstep.ad{border-top:3px solid var(--dewat);}.flowstep.ad .fv{color:var(--dewat);}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v8.1</span>
+    <span class="vb">v8.2</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v8.1 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v8.2 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v8.1
+// 트레이 세척·탈수·건조 시뮬레이터 v8.2
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='8.1';
+const VER='8.2';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -1090,12 +1090,12 @@ function renderLeft(){
     var optHtml='<div style="border:2px solid #1565c0;border-radius:10px;padding:9px;background:#e8f1fb;margin-bottom:8px;">'
       +'<div style="font-size:14px;font-weight:800;color:#0d47a1;margin-bottom:6px;">🎯 최적조건 자동 산출 — 목표 효율을 최소 에너지 조건으로 역산</div>'
       +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;align-items:end;">'
-      +'<div><label style="font-size:11px;color:#5a7088;">목표 세척(%)</label><input type="number" id="optTgtWash" value="'+S.optTgtWash+'" style="width:100%;border:1.5px solid #90caf9;border-radius:5px;padding:5px;font-size:13px;font-family:inherit;font-weight:700;"></div>'
-      +'<div><label style="font-size:11px;color:#5a7088;">목표 탈수(%)</label><input type="number" id="optTgtDewat" value="'+S.optTgtDewat+'" style="width:100%;border:1.5px solid #90caf9;border-radius:5px;padding:5px;font-size:13px;font-family:inherit;font-weight:700;"></div>'
-      +'<div><label style="font-size:11px;color:#5a7088;">목표 건조(%)</label><input type="number" id="optTgtDry" value="'+S.optTgtDry+'" style="width:100%;border:1.5px solid #90caf9;border-radius:5px;padding:5px;font-size:13px;font-family:inherit;font-weight:700;"></div>'
+      +'<div><label style="font-size:13px;color:#5a7088;">목표 세척(%)</label><input type="number" id="optTgtWash" value="'+S.optTgtWash+'" style="width:100%;border:1.5px solid #90caf9;border-radius:5px;padding:5px;font-size:13px;font-family:inherit;font-weight:700;"></div>'
+      +'<div><label style="font-size:13px;color:#5a7088;">목표 탈수(%)</label><input type="number" id="optTgtDewat" value="'+S.optTgtDewat+'" style="width:100%;border:1.5px solid #90caf9;border-radius:5px;padding:5px;font-size:13px;font-family:inherit;font-weight:700;"></div>'
+      +'<div><label style="font-size:13px;color:#5a7088;">목표 건조(%)</label><input type="number" id="optTgtDry" value="'+S.optTgtDry+'" style="width:100%;border:1.5px solid #90caf9;border-radius:5px;padding:5px;font-size:13px;font-family:inherit;font-weight:700;"></div>'
       +'<button id="btnOptimize" style="background:#1565c0;color:#fff;border:0;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;">최적조건 적용</button>'
       +'</div>'
-      +(orv?'<div style="margin-top:7px;padding:7px 9px;border-radius:7px;background:'+(orv.ok?'#e8f5e9':'#fff3e0')+';border:1.5px solid '+(orv.ok?'#a5d6a7':'#ffcc80')+';color:'+(orv.ok?'#1b5e20':'#e65100')+';font-size:12px;font-weight:600;line-height:1.6;">'
+      +(orv?'<div style="margin-top:7px;padding:7px 9px;border-radius:7px;background:'+(orv.ok?'#e8f5e9':'#fff3e0')+';border:1.5px solid '+(orv.ok?'#a5d6a7':'#ffcc80')+';color:'+(orv.ok?'#1b5e20':'#e65100')+';font-size:13px;font-weight:600;line-height:1.6;">'
         +(orv.ok?'✅ <b>목표 달성 조건 확정</b>':'⚠️ <b>일부 목표 미달 — 도달 가능한 최대치 적용</b>')+'<br>'
         +'세척 <b>'+orv.washEff.toFixed(1)+'%</b>'+(orv.washHit?'✅':'⚠️')+' / 탈수 <b>'+orv.dewatEff.toFixed(1)+'%</b>'+(orv.dewatHit?'✅':'⚠️')+' / 건조 <b>'+orv.dryEff.toFixed(1)+'%</b>'+(orv.dryHit?'✅':'⚠️')+'<br>'
         +'세척: 압력 '+orv.press+'kPa · 분사각 '+orv.ang+'° · 이격 '+orv.dist+'mm · 노즐간격 '+orv.pitch.toFixed(0)+'mm<br>'
@@ -1117,48 +1117,49 @@ function renderLeft(){
       var inpBg=active?'#fff':'#eceff1';
       stgHtml+='<div style="border:1.5px solid '+bd+';border-radius:9px;padding:8px;background:'+bg+';'+opacity+'">'
         +'<div style="font-weight:800;font-size:13px;color:'+tc+';margin-bottom:5px;text-align:center;">'+(i+1)+'단</div>'
-        +'<div style="font-size:11px;color:'+tc+';text-align:center;margin-bottom:6px;">'+(active?stgNames[i]:'미사용')+'</div>'
-        +'<div style="text-align:center;font-size:12px;font-weight:800;padding:3px;border-radius:5px;background:'+(isRinse?'#b2ebf2':'#bbdefb')+';color:'+(isRinse?'#00838f':'#1565c0')+';margin-bottom:5px;">'+(isRinse?'헹굼(고정)':'세척(고정)')+'</div>'
-        +'<label style="font-size:11px;color:#5a7088;">조 길이(mm)'+(S.stgLenAuto?' <span style="color:#1b5e20;font-weight:800;">자동</span>':'')+'</label>'
+        +'<div style="font-size:13px;color:'+tc+';text-align:center;margin-bottom:6px;">'+(active?stgNames[i]:'미사용')+'</div>'
+        +'<div style="text-align:center;font-size:13px;font-weight:800;padding:3px;border-radius:5px;background:'+(isRinse?'#b2ebf2':'#bbdefb')+';color:'+(isRinse?'#00838f':'#1565c0')+';margin-bottom:5px;">'+(isRinse?'헹굼(고정)':'세척(고정)')+'</div>'
+        +'<label style="font-size:13px;color:#5a7088;">조 길이(mm)'+(S.stgLenAuto?' <span style="color:#1b5e20;font-weight:800;">자동</span>':'')+'</label>'
         +'<input type="number" id="stgLen'+i+'" value="'+S.stgLen[i]+'"'+(S.stgLenAuto?' disabled':dis)+' style="width:100%;border:1.5px solid '+(S.stgLenAuto?'#a5d6a7':'#c5d5e5')+';border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:'+(S.stgLenAuto&&active?'#e8f5e9':inpBg)+';margin-bottom:5px;">'
-        +'<label style="font-size:11px;color:#5a7088;">분사압력(bar)</label>'
+        +'<label style="font-size:13px;color:#5a7088;">분사압력(bar)</label>'
         +'<input type="number" step="0.1" id="stgPress'+i+'" value="'+(S.stgPress[i]/100).toFixed(1)+'"'+dis+' style="width:100%;border:1.5px solid #c5d5e5;border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:'+inpBg+';margin-bottom:5px;">'
-        +'<label style="font-size:11px;color:#5a7088;">↕️ 높이방향 노즐(개/열)'+(S.wAutoArray?' <span style="color:#1b5e20;font-weight:800;">자동</span>':'')+'</label>'
+        +'<label style="font-size:13px;color:#5a7088;">↕️ 높이방향 노즐(개/열)'+(S.wAutoArray?' <span style="color:#1b5e20;font-weight:800;">자동</span>':'')+'</label>'
         +'<input type="number" id="stgCol'+i+'" value="'+S.stgCol[i]+'"'+(S.wAutoArray?' disabled':dis)+' style="width:100%;border:1.5px solid '+(S.wAutoArray?'#a5d6a7':'#c5d5e5')+';border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:'+(S.wAutoArray&&active?'#e8f5e9':inpBg)+';margin-bottom:5px;">'
-        +'<label style="font-size:11px;color:#5a7088;">➡️ 길이방향 노즐 줄(열)'+(S.wAutoArray?' <span style="color:#1b5e20;font-weight:800;">자동</span>':'')+'</label>'
+        +'<label style="font-size:13px;color:#5a7088;">➡️ 길이방향 노즐 줄(열)'+(S.wAutoArray?' <span style="color:#1b5e20;font-weight:800;">자동</span>':'')+'</label>'
         +'<input type="number" id="stgRow'+i+'" value="'+S.stgRow[i]+'"'+(S.wAutoArray?' disabled':dis)+' style="width:100%;border:1.5px solid '+(S.wAutoArray?'#a5d6a7':'#c5d5e5')+';border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:'+(S.wAutoArray&&active?'#e8f5e9':inpBg)+';margin-bottom:5px;">'
-        +(S.pumpMode==='fixed'&&active?'<label style="font-size:11px;color:#5a7088;">펌프 정격유량(LPM)</label><input type="number" id="stgPumpLpm'+i+'" value="'+(S.stgPumpLpm[i]>0?S.stgPumpLpm[i]:(d.pumpReq||0))+'"'+dis+' style="width:100%;border:1.5px solid #ffcc80;border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:#fff8e1;margin-bottom:5px;">':'')
+        +(S.pumpMode==='fixed'&&active?'<label style="font-size:13px;color:#5a7088;">펌프 정격유량(LPM)</label><input type="number" id="stgPumpLpm'+i+'" value="'+(S.stgPumpLpm[i]>0?S.stgPumpLpm[i]:(d.pumpReq||0))+'"'+dis+' style="width:100%;border:1.5px solid #ffcc80;border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:#fff8e1;margin-bottom:5px;">':'')
         +(active
-          ?'<div style="font-size:11px;color:'+tc+';font-weight:600;line-height:1.5;border-top:1px dashed '+bd+';padding-top:5px;">'
+          ?'<div style="font-size:13px;color:'+tc+';font-weight:600;line-height:1.5;border-top:1px dashed '+bd+';padding-top:5px;">'
             +'체류 <b>'+((S.stgLen[i]/1000)/((S.qty*(S.trayPitch/1000)/60)/60)).toFixed(0)+'초</b><br>'
             +'노즐 길이'+(d.nL||'—')+'줄 × 높이'+(d.nH||'—')+'개 = <b>'+(d.nPerFace||'—')+'/면</b><br>'
             +'전체 <b>'+(d.nozTotal||'—')+'개</b> (2면×2CH)<br>'
             +'실제압력 <b>'+(d.press?(d.press/100).toFixed(2):'—')+'bar</b>'+(d.pressDrop>2?' <span style="color:#c62828;">▼'+d.pressDrop+'%</span>':'')+'<br>'
             +'펌프 '+(d.pkw?d.pkw.toFixed(2):'—')+'kW · 정격'+(d.pumpRated||'—')+'LPM<br>'
             +'유량 '+(d.flow?d.flow.toFixed(0):'—')+'LPM</div>'
-          :'<div style="font-size:11px;color:#999;text-align:center;border-top:1px dashed #d0d5db;padding-top:5px;">저수조·펌프<br>불필요</div>')
+          :'<div style="font-size:13px;color:#999;text-align:center;border-top:1px dashed #d0d5db;padding-top:5px;">저수조·펌프<br>불필요</div>')
         +'</div>';
     }
     stgHtml+='</div>';
     stgHtml = optHtml + stgHtml;
 
+    var coverMmOverlap = R.nozzleInfo.coverW - R.nozPitch;   // 인접 노즐 중첩량(mm)
         h='<div class="card"><div class="ch"><span class="ci">💧</span><span class="cl">세척부 설계 (단계별 독립)</span><span class="cq">실시간 연동</span></div><div class="cb">'
       // ══ ① 상단 실시간 요약 대시보드 (항상 최상단 고정) ══
       +'<div style="background:linear-gradient(135deg,#e3f2fd,#e8f5e9);border:2px solid #90caf9;border-radius:11px;padding:11px 13px;margin-bottom:11px;">'
       +'<div style="font-size:14px;font-weight:800;color:#0d2137;margin-bottom:8px;">📊 실시간 세척 성능 (값 변경 시 즉시 반영)</div>'
       +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;">'
-      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:19px;font-weight:900;color:'+(R.dwellFactor<0.8?'#e65100':'#1b5e20')+';">'+R.washEff.toFixed(0)+'%</div><div style="font-size:12px;color:#5a7088;">세척효율(체류'+(R.dwellFactor*100).toFixed(0)+'%)</div></div>'
-      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:19px;font-weight:900;color:#0d47a1;">'+R.capa2ch+'</div><div style="font-size:12px;color:#5a7088;">CAPA 매/h(2CH)</div></div>'
-      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:19px;font-weight:900;color:#6a1b9a;">'+R.washPumpTotal.toFixed(1)+'</div><div style="font-size:12px;color:#5a7088;">순환펌프 kW</div></div>'
-      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:17px;font-weight:900;color:#00695c;">'+R.actStages.length+'단</div><div style="font-size:12px;color:#5a7088;">세척조 구성</div></div>'
-      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:17px;font-weight:900;color:#e65100;">'+R.tankL+'L</div><div style="font-size:12px;color:#5a7088;">총 저수량</div></div>'
-      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:17px;font-weight:900;color:#c62828;">'+R.recommend.washLen+'</div><div style="font-size:12px;color:#5a7088;">추천 세척조 mm</div></div>'
+      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:19px;font-weight:900;color:'+(R.dwellFactor<0.8?'#e65100':'#1b5e20')+';">'+R.washEff.toFixed(0)+'%</div><div style="font-size:13px;color:#5a7088;">세척효율(체류'+(R.dwellFactor*100).toFixed(0)+'%)</div></div>'
+      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:19px;font-weight:900;color:#0d47a1;">'+R.capa2ch+'</div><div style="font-size:13px;color:#5a7088;">CAPA 매/h(2CH)</div></div>'
+      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:19px;font-weight:900;color:#6a1b9a;">'+R.washPumpTotal.toFixed(1)+'</div><div style="font-size:13px;color:#5a7088;">순환펌프 kW</div></div>'
+      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:17px;font-weight:900;color:#00695c;">'+R.actStages.length+'단</div><div style="font-size:13px;color:#5a7088;">세척조 구성</div></div>'
+      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:17px;font-weight:900;color:#e65100;">'+R.tankL+'L</div><div style="font-size:13px;color:#5a7088;">총 저수량</div></div>'
+      +'<div style="background:#fff;border-radius:8px;padding:7px;text-align:center;"><div style="font-size:17px;font-weight:900;color:#c62828;">'+R.recommend.washLen+'</div><div style="font-size:13px;color:#5a7088;">추천 세척조 mm</div></div>'
       +'</div>'
-      +'<div style="margin-top:7px;font-size:12px;color:#37474f;line-height:1.6;">⏱️ 투입 '+R.feedIntervalSec.toFixed(1)+'초/2개 · 컨베이어 '+R.speedMmin.toFixed(2)+'m/min · 체류 '+R.dwellWash.toFixed(0)+'s(필요'+R.needWash.toFixed(0)+'s '+(R.washOK?'✅':'⚠️')+')</div>'
+      +'<div style="margin-top:7px;font-size:13px;color:#37474f;line-height:1.6;">⏱️ 투입 '+R.feedIntervalSec.toFixed(1)+'초/2개 · 컨베이어 '+R.speedMmin.toFixed(2)+'m/min · 체류 '+R.dwellWash.toFixed(0)+'s(필요'+R.needWash.toFixed(0)+'s '+(R.washOK?'✅':'⚠️')+')</div>'
       +'</div>'
 
       // ══ ② 사용 단 조합 (최상단 - 이걸 바꾸면 아래 전부 연동) ══
-      +'<div class="st">① 사용 단 조합 <span style="color:#c62828;font-size:12px;">(변경 시 저수조·노즐·효율·CAPA 전체 연동)</span></div>'
+      +'<div class="st">① 사용 단 조합 <span style="color:#c62828;font-size:13px;">(변경 시 저수조·노즐·효율·CAPA 전체 연동)</span></div>'
       +'<div class="g2">'+sel('stageCombo','사용 단',[['all','1·2·3단 전체 (예세척+본세척+헹굼)'],['13','1·3단만 (세척+헹굼, 2단 생략)'],['1','1단만 (간이 세척)']],S.stageCombo)+sel('dlv','오염도',[['1','① 경미'],['2','② 보통'],['3','③ 중간'],['4','④ 심함'],['5','⑤ 극심']],String(S.dlv))+'</div>'
       +'<div class="chbox" style="background:#fff8f0;border-color:#ffd9a8;color:#8a5a00;">🎯 <b>'+(S.stageCombo==='all'?'3단 전체':S.stageCombo==='13'?'1·3단만':'1단만')+'</b> 선택됨 → 저수조 '+R.actStages.length+'개, 노즐·펌프·효율이 이 조합에 맞춰 자동 재계산됩니다. 오염도가 낮으면 단수를 줄여 투자·운전비 절감.</div>'
 
@@ -1170,11 +1171,11 @@ function renderLeft(){
       +'<tr><td style="padding:2px 4px;color:#5a7088;">두께</td><td style="padding:2px;"><input type="number" id="trayT" value="'+S.trayT+'" style="width:80px;border:1.5px solid #c5d5e5;border-radius:5px;padding:4px 6px;font-size:13px;font-family:inherit;font-weight:600;"> mm</td>'
       +'<td style="padding:2px 4px;color:#5a7088;">포켓</td><td style="padding:2px;"><input type="number" id="pocketCount" value="'+S.pocketCount+'" style="width:80px;border:1.5px solid #c5d5e5;border-radius:5px;padding:4px 6px;font-size:13px;font-family:inherit;font-weight:600;"> 칸</td></tr>'
       +'</table>'
-      +'<div style="margin-top:4px;font-size:12px;padding:4px 8px;border-radius:6px;background:'+(S.pocketCount>=6?'#fff3e0':'#e8f5e9')+';color:'+(S.pocketCount>=6?'#e65100':'#1b5e20')+';font-weight:700;">현재 트레이 '+S.trayW+'×'+S.trayD+'×'+S.trayT+' · 포켓'+S.pocketCount+'칸 → 세척효율'+(R.pocketPen*100).toFixed(0)+'%↓ · 노즐'+R.nozzleInfo.nc+'×'+R.nozzleInfo.nr+'/면</div>'
+      +'<div style="margin-top:4px;font-size:13px;padding:4px 8px;border-radius:6px;background:'+(S.pocketCount>=6?'#fff3e0':'#e8f5e9')+';color:'+(S.pocketCount>=6?'#e65100':'#1b5e20')+';font-weight:700;">현재 트레이 '+S.trayW+'×'+S.trayD+'×'+S.trayT+' · 포켓'+S.pocketCount+'칸 → 세척효율'+(R.pocketPen*100).toFixed(0)+'%↓ · 노즐'+R.nozzleInfo.nc+'×'+R.nozzleInfo.nr+'/면</div>'
       +'<div class="g2" style="margin-top:6px;">'+fld('qty','처리량(1CH)','매/h',S.qty)+'<div class="fl"><label>세척 단수 (조합 자동)</label><input type="text" value="'+(S.stageCombo==='all'?'3단 (1·2·3)':S.stageCombo==='13'?'2단 (1·3)':'1단')+'" readonly style="background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#1b5e20;font-family:inherit;"></div></div>'
-      +'<div class="st">분사 노즐 설계 <span style="color:#0d7fa8;font-size:12px;">(직경·각도·이격 연동)</span></div>'
+      +'<div class="st">분사 노즐 설계 <span style="color:#0d7fa8;font-size:13px;">(직경·각도·이격 연동)</span></div>'
       +sliderHTML('wHole','💧 노즐 직경','mm',0.5,10,0.1,S.wHole,2,3)
-      +'<div style="font-size:12px;color:#5a7088;margin:-3px 0 5px;">→ 유량 <b>'+R.nozzleInfo.unitQ.toFixed(2)+'LPM</b>/노즐 @'+((S.stgPress[0]||200)/100).toFixed(1)+'bar</div>'
+      +'<div style="font-size:13px;color:#5a7088;margin:-3px 0 5px;">→ 유량 <b>'+R.nozzleInfo.unitQ.toFixed(2)+'LPM</b>/노즐 @'+((S.stgPress[0]||200)/100).toFixed(1)+'bar</div>'
       +sliderHTML('wSprayAngle','📐 분사 각도','°',15,120,5,S.wSprayAngle,45,90)
       +'<label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1565c0;margin:4px 0;cursor:pointer;"><input type="checkbox" id="wDistAuto" '+(S.wDistAuto?'checked':'')+'> ↔️ 이격거리 자동 — 분사각 최적점 추종 (현재 '+S.wSprayAngle+'° → 최적 '+R.nozzleInfo.distOpt.opt+'mm)</label>'
       +sliderHTML('wNozzleDist','↔️ 트레이면 이격거리','mm',30,300,10,S.wNozzleDist,R.nozzleInfo.distOpt.lo,R.nozzleInfo.distOpt.hi)
@@ -1188,13 +1189,17 @@ function renderLeft(){
       +'🎯 세척 계수 <b>'+(R.distFactor*100).toFixed(0)+'%</b> (분사각 '+S.wSprayAngle+'° 최적 '+R.nozzleInfo.distOpt.lo+'~'+R.nozzleInfo.distOpt.hi+'mm '+(R.distFactor>=1?'✅':'⚠️'+(S.wNozzleDist<R.nozzleInfo.distOpt.lo?'가까움·커버부족':'멀어서 충격↓'))+')'+' ('+S.wSprayAngle+'°는 '+(S.wSprayAngle<=30?'직선분사·침투력':S.wSprayAngle<=60?'표준':S.wSprayAngle<=90?'부채·면세척':'광각·근접')+')<br>'
       +'🔲 <b>자동 배열: '+R.nozzleInfo.nc+'×'+R.nozzleInfo.nr+'개/면</b> (분사각·이격에 맞춰 자동 산정)</div>'
       +'<div style="background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px;margin-bottom:8px;">'
-      +'<div style="font-size:12px;font-weight:800;color:#0d2137;margin-bottom:6px;">📐 분사 커버리지 (분사각·이격 연동)</div>'
+      +'<div style="font-size:13px;font-weight:800;color:#0d2137;margin-bottom:6px;">📐 분사 커버리지 (분사각·이격 연동)</div>'
       +nozzleSVG()
-      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-top:6px;">'
-      +'<div style="text-align:center;background:#e3f2fd;border-radius:6px;padding:5px;"><div style="font-size:15px;font-weight:900;color:#1565c0;">'+R.nozzleInfo.coverW.toFixed(0)+'</div><div style="font-size:10px;color:#5a7088;">커버폭mm</div></div>'
-      +'<div style="text-align:center;background:'+(R.distFactor>=1?'#e8f5e9':'#fff3e0')+';border-radius:6px;padding:5px;"><div style="font-size:15px;font-weight:900;color:'+(R.distFactor>=1?'#1b5e20':'#e65100')+';">'+(R.distFactor*100).toFixed(0)+'%</div><div style="font-size:10px;color:#5a7088;">세척계수</div></div>'
-      +'<div style="text-align:center;background:#f3e5f5;border-radius:6px;padding:5px;"><div style="font-size:15px;font-weight:900;color:#6a1b9a;">'+R.nozzleInfo.nc+'×'+R.nozzleInfo.nr+'</div><div style="font-size:10px;color:#5a7088;">배열</div></div>'
-      +'</div></div>'
+      // 치수 라벨은 SVG 밖(HTML)에 배치 — SVG 내부 글자는 화면 확대 배율만큼 커져 본문과 크기가 어긋남
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:7px;">'
+      +'<div style="display:flex;align-items:center;gap:6px;background:#f3e5f5;border-radius:6px;padding:6px 8px;"><span style="width:14px;height:3px;background:#6a1b9a;border-radius:2px;flex:none;"></span><span style="font-size:13px;color:#4a148c;font-weight:700;">노즐 간격 '+R.nozPitch.toFixed(0)+'mm</span></div>'
+      +'<div style="display:flex;align-items:center;gap:6px;background:#e3f2fd;border-radius:6px;padding:6px 8px;"><span style="width:14px;height:3px;background:#1565c0;border-radius:2px;flex:none;"></span><span style="font-size:13px;color:#0d47a1;font-weight:700;">커버폭 '+R.nozzleInfo.coverW.toFixed(0)+'mm</span></div>'
+      +'<div style="display:flex;align-items:center;gap:6px;background:#eceff1;border-radius:6px;padding:6px 8px;"><span style="width:14px;height:3px;background:#546e7a;border-radius:2px;flex:none;"></span><span style="font-size:13px;color:#37474f;font-weight:700;">이격 '+S.wNozzleDist+'mm · 분사각 '+S.wSprayAngle+'°</span></div>'
+      +'<div style="display:flex;align-items:center;gap:6px;background:'+(R.distFactor>=1?'#e8f5e9':'#fff3e0')+';border-radius:6px;padding:6px 8px;"><span style="font-size:13px;color:'+(R.distFactor>=1?'#1b5e20':'#e65100')+';font-weight:700;">세척계수 '+(R.distFactor*100).toFixed(0)+'% · 배열 '+R.nozzleInfo.nc+'×'+R.nozzleInfo.nr+'</span></div>'
+      +'</div>'
+      +'<div style="font-size:13px;color:#37474f;margin-top:6px;line-height:1.5;">'+(coverMmOverlap>0?'🟦 파란 음영 = 인접 노즐 중첩 '+coverMmOverlap.toFixed(0)+'mm':'⚠️ 중첩 없음 — 노즐 사이 미세척 구간 '+(-coverMmOverlap).toFixed(0)+'mm 발생')+'</div>'
+      +'</div>'
       +'<div class="g2"><div class="fl"><label>노즐 배열</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="wAutoArray" '+(S.wAutoArray?'checked':'')+'> 분사각·이격 자동 배열(길이·높이)</label></div>'
       +sel('pumpMode','펌프 운전 방식',[['auto','자동선정 — 설정압 유지(펌프 용량↑)'],['fixed','정격 고정 — 노즐↑ 시 압력강하 반영']],S.pumpMode)+'</div>'
       +'<div class="chbox" style="background:'+(S.pumpMode==='fixed'?'#fff8e1':'#e8f5e9')+';border-color:'+(S.pumpMode==='fixed'?'#ffcc80':'#a5d6a7')+';color:'+(S.pumpMode==='fixed'?'#e65100':'#1b5e20')+';">'
@@ -1202,7 +1207,7 @@ function renderLeft(){
       +R.stgDetail.filter(function(d,ix){return R.actStages.indexOf(ix)>=0;}).map(function(d){
           return (d.idx+1)+'단: 노즐 '+d.nozTotal+'개 → 필요펌프 <b>'+d.pumpReq+'LPM</b> · 실제압력 <b>'+(d.press/100).toFixed(2)+'bar</b>'+(d.pressDrop>2?' <span style="color:#c62828;font-weight:800;">(설정 대비 ▼'+d.pressDrop+'%)</span>':' ✅');
         }).join('<br>')+'</div>'
-      +'<div class="st">노즐 각도 배치 <span style="color:#0d7fa8;font-size:12px;">(포켓 측면 세척)</span></div>'
+      +'<div class="st">노즐 각도 배치 <span style="color:#0d7fa8;font-size:13px;">(포켓 측면 세척)</span></div>'
       +'<div class="g2">'+sel('nozzleLayout','배치 방식',[['cross','교차각도(±) — 포켓 측면 세척'],['vertical','전체 수직 — 바닥 세척'],['horizontal','수평 배치 — 폭방향'],['vertical_arr','수직 배치 — 진행방향']],S.nozzleLayout)+'<div class="fl"><label>배치 효율</label><input type="text" value="'+(R.layoutEff*100).toFixed(0)+'%" readonly style="background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#1b5e20;font-family:inherit;"></div></div>'
       +'<div class="chbox" style="background:'+(S.nozzleLayout==='cross'?'#e8f5e9':S.pocketCount>=6&&S.nozzleLayout==='vertical'?'#ffebee':'#fff8e1')+';border-color:'+(S.nozzleLayout==='cross'?'#a5d6a7':'#ffcc80')+';color:'+(S.nozzleLayout==='cross'?'#1b5e20':'#e65100')+';">'
       +(S.nozzleLayout==='cross'?'🔀 <b>교차 각도 배치</b>: 노즐 열마다 각도를 반대로(±) → 홀수열은 우측벽, 짝수열은 좌측벽 타격. <b>포켓 '+S.pocketCount+'칸 측면까지 세척</b> (효율 '+(R.layoutEff*100).toFixed(0)+'%)'
@@ -1212,12 +1217,12 @@ function renderLeft(){
       +sliderHTML('wTemp','🌡️ 세척온도(공통)','°C',20,90,1,S.wTemp,50,65)
 
       // ══ ④ 단계별 노즐·압력 설정 ══
-      +'<div class="st">③ 단계별 노즐·압력 설정 <span style="color:#0d7fa8;font-size:12px;">(각 단 독립)</span></div>'
+      +'<div class="st">③ 단계별 노즐·압력 설정 <span style="color:#0d7fa8;font-size:13px;">(각 단 독립)</span></div>'
       +'<div class="chbox">🍽️ 노즐수는 <b>면당</b> 기준. 실제 = 입력 × 2면(외벽+격벽) × 2CH = ×4. 1차 고압·다노즐, 헹굼 저압·소노즐이 효율적.</div>'
       +stgHtml
 
       // ══ ⑤ 저수조 추천 (사용 단만) ══
-      +'<div class="st">④ 단별 독립 저수조 <span style="color:#0d7fa8;font-size:12px;">(사용 단만 자동 추천)</span></div>'
+      +'<div class="st">④ 단별 독립 저수조 <span style="color:#0d7fa8;font-size:13px;">(사용 단만 자동 추천)</span></div>'
       +'<div class="g2">'+sel('stgTankMode','저수조 입력',[['auto','자동 최적(회전율)'],['volume','용량 입력→치수'],['dim','치수 입력→용량']],S.stgTankMode)+fld('stgTankFixW','저수조 폭(고정)','mm',S.stgTankFixW)+'</div>'
       +'<table class="tbl" style="margin-top:6px;"><thead><tr><th>단</th><th>유량</th><th>회전</th><th>용량(L)</th><th>폭×길이×깊이(mm)</th></tr></thead><tbody>'
       +R.stgTanks.map(function(t){
@@ -1227,17 +1232,17 @@ function renderLeft(){
           var stI='width:56px;border:1.5px solid #c5d5e5;border-radius:5px;padding:3px 4px;font-size:13px;font-family:inherit;';
           if(S.stgTankMode==='auto'){
             volCell='<span class="hi">'+t.tankL+'L</span>';
-            dimCell='<span style="font-size:12px;color:#5a7088;">'+t.dimW+'×'+t.dimD+'×'+t.dimH+'</span>';
+            dimCell='<span style="font-size:13px;color:#5a7088;">'+t.dimW+'×'+t.dimD+'×'+t.dimH+'</span>';
           } else if(S.stgTankMode==='volume'){
             volCell='<input type="number" id="stgTank'+t.idx+'" value="'+t.tankL+'" style="'+stI+'">';
-            dimCell='<span style="font-size:12px;color:#43a047;font-weight:700;">'+t.dimW+'×'+t.dimD+'×'+t.dimH+'(자동)</span>';
+            dimCell='<span style="font-size:13px;color:#43a047;font-weight:700;">'+t.dimW+'×'+t.dimD+'×'+t.dimH+'(자동)</span>';
           } else {
             volCell='<span class="hi" style="color:#43a047;">'+t.tankL+'L(자동)</span>';
             dimCell='<input type="number" id="stgTankW'+t.idx+'" value="'+t.dimW+'" style="'+stI+'">×<input type="number" id="stgTankD'+t.idx+'" value="'+t.dimD+'" style="'+stI+'">×<input type="number" id="stgTankH'+t.idx+'" value="'+t.dimH+'" style="'+stI+'">';
           }
-          var overMark = t.tankLenOver ? ' <span style="color:#c62828;font-weight:700;font-size:11px;">⚠️세척조('+S.washDryLen+')초과</span>' : '';
+          var overMark = t.tankLenOver ? ' <span style="color:#c62828;font-weight:700;font-size:13px;">⚠️세척조('+S.washDryLen+')초과</span>' : '';
           var turnMark = t.actTurnover<1.5?'⚠️짧음':t.actTurnover>4?'⚠️과대':'✅';
-          return '<tr><td style="font-weight:700;">'+nm+'</td><td>'+(t.flow?t.flow.toFixed(0):'—')+'LPM</td><td style="font-size:12px;">'+t.actTurnover.toFixed(1)+'분'+turnMark+'</td><td>'+volCell+'</td><td>'+dimCell+overMark+'</td></tr>';
+          return '<tr><td style="font-weight:700;">'+nm+'</td><td>'+(t.flow?t.flow.toFixed(0):'—')+'LPM</td><td style="font-size:13px;">'+t.actTurnover.toFixed(1)+'분'+turnMark+'</td><td>'+volCell+'</td><td>'+dimCell+overMark+'</td></tr>';
         }).join('')
       +'</tbody></table>'
       +'<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">💧 저수조 '+R.actStages.length+'개 · 총 <b>'+R.tankL+'L</b> · 폭 고정, 용량은 길이·깊이로 흡수. 저수조 길이 ≤ 세척조('+S.washDryLen+'mm). 캐스케이드 오버플로우(3→2→1).</div>'
@@ -1323,7 +1328,7 @@ function renderLeft(){
           if(R.actStages.indexOf(i)<0) return '<tr style="opacity:.4;"><td>'+nm+'</td><td colspan="2" style="color:#999;">미사용</td></tr>';
           var vv = i===2 ? '<span style="color:#0277bd;">보일러 직결</span>' : '<input type="number" id="directValve'+i+'" value="'+S.directValve[i]+'" min="0" max="100" style="width:56px;border:1.5px solid #c5d5e5;border-radius:5px;padding:3px 5px;font-size:13px;font-family:inherit;">%';
           var path = i===2 ? '보일러→헹굼' : (i===1?'캐스케이드(헹굼→2) + 직공급':'캐스케이드(2→1) + 직공급');
-          return '<tr><td style="font-weight:700;">'+nm+'</td><td>'+vv+'</td><td style="font-size:12px;">'+path+'</td></tr>';
+          return '<tr><td style="font-weight:700;">'+nm+'</td><td>'+vv+'</td><td style="font-size:13px;">'+path+'</td></tr>';
         }).join('')
       +'</tbody></table>'
       +'<div class="g2" style="margin-top:6px;">'+fld('tempSensor','밸브개방 온도','°C',S.tempSensor)+'<div class="fl"><label>전 조 목표온도</label><input type="text" value="'+S.rinseTemp+' °C" readonly style="background:#eef4fa;border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#0b5a80;font-family:inherit;"></div></div>'
@@ -1331,11 +1336,11 @@ function renderLeft(){
       +'<div class="st">보일러 용량 산출</div>'
       +'<div class="g2"><div class="fl"><label>열원(위에서 선택)</label><input type="text" value="'+(S.boilerType==='gas'?'가스보일러':'전기보일러')+'" readonly style="background:#eef4fa;border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#0b5a80;font-family:inherit;"></div><div class="fl"><label>컨베이어 모터(자동)</label><input type="text" value="'+S.convKW+' kW" readonly style="background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#1b5e20;font-family:inherit;"></div></div>'
       +'<table class="tbl" style="margin-top:6px;"><tbody>'
-      +'<tr><td style="text-align:left;font-weight:700;">목표 온도</td><td class="hi">'+S.rinseTemp+'°C</td><td style="text-align:left;font-size:12px;color:#7a90a4;">전 조 (ΔT'+(S.rinseTemp-S.inletTemp)+')</td></tr>'
-      +'<tr><td style="text-align:left;font-weight:700;">보충수 가열</td><td class="hi">'+(R.supplyFresh*4.18*(S.rinseTemp-S.inletTemp)/3600).toFixed(1)+'kW</td><td style="text-align:left;font-size:12px;color:#7a90a4;">'+R.supplyFresh.toFixed(0)+'L/h × ΔT</td></tr>'
-      +'<tr><td style="text-align:left;font-weight:700;">열손실 보상</td><td class="hi">'+(R.boilerRunKW-R.supplyFresh*4.18*(S.rinseTemp-S.inletTemp)/3600).toFixed(1)+'kW</td><td style="text-align:left;font-size:12px;color:#7a90a4;">전 조 60°C 유지</td></tr>'
-      +'<tr style="background:#fff3cd;"><td style="text-align:left;font-weight:800;">보일러 운전용량</td><td class="hi" style="font-size:16px;">'+R.boilerRunKW.toFixed(1)+'kW</td><td style="text-align:left;font-size:12px;color:#7a90a4;">보충+손실</td></tr>'
-      +'<tr><td style="text-align:left;font-weight:700;">보일러 정격</td><td class="hi">'+R.boilerRatedKW.toFixed(1)+'kW</td><td style="text-align:left;font-size:12px;color:#7a90a4;">초기 급속가열 포함</td></tr>'
+      +'<tr><td style="text-align:left;font-weight:700;">목표 온도</td><td class="hi">'+S.rinseTemp+'°C</td><td style="text-align:left;font-size:13px;color:#7a90a4;">전 조 (ΔT'+(S.rinseTemp-S.inletTemp)+')</td></tr>'
+      +'<tr><td style="text-align:left;font-weight:700;">보충수 가열</td><td class="hi">'+(R.supplyFresh*4.18*(S.rinseTemp-S.inletTemp)/3600).toFixed(1)+'kW</td><td style="text-align:left;font-size:13px;color:#7a90a4;">'+R.supplyFresh.toFixed(0)+'L/h × ΔT</td></tr>'
+      +'<tr><td style="text-align:left;font-weight:700;">열손실 보상</td><td class="hi">'+(R.boilerRunKW-R.supplyFresh*4.18*(S.rinseTemp-S.inletTemp)/3600).toFixed(1)+'kW</td><td style="text-align:left;font-size:13px;color:#7a90a4;">전 조 60°C 유지</td></tr>'
+      +'<tr style="background:#fff3cd;"><td style="text-align:left;font-weight:800;">보일러 운전용량</td><td class="hi" style="font-size:16px;">'+R.boilerRunKW.toFixed(1)+'kW</td><td style="text-align:left;font-size:13px;color:#7a90a4;">보충+손실</td></tr>'
+      +'<tr><td style="text-align:left;font-weight:700;">보일러 정격</td><td class="hi">'+R.boilerRatedKW.toFixed(1)+'kW</td><td style="text-align:left;font-size:13px;color:#7a90a4;">초기 급속가열 포함</td></tr>'
       +'</tbody></table>'
       +'<div class="note">💡 보일러는 헹굼탱크에 직결, 캐스케이드로 2·1조 공급 + 전자밸브 직공급으로 전 조 60°C 유지.</div>'
       +'</div></div>';
@@ -1458,15 +1463,15 @@ function renderRight(){
       return '<tr><td style="text-align:left;font-weight:700;">'+label+'</td>'
         +'<td style="color:#0d47a1;font-weight:700;">'+set+unit+'</td>'
         +'<td style="color:#2e7d32;font-weight:700;">'+rec+unit+'</td>'
-        +'<td style="color:'+st+';font-size:12px;">'+mark+'</td></tr>';
+        +'<td style="color:'+st+';font-size:13px;">'+mark+'</td></tr>';
     }
     // 막대 비교 (설정 vs 추천 정규화)
     function cmpBar(label,set,rec,max){
       const setPct=Math.min(100,set/max*100).toFixed(1), recPct=Math.min(100,rec/max*100).toFixed(1);
       const setV=Math.round(set), recV=Math.round(rec);
-      return '<div style="margin-bottom:7px;"><div style="font-size:12px;font-weight:600;color:#37474f;margin-bottom:2px;">'+label+'</div>'
-        +'<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;"><span style="width:38px;font-size:11px;color:#0d47a1;">설정</span><div style="flex:1;background:#e3eaf0;border-radius:5px;height:16px;"><div style="width:'+setPct+'%;height:100%;background:#1565c0;border-radius:5px;"></div></div><span style="width:60px;font-size:11px;text-align:right;color:#0d47a1;">'+setV+'</span></div>'
-        +'<div style="display:flex;align-items:center;gap:5px;"><span style="width:38px;font-size:11px;color:#2e7d32;">추천</span><div style="flex:1;background:#e8f5e9;border-radius:5px;height:16px;"><div style="width:'+recPct+'%;height:100%;background:#43a047;border-radius:5px;"></div></div><span style="width:60px;font-size:11px;text-align:right;color:#2e7d32;">'+recV+'</span></div></div>';
+      return '<div style="margin-bottom:7px;"><div style="font-size:13px;font-weight:600;color:#37474f;margin-bottom:2px;">'+label+'</div>'
+        +'<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;"><span style="width:38px;font-size:13px;color:#0d47a1;">설정</span><div style="flex:1;background:#e3eaf0;border-radius:5px;height:16px;"><div style="width:'+setPct+'%;height:100%;background:#1565c0;border-radius:5px;"></div></div><span style="width:60px;font-size:13px;text-align:right;color:#0d47a1;">'+setV+'</span></div>'
+        +'<div style="display:flex;align-items:center;gap:5px;"><span style="width:38px;font-size:13px;color:#2e7d32;">추천</span><div style="flex:1;background:#e8f5e9;border-radius:5px;height:16px;"><div style="width:'+recPct+'%;height:100%;background:#43a047;border-radius:5px;"></div></div><span style="width:60px;font-size:13px;text-align:right;color:#2e7d32;">'+recV+'</span></div></div>';
     }
     h+='<div class="card"><div class="ch"><span class="ci">📊</span><span class="cl">추천값 vs 설정값 비교</span><span class="cq">단수·오염도 연동</span></div><div class="cb">'
       +'<div class="chbox" style="background:#f3e5f5;border-color:#ce93d8;color:#6a1b9a;">🎯 사용 단수·오염도·처리량을 바꾸면 <b>추천값이 재계산</b>됩니다. 설정값(파랑)과 추천값(초록)을 비교해 최적 설계에 근접시키세요.</div>'
@@ -1536,7 +1541,7 @@ function renderBlowerInfo(){
     +'<tr><td style="text-align:left;">토출 속도</td><td class="hi">'+R.knifeVelReal.toFixed(0)+' m/s</td></tr>'
     +'<tr style="background:'+(R.dewatEff>=95?'#e8f5e9':'#fff3e0')+';"><td style="text-align:left;font-weight:800;">탈수율</td><td class="hi" style="font-size:16px;">'+R.dewatEff.toFixed(0)+'%</td></tr>'
     +'</tbody></table>'
-    +(bs.blowerShortage?'<div style="margin-top:6px;font-size:12px;color:#b71c1c;font-weight:700;">⚠️ 블로어 공급이 필요 풍량의 '+(bs.blowerRatio*100).toFixed(0)+'%뿐 → 충돌압↓ → 탈수율 '+R.dewatEff.toFixed(0)+'%로 저하! 블로어 대수↑ 또는 나이프↓ 또는 정압↑ 필요</div>':'<div style="margin-top:6px;font-size:12px;color:#1b5e20;">✅ 블로어 풍량 충분, 충돌압 임계 초과 → 탈수 정상</div>')
+    +(bs.blowerShortage?'<div style="margin-top:6px;font-size:13px;color:#b71c1c;font-weight:700;">⚠️ 블로어 공급이 필요 풍량의 '+(bs.blowerRatio*100).toFixed(0)+'%뿐 → 충돌압↓ → 탈수율 '+R.dewatEff.toFixed(0)+'%로 저하! 블로어 대수↑ 또는 나이프↓ 또는 정압↑ 필요</div>':'<div style="margin-top:6px;font-size:13px;color:#1b5e20;">✅ 블로어 풍량 충분, 충돌압 임계 초과 → 탈수 정상</div>')
     +'</div>';
 }
 
@@ -1594,9 +1599,9 @@ function nozzleSVG(){
   const pitchMm=R.nozPitch;
   const N=3;                                   // 인접 노즐 3개로 간격·중첩 표시
   const spanMm=(N-1)*pitchMm+coverMm;          // 가로 실치수
-  const W=320, H=185, padX=14, topY=34;
+  const W=320, H=150, padX=14, topY=26;
   // 등축(가로=세로 동일) 스케일 → 화면 각도 = 실제 분사각
-  const scale=Math.min((H-topY-46)/Math.max(1,dist), (W-padX*2)/Math.max(1,spanMm));
+  const scale=Math.min((H-topY-30)/Math.max(1,dist), (W-padX*2)/Math.max(1,spanMm));
   const faceY=topY+dist*scale;
   const halfCov=dist*Math.tan(half)*scale;
   const pitchPx=pitchMm*scale;
@@ -1642,21 +1647,18 @@ function nozzleSVG(){
   // 각도 표시(실제 각 호)
   var arcR=Math.min(30,dist*scale*0.55), ax=Math.sin(half)*arcR, ay=Math.cos(half)*arcR, mcx=cx0+Math.floor(N/2)*pitchPx;
   s+='<path d="M '+(mcx-ax).toFixed(1)+' '+(topY+ay).toFixed(1)+' A '+arcR.toFixed(1)+' '+arcR.toFixed(1)+' 0 0 1 '+(mcx+ax).toFixed(1)+' '+(topY+ay).toFixed(1)+'" fill="none" stroke="#0d2137" stroke-width="1.2"/>';
-  s+='<text x="'+(mcx+ax+4)+'" y="'+(topY+ay+4)+'" font-size="12" font-weight="700" fill="#0d2137">'+ang+'°</text>';
   // 커버폭 치수선 (가운데 노즐)
   s+='<line x1="'+(mcx-halfCov)+'" y1="'+(faceY+16)+'" x2="'+(mcx+halfCov)+'" y2="'+(faceY+16)+'" stroke="#1565c0" stroke-width="1.2"/>';
   s+='<line x1="'+(mcx-halfCov)+'" y1="'+(faceY+12)+'" x2="'+(mcx-halfCov)+'" y2="'+(faceY+20)+'" stroke="#1565c0" stroke-width="1.2"/>';
   s+='<line x1="'+(mcx+halfCov)+'" y1="'+(faceY+12)+'" x2="'+(mcx+halfCov)+'" y2="'+(faceY+20)+'" stroke="#1565c0" stroke-width="1.2"/>';
-  s+='<text x="'+mcx+'" y="'+(faceY+31)+'" font-size="12" fill="#1565c0" font-weight="700" text-anchor="middle">커버 '+coverMm.toFixed(0)+'mm</text>';
   // 노즐 간격 치수선 (상단)
   if(N>1){
-    s+='<line x1="'+cx0+'" y1="'+(topY-19)+'" x2="'+(cx0+pitchPx)+'" y2="'+(topY-19)+'" stroke="#6a1b9a" stroke-width="1.2"/>';
-    s+='<text x="'+(cx0+pitchPx/2)+'" y="'+(topY-23)+'" font-size="12" fill="#6a1b9a" font-weight="700" text-anchor="middle">간격 '+pitchMm.toFixed(0)+'mm</text>';
+    s+='<line x1="'+cx0+'" y1="'+(topY-16)+'" x2="'+(cx0+pitchPx)+'" y2="'+(topY-16)+'" stroke="#6a1b9a" stroke-width="1.6"/>';
+    s+='<line x1="'+cx0+'" y1="'+(topY-20)+'" x2="'+cx0+'" y2="'+(topY-12)+'" stroke="#6a1b9a" stroke-width="1.6"/>';
+    s+='<line x1="'+(cx0+pitchPx)+'" y1="'+(topY-20)+'" x2="'+(cx0+pitchPx)+'" y2="'+(topY-12)+'" stroke="#6a1b9a" stroke-width="1.6"/>';
   }
   // 이격 치수선 (우측)
   s+='<line x1="'+(W-8)+'" y1="'+topY+'" x2="'+(W-8)+'" y2="'+faceY+'" stroke="#546e7a" stroke-width="1" stroke-dasharray="3,2"/>';
-  s+='<text x="'+(W-11)+'" y="'+((topY+faceY)/2)+'" font-size="12" fill="#546e7a" font-weight="700" text-anchor="end">이격 '+dist+'mm</text>';
-  s+='<text x="'+padX+'" y="'+(faceY+31)+'" font-size="12" fill="#37474f">트레이면 · 세척계수 '+(R.distFactor*100).toFixed(0)+'%</text>';
   s+='</svg>';
   return s;
 }
@@ -1761,18 +1763,18 @@ function buildMech(){
   h+='<div class="chbox" style="background:#e1f5fe;border-color:#81d4fa;color:#01579b;">📐 <b>설비 폭 '+R.equipDim.equipWidth+'mm</b> (2CH×트레이깊이'+S.trayD+' + 격벽 + 프레임) · <b>높이 '+R.equipDim.equipHeight+'mm</b> (트레이'+S.trayW+' + 상부 + 하부저수조)<br>트레이 깊이·높이, 세척단수, 저수조 깊이를 바꾸면 치수가 연동됩니다.</div>';
   h+='<table class="tbl"><thead><tr><th>모듈</th><th>길이(mm)</th><th>폭(mm)</th><th>높이(mm)</th><th>연동</th></tr></thead><tbody>';
   R.equipDim.modules.forEach(function(m){
-    h+='<tr><td style="font-weight:700;">'+m.nm+'</td><td class="hi">'+m.L+'</td><td>'+m.W+'</td><td>'+m.H+'</td><td style="font-size:11px;color:#7a90a4;">'+m.note+'</td></tr>';
+    h+='<tr><td style="font-weight:700;">'+m.nm+'</td><td class="hi">'+m.L+'</td><td>'+m.W+'</td><td>'+m.H+'</td><td style="font-size:13px;color:#7a90a4;">'+m.note+'</td></tr>';
   });
-  h+='<tr style="background:#f0f7ff;"><td style="font-weight:800;">전체</td><td class="hi" style="font-size:15px;">'+R.convTotalLen+'</td><td class="hi">'+R.equipDim.equipWidth+'</td><td class="hi">'+R.equipDim.equipHeight+'</td><td style="font-size:11px;">조간격 '+R.gapTotal+' 포함</td></tr>';
+  h+='<tr style="background:#f0f7ff;"><td style="font-weight:800;">전체</td><td class="hi" style="font-size:15px;">'+R.convTotalLen+'</td><td class="hi">'+R.equipDim.equipWidth+'</td><td class="hi">'+R.equipDim.equipHeight+'</td><td style="font-size:13px;">조간격 '+R.gapTotal+' 포함</td></tr>';
   h+='</tbody></table>';
 
   h+='<div class="st">③ 40ft 컨테이너 운송·현장 조립</div>';
   h+='<div class="g2">'+sel('containerType','컨테이너',[["40ft","40ft (12032mm)"],["20ft","20ft (5898mm)"]],S.containerType)+'<div class="fl"><label>모듈 분할</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="moduleSplit" '+(S.moduleSplit?'checked':'')+'> 조별 분할 제작</label></div></div>';
   h+='<div class="st" style="font-size:13px;">모듈별 길이 (최적 추천 = 필요 체류시간 기준 최단)</div>';
   h+='<table class="tbl"><thead><tr><th>모듈</th><th>현재</th><th>체류/필요</th><th>최적</th><th>판정</th></tr></thead><tbody>'
-    +'<tr><td style="font-weight:700;">세척조</td><td class="hi" style="color:#43a047;">'+S.washDryLen+'<br><span style="font-size:10px;color:#7a90a4;">저수조합</span></td><td>'+R.dwellWash.toFixed(0)+'/'+R.needWash.toFixed(0)+'s</td><td class="hi">'+R.optWashLen+'</td><td>'+(R.washOK?'✅':'⚠️단축과다')+'</td></tr>'
-    +'<tr><td style="font-weight:700;">탈수조</td><td class="hi" style="color:#43a047;">'+S.dewatLen+'<br><span style="font-size:10px;color:#7a90a4;">패스연동</span></td><td>'+R.dwellDewat.toFixed(0)+'/'+R.needDewat.toFixed(0)+'s</td><td class="hi">'+R.optDewatLen+'</td><td>'+(R.dewatOK?'✅':'⚠️')+'</td></tr>'
-    +'<tr><td style="font-weight:700;">건조기</td><td class="hi" style="color:#43a047;">'+S.dryLen+'<br><span style="font-size:10px;color:#7a90a4;">온도·풍량</span></td><td>'+R.dwellDry.toFixed(0)+'/'+R.needDry.toFixed(0)+'s</td><td class="hi">'+R.optDryLen+'</td><td>'+(R.dryOK?'✅':'⚠️')+'</td></tr>'
+    +'<tr><td style="font-weight:700;">세척조</td><td class="hi" style="color:#43a047;">'+S.washDryLen+'<br><span style="font-size:13px;color:#7a90a4;">저수조합</span></td><td>'+R.dwellWash.toFixed(0)+'/'+R.needWash.toFixed(0)+'s</td><td class="hi">'+R.optWashLen+'</td><td>'+(R.washOK?'✅':'⚠️단축과다')+'</td></tr>'
+    +'<tr><td style="font-weight:700;">탈수조</td><td class="hi" style="color:#43a047;">'+S.dewatLen+'<br><span style="font-size:13px;color:#7a90a4;">패스연동</span></td><td>'+R.dwellDewat.toFixed(0)+'/'+R.needDewat.toFixed(0)+'s</td><td class="hi">'+R.optDewatLen+'</td><td>'+(R.dewatOK?'✅':'⚠️')+'</td></tr>'
+    +'<tr><td style="font-weight:700;">건조기</td><td class="hi" style="color:#43a047;">'+S.dryLen+'<br><span style="font-size:13px;color:#7a90a4;">온도·풍량</span></td><td>'+R.dwellDry.toFixed(0)+'/'+R.needDry.toFixed(0)+'s</td><td class="hi">'+R.optDryLen+'</td><td>'+(R.dryOK?'✅':'⚠️')+'</td></tr>'
 
     +'</tbody></table>';
   h+='<div class="g3" style="margin-top:6px;">'+fld('inLen','입구(투입)','mm',S.inLen)+fld('outLen','출구(배출)','mm',S.outLen)+fld('moduleGap','조 상부간격','mm',S.moduleGap)+'</div>';
@@ -1942,7 +1944,7 @@ async function fbLoadList(kw){
       const dt=(x.savedAt||'').slice(0,16).replace('T',' ');
       return '<div class="load-item" data-id="'+x._id+'" style="border:1px solid #dde5ee;border-radius:8px;padding:9px 11px;margin-bottom:7px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;">'
         +'<div style="flex:1;min-width:0;"><div style="font-weight:700;color:#0d2137;font-size:14px;">'+(x.name||'—')+'</div>'
-        +'<div style="font-size:12px;color:#7a90a4;">'+dt+' | '+(x.memo||'')+' | 세척'+(x._resWashEff||'?')+'% 탈수'+(x._resDewatEff||'?')+'% '+(x._resElecReal||'?')+'kW</div></div>'
+        +'<div style="font-size:13px;color:#7a90a4;">'+dt+' | '+(x.memo||'')+' | 세척'+(x._resWashEff||'?')+'% 탈수'+(x._resDewatEff||'?')+'% '+(x._resElecReal||'?')+'kW</div></div>'
         +'<button class="load-del" data-id="'+x._id+'" style="background:#ffebee;color:#c62828;border:none;border-radius:6px;padding:5px 9px;font-size:13px;cursor:pointer;font-family:inherit;">🗑</button></div>';
     }).join('');
     // 클릭 이벤트
