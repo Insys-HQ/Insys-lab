@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v8.2 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v8.3 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v8.2</span>
+    <span class="vb">v8.3</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v8.2 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v8.3 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v8.2
+// 트레이 세척·탈수·건조 시뮬레이터 v8.3
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='8.2';
+const VER='8.3';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -405,6 +405,18 @@ function tankVol(L,W,D){return Math.round(L*W*D*0.75/1e6);}
 function tankOptimal(flowLpm, turnoverMin){
   const vol = flowLpm * turnoverMin * 1.2; // L
   return Math.max(100, Math.round(vol/50)*50); // 50L 올림, 최소100L
+}
+// ★v8.3 저수조는 세척조 하부에 들어감 → 길이 = 해당 단 조 길이로 고정, 깊이로 용량 흡수
+// 깊이 300~900mm 실용범위. 900 초과 시 폭 확대, 그래도 부족하면 over=true (조 길이 부족)
+function tankUnderBath(volL, bathLenMm, widthMm, maxWidthMm, fill){
+  fill = fill||0.75;
+  const L = Math.max(300, Math.round(bathLenMm/10)*10);
+  let W = widthMm, D = volL*1e6/(W*L*fill);
+  while(D>900 && W<maxWidthMm){ W += 50; D = volL*1e6/(W*L*fill); }
+  const over = D>900;
+  D = Math.min(900, Math.max(300, Math.round(D/10)*10));   // 실용 깊이로 클램프
+  const realVol = Math.round(W*L*D*fill/1e6);              // 클램프 후 실제 유효용량
+  return {W:W, L:L, D:D, realVol:realVol, over:over};
 }
 // 용량(L) → 치수 역산: 폭(W) 고정, 깊이(D) 기준 길이(L) 산출
 // 세척기 저수조는 폭이 세척부에 맞춰 고정, 용량은 길이·깊이로 흡수
@@ -774,25 +786,37 @@ function calcAll(){
     let tankL_i, dimW, dimD, dimH;
     const fixW = S.stgTankFixW||1200; // 폭 고정
     dimH = S.stgTankH[i]||800;
+    // ★v8.3 저수조 길이 = 해당 단 조 길이 (하부 수납) — 초과 불가
+    const bathLen = S.stgLen[i]||1000;
+    const maxTankW = S.trayD*CH + 400;   // 설비 폭 내에서만 확장 가능
+    let tankLenOver=false, tankReqLen=0;
     if(S.stgTankMode==='auto'){
-      tankL_i = optTank;
-      const dm = volToDim(tankL_i, fixW, dimH, 0.75, 5000); // 길이 상한 넉넉히
+      const need = optTank;
+      const dm = tankUnderBath(need, bathLen, fixW, maxTankW, 0.75);
       dimW = dm.W; dimD = dm.L; dimH = dm.D;
+      tankL_i = dm.realVol;                       // 조 길이에 맞춘 실제 유효용량
+      tankLenOver = dm.over || (tankL_i < need*0.95);
+      if(tankLenOver) tankReqLen = Math.ceil(need*1e6/(dm.W*900*0.75)/50)*50;  // 필요 조 길이
     } else if(S.stgTankMode==='volume'){
-      tankL_i = S.stgTank[i]||optTank;
-      const dm = volToDim(tankL_i, fixW, dimH, 0.75, 5000);
+      const need = S.stgTank[i]||optTank;
+      const dm = tankUnderBath(need, bathLen, fixW, maxTankW, 0.75);
       dimW = dm.W; dimD = dm.L; dimH = dm.D;
-    } else { // dim: 치수 입력 → 용량 역산
-      dimW = S.stgTankW[i]||fixW; dimD = S.stgTankD[i]||1000; dimH = S.stgTankH[i]||800;
+      tankL_i = dm.realVol;
+      tankLenOver = dm.over || (tankL_i < need*0.95);
+      if(tankLenOver) tankReqLen = Math.ceil(need*1e6/(dm.W*900*0.75)/50)*50;
+    } else { // dim: 치수 입력 → 용량 역산 (길이는 조 길이로 제한)
+      dimW = S.stgTankW[i]||fixW;
+      dimD = Math.min(S.stgTankD[i]||bathLen, bathLen);
+      dimH = S.stgTankH[i]||600;
       tankL_i = dimToVol(dimW, dimD, dimH, 0.75);
+      tankLenOver = (S.stgTankD[i]||0) > bathLen;
     }
-    const tankLenOver = false; // 세척조가 저수조 합으로 결정되므로 초과 없음
     const heater_i = heaterMaintainKW(tankL_i, S.wTemp, S.wTankIns);
     // 실제 회전시간 (용량/유량)
     const actTurnover = d.flow>0 ? tankL_i/d.flow : 0;
     totalTankL += tankL_i;
     washHeaterTotal += heater_i;
-    stgTanks.push({idx:i,active:true,tankL:tankL_i,optTank,heater:heater_i,flow:d.flow,turnover,actTurnover,dimW,dimD,dimH,tankLenOver});
+    stgTanks.push({idx:i,active:true,tankL:tankL_i,optTank,heater:heater_i,flow:d.flow,turnover,actTurnover,dimW,dimD,dimH,tankLenOver,tankReqLen,bathLen});
   }
   const tankL = totalTankL; // 전체 저수량 합계
   // ★ 세척조 길이 = 사용 단 조길이 합 + 단간 여유 (사용자 입력 조길이 기반)
@@ -1224,10 +1248,10 @@ function renderLeft(){
       // ══ ⑤ 저수조 추천 (사용 단만) ══
       +'<div class="st">④ 단별 독립 저수조 <span style="color:#0d7fa8;font-size:13px;">(사용 단만 자동 추천)</span></div>'
       +'<div class="g2">'+sel('stgTankMode','저수조 입력',[['auto','자동 최적(회전율)'],['volume','용량 입력→치수'],['dim','치수 입력→용량']],S.stgTankMode)+fld('stgTankFixW','저수조 폭(고정)','mm',S.stgTankFixW)+'</div>'
-      +'<table class="tbl" style="margin-top:6px;"><thead><tr><th>단</th><th>유량</th><th>회전</th><th>용량(L)</th><th>폭×길이×깊이(mm)</th></tr></thead><tbody>'
+      +'<table class="tbl" style="margin-top:6px;"><thead><tr><th>단</th><th>유량</th><th>회전</th><th>조 길이</th><th>용량(L)</th><th>폭×길이×깊이(mm)</th></tr></thead><tbody>'
       +R.stgTanks.map(function(t){
           var nm=['1차','2차','3차헹굼'][t.idx];
-          if(!t.active) return '<tr style="opacity:.4;"><td>'+nm+'</td><td colspan="4" style="color:#999;">미사용 (저수조·펌프 불필요)</td></tr>';
+          if(!t.active) return '<tr style="opacity:.4;"><td>'+nm+'</td><td colspan="5" style="color:#999;">미사용 (저수조·펌프 불필요)</td></tr>';
           var volCell, dimCell;
           var stI='width:56px;border:1.5px solid #c5d5e5;border-radius:5px;padding:3px 4px;font-size:13px;font-family:inherit;';
           if(S.stgTankMode==='auto'){
@@ -1240,12 +1264,13 @@ function renderLeft(){
             volCell='<span class="hi" style="color:#43a047;">'+t.tankL+'L(자동)</span>';
             dimCell='<input type="number" id="stgTankW'+t.idx+'" value="'+t.dimW+'" style="'+stI+'">×<input type="number" id="stgTankD'+t.idx+'" value="'+t.dimD+'" style="'+stI+'">×<input type="number" id="stgTankH'+t.idx+'" value="'+t.dimH+'" style="'+stI+'">';
           }
-          var overMark = t.tankLenOver ? ' <span style="color:#c62828;font-weight:700;font-size:13px;">⚠️세척조('+S.washDryLen+')초과</span>' : '';
+          var overMark = t.tankLenOver ? ' <span style="color:#c62828;font-weight:700;font-size:13px;">⚠️용량부족 · 조길이 '+t.tankReqLen+'mm 필요</span>' : '';
+          var lenCell = '<span style="font-size:13px;font-weight:700;color:'+(t.dimD>t.bathLen?'#c62828':(t.dimD===t.bathLen?'#1b5e20':'#0d47a1'))+';">'+t.bathLen+'mm'+(t.dimD>t.bathLen?' ❌초과':(t.dimD===t.bathLen?' ✅':' ▽여유'))+'</span>';
           var turnMark = t.actTurnover<1.5?'⚠️짧음':t.actTurnover>4?'⚠️과대':'✅';
-          return '<tr><td style="font-weight:700;">'+nm+'</td><td>'+(t.flow?t.flow.toFixed(0):'—')+'LPM</td><td style="font-size:13px;">'+t.actTurnover.toFixed(1)+'분'+turnMark+'</td><td>'+volCell+'</td><td>'+dimCell+overMark+'</td></tr>';
+          return '<tr><td style="font-weight:700;">'+nm+'</td><td>'+(t.flow?t.flow.toFixed(0):'—')+'LPM</td><td style="font-size:13px;">'+t.actTurnover.toFixed(1)+'분'+turnMark+'</td><td>'+lenCell+'</td><td>'+volCell+'</td><td>'+dimCell+overMark+'</td></tr>';
         }).join('')
       +'</tbody></table>'
-      +'<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">💧 저수조 '+R.actStages.length+'개 · 총 <b>'+R.tankL+'L</b> · 폭 고정, 용량은 길이·깊이로 흡수. 저수조 길이 ≤ 세척조('+S.washDryLen+'mm). 캐스케이드 오버플로우(3→2→1).</div>'
+      +'<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">💧 저수조 '+R.actStages.length+'개 · 총 <b>'+R.tankL+'L</b> <br>★ <b>저수조 길이 = 해당 단 조 길이</b>(하부 수납) · 폭 고정 · 용량은 <b>깊이</b>로 흡수(300~900mm). 조 길이를 늘리면 저수조도 함께 커집니다. 캐스케이드 오버플로우(3→2→1).</div>'
 
       // ══ ⑥ 배수 · 단열 ══
       +'<div class="st">⑤ 배수 · 단열</div>'
