@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* pcb.html v1.3 — 인시스 AI혁신 연구개발실 (2026) */
+/* pcb.html v1.4 — 인시스 AI혁신 연구개발실 (2026) */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Noto Sans KR',sans-serif;font-size:14px;line-height:1.6;color:#28323f;background:#eef1f4}
 nav{background:#16324f;width:100%}
@@ -72,6 +72,15 @@ td .win{color:#0d7a66;font-weight:700}
 .points li::before{content:counter(pt);position:absolute;left:10px;top:8px;width:20px;height:20px;background:#16324f;color:#fff;border-radius:50%;font-size:12px;font-weight:700;text-align:center;line-height:20px}
 footer{border-top:1px solid #d5dce4;margin-top:8px;padding:10px 4px 12px;font-size:12px;color:#5a6b7d;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px}
 footer b{color:#16324f}
+.add-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.add-row input{flex:1;min-width:90px;border:1px solid #c9d2dc;border-radius:6px;padding:6px 8px;font-family:inherit;font-size:13px;color:#28323f;background:#fff}
+.btn-add{background:#16324f;color:#fff;border:0;border-radius:6px;padding:6px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-del{background:transparent;border:0;color:#b8541f;cursor:pointer;font-size:12px;font-family:inherit;padding:2px 4px;white-space:nowrap}
+.points li{padding-right:56px}
+.points .btn-del{position:absolute;right:6px;top:8px}
+.hint{font-size:12px;color:#5a6b7d;margin-top:6px}
+td input.bud{width:100%;min-width:80px;border:1px solid #c9d2dc;border-radius:4px;padding:4px 6px;font-family:inherit;font-size:12.5px;color:#28323f;background:#fdfefe}
+#fbStatus{font-size:12px;color:#5a6b7d}
 .card svg{max-width:480px;margin:0 auto;display:block}
 body.pc .panel.show{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start}
 body.pc .panel .card{margin-top:0}
@@ -101,7 +110,7 @@ body.pc #panel3 .card:first-child{grid-column:1/3}
 </nav>
 
 <div class="wrap">
-  <div class="meta"><span>검토 대상: 정렬 방식 2안</span><span>버전 <b id="verTop">v1.3</b></span></div>
+  <div class="meta"><span id="fbStatus"></span><span>버전 <b id="verTop">v1.4</b></span></div>
 
   <div class="menu">
     <button class="m-card sel" id="menu1" onclick="showPanel(1)">
@@ -190,35 +199,31 @@ body.pc #panel3 .card:first-child{grid-column:1/3}
     </div>
     <div class="card">
       <h2>미팅 협의 포인트</h2>
-      <ol class="points">
-        <li>검사카메라 화각(FOV)에 PCB 전체(장축 100mm)가 들어오는 렌즈로 갈지, 부분 촬영(분할 검사)으로 갈지 — 방안 2 성립의 핵심 전제</li>
-        <li>반복 수렴에 따른 택트타임 증가(+1~2초) 허용 여부</li>
-        <li>현장 조명 조건에서 PCB 외곽 엣지가 안정 검출되는지 — 보유 카메라로 간이 테스트 진행</li>
-      </ol>
+      <ol class="points" id="pointsList"></ol>
+      <div class="add-row"><input id="ptInput" placeholder="협의 항목 입력"><button class="btn-add" onclick="addPoint()">항목 추가</button></div>
+      <div class="hint">외부 설비업체에서 협의 항목을 직접 추가·삭제할 수 있습니다. 변경 즉시 자동 저장됩니다.</div>
     </div>
     <div class="card">
       <h2>공통 하드웨어 구성 (개략)</h2>
       <div class="tbl-scroll"><table>
-        <tr><th>구분</th><th>추천 사양</th><th>개략 예산</th></tr>
-        <tr><td>XY 스테이지</td><td>스트로크 100mm · 리드스크류 + 클로즈드루프 스텝(NEMA23)</td><td>80~150만원</td></tr>
-        <tr><td>틸트(Rx·Ry)</td><td>2축 모터라이즈드 고니오 · 회전중심=카메라 초점</td><td>100~200만원</td></tr>
-        <tr><td>모션 컨트롤러</td><td>4축 보드 + 클로즈드루프 드라이버 · 이더넷/USB</td><td>30~60만원</td></tr>
-        <tr><td>검사 카메라</td><td>500만~1,200만 화소 글로벌셔터 + 저왜곡 렌즈</td><td>150~300만원</td></tr>
-        <tr><td>조명</td><td>링 + 동축 병용 (납땜 경면반사 대응)</td><td>50~100만원</td></tr>
-        <tr><td>제어 PC · SW</td><td>Windows + Python (OpenCV · PyTorch)</td><td>보유 PC 활용</td></tr>
-        <tr><td>정밀도 목표</td><td>위치 ±0.1mm / 각도 ±0.5°</td><td>—</td></tr>
+        <thead><tr><th>구분</th><th>추천 사양</th><th style="width:130px">개략 예산</th><th style="width:52px">관리</th></tr></thead>
+        <tbody id="hwBody"></tbody>
       </table></div>
+      <div class="add-row"><input id="hwName" placeholder="구분"><input id="hwSpec" placeholder="추천 사양"><input id="hwBudget" placeholder="개략 예산 (선택)"><button class="btn-add" onclick="addHw()">항목 추가</button></div>
+      <div class="hint">개략 예산은 공란입니다 — 설비업체에서 직접 입력·수정해 주세요. 행 추가·삭제 가능하며 변경 즉시 자동 저장됩니다.</div>
     </div>
   </section>
 
   <footer>
     <span><b>인시스 AI혁신 연구개발실</b> · ys.kim@in-sys.co.kr</span>
-    <span>pcb.html <b id="verFoot">v1.3</b></span>
+    <span>pcb.html <b id="verFoot">v1.4</b></span>
   </footer>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
-var APP_VERSION = "v1.3"; /* pcb.html v1.3 (2026) */
+var APP_VERSION = "v1.4"; /* pcb.html v1.4 (2026) */
 document.getElementById("verTop").textContent = APP_VERSION;
 document.getElementById("verFoot").textContent = APP_VERSION;
 
@@ -234,6 +239,111 @@ function setDevice(mode){
   document.getElementById("btnPc").classList.toggle("on", mode==="pc");
 }
 setDevice("pc"); /* 초기값: PC */
+
+/* ---------- Firebase 저장소 (인시스 그룹 공용 insys-work 프로젝트) ---------- */
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",
+  authDomain: "insys-work.firebaseapp.com",
+  projectId: "insys-work",
+  storageBucket: "insys-work.firebasestorage.app",
+  messagingSenderId: "225275784859",
+  appId: "1:225275784859:web:bd12815c6dc47c0c49e03e"
+};
+var FB_COL = "pcb_review", FB_DOC = "main";
+var db = null, FB_OK = false;
+try{
+  if(typeof firebase !== "undefined"){
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    FB_OK = true;
+  }
+}catch(e){ FB_OK = false; }
+
+var DEFAULT_DATA = {
+  points: [
+    "검사카메라 화각(FOV)에 PCB 전체(장축 100mm)가 들어오는 렌즈로 갈지, 부분 촬영(분할 검사)으로 갈지 — 방안 2 성립의 핵심 전제",
+    "반복 수렴에 따른 택트타임 증가(+1~2초) 허용 여부",
+    "현장 조명 조건에서 PCB 외곽 엣지가 안정 검출되는지 — 보유 카메라로 간이 테스트 진행"
+  ],
+  hw: [
+    {name:"XY 스테이지", spec:"스트로크 100mm · 리드스크류 + 클로즈드루프 스텝(NEMA23)", budget:""},
+    {name:"틸트(Rx·Ry)", spec:"2축 모터라이즈드 고니오 · 회전중심=카메라 초점", budget:""},
+    {name:"모션 컨트롤러", spec:"4축 보드 + 클로즈드루프 드라이버 · 이더넷/USB", budget:""},
+    {name:"검사 카메라", spec:"500만~1,200만 화소 글로벌셔터 + 저왜곡 렌즈", budget:""},
+    {name:"조명", spec:"링 + 동축 병용 (납땜 경면반사 대응)", budget:""},
+    {name:"제어 PC · SW", spec:"Windows + Python (OpenCV · PyTorch)", budget:""},
+    {name:"정밀도 목표", spec:"위치 ±0.1mm / 각도 ±0.5°", budget:""}
+  ]
+};
+var data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function setStatus(msg){ var el=document.getElementById("fbStatus"); if(el) el.textContent = msg; }
+
+function renderPoints(){
+  var out = "";
+  for(var i=0;i<data.points.length;i++){
+    out += '<li>'+esc(data.points[i])+'<button class="btn-del" onclick="delPoint('+i+')">삭제</button></li>';
+  }
+  document.getElementById("pointsList").innerHTML = out;
+}
+function renderHw(){
+  var out = "";
+  for(var i=0;i<data.hw.length;i++){
+    var r = data.hw[i];
+    out += '<tr><td>'+esc(r.name)+'</td><td>'+esc(r.spec)+'</td>'
+        +  '<td><input class="bud" value="'+esc(r.budget)+'" placeholder="금액 입력" onchange="updateBudget('+i+', this.value)"></td>'
+        +  '<td><button class="btn-del" onclick="delHw('+i+')">삭제</button></td></tr>';
+  }
+  document.getElementById("hwBody").innerHTML = out;
+}
+function addPoint(){
+  var el = document.getElementById("ptInput");
+  var v = el.value.trim();
+  if(!v){ alert("협의 항목을 입력해 주세요."); return; }
+  data.points.push(v); el.value = "";
+  renderPoints(); saveData();
+}
+function delPoint(i){ data.points.splice(i,1); renderPoints(); saveData(); }
+function addHw(){
+  var n = document.getElementById("hwName"), s = document.getElementById("hwSpec"), b = document.getElementById("hwBudget");
+  if(!n.value.trim()){ alert("구분을 입력해 주세요."); return; }
+  data.hw.push({name:n.value.trim(), spec:s.value.trim(), budget:b.value.trim()});
+  n.value=""; s.value=""; b.value="";
+  renderHw(); saveData();
+}
+function delHw(i){ data.hw.splice(i,1); renderHw(); saveData(); }
+function updateBudget(i,v){ data.hw[i].budget = v.trim(); saveData(); }
+
+function saveData(){
+  if(!FB_OK){ setStatus("저장 안 됨 (오프라인)"); return; }
+  db.collection(FB_COL).doc(FB_DOC).set({
+    points: data.points, hw: data.hw, updatedAt: new Date().toISOString()
+  }).then(function(){ setStatus("자동 저장됨 · " + new Date().toLocaleTimeString("ko-KR")); })
+    .catch(function(e){
+      setStatus(e && e.code === "permission-denied"
+        ? "저장 실패 — Firebase 규칙에 pcb_review 허용 필요"
+        : "저장 실패: " + (e && e.message ? e.message : e));
+    });
+}
+function loadData(){
+  renderPoints(); renderHw();
+  if(!FB_OK){ setStatus("저장 안 됨 (오프라인)"); return; }
+  db.collection(FB_COL).doc(FB_DOC).get().then(function(snap){
+    if(snap.exists){
+      var d = snap.data();
+      if(d.points) data.points = d.points;
+      if(d.hw) data.hw = d.hw;
+      renderPoints(); renderHw();
+      setStatus("데이터 불러옴");
+    } else { saveData(); }
+  }).catch(function(e){
+    setStatus(e && e.code === "permission-denied"
+      ? "불러오기 실패 — Firebase 규칙에 pcb_review 허용 필요"
+      : "불러오기 실패: " + (e && e.message ? e.message : e));
+  });
+}
+loadData();
 </script>
 </body>
 </html>
