@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v8.7 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v8.9 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v8.7</span>
+    <span class="vb">v8.9</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v8.7 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v8.9 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v8.7
+// 트레이 세척·탈수·건조 시뮬레이터 v8.9
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='8.7';
+const VER='8.9';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -258,6 +258,8 @@ const S={
   knifePass:4,knifeAng:50,knifeVel:110,knifePress:20,knifeSlot:1.0,knifeGap:60,knifeLen:600,blowerPerN:2,
   // 건조
   dryTemp:75,dryAirVol:25,dryRecirc:70,heaterCount:2,
+  // ★v8.9 건조기 구성: 최소 길이, 팬 1대 담당 길이, 순환 덕트 풍속
+  dryMinLen:3000, dryFanCover:1000, dryDuctVel:12,
   // 온수/유틸
   boilerType:'gas',boilerTankL:1000,boilerIns:true,inletTemp:15,convKW:1.5,
   // 급수 방식: cascade(역류) or direct(직공급), 헹굼 청수량, 1차 보조급수
@@ -630,6 +632,26 @@ function knifeLength(faceHmm, incidenceDeg){
   return faceHmm / Math.sin(incidenceDeg*Math.PI/180);
 }
 function blowerKW(air,p,eff){return (air/60)*p*1000/eff/1000;}
+// ★v8.9 히터 내장 시로코팬 라인업 (일반 유통 사양 기준 — 발주 전 제작사 확인 필요)
+//  모터kW / 풍량 m³/min / 정압 Pa / 내장히터 kW / 토출·순환 덕트경(A)
+const SIROCCO=[
+  {kw:0.75, air:30,  sp:500,  heat:9,  duct:200},
+  {kw:1.5,  air:50,  sp:700,  heat:15, duct:250},
+  {kw:2.2,  air:70,  sp:900,  heat:21, duct:300},
+  {kw:3.7,  air:100, sp:1100, heat:30, duct:350},
+  {kw:5.5,  air:140, sp:1300, heat:45, duct:400},
+  {kw:7.5,  air:180, sp:1500, heat:60, duct:450}
+];
+// 대당 필요 풍량·히터를 모두 만족하는 최소 기종 선정 (없으면 최대 기종 + 부족 표시)
+function selectSirocco(airPerUnit, heatPerUnit){
+  for(const m of SIROCCO){ if(m.air>=airPerUnit && m.heat>=heatPerUnit) return {m:m, short:false}; }
+  return {m:SIROCCO[SIROCCO.length-1], short:true};
+}
+// 측면 순환 원형 덕트 내경 (풍속 기준) — Q[m³/min], v[m/s]
+function ductDiaMm(qM3min, vMs){
+  const A=(qM3min/60)/Math.max(1,vMs);        // m²
+  return Math.ceil(Math.sqrt(4*A/Math.PI)*1000/25)*25;  // 25mm 단위 올림
+}
 function dryerKW(res,airVol,dT,recirc){const evap=res*2260/3600;const airH=(airVol/60)*1.2*1005*dT/1000;return evap+airH*(1-recirc/100);}
 // 트레이 잔류수분 — 평판이라 탈수 효율 좋음 (개당 30g 기준)
 // 트레이 잔류수분 — 면당 4패스 순차 제거 모델
@@ -704,7 +726,7 @@ function bindSlider(id){
   el.addEventListener('input',()=>{rg.value=el.value;el.classList.add('s-user');onChange(id);});
 }
 function syncState(){
-  ['trayW','trayD','trayT','pocketCount','qty','dlv','wHole','wSprayAngle','wTiltAngle','wOverlap','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
+  ['dryMinLen','dryFanCover','dryDuctVel','trayW','trayD','trayT','pocketCount','qty','dlv','wHole','wSprayAngle','wTiltAngle','wOverlap','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
   if(!S.wDistAuto){const nd=gi('wNozzleDist'); if(nd&&nd.value!=='')S.wNozzleDist=+nd.value;}
   const bt=gi('boilerType');if(bt)S.boilerType=bt.value;
   const wi=gi('wTankIns');if(wi)S.wTankIns=wi.checked;
@@ -1105,7 +1127,23 @@ function calcAll(){
   // ★ 건조기 길이 = 건조 체류시간 × 속도 (온도·풍량 반비례)
   const drySpeed = (S.qty*(S.trayPitch/1000)/60)/60;
   const dryNeedDwell = Math.max(6, 15 - (S.dryTemp-75)*0.08 - (S.dryAirVol-25)*0.1);
-  S.dryLen = Math.round(dryNeedDwell * drySpeed * 1000 * 1.2 / 100)*100;
+  // ★v8.9 건조기 길이 = 컨베이어 속도 × 필요 체류 (여유 20%), 단 최소 3000mm
+  //   히터 내장 시로코팬을 상부에 나란히 배치하려면 물리적으로 3m 이상이 필요
+  const dryLenBySpeed = Math.round(dryNeedDwell * drySpeed * 1000 * 1.2 / 100)*100;
+  S.dryLen = Math.max(S.dryMinLen||3000, dryLenBySpeed);
+  const dryLenGovern = (S.dryLen>dryLenBySpeed) ? 'min' : 'speed';   // 어느 조건이 길이를 결정했는지
+  // 상부 시로코팬: 길이를 팬 1대 담당 구간으로 나눠 대수 산정 (최소 3대)
+  const dryFanN = Math.max(3, Math.ceil(S.dryLen/Math.max(500, S.dryFanCover)));
+  const airPerFan = S.dryAirVol/dryFanN;
+  const heatPerFan = dryKW/dryFanN;
+  const siro = selectSirocco(airPerFan, heatPerFan);
+  const siroModel = siro.m, siroShort = siro.short;
+  const siroTotalKW = (siroModel.kw + siroModel.heat) * dryFanN;      // 팬동력+히터 총 정격
+  // 측면 원형 순환 덕트: 순환 풍량을 좌우 2계통으로 분배
+  const recircQ = S.dryAirVol * (S.dryRecirc/100);
+  const ductQPerSide = recircQ/2;
+  const dryDuctDia = ductDiaMm(ductQPerSide, S.dryDuctVel);
+  const ductPerSide = Math.max(1, Math.ceil(dryFanN/2));              // 측면 계통당 분기 수
   const convTotalLen = S.inLen + S.washDryLen + S.dewatLen + S.dryLen + S.outLen + gapTotal;
   // ── 설비 각부 치수 (트레이·설계값 연동) ──
   // 폭 = 2CH × 트레이깊이 + 격벽100 + 양측프레임150×2
@@ -1174,10 +1212,11 @@ function calcAll(){
   const convLoadKW = Math.round((loadKg*9.81*0.35*speedMs/0.6/1000 + 0.25)*1000)/1000;
   const convMotorKW = [0.4,0.75,1.5,2.2,3.7,5.5].find(function(k){return k>=convLoadKW*2.5;})||7.5;
   S.convKW = convMotorKW;
-  const elecTotal = elecBase + convMotorKW;
-  const elecReal = elecRealBase + convLoadKW;
+  const siroFanKW = siroModel.kw * dryFanN;    // ★v8.9 상부 시로코팬 모터 동력 (기존 누락분)
+  const elecTotal = elecBase + convMotorKW + siroFanKW;
+  const elecReal = elecRealBase + convLoadKW + siroFanKW*0.85;
 
-  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,filterFactor,fScore,heaterPerUnit,heaterOK,heaterFactor,convLoadKW,nClipPairs,trayOnLine,loadKg,convMotorKW,tankBottomMax,cascadeOK,topStage,nozPitch,angImpact,slantD,tiltF,ovF,altF,effCovH,rinseF,rinseNeedLph,recircF,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
+  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,filterFactor,fScore,heaterPerUnit,heaterOK,heaterFactor,convLoadKW,nClipPairs,trayOnLine,loadKg,convMotorKW,tankBottomMax,cascadeOK,topStage,nozPitch,angImpact,slantD,tiltF,ovF,altF,effCovH,dryLenBySpeed,dryLenGovern,dryFanN,airPerFan,heatPerFan,siroModel,siroShort,siroTotalKW,recircQ,dryDuctDia,ductPerSide,siroFanKW,dryNeedDwell,rinseF,rinseNeedLph,recircF,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
 }
 
 // ── 좌측 렌더 ──
@@ -1201,7 +1240,7 @@ function renderLeft(){
         +(orv.ok?'✅ <b>목표 달성 조건 확정</b>':'⚠️ <b>일부 목표 미달 — 도달 가능한 최대치 적용</b>')+'<br>'
         +'세척 <b>'+orv.washEff.toFixed(1)+'%</b>'+(orv.washHit?'✅':'⚠️')+' / 탈수 <b>'+orv.dewatEff.toFixed(1)+'%</b>'+(orv.dewatHit?'✅':'⚠️')+' / 건조 <b>'+orv.dryEff.toFixed(1)+'%</b>'+(orv.dryHit?'✅':'⚠️')+'<br>'
         +'세척: 압력 '+orv.press+'kPa · 분사각 '+orv.ang+'° · 이격 '+orv.dist+'mm · 노즐간격 '+orv.pitch.toFixed(0)+'mm<br>'
-        +'팬 회전: '+orv.tilt+'° · 겹침 '+orv.ov+'% · V자 교대 · 타격계수 '+(orv.impact*100).toFixed(0)+'%<br>'
+        +'노즐 팬 경사: '+orv.tilt+'° · 겹침 '+orv.ov+'% · V자 교대 · 타격계수 '+(orv.impact*100).toFixed(0)+'%<br>'
         +'노즐: 길이 '+orv.row+'줄 × 높이 '+orv.col+'개 = '+(orv.col*orv.row)+'/면 (전체 '+orv.nozTotal+'개) · 펌프 '+orv.pumpLpm+'LPM · '+orv.temp+'°C · 세척조 '+orv.washLen+'mm<br>'
         +'탈수: '+orv.knifePass+'패스 · '+orv.knifePress+'kPa / 건조: '+orv.dryTemp+'°C · '+orv.dryAirVol+'m³/min · 열풍기 '+orv.heaterCount+'대<br>'
         +'전기 <b>'+orv.elec.toFixed(1)+'kW</b> · 총길이 <b>'+orv.totalLen+'mm</b> ('+(orv.fitL?'40ft 적재 가능':'⚠️ 40ft 초과')+')</div>':'')
@@ -1282,20 +1321,31 @@ function renderLeft(){
       +sliderHTML('wSprayAngle','📐 분사 각도','°',15,120,5,S.wSprayAngle,45,90)
       +'<label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1565c0;margin:4px 0;cursor:pointer;"><input type="checkbox" id="wDistAuto" '+(S.wDistAuto?'checked':'')+'> ↔️ 이격거리 자동 — 분사각 최적점 추종 (현재 '+S.wSprayAngle+'° → 최적 '+R.nozzleInfo.distOpt.opt+'mm)</label>'
       +sliderHTML('wNozzleDist','↔️ 트레이면 이격거리','mm',30,300,10,S.wNozzleDist,R.nozzleInfo.distOpt.lo,R.nozzleInfo.distOpt.hi)
-      +sliderHTML('wTiltAngle','🔄 팬 회전각(진행방향 기준)','°',0,45,5,S.wTiltAngle,15,35)
+      +sliderHTML('wTiltAngle','📐 노즐 팬 경사각(진행방향 수직 기준)','°',0,45,5,S.wTiltAngle,15,35)
       +sliderHTML('wOverlap','🔁 분사 겹침률','%',0,60,5,S.wOverlap,20,40)
-      +'<div class="g2"><div class="fl"><label>회전 방향</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="wTiltAlt" '+(S.wTiltAlt?'checked':'')+'> 줄마다 좌·우 교대(V자)</label></div><div></div></div>'
+      +'<div class="g2"><div class="fl"><label>팬 경사 방향</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="wTiltAlt" '+(S.wTiltAlt?'checked':'')+'> 노즐마다 좌·우 교대(V자)</label></div><div></div></div>'
       +'<div style="background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px;margin:6px 0;">'
-      +'<div style="font-size:13px;font-weight:800;color:#0d2137;margin-bottom:6px;">🔄 팬 회전 배치 (평면도 · 진행방향 →)</div>'
+      +'<div style="font-size:13px;font-weight:800;color:#0d2137;margin-bottom:6px;">📐 노즐 팬 경사 — 좌: Before(팬 수직) / 우: After(팬 '+S.wTiltAngle+'° 경사)</div>'
       +fanPlanSVG()
-      +'<div style="font-size:13px;color:#37474f;margin-top:6px;line-height:1.6;">초록 선 = 각 노즐의 분사 팬 · 파란 선 = 한 노즐의 높이방향 유효 커버'+(S.wTiltAlt?' · V자 교대 배치':'')+'</div></div>'
-      +'<div class="chbox" style="background:#f1f8e9;border-color:#c5e1a5;color:#33691e;">🔄 <b>팬 회전 '+S.wTiltAngle+'° · 겹침 '+S.wOverlap+'%</b> — 트레이면 충돌은 <b>직각 유지</b>(타격력 손실 없음)<br>'
-      +'· 팬 길이 '+R.nozzleInfo.coverW.toFixed(0)+'mm → 높이방향 유효커버 <b>'+R.effCovH.toFixed(0)+'mm</b> (×cos'+S.wTiltAngle+'°) → 노즐 간격 <b>'+R.nozPitch.toFixed(0)+'mm</b><br>'
+      +(function(){
+          var sBar=Math.max(20, R.nozzleInfo.coverW*(1-S.wOverlap/100));
+          var rawB=S.trayW/sBar, rawA=S.trayW/Math.max(20, R.nozzleInfo.coverW*Math.cos(S.wTiltAngle*Math.PI/180)*(1-S.wOverlap/100));
+          var nB=Math.max(2,Math.ceil(rawB)), nA=Math.max(2,Math.ceil(rawA));
+          var nextDeg=null;
+          for(var d=S.wTiltAngle+1; d<=60; d++){ if(Math.ceil(S.trayW/Math.max(20,R.nozzleInfo.coverW*Math.cos(d*Math.PI/180)*(1-S.wOverlap/100)))>nA){ nextDeg=d; break; } }
+          return '<div style="font-size:13px;color:#37474f;margin-top:6px;line-height:1.6;">갈색 = 헤더 배관(<b>수직 그대로</b>) · 삼각형 = 각 노즐의 분사 팬 · 파란 선 = 높이방향 투영 간격<br>'
+          +'<b>개별 노즐의 팬만</b> 기울이면 높이방향 유효커버가 cos배로 줄어듭니다 — 팬 '+R.nozzleInfo.coverW.toFixed(0)+' → <b>'+R.effCovH.toFixed(0)+'mm</b><br>'
+          +'필요 노즐 <b>'+rawB.toFixed(1)+'EA → '+rawA.toFixed(1)+'EA</b> (실제 설치 '+nB+'EA → <b>'+nA+'EA</b>)'
+          +(nA>nB?' ✅ 증가':(nextDeg?' — 올림 때문에 아직 동수, <b>'+nextDeg+'° 이상</b>에서 '+(nA+1)+'EA로 증가':''))+'</div></div>';
+        })()
+      +'<div class="chbox" style="background:#f1f8e9;border-color:#c5e1a5;color:#33691e;">📐 <b>노즐 팬 경사 '+S.wTiltAngle+'° · 겹침 '+S.wOverlap+'%</b> — 트레이면 충돌은 <b>직각 유지</b>(타격력 손실 없음)<br>'
+      +'· 헤더 배관은 수직 유지 · 팬 길이 '+R.nozzleInfo.coverW.toFixed(0)+'mm(불변) → 높이방향 유효커버 <b>'+R.effCovH.toFixed(0)+'mm</b> (×cos'+S.wTiltAngle+'°)<br>'
+      +'· 노즐 간격 <b>'+R.nozPitch.toFixed(0)+'mm</b>로 좁아짐 (= 유효커버 × (1−겹침 '+S.wOverlap+'%))<br>'
       +'· 그만큼 노즐 추가: 높이방향 <b>'+Math.max(2,Math.ceil(S.trayW/R.nozPitch))+'개/열</b> 필요'+(S.wAutoArray?' (자동 적용)':' ← 현재 수동 '+S.stgCol[0]+'개')+'<br>'
-      +'· 인접 팬 간섭 '+(S.wTiltAngle>=10?'<b>회피됨 ✅</b> (겹침을 키워도 분류끼리 충돌하지 않음)':'<b>⚠️ 발생</b> — 10° 이상 돌려야 겹침 구간에서 분류 충돌 손실이 사라짐')+'<br>'
+      +'· 인접 팬 간섭 '+(S.wTiltAngle>=10?'<b>회피됨 ✅</b> (겹침을 키워도 분류끼리 충돌하지 않음)':'<b>⚠️ 발생</b> — 10° 이상 기울여야 겹침 구간의 분류 충돌 손실이 사라짐')+'<br>'
       +'· 타격 시간 <b>×'+(1/Math.max(0.5,Math.cos(S.wTiltAngle*Math.PI/180))).toFixed(2)+'</b> (기울어진 팬이 진행방향으로 더 넓어 한 점이 오래 맞음) · 세로 줄무늬 '+(S.wTiltAngle>0?'제거 ✅':'발생 ⚠️')+'<br>'
-      +(S.wTiltAlt?'· V자 교대 ✅ 포켓 양 측면 도달':'· 단방향 회전 — 포켓 한쪽 편중 가능')+'<br>'
-      +'· 회전 효과계수 <b>'+(R.tiltF*100).toFixed(0)+'%</b> · 종합 타격계수 <b>'+(R.angImpact*100).toFixed(0)+'%</b>'+(R.angImpact>1.15?' 🔥 우수':(R.angImpact>=1?' ✅':' ⚠️ 저하'))+(S.wTiltAngle>40?'<br>⚠️ 40° 초과 — 팬이 진행방향에 지나치게 누워 높이방향 균일도 저하':'')+'</div>'
+      +(S.wTiltAlt?'· 좌우 교대(V자) ✅ 포켓 양 측면 도달':'· 단방향 경사 — 포켓 한쪽 편중 가능')+'<br>'
+      +'· 팬 경사 효과계수 <b>'+(R.tiltF*100).toFixed(0)+'%</b> · 종합 타격계수 <b>'+(R.angImpact*100).toFixed(0)+'%</b>'+(R.angImpact>1.15?' 🔥 우수':(R.angImpact>=1?' ✅':' ⚠️ 저하'))+(S.wTiltAngle>40?'<br>⚠️ 40° 초과 — 노즐 수 급증 대비 이득 미미':'')+'</div>'
       +'<div class="chbox" style="background:#eef6fb;border-color:#cde3f0;color:#0b5a80;">🔗 <b>분사각 ↔ 이격 ↔ 노즐 간격 연동</b><br>'
       +'분사각 '+S.wSprayAngle+'° · 이격 '+S.wNozzleDist+'mm → 커버폭 <b>'+R.nozzleInfo.coverW.toFixed(0)+'mm</b> → <b>노즐 간격 '+R.nozPitch.toFixed(0)+'mm</b> (중첩 15%)<br>'
       +'→ 높이방향 필요 노즐 <b>'+Math.max(2,Math.ceil(S.trayW/R.nozPitch))+'개</b> (트레이 높이 '+S.trayW+'mm 커버) · 길이방향 줄간격도 동일 피치<br>'
@@ -1429,7 +1479,23 @@ function renderLeft(){
       +sliderHTML('dryTemp','🌡️ 열풍 온도','°C',40,140,5,S.dryTemp,65,95)
       +sliderHTML('dryAirVol','🌀 열풍 풍량','m³/min',10,80,5,S.dryAirVol,20,40)
       +sliderHTML('dryRecirc','♻️ 순환 재사용','%',0,90,5,S.dryRecirc,60,80)
-      +'<div class="g2" style="margin-top:6px;">'+fld('heaterCount','열풍기 댓수','대',S.heaterCount)+'</div>'
+      +'<div class="g3" style="margin-top:6px;">'+fld('dryMinLen','건조기 최소길이','mm',S.dryMinLen)+fld('dryFanCover','팬 1대 담당','mm',S.dryFanCover)+fld('dryDuctVel','덕트 풍속','m/s',S.dryDuctVel)+'</div>'
+      +'<div class="st">건조기 구성 (상부 시로코팬 · 측면 순환덕트)</div>'
+      +'<div class="chbox" style="background:#fff3e0;border-color:#ffcc80;color:#e65100;">📏 <b>건조기 길이 '+S.dryLen+'mm</b> — 컨베이어 속도 '+R.speedMmin.toFixed(2)+'m/min × 필요체류 '+R.dryNeedDwell.toFixed(0)+'초 → 속도기준 '+R.dryLenBySpeed+'mm'
+      +(R.dryLenGovern==='min'?' → <b>최소길이 '+S.dryMinLen+'mm 적용</b> (팬 배치 공간 확보)':' → <b>속도 조건이 지배</b> (최소길이 초과)')+'<br>'
+      +'속도가 빨라지면 길이도 자동으로 늘어납니다.</div>'
+      +'<div class="chbox" style="background:'+(R.siroShort?'#ffebee':'#e8f5e9')+';border-color:'+(R.siroShort?'#ef9a9a':'#a5d6a7')+';color:'+(R.siroShort?'#b71c1c':'#1b5e20')+';">'
+      +'🌀 <b>히터 내장 시로코팬 '+R.dryFanN+'대</b> (상부 배치 · '+S.dryFanCover+'mm 간격)<br>'
+      +'· 대당 부담 풍량 '+R.airPerFan.toFixed(1)+'m³/min · 히터 '+R.heatPerFan.toFixed(1)+'kW<br>'
+      +'· 선정 기종 <b>'+R.siroModel.kw+'kW / '+R.siroModel.air+'m³·min⁻¹ / '+R.siroModel.sp+'Pa / 내장히터 '+R.siroModel.heat+'kW / 덕트 '+R.siroModel.duct+'A</b><br>'
+      +'· 총 정격 <b>'+R.siroTotalKW.toFixed(1)+'kW</b> (팬동력 '+R.siroFanKW.toFixed(2)+' + 내장히터 '+(R.siroModel.heat*R.dryFanN).toFixed(0)+'kW, '+R.dryFanN+'대) · 실제 건조 열부하 '+R.dryKW.toFixed(1)+'kW'
+      +(R.siroShort?'<br>❌ 라인업 최대 기종으로도 부족 — 팬 대수를 늘리거나 풍량·온도를 낮추십시오':' ✅ 여유 있음')+'</div>'
+      +'<div class="chbox" style="background:#eef6fb;border-color:#cde3f0;color:#0b5a80;">'
+      +'🔄 <b>측면 원형 순환덕트</b> — 상부 팬 토출 → 트레이 통과 → 측면 회수 → 팬 흡입(폐열 재사용 '+S.dryRecirc+'%)<br>'
+      +'· 순환 풍량 '+R.recircQ.toFixed(1)+'m³/min → 좌·우 2계통 분배 '+(R.recircQ/2).toFixed(1)+'m³/min<br>'
+      +'· 덕트 내경 <b>Ø'+R.dryDuctDia+'mm</b> (풍속 '+S.dryDuctVel+'m/s 기준) · 계통당 분기 '+R.ductPerSide+'개<br>'
+      +'· 팬 토출구 '+R.siroModel.duct+'A와 맞춰 접속 (차이 시 레듀서 적용)</div>'
+      +'<div class="g2" style="margin-top:6px;">'+fld('heaterCount','보조 열풍기 댓수','대',S.heaterCount)+'</div>'
       +'</div></div>';
   }else if(_tab==='util'){
     h='<div class="card"><div class="ch"><span class="ci">♨️</span><span class="cl">온수·유틸리티</span><span class="cq">보일러·단열</span></div><div class="cb">'
@@ -1715,35 +1781,45 @@ function renderCost(){
 // ★v8.1 분사 커버리지 SVG — 실제 분사각 그대로 작도(등축 스케일) + 분사 애니메이션
 // 이전 버전은 커버폭에 ×3 보정이 들어가 화면상 각도가 실제와 달랐음 → 제거
 // ★v8.7 평면도 — 진행방향 기준 팬 회전 배치 (충돌은 직각, 팬만 면 안에서 회전)
+// ★v8.8 스프레이 바(헤더 배관) 경사 배치 도해 — Before(수직 바) / After(사선 바)
+// 바를 진행방향 수직에서 rot만큼 기울이면 같은 트레이 높이 안의 바 길이가 1/cos 배가 되어
+// 바 위 노즐 간격(팬 길이 기준)은 그대로인데 노즐 수가 늘고, 높이방향 투영 간격이 좁아져 겹침이 생긴다.
+// ★v8.9 노즐 배치 도해 — 헤더 배관은 수직 그대로, 개별 노즐의 분사 팬만 기울임
 function fanPlanSVG(){
   const rot=(S.wTiltAngle||0), rad=rot*Math.PI/180;
-  const fanMm=coverWidth(S.wSprayAngle, S.wNozzleDist);   // 팬 길이(불변)
-  const pitchMm=R.nozPitch;                                // 높이방향 간격
-  const W=320,H=170,padL=16,padR=16,padT=16;
-  const faceH=S.trayW;                                     // 세로축 = 트레이 높이
-  const viewH=H-padT-26;
-  const sc=Math.min(viewH/faceH, (W-padL-padR)/900);
-  const y0=padT, yH=faceH*sc;
-  const xMid=(W-padL-padR)/2+padL;
-  const nH=Math.max(2,Math.ceil(faceH/pitchMm));
-  const col=R.tiltF>=1?'#2e7d32':'#ef6c00';
-  var s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">';
-  // 트레이면(진행방향으로 흐르는 띠)
-  s+='<rect x="'+padL+'" y="'+y0+'" width="'+(W-padL-padR)+'" height="'+yH+'" fill="#eceff1" stroke="#b0bec5" stroke-width="1"/>';
-  // 진행방향 화살표
-  s+='<line x1="'+padL+'" y1="'+(y0+yH+13)+'" x2="'+(W-padR-8)+'" y2="'+(y0+yH+13)+'" stroke="#37474f" stroke-width="1.4"/>';
-  s+='<polygon points="'+(W-padR)+','+(y0+yH+13)+' '+(W-padR-9)+','+(y0+yH+9)+' '+(W-padR-9)+','+(y0+yH+17)+'" fill="#37474f"/>';
-  // 각 노즐의 팬(선분) — 세로 기준에서 rot만큼 회전
-  const halfFan=fanMm/2*sc;
-  for(let i=0;i<nH;i++){
-    const yc=y0+ (i+0.5)*(yH/nH);
-    const dx=Math.sin(rad)*halfFan*(S.wTiltAlt&&i%2===1?-1:1), dy=Math.cos(rad)*halfFan;
-    s+='<line x1="'+(xMid-dx).toFixed(1)+'" y1="'+(yc-dy).toFixed(1)+'" x2="'+(xMid+dx).toFixed(1)+'" y2="'+(yc+dy).toFixed(1)+'" stroke="'+col+'" stroke-width="5" stroke-linecap="round" stroke-opacity="0.55"/>';
-    s+='<circle cx="'+xMid+'" cy="'+yc.toFixed(1)+'" r="3" fill="#0d2137"/>';
+  const fanMm=coverWidth(S.wSprayAngle, S.wNozzleDist);
+  const ovR=Math.min(70,Math.max(0,S.wOverlap))/100;
+  const nBefore=Math.max(2, Math.ceil(S.trayW/Math.max(20, fanMm*(1-ovR))));
+  const nAfter =Math.max(2, Math.ceil(S.trayW/Math.max(20, fanMm*Math.cos(rad)*(1-ovR))));
+  const W=320,H=196,padT=16,gap=18;
+  const panelW=(W-gap)/2, viewH=H-padT-30;
+  const sc=Math.min(viewH/S.trayW, panelW/Math.max(200, fanMm*1.2));
+  const yH=S.trayW*sc, y0=padT, halfFan=fanMm/2*sc;
+  function panel(x0, tiltDeg, n, col){
+    const r=tiltDeg*Math.PI/180;
+    var g='<rect x="'+x0+'" y="'+y0+'" width="'+panelW+'" height="'+yH+'" fill="#eceff1" stroke="#b0bec5" stroke-width="1"/>';
+    const cx=x0+panelW*0.70;
+    g+='<line x1="'+cx+'" y1="'+y0+'" x2="'+cx+'" y2="'+(y0+yH)+'" stroke="#5d4037" stroke-width="4.5" stroke-linecap="round"/>';
+    for(let k=0;k<n;k++){
+      const ny=y0+yH*(k+0.5)/n;
+      const dir=(S.wTiltAlt && k%2===1)?-1:1;
+      const rr=r*dir;
+      const ux=-Math.cos(rr), uy=Math.sin(rr);
+      const px=-uy, py=ux, tip=halfFan*0.5;
+      g+='<polygon points="'+cx.toFixed(1)+','+ny.toFixed(1)+' '
+        +(cx+ux*halfFan+px*tip).toFixed(1)+','+(ny+uy*halfFan+py*tip).toFixed(1)+' '
+        +(cx+ux*halfFan-px*tip).toFixed(1)+','+(ny+uy*halfFan-py*tip).toFixed(1)
+        +'" fill="'+col+'" fill-opacity="0.30" stroke="'+col+'" stroke-width="1.1"/>';
+      g+='<g transform="rotate('+(-tiltDeg*dir)+','+cx+','+ny.toFixed(1)+')"><rect x="'+(cx-9)+'" y="'+(ny-3.5).toFixed(1)+'" width="9" height="7" rx="1.5" fill="#0d2137"/></g>';
+    }
+    g+='<line x1="'+(x0+5)+'" y1="'+(y0+yH*0.5-yH/n/2).toFixed(1)+'" x2="'+(x0+5)+'" y2="'+(y0+yH*0.5+yH/n/2).toFixed(1)+'" stroke="#1565c0" stroke-width="3"/>';
+    return g;
   }
-  // 높이방향 유효 커버(=팬×cos) 표시: 한 노즐의 세로 투영
-  const ycd=y0+0.5*(yH/nH), projd=Math.cos(rad)*halfFan;
-  s+='<line x1="'+(padL+6)+'" y1="'+(ycd-projd).toFixed(1)+'" x2="'+(padL+6)+'" y2="'+(ycd+projd).toFixed(1)+'" stroke="#1565c0" stroke-width="3"/>';
+  var s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">';
+  s+=panel(0, 0, nBefore, '#90a4ae');
+  s+=panel(panelW+gap, rot, nAfter, '#2e7d32');
+  s+='<line x1="4" y1="'+(y0+yH+14)+'" x2="'+(W-12)+'" y2="'+(y0+yH+14)+'" stroke="#37474f" stroke-width="1.4"/>';
+  s+='<polygon points="'+W+','+(y0+yH+14)+' '+(W-10)+','+(y0+yH+9.5)+' '+(W-10)+','+(y0+yH+18.5)+'" fill="#37474f"/>';
   s+='</svg>';
   return s;
 }
