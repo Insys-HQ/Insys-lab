@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v8.9 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v9.0 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v8.9</span>
+    <span class="vb">v9.0</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v8.9 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v9.0 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v8.9
+// 트레이 세척·탈수·건조 시뮬레이터 v9.0
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='8.9';
+const VER='9.0';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -222,14 +222,14 @@ const S={
   trayW:430,trayD:330,trayT:150,pocketCount:6,qty:500,dlv:3,
   nozzleLayout:'cross',  // vertical(수직)/cross(교차각도)/horizontal(수평)
   // 세척 (2CH 고정)
-  wZones:3,wHole:2.5,wTemp:60,
-  wSprayAngle:60, wNozzleDist:80, wAutoArray:false,
+  wZones:3,wHole:2.5,wTemp:70,
+  wSprayAngle:60, wNozzleDist:120, wAutoArray:true,   // ★v9.0 발주 검토 강건최적
   // ★v8.0 이격 자동(분사각 최적값 추종) · 펌프 모드 · 단별 펌프 정격유량
   // ★v8.6 사선(경사) 노즐 설치 — 경사각·겹침률·지그재그 교차
-  wTiltAngle:30, wOverlap:25, wTiltAlt:true,
+  wTiltAngle:15, wOverlap:45, wTiltAlt:true,          // ★v9.0 발주 검토 강건최적
   wDistAuto:true, pumpMode:'auto', stgPumpLpm:[0,0,0], stgPressAct:[280,200,120],
   // 단계별 독립 설정 [1차, 2차, 3차헹굼]
-  stgPress:[280,200,120], stgCol:[3,3,2], stgRow:[4,4,2], stgType:['wash','wash','rinse'],
+  stgPress:[200,144,120], stgCol:[3,3,2], stgRow:[4,4,2], stgType:['wash','wash','rinse'],
   stgLen:[1200,1200,800],  // 단별 조 길이 (세척·세척·헹굼)
   stgLenAuto:true,  // ★v7.0 조길이 자동: 세로줄 노즐수×줄간격 연동
   // ★v7.1 최적화 목표 효율 (%)
@@ -255,9 +255,9 @@ const S={
   meshFilter:true, meshSize:30, sludgeFilter:true, sludgeMesh:100,
   pumpStrainer:true, strainerMesh:50, autoBackwash:false, filterWaterSave:true,
   // 탈수
-  knifePass:4,knifeAng:50,knifeVel:110,knifePress:20,knifeSlot:1.0,knifeGap:60,knifeLen:600,blowerPerN:2,
+  knifePass:5,knifeAng:60,knifeVel:95,knifePress:14,knifeSlot:1.0,knifeGap:60,knifeLen:600,blowerPerN:2,
   // 건조
-  dryTemp:75,dryAirVol:25,dryRecirc:70,heaterCount:2,
+  dryTemp:90,dryAirVol:40,dryRecirc:75,heaterCount:1,   // ★v9.0 발주 검토 강건최적
   // ★v8.9 건조기 구성: 최소 길이, 팬 1대 담당 길이, 순환 덕트 풍속
   dryMinLen:3000, dryFanCover:1000, dryDuctVel:12,
   // 온수/유틸
@@ -459,7 +459,9 @@ function tankUnderBath(volL, bathLenMm, widthMm, maxWidthMm, fill, frameGapMm, m
   if(L >= bathLenMm) L = Math.round((bathLenMm-20)/10)*10;   // 최소 20mm는 반드시 작게
   L = Math.max(300, Math.min(L, bathLenMm-20));
   let W = widthMm, D = volL*1e6/(W*L*fill);
-  while(D>900 && W<maxWidthMm){ W += 50; D = volL*1e6/(W*L*fill); }
+  // ★v9.0 폭 확대는 설비 폭 한도까지만 — 초과 오버슈트 방지 (저수조가 설비보다 넓어지는 결함)
+  while(D>900 && W<maxWidthMm){ W = Math.min(maxWidthMm, W+50); D = volL*1e6/(W*L*fill); }
+  W = Math.min(W, maxWidthMm);
   const over = D>900;
   const minD = minDepthMm||300;                            // ★v8.5 헹굼조는 저수량 확보 위해 600↑
   D = Math.min(900, Math.max(minD, Math.round(D/10)*10));
@@ -766,7 +768,12 @@ function syncState(){
     const p=gi('stgPress'+i); if(p&&p.value!=='') S.stgPress[i]=Math.round(+p.value*100);
     const c=gi('stgCol'+i); if(c&&c.value!=='' && !S.wAutoArray) S.stgCol[i]=+c.value;
     const r=gi('stgRow'+i); if(r&&r.value!=='' && !S.wAutoArray) S.stgRow[i]=+r.value;
-    const sl=gi('stgLen'+i); if(sl&&sl.value!==''&&!S.stgLenAuto) S.stgLen[i]=+sl.value;
+    const sl=gi('stgLen'+i);
+    if(sl&&sl.value!==''){
+      const v=Math.max(300, Math.round(+sl.value/100)*100);   // ★v9.0 100mm 단위로 정규화
+      if(!S.stgLenAuto) S.stgLen[i]=v;
+      else if(v!==S.stgLen[i]) { S.stgLenAuto=false; S.stgLen[i]=v; }  // 직접 수정 시 자동 해제
+    }
   }
 }
 let _tab='wash';
@@ -830,7 +837,7 @@ function calcAll(){
     // ★v7.0/8.0 조길이 자동: 길이방향 줄 수 × 줄간격(피치) + 전후여유
     if(S.stgLenAuto){
       const rowPitch = Math.max(200, Math.round(nozPitch/10)*10);
-      S.stgLen[i] = Math.round((nL*rowPitch + 250)/50)*50;
+      S.stgLen[i] = Math.ceil((nL*rowPitch + 250)/100)*100;   // ★v9.0 100mm 단위
     }
     const nPerFace = nH*nL;
     const nozTotal = nPerFace*FACES_PER_CH*CH;   // 단 전체 노즐 수 (2면×2CH)
@@ -1261,8 +1268,12 @@ function renderLeft(){
         +'<div style="font-weight:800;font-size:13px;color:'+tc+';margin-bottom:5px;text-align:center;">'+(i+1)+'단</div>'
         +'<div style="font-size:13px;color:'+tc+';text-align:center;margin-bottom:6px;">'+(active?stgNames[i]:'미사용')+'</div>'
         +'<div style="text-align:center;font-size:13px;font-weight:800;padding:3px;border-radius:5px;background:'+(isRinse?'#b2ebf2':'#bbdefb')+';color:'+(isRinse?'#00838f':'#1565c0')+';margin-bottom:5px;">'+(isRinse?'헹굼(고정)':'세척(고정)')+'</div>'
-        +'<label style="font-size:13px;color:#5a7088;">조 길이(mm)'+(S.stgLenAuto?' <span style="color:#1b5e20;font-weight:800;">자동</span>':'')+'</label>'
-        +'<input type="number" id="stgLen'+i+'" value="'+S.stgLen[i]+'"'+(S.stgLenAuto?' disabled':dis)+' style="width:100%;border:1.5px solid '+(S.stgLenAuto?'#a5d6a7':'#c5d5e5')+';border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:'+(S.stgLenAuto&&active?'#e8f5e9':inpBg)+';margin-bottom:5px;">'
+        +'<label style="font-size:13px;color:#5a7088;">조 길이(mm)'+(S.stgLenAuto?' <span style="color:#1b5e20;font-weight:800;">자동</span>':' <span style="color:#0d47a1;font-weight:800;">수동</span>')+'</label>'
+        +'<div style="display:flex;gap:3px;margin-bottom:5px;">'
+        +'<button type="button" class="lenbtn" data-len="'+i+'" data-d="-100"'+(active?'':' disabled')+' style="flex:none;width:30px;border:1.5px solid #c5d5e5;border-radius:5px;background:#f4f8fb;font-size:14px;font-weight:800;color:#0d47a1;font-family:inherit;cursor:pointer;">−</button>'
+        +'<input type="number" step="100" min="300" id="stgLen'+i+'" value="'+S.stgLen[i]+'"'+dis+' style="flex:1;min-width:0;border:1.5px solid '+(S.stgLenAuto?'#a5d6a7':'#c5d5e5')+';border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:700;text-align:center;background:'+(S.stgLenAuto&&active?'#e8f5e9':inpBg)+';">'
+        +'<button type="button" class="lenbtn" data-len="'+i+'" data-d="100"'+(active?'':' disabled')+' style="flex:none;width:30px;border:1.5px solid #c5d5e5;border-radius:5px;background:#f4f8fb;font-size:14px;font-weight:800;color:#0d47a1;font-family:inherit;cursor:pointer;">+</button>'
+        +'</div>'
         +'<label style="font-size:13px;color:#5a7088;">분사압력(bar)</label>'
         +'<input type="number" step="0.1" id="stgPress'+i+'" value="'+(S.stgPress[i]/100).toFixed(1)+'"'+dis+' style="width:100%;border:1.5px solid #c5d5e5;border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:'+inpBg+';margin-bottom:5px;">'
         +'<label style="font-size:13px;color:#5a7088;">↕️ 높이방향 노즐(개/열)'+(S.wAutoArray?' <span style="color:#1b5e20;font-weight:800;">자동</span>':'')+'</label>'
@@ -1589,6 +1600,15 @@ function renderLeft(){
   if(_tab==='dewat' && gi('blowerInfo')) renderBlowerInfo();
   if(_tab==='balance' && gi('balanceChart')) setTimeout(drawBalanceChart,30);
   L.querySelectorAll('.sv-n').forEach(el=>{updateSlider(el.id);bindSlider(el.id);});
+  L.querySelectorAll('.lenbtn').forEach(function(b){
+    b.addEventListener('click',function(){
+      const i=+b.dataset.len, d=+b.dataset.d;
+      S.stgLenAuto=false;                                  // ★v9.0 버튼 조작 시 자동 해제
+      S.stgLen[i]=Math.max(300, Math.round((S.stgLen[i]+d)/100)*100);
+      const e=gi('stgLen'+i); if(e)e.value=S.stgLen[i];
+      calcAll(); renderLeft(); renderRight();
+    });
+  });
   const ob=gi('btnOptimize'); if(ob) ob.addEventListener('click',()=>{ ob.textContent='계산 중…'; ob.disabled=true; setTimeout(optimizeAll,10); });
   L.querySelectorAll('input:not(.sv-n):not(.sv-range),select').forEach(el=>{
     // 텍스트/숫자 입력 필드: input 중에는 재렌더 금지(커서 유지), 우측 결과만 갱신
