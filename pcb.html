@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* pcb.html v1.4 — 인시스 AI혁신 연구개발실 (2026) */
+/* pcb.html v1.5 — 인시스 AI혁신 연구개발실 (2026) */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Noto Sans KR',sans-serif;font-size:14px;line-height:1.6;color:#28323f;background:#eef1f4}
 nav{background:#16324f;width:100%}
@@ -26,9 +26,9 @@ body.pc .wrap{max-width:1100px}
 .meta{font-size:12px;color:#5a6b7d;padding:6px 4px 4px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px}
 .menu{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;margin-bottom:8px}
 .menu .m-card{background:#fff;border:2px solid #d5dce4;border-radius:10px;padding:10px 12px;cursor:pointer;text-align:left;font-family:inherit}
-.menu .m-card .m-no{font-size:11px;font-weight:700;color:#5a6b7d}
-.menu .m-card .m-name{font-size:14px;font-weight:700;color:#16324f;margin-top:2px}
-.menu .m-card .m-desc{font-size:12px;color:#5a6b7d;margin-top:2px}
+.menu .m-card .m-no{display:block;font-size:11px;font-weight:700;color:#5a6b7d}
+.menu .m-card .m-name{display:block;font-size:14px;font-weight:700;color:#16324f;margin-top:2px}
+.menu .m-card .m-desc{display:block;font-size:12px;color:#5a6b7d;margin-top:2px}
 .menu .m-card.sel{border-color:#16324f;background:#f4f8fc}
 .menu .m-card.sel .m-no{color:#b8541f}
 .menu .m-compare{grid-column:1/3;display:flex;align-items:center;justify-content:center;gap:6px}
@@ -101,7 +101,7 @@ body.pc #panel3 .card:first-child{grid-column:1/3}
 <body>
 <nav>
   <div class="nav-inner">
-    <div class="nav-title">PCB 납땜 비전검사 검토서<small>인시스 AI혁신 연구개발실 · 2026-09-03 미팅 자료</small></div>
+    <div class="nav-title">PCB 납땜 비전검사 검토서<small>인시스 AI혁신 연구개발실</small></div>
     <div class="dev-toggle" role="tablist" aria-label="화면 선택">
       <button id="btnMobile" class="on" onclick="setDevice('mobile')">모바일</button>
       <button id="btnPc" onclick="setDevice('pc')">PC</button>
@@ -110,7 +110,7 @@ body.pc #panel3 .card:first-child{grid-column:1/3}
 </nav>
 
 <div class="wrap">
-  <div class="meta"><span id="fbStatus"></span><span>버전 <b id="verTop">v1.4</b></span></div>
+  <div class="meta"><span id="fbStatus"></span><span>버전 <b id="verTop">v1.5</b></span></div>
 
   <div class="menu">
     <button class="m-card sel" id="menu1" onclick="showPanel(1)">
@@ -216,14 +216,14 @@ body.pc #panel3 .card:first-child{grid-column:1/3}
 
   <footer>
     <span><b>인시스 AI혁신 연구개발실</b> · ys.kim@in-sys.co.kr</span>
-    <span>pcb.html <b id="verFoot">v1.4</b></span>
+    <span>pcb.html <b id="verFoot">v1.5</b></span>
   </footer>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
-var APP_VERSION = "v1.4"; /* pcb.html v1.4 (2026) */
+var APP_VERSION = "v1.5"; /* pcb.html v1.5 (2026) */
 document.getElementById("verTop").textContent = APP_VERSION;
 document.getElementById("verFoot").textContent = APP_VERSION;
 
