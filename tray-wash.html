@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v8.5 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v8.6 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v8.5</span>
+    <span class="vb">v8.6</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v8.5 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v8.6 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v8.5
+// 트레이 세척·탈수·건조 시뮬레이터 v8.6
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='8.5';
+const VER='8.6';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -225,6 +225,8 @@ const S={
   wZones:3,wHole:2.5,wTemp:60,
   wSprayAngle:60, wNozzleDist:80, wAutoArray:false,
   // ★v8.0 이격 자동(분사각 최적값 추종) · 펌프 모드 · 단별 펌프 정격유량
+  // ★v8.6 사선(경사) 노즐 설치 — 경사각·겹침률·지그재그 교차
+  wTiltAngle:30, wOverlap:25, wTiltAlt:true,
   wDistAuto:true, pumpMode:'auto', stgPumpLpm:[0,0,0], stgPressAct:[280,200,120],
   // 단계별 독립 설정 [1차, 2차, 3차헹굼]
   stgPress:[280,200,120], stgCol:[3,3,2], stgRow:[4,4,2], stgType:['wash','wash','rinse'],
@@ -364,8 +366,33 @@ function angleImpactFactor(a){
   if(a<=105) return 0.83;
   return 0.76;
 }
-// ★v8.0 노즐 간격(피치) = 커버폭 × (1-중첩15%) — 분사각·이격에 직접 연동
-function nozzlePitch(angleDeg, distMm){ return Math.max(20, coverWidth(angleDeg, distMm)*0.85); }
+// ★v8.6 사선 설치: 노즐을 면 법선에서 tilt만큼 기울이면
+//   · 실제 분사 도달거리 = 이격/cos(tilt) 로 늘어나고
+//   · 세척면 위 분사 자국(풋프린트)은 1/cos(tilt) 배로 길어짐 (타원 장축)
+function tiltReach(distMm, tiltDeg){ return distMm/Math.cos(tiltDeg*Math.PI/180); }
+function sprayFootprint(angleDeg, distMm, tiltDeg){
+  return coverWidth(angleDeg, distMm)/Math.cos(tiltDeg*Math.PI/180);
+}
+// ★v8.6 노즐 간격 = 풋프린트 × (1 − 겹침률). 겹침을 키우면 간격이 좁아져 노즐이 조밀해짐
+function nozzlePitch(angleDeg, distMm, tiltDeg, overlapPct){
+  const t = tiltDeg||0, ov = Math.min(70, Math.max(0, overlapPct===undefined?15:overlapPct));
+  return Math.max(20, sprayFootprint(angleDeg, distMm, t)*(1-ov/100));
+}
+// ★v8.6 경사각 세척 특성: 수직 타격력은 cos으로 줄지만 표면 전단력(쓸어내림)이 커짐
+//   · 오염 박리는 수직 충돌보다 전단이 유리 → 25~40°에서 최대
+//   · 배출 측면에서도 오염물이 면을 따라 흘러내려 재부착이 줄어듦
+function tiltFactor(tiltDeg){
+  const r = tiltDeg*Math.PI/180;
+  const normal = Math.pow(Math.cos(r), 0.5);      // 수직 성분 감소(감쇠 완만)
+  const shear  = 1 + 0.45*Math.sin(2*r);          // 전단 성분 증가(45°에서 최대)
+  return normal*shear;
+}
+// ★v8.6 겹침 타격 횟수: 겹칠수록 같은 지점을 여러 번 때림 (체감 곡선)
+function overlapFactor(overlapPct){
+  const ov = Math.min(70, Math.max(0, overlapPct))/100;
+  const hits = 1/Math.max(0.3, 1-ov);
+  return 1 + 0.22*Math.log(hits);
+}
 // ★v8.0 펌프↔노즐 실제 운전점 압력 (kPa)
 // 노즐측 Q=k√P (k=총 오리피스 통과계수), 펌프측 Q=Qr√(1-P/Pmax) → 교점 해석해
 // P = Qr² / (k² + Qr²/Pmax)   ※ 노즐 수·직경↑ → k↑ → 실제 압력↓ (물리적 필연)
@@ -467,21 +494,25 @@ function optimizeAll(){
   // 1) 세척: 전 조합 평가 후 "목표 달성 조합 중 최소 전력" 선택 (미달 시 최대 효율 중 최소 전력)
   let best=null;
   const angList=[30,45,60,75,90];
+  const tiltList=[0,15,30,40];       // ★v8.6 사선 설치각
+  const ovList=[15,30,45];           // ★v8.6 겹침률
+  for(const tl of tiltList){
+  for(const ov of ovList){
   for(const ang of angList){
   for(let row=3; row<=9; row++){
     for(let col=0; col<=0; col++){   // 높이방향은 분사각·이격으로 자동 산정
       for(let tmp=55; tmp<=70; tmp+=5){
         for(let bar=20; bar<=40; bar+=4){
-          S.wSprayAngle=ang;
+          S.wSprayAngle=ang; S.wTiltAngle=tl; S.wOverlap=ov; S.wTiltAlt=true;
           S.wNozzleDist=optDist(ang).opt;
-          const pitch=nozzlePitch(ang,S.wNozzleDist);
+          const pitch=nozzlePitch(ang,S.wNozzleDist,tl,ov);
           const nH=Math.max(2,Math.ceil(S.trayW/pitch));
           S.stgRow=[row,row,Math.max(2,Math.round(row*0.5))];
           S.stgCol=[nH,nH,Math.max(2,Math.round(nH*0.6))];
           S.wTemp=tmp;
           S.stgPress=[bar*10, Math.round(bar*10*0.72), 120];
           calcAll();
-          const cand={row,col:nH,ang,tmp,bar,eff:R.washEff,kw:R.elecTotal,len:R.convTotalLen,fit:R.equipDim.fitL};
+          const cand={row,col:nH,ang,tilt:tl,ov:ov,tmp,bar,eff:R.washEff,kw:R.elecTotal,len:R.convTotalLen,fit:R.equipDim.fitL};
           if(!best){ best=cand; continue; }
           const hitC=cand.eff>=tgtW, hitB=best.eff>=tgtW;
           if(hitC&&!hitB){ best=cand; }
@@ -491,8 +522,9 @@ function optimizeAll(){
       }
     }
   }
-  }
-  S.wSprayAngle=best.ang; S.wNozzleDist=optDist(best.ang).opt;
+  }}}
+  S.wSprayAngle=best.ang; S.wTiltAngle=best.tilt; S.wOverlap=best.ov; S.wTiltAlt=true;
+  S.wNozzleDist=optDist(best.ang).opt;
   S.stgRow=[best.row,best.row,Math.max(2,Math.round(best.row*0.5))];
   S.stgCol=[best.col,best.col,Math.max(2,Math.round(best.col*0.6))];
   S.wTemp=best.tmp;
@@ -531,7 +563,7 @@ function optimizeAll(){
   S.optResult = {ok, washHit, dewatHit, dryHit,
     washEff:R.washEff, dewatEff:R.dewatEff, dryEff:R.dryEff,
     press:S.stgPress.slice(0,3).join('/'), col:S.stgCol[0], row:S.stgRow[0], temp:S.wTemp,
-    ang:S.wSprayAngle, dist:S.wNozzleDist, pitch:R.nozPitch, pumpLpm:S.stgPumpLpm[0], nozTotal:R.stgDetail[0].nozTotal,
+    ang:S.wSprayAngle, tilt:S.wTiltAngle, ov:S.wOverlap, impact:R.angImpact, dist:S.wNozzleDist, pitch:R.nozPitch, pumpLpm:S.stgPumpLpm[0], nozTotal:R.stgDetail[0].nozTotal,
     washLen:S.washDryLen, knifePass:S.knifePass, knifePress:S.knifePress,
     dryTemp:S.dryTemp, dryAirVol:S.dryAirVol, heaterCount:S.heaterCount,
     elec:R.elecTotal, totalLen:R.convTotalLen, fitL:R.equipDim.fitL};
@@ -660,7 +692,7 @@ function bindSlider(id){
   el.addEventListener('input',()=>{rg.value=el.value;el.classList.add('s-user');onChange(id);});
 }
 function syncState(){
-  ['trayW','trayD','trayT','pocketCount','qty','dlv','wHole','wSprayAngle','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
+  ['trayW','trayD','trayT','pocketCount','qty','dlv','wHole','wSprayAngle','wTiltAngle','wOverlap','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
   if(!S.wDistAuto){const nd=gi('wNozzleDist'); if(nd&&nd.value!=='')S.wNozzleDist=+nd.value;}
   const bt=gi('boilerType');if(bt)S.boilerType=bt.value;
   const wi=gi('wTankIns');if(wi)S.wTankIns=wi.checked;
@@ -677,6 +709,7 @@ function syncState(){
   const ta=gi('stgTankAuto');if(ta)S.stgTankAuto=ta.checked;
   const wa=gi('wAutoArray');if(wa)S.wAutoArray=wa.checked;
   const wd=gi('wDistAuto');if(wd)S.wDistAuto=wd.checked;
+  const tAlt=gi('wTiltAlt');if(tAlt)S.wTiltAlt=tAlt.checked;
   const pm=gi('pumpMode');if(pm)S.pumpMode=pm.value;
   for(let i=0;i<3;i++){const pl=gi('stgPumpLpm'+i); if(pl&&pl.value!=='')S.stgPumpLpm[i]=+pl.value;}
   const nl=gi('nozzleLayout');if(nl)S.nozzleLayout=nl.value;
@@ -740,8 +773,12 @@ function calcAll(){
   // ★v8.0 분사각 → 최적 이격 자동 추종 (분사각을 바꾸면 이격도 최적점으로 이동)
   if(S.wDistAuto) S.wNozzleDist = optDist(S.wSprayAngle).opt;
   // ★v8.0 노즐 간격(피치) = 분사각·이격 연동 커버폭의 85%
-  const nozPitch = nozzlePitch(S.wSprayAngle, S.wNozzleDist);
-  const angImpact = angleImpactFactor(S.wSprayAngle);
+  const nozPitch = nozzlePitch(S.wSprayAngle, S.wNozzleDist, S.wTiltAngle, S.wOverlap);
+  const slantD = tiltReach(S.wNozzleDist, S.wTiltAngle);
+  const tiltF = tiltFactor(S.wTiltAngle);
+  const ovF = overlapFactor(S.wOverlap);
+  const altF = S.wTiltAlt ? 1.04 : 1;   // 줄마다 경사 방향 교대 → 포켓 양측면 타격
+  const angImpact = angleImpactFactor(S.wSprayAngle) * tiltF * ovF * altF;
   const lineSpeedMs = (S.qty*(S.trayPitch/1000)/60)/60;
   for(let i=0;i<zn;i++){
     const pressSet = S.stgPress[i]||200;
@@ -973,7 +1010,7 @@ function calcAll(){
     const tempF=isRinse?1:(0.85+(S.wTemp-40)*0.006);
     // ★v7.1 헹굼은 이미 세척된 표면의 잔류물 제거 → 오염저항 영향 40%만 적용
     baseRem = baseRem / (isRinse ? (1+(dirtHardness-1)*0.4) : dirtHardness);
-    dirt=dirt*(1-Math.min(0.9,baseRem*tempF));
+    dirt=dirt*(1-Math.min(0.93,baseRem*tempF));   // ★v8.6 단회 통과 제거율 상한 (개선 반영 여지 확보)
   });
   // 노즐 배치·포켓 개수 반영
   const layoutEff = layoutEfficiency(S.nozzleLayout, S.pocketCount);
@@ -992,8 +1029,8 @@ function calcAll(){
   const dwellFactor = dwellCount>0 ? dwellFactorSum/dwellCount : 1;
   // 체류 부족 시 효율 저하 (체류계수 곱)
   // ★v7.0 교차배치는 포켓 측면 직접 세척 → 패널티 60% 완화 (목표 95% 도달 가능)
-  const pocketPen = pocketPenalty(S.pocketCount) * (S.nozzleLayout==='cross'?0.4:1);
-  const distFactor = distWashFactor(S.wNozzleDist, S.wSprayAngle);
+  const pocketPen = pocketPenalty(S.pocketCount) * (S.nozzleLayout==='cross'?0.4:1) * (S.wTiltAlt&&S.wTiltAngle>=15?0.75:1);   // ★v8.6 사선 교대 배치
+  const distFactor = distWashFactor(slantD, S.wSprayAngle);   // ★v8.6 사선 도달거리 기준
   const washEff = Math.min(99, washEffBase * (layoutEff/0.9) * (0.4+0.6*dwellFactor) * (1-pocketPen) * distFactor * filterFactor);
   const dewatEff=Math.min(99,Math.max(0,(1-residual/(qtyH*0.03))*100)); // ★v7.0 음수 방지
   // ★v7.0 건조효율: 온도·풍량·순환 + 잔수(탈수 결과) 연동 — 세척→탈수→건조 체인 연결
@@ -1127,7 +1164,7 @@ function calcAll(){
   const elecTotal = elecBase + convMotorKW;
   const elecReal = elecRealBase + convLoadKW;
 
-  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,filterFactor,fScore,heaterPerUnit,heaterOK,heaterFactor,convLoadKW,nClipPairs,trayOnLine,loadKg,convMotorKW,tankBottomMax,cascadeOK,topStage,nozPitch,angImpact,rinseF,rinseNeedLph,recircF,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
+  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,filterFactor,fScore,heaterPerUnit,heaterOK,heaterFactor,convLoadKW,nClipPairs,trayOnLine,loadKg,convMotorKW,tankBottomMax,cascadeOK,topStage,nozPitch,angImpact,slantD,tiltF,ovF,altF,rinseF,rinseNeedLph,recircF,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
 }
 
 // ── 좌측 렌더 ──
@@ -1151,6 +1188,7 @@ function renderLeft(){
         +(orv.ok?'✅ <b>목표 달성 조건 확정</b>':'⚠️ <b>일부 목표 미달 — 도달 가능한 최대치 적용</b>')+'<br>'
         +'세척 <b>'+orv.washEff.toFixed(1)+'%</b>'+(orv.washHit?'✅':'⚠️')+' / 탈수 <b>'+orv.dewatEff.toFixed(1)+'%</b>'+(orv.dewatHit?'✅':'⚠️')+' / 건조 <b>'+orv.dryEff.toFixed(1)+'%</b>'+(orv.dryHit?'✅':'⚠️')+'<br>'
         +'세척: 압력 '+orv.press+'kPa · 분사각 '+orv.ang+'° · 이격 '+orv.dist+'mm · 노즐간격 '+orv.pitch.toFixed(0)+'mm<br>'
+        +'사선: 경사 '+orv.tilt+'° · 겹침 '+orv.ov+'% · 지그재그 교대 · 타격계수 '+(orv.impact*100).toFixed(0)+'%<br>'
         +'노즐: 길이 '+orv.row+'줄 × 높이 '+orv.col+'개 = '+(orv.col*orv.row)+'/면 (전체 '+orv.nozTotal+'개) · 펌프 '+orv.pumpLpm+'LPM · '+orv.temp+'°C · 세척조 '+orv.washLen+'mm<br>'
         +'탈수: '+orv.knifePass+'패스 · '+orv.knifePress+'kPa / 건조: '+orv.dryTemp+'°C · '+orv.dryAirVol+'m³/min · 열풍기 '+orv.heaterCount+'대<br>'
         +'전기 <b>'+orv.elec.toFixed(1)+'kW</b> · 총길이 <b>'+orv.totalLen+'mm</b> ('+(orv.fitL?'40ft 적재 가능':'⚠️ 40ft 초과')+')</div>':'')
@@ -1231,6 +1269,16 @@ function renderLeft(){
       +sliderHTML('wSprayAngle','📐 분사 각도','°',15,120,5,S.wSprayAngle,45,90)
       +'<label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1565c0;margin:4px 0;cursor:pointer;"><input type="checkbox" id="wDistAuto" '+(S.wDistAuto?'checked':'')+'> ↔️ 이격거리 자동 — 분사각 최적점 추종 (현재 '+S.wSprayAngle+'° → 최적 '+R.nozzleInfo.distOpt.opt+'mm)</label>'
       +sliderHTML('wNozzleDist','↔️ 트레이면 이격거리','mm',30,300,10,S.wNozzleDist,R.nozzleInfo.distOpt.lo,R.nozzleInfo.distOpt.hi)
+      +sliderHTML('wTiltAngle','📐 노즐 경사각(사선 설치)','°',0,45,5,S.wTiltAngle,25,40)
+      +sliderHTML('wOverlap','🔁 분사 겹침률','%',0,60,5,S.wOverlap,20,40)
+      +'<div class="g2"><div class="fl"><label>경사 방향</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="wTiltAlt" '+(S.wTiltAlt?'checked':'')+'> 줄마다 좌·우 교대(지그재그)</label></div><div></div></div>'
+      +'<div class="chbox" style="background:#f1f8e9;border-color:#c5e1a5;color:#33691e;">📐 <b>사선 설치 효과</b> — 경사 '+S.wTiltAngle+'° · 겹침 '+S.wOverlap+'%<br>'
+      +'· 실제 도달거리 '+S.wNozzleDist+' → <b>'+R.slantD.toFixed(0)+'mm</b> (이격/cos) · 풋프린트 '+R.nozzleInfo.coverW.toFixed(0)+' → <b>'+(R.nozzleInfo.coverW/Math.cos(S.wTiltAngle*Math.PI/180)).toFixed(0)+'mm</b><br>'
+      +'· 타격 특성 <b>'+(R.tiltF*100).toFixed(0)+'%</b> (수직력↓ 전단력↑ — 오염 박리는 전단이 유리, 25~40°가 최적)<br>'
+      +'· 겹침 타격 <b>'+(R.ovF*100).toFixed(0)+'%</b> (같은 지점 '+(1/Math.max(0.3,1-S.wOverlap/100)).toFixed(2)+'회 타격) · 노즐 간격 <b>'+R.nozPitch.toFixed(0)+'mm</b>로 조밀화<br>'
+      +(S.wTiltAlt?'· 지그재그 교대 ✅ 포켓 양 측면 타격 (포켓 손실 25% 완화)':'· ⚠️ 단방향 경사 — 포켓 한쪽 면만 타격됨')+'<br>'
+      +'· 겹침률 기준 <b>높이방향 권장 '+Math.max(2,Math.ceil(S.trayW/R.nozPitch))+'개/열</b>'+(S.wAutoArray?' (자동 적용됨)':' ← 현재 수동 '+S.stgCol[0]+'개, 자동배열 켜면 반영')+'<br>'
+      +'· 종합 세척 타격계수 <b>'+(R.angImpact*100).toFixed(0)+'%</b>'+(R.angImpact>1.2?' 🔥 우수':(R.angImpact>=1?' ✅':' ⚠️ 저하'))+'</div>'
       +'<div class="chbox" style="background:#eef6fb;border-color:#cde3f0;color:#0b5a80;">🔗 <b>분사각 ↔ 이격 ↔ 노즐 간격 연동</b><br>'
       +'분사각 '+S.wSprayAngle+'° · 이격 '+S.wNozzleDist+'mm → 커버폭 <b>'+R.nozzleInfo.coverW.toFixed(0)+'mm</b> → <b>노즐 간격 '+R.nozPitch.toFixed(0)+'mm</b> (중첩 15%)<br>'
       +'→ 높이방향 필요 노즐 <b>'+Math.max(2,Math.ceil(S.trayW/R.nozPitch))+'개</b> (트레이 높이 '+S.trayW+'mm 커버) · 길이방향 줄간격도 동일 피치<br>'
@@ -1476,7 +1524,7 @@ function renderLeft(){
       const needRerender =
         el.id==='boilerType'||el.id==='containerType'||el.id==='supplyMode'||el.id==='aux1st'
         ||el.id==='meshFilter'||el.id==='sludgeFilter'||el.id==='pumpStrainer'
-        ||el.id==='drainMode'||el.id==='stgTankMode'||el.id==='dlv'||el.id==='wAutoArray'||el.id==='wDistAuto'||el.id==='pumpMode'||el.id==='nozzleLayout'||el.id==='pocketCount'||el.id==='wSprayAngle'||el.id==='rinseWater'
+        ||el.id==='drainMode'||el.id==='stgTankMode'||el.id==='dlv'||el.id==='wAutoArray'||el.id==='wDistAuto'||el.id==='pumpMode'||el.id==='wTiltAlt'||el.id==='wTiltAngle'||el.id==='wOverlap'||el.id==='nozzleLayout'||el.id==='pocketCount'||el.id==='wSprayAngle'||el.id==='rinseWater'
         ||(el.id&&el.id.startsWith('stgType'))
         ||['washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch','qty','tempSensor','rinseTemp','rinseWater','hours','days','targetMonth','workers','wage','trayW','trayD','trayT','wHole','wSprayAngle','wNozzleDist'].indexOf(el.id)>=0||(el.id&&el.id.startsWith('directValve'))
         ||(el.id&&el.id.startsWith('stg'));
@@ -1652,7 +1700,8 @@ function renderCost(){
 function nozzleSVG(){
   const ang=S.wSprayAngle, dist=S.wNozzleDist;
   const half=ang/2*Math.PI/180;
-  const coverMm=2*dist*Math.tan(half);
+  const tilt=(S.wTiltAngle||0)*Math.PI/180;          // ★v8.6 설치 경사각
+  const coverMm=2*dist*Math.tan(half)/Math.cos(tilt); // 사선 풋프린트(면 위 자국)
   const pitchMm=R.nozPitch;
   const N=3;                                   // 인접 노즐 3개로 간격·중첩 표시
   const spanMm=(N-1)*pitchMm+coverMm;          // 가로 실치수
@@ -1660,17 +1709,19 @@ function nozzleSVG(){
   // 등축(가로=세로 동일) 스케일 → 화면 각도 = 실제 분사각
   const scale=Math.min((H-topY-30)/Math.max(1,dist), (W-padX*2)/Math.max(1,spanMm));
   const faceY=topY+dist*scale;
-  const halfCov=dist*Math.tan(half)*scale;
+  const halfCov=coverMm/2*scale;                     // 면 위 반폭(사선 반영)
   const pitchPx=pitchMm*scale;
   const cx0=W/2-(N-1)*pitchPx/2;
   const col=R.distFactor>=1?'#2e7d32':(R.distFactor>=0.8?'#ef6c00':'#c62828');
   var s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">';
+  // 경사 설치: 노즐 꼭지점을 면 도달점 기준으로 tilt만큼 어긋나게 배치 (지그재그면 줄마다 교대)
+  function tiltShift(i){ const dir = S.wTiltAlt ? (i%2===0?1:-1) : 1; return dir*Math.tan(tilt)*dist*scale; }
   s+='<defs><linearGradient id="spg" x1="0" y1="0" x2="0" y2="1">'
    +'<stop offset="0%" stop-color="'+col+'" stop-opacity="0.45"/>'
    +'<stop offset="100%" stop-color="'+col+'" stop-opacity="0.14"/></linearGradient>'
    +'<clipPath id="spclip">';
-  for(var i=0;i<N;i++){ var cx=cx0+i*pitchPx;
-    s+='<polygon points="'+cx+','+topY+' '+(cx-halfCov)+','+faceY+' '+(cx+halfCov)+','+faceY+'"/>'; }
+  for(var i=0;i<N;i++){ var cx=cx0+i*pitchPx, sh=tiltShift(i);
+    s+='<polygon points="'+(cx+sh)+','+topY+' '+(cx-halfCov)+','+faceY+' '+(cx+halfCov)+','+faceY+'"/>'; }
   s+='</clipPath></defs>';
   // 중첩 구간 음영 (인접 커버가 겹치는 영역)
   if(coverMm>pitchMm){
@@ -1681,19 +1732,22 @@ function nozzleSVG(){
   }
   // 분사 원뿔 (실제 각도) + 노즐 + 낙하 물방울 애니메이션
   for(var i2=0;i2<N;i2++){
-    var cxx=cx0+i2*pitchPx, mid=(i2===Math.floor(N/2));
-    s+='<polygon points="'+cxx+','+topY+' '+(cxx-halfCov)+','+faceY+' '+(cxx+halfCov)+','+faceY+'" fill="url(#spg)" stroke="'+col+'" stroke-width="'+(mid?1.6:1)+'" stroke-opacity="'+(mid?1:0.55)+'"/>';
-    s+='<rect x="'+(cxx-4)+'" y="'+(topY-11)+'" width="8" height="11" rx="2" fill="#0d2137"/>';
+    var cxx=cx0+i2*pitchPx, mid=(i2===Math.floor(N/2)), sh2=tiltShift(i2);
+    s+='<polygon points="'+(cxx+sh2)+','+topY+' '+(cxx-halfCov)+','+faceY+' '+(cxx+halfCov)+','+faceY+'" fill="url(#spg)" stroke="'+col+'" stroke-width="'+(mid?1.6:1)+'" stroke-opacity="'+(mid?1:0.55)+'"/>';
+    // 노즐 몸체도 경사 방향으로 기울여 표시
+    var degv=(S.wTiltAngle||0)*(S.wTiltAlt&&i2%2===1?1:-1);
+    s+='<g transform="rotate('+degv+','+(cxx+sh2)+','+topY+')"><rect x="'+(cxx+sh2-4)+'" y="'+(topY-12)+'" width="8" height="12" rx="2" fill="#0d2137"/></g>';
   }
   // 물방울: 원뿔 내부에서만 보이도록 clip
   s+='<g clip-path="url(#spclip)">';
   var dur=(1.15-Math.min(0.5,(S.stgPressAct[0]||280)/1400)).toFixed(2); // 압력↑ → 빠르게
   for(var i3=0;i3<N;i3++){
     var cx3=cx0+i3*pitchPx;
+    var sh3=tiltShift(i3);
     for(var k=-2;k<=2;k++){
       var tx=cx3+halfCov*(k/2), delay=(Math.abs(k)*0.13+i3*0.09).toFixed(2);
       s+='<circle r="'+(k===0?2.2:1.7)+'" fill="'+col+'" fill-opacity="0.85">'
-       +'<animate attributeName="cx" values="'+cx3+';'+tx.toFixed(1)+'" dur="'+dur+'s" begin="'+delay+'s" repeatCount="indefinite"/>'
+       +'<animate attributeName="cx" values="'+(cx3+sh3).toFixed(1)+';'+tx.toFixed(1)+'" dur="'+dur+'s" begin="'+delay+'s" repeatCount="indefinite"/>'
        +'<animate attributeName="cy" values="'+topY+';'+faceY.toFixed(1)+'" dur="'+dur+'s" begin="'+delay+'s" repeatCount="indefinite"/>'
        +'<animate attributeName="fill-opacity" values="0.95;0.95;0.1" dur="'+dur+'s" begin="'+delay+'s" repeatCount="indefinite"/></circle>';
     }
@@ -1702,7 +1756,7 @@ function nozzleSVG(){
   // 트레이 면
   s+='<rect x="'+padX+'" y="'+faceY+'" width="'+(W-padX*2)+'" height="9" fill="#607d8b" rx="2"/>';
   // 각도 표시(실제 각 호)
-  var arcR=Math.min(30,dist*scale*0.55), ax=Math.sin(half)*arcR, ay=Math.cos(half)*arcR, mcx=cx0+Math.floor(N/2)*pitchPx;
+  var arcR=Math.min(30,dist*scale*0.55), ax=Math.sin(half)*arcR, ay=Math.cos(half)*arcR, mcx=cx0+Math.floor(N/2)*pitchPx+tiltShift(Math.floor(N/2));
   s+='<path d="M '+(mcx-ax).toFixed(1)+' '+(topY+ay).toFixed(1)+' A '+arcR.toFixed(1)+' '+arcR.toFixed(1)+' 0 0 1 '+(mcx+ax).toFixed(1)+' '+(topY+ay).toFixed(1)+'" fill="none" stroke="#0d2137" stroke-width="1.2"/>';
   // 커버폭 치수선 (가운데 노즐)
   s+='<line x1="'+(mcx-halfCov)+'" y1="'+(faceY+16)+'" x2="'+(mcx+halfCov)+'" y2="'+(faceY+16)+'" stroke="#1565c0" stroke-width="1.2"/>';
