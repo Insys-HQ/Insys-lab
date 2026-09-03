@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* pcb.html v1.5 — 인시스 AI혁신 연구개발실 (2026) */
+/* pcb.html v1.6 — 인시스 AI혁신 연구개발실 (2026) */
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Noto Sans KR',sans-serif;font-size:14px;line-height:1.6;color:#28323f;background:#eef1f4}
 nav{background:#16324f;width:100%}
@@ -110,7 +110,7 @@ body.pc #panel3 .card:first-child{grid-column:1/3}
 </nav>
 
 <div class="wrap">
-  <div class="meta"><span id="fbStatus"></span><span>버전 <b id="verTop">v1.5</b></span></div>
+  <div class="meta"><span id="fbStatus"></span><span>버전 <b id="verTop">v1.6</b></span></div>
 
   <div class="menu">
     <button class="m-card sel" id="menu1" onclick="showPanel(1)">
@@ -206,24 +206,24 @@ body.pc #panel3 .card:first-child{grid-column:1/3}
     <div class="card">
       <h2>공통 하드웨어 구성 (개략)</h2>
       <div class="tbl-scroll"><table>
-        <thead><tr><th>구분</th><th>추천 사양</th><th style="width:130px">개략 예산</th><th style="width:52px">관리</th></tr></thead>
+        <thead><tr><th>구분</th><th>추천 사양</th><th style="width:130px">개략 예산(원)</th><th style="width:52px">관리</th></tr></thead>
         <tbody id="hwBody"></tbody>
       </table></div>
-      <div class="add-row"><input id="hwName" placeholder="구분"><input id="hwSpec" placeholder="추천 사양"><input id="hwBudget" placeholder="개략 예산 (선택)"><button class="btn-add" onclick="addHw()">항목 추가</button></div>
+      <div class="add-row"><input id="hwName" placeholder="구분"><input id="hwSpec" placeholder="추천 사양"><input id="hwBudget" placeholder="개략 예산(원)"><button class="btn-add" onclick="addHw()">항목 추가</button></div>
       <div class="hint">개략 예산은 공란입니다 — 설비업체에서 직접 입력·수정해 주세요. 행 추가·삭제 가능하며 변경 즉시 자동 저장됩니다.</div>
     </div>
   </section>
 
   <footer>
     <span><b>인시스 AI혁신 연구개발실</b> · ys.kim@in-sys.co.kr</span>
-    <span>pcb.html <b id="verFoot">v1.5</b></span>
+    <span>pcb.html <b id="verFoot">v1.6</b></span>
   </footer>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
-var APP_VERSION = "v1.5"; /* pcb.html v1.5 (2026) */
+var APP_VERSION = "v1.6"; /* pcb.html v1.6 (2026) */
 document.getElementById("verTop").textContent = APP_VERSION;
 document.getElementById("verFoot").textContent = APP_VERSION;
 
@@ -277,6 +277,12 @@ var DEFAULT_DATA = {
 };
 var data = JSON.parse(JSON.stringify(DEFAULT_DATA));
 
+function fmtBudget(v){
+  v = String(v || "").trim();
+  var digits = v.replace(/,/g, "");
+  if(/^\d+$/.test(digits)) return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return v;
+}
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function setStatus(msg){ var el=document.getElementById("fbStatus"); if(el) el.textContent = msg; }
 
@@ -292,7 +298,7 @@ function renderHw(){
   for(var i=0;i<data.hw.length;i++){
     var r = data.hw[i];
     out += '<tr><td>'+esc(r.name)+'</td><td>'+esc(r.spec)+'</td>'
-        +  '<td><input class="bud" value="'+esc(r.budget)+'" placeholder="금액 입력" onchange="updateBudget('+i+', this.value)"></td>'
+        +  '<td><input class="bud" value="'+esc(fmtBudget(r.budget))+'" placeholder="금액 입력" onchange="updateBudget('+i+', this.value)"></td>'
         +  '<td><button class="btn-del" onclick="delHw('+i+')">삭제</button></td></tr>';
   }
   document.getElementById("hwBody").innerHTML = out;
@@ -308,12 +314,12 @@ function delPoint(i){ data.points.splice(i,1); renderPoints(); saveData(); }
 function addHw(){
   var n = document.getElementById("hwName"), s = document.getElementById("hwSpec"), b = document.getElementById("hwBudget");
   if(!n.value.trim()){ alert("구분을 입력해 주세요."); return; }
-  data.hw.push({name:n.value.trim(), spec:s.value.trim(), budget:b.value.trim()});
+  data.hw.push({name:n.value.trim(), spec:s.value.trim(), budget:fmtBudget(b.value)});
   n.value=""; s.value=""; b.value="";
   renderHw(); saveData();
 }
 function delHw(i){ data.hw.splice(i,1); renderHw(); saveData(); }
-function updateBudget(i,v){ data.hw[i].budget = v.trim(); saveData(); }
+function updateBudget(i,v){ data.hw[i].budget = fmtBudget(v); renderHw(); saveData(); }
 
 function saveData(){
   if(!FB_OK){ setStatus("저장 안 됨 (오프라인)"); return; }
