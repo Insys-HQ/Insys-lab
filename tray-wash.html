@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v8.0 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v8.1 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v8.0</span>
+    <span class="vb">v8.1</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v8.0 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v8.1 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v8.0
+// 트레이 세척·탈수·건조 시뮬레이터 v8.1
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='8.0';
+const VER='8.1';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -1585,27 +1585,78 @@ function renderCost(){
     +'<div class="save-i">💨 트레이는 탈수 강화가 건조 절감의 핵심</div></div>';
 }
 // ── 상관관계 ──
-// 분사각·이격 커버리지 SVG (분사 원뿔 + 커버폭 시각화)
+// ★v8.1 분사 커버리지 SVG — 실제 분사각 그대로 작도(등축 스케일) + 분사 애니메이션
+// 이전 버전은 커버폭에 ×3 보정이 들어가 화면상 각도가 실제와 달랐음 → 제거
 function nozzleSVG(){
-  const ang=S.wSprayAngle, dist=S.wNozzleDist, cover=R.nozzleInfo.coverW;
-  const W=280, H=110;
-  const nozzleX=W/2, nozzleY=15;
-  // 스케일: 이격 300mm를 H-30에 매핑
-  const scale=(H-35)/300;
-  const faceY=nozzleY + dist*scale;
-  const halfCover=Math.min(W/2-10, cover/2*scale*3); // 커버 시각 스케일
-  const col = R.distFactor>=1 ? '#43a047' : (R.distFactor>=0.8?'#fb8c00':'#e53935');
-  var s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:'+H+'px;">';
-  // 분사 원뿔 (노즐→면)
-  s+='<polygon points="'+nozzleX+','+nozzleY+' '+(nozzleX-halfCover)+','+faceY+' '+(nozzleX+halfCover)+','+faceY+'" fill="'+col+'" fill-opacity="0.25" stroke="'+col+'" stroke-width="1.5"/>';
-  // 노즐
-  s+='<circle cx="'+nozzleX+'" cy="'+nozzleY+'" r="4" fill="#0d2137"/>';
-  s+='<text x="'+(nozzleX+8)+'" y="'+(nozzleY+4)+'" font-size="10" fill="#5a7088">노즐 '+ang+'°</text>';
+  const ang=S.wSprayAngle, dist=S.wNozzleDist;
+  const half=ang/2*Math.PI/180;
+  const coverMm=2*dist*Math.tan(half);
+  const pitchMm=R.nozPitch;
+  const N=3;                                   // 인접 노즐 3개로 간격·중첩 표시
+  const spanMm=(N-1)*pitchMm+coverMm;          // 가로 실치수
+  const W=320, H=185, padX=14, topY=34;
+  // 등축(가로=세로 동일) 스케일 → 화면 각도 = 실제 분사각
+  const scale=Math.min((H-topY-46)/Math.max(1,dist), (W-padX*2)/Math.max(1,spanMm));
+  const faceY=topY+dist*scale;
+  const halfCov=dist*Math.tan(half)*scale;
+  const pitchPx=pitchMm*scale;
+  const cx0=W/2-(N-1)*pitchPx/2;
+  const col=R.distFactor>=1?'#2e7d32':(R.distFactor>=0.8?'#ef6c00':'#c62828');
+  var s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">';
+  s+='<defs><linearGradient id="spg" x1="0" y1="0" x2="0" y2="1">'
+   +'<stop offset="0%" stop-color="'+col+'" stop-opacity="0.45"/>'
+   +'<stop offset="100%" stop-color="'+col+'" stop-opacity="0.14"/></linearGradient>'
+   +'<clipPath id="spclip">';
+  for(var i=0;i<N;i++){ var cx=cx0+i*pitchPx;
+    s+='<polygon points="'+cx+','+topY+' '+(cx-halfCov)+','+faceY+' '+(cx+halfCov)+','+faceY+'"/>'; }
+  s+='</clipPath></defs>';
+  // 중첩 구간 음영 (인접 커버가 겹치는 영역)
+  if(coverMm>pitchMm){
+    for(var j=0;j<N-1;j++){
+      var xa=cx0+j*pitchPx+halfCov, xb=cx0+(j+1)*pitchPx-halfCov;
+      s+='<rect x="'+xb+'" y="'+(faceY-7)+'" width="'+Math.max(0,xa-xb)+'" height="9" fill="#1565c0" fill-opacity="0.30"/>';
+    }
+  }
+  // 분사 원뿔 (실제 각도) + 노즐 + 낙하 물방울 애니메이션
+  for(var i2=0;i2<N;i2++){
+    var cxx=cx0+i2*pitchPx, mid=(i2===Math.floor(N/2));
+    s+='<polygon points="'+cxx+','+topY+' '+(cxx-halfCov)+','+faceY+' '+(cxx+halfCov)+','+faceY+'" fill="url(#spg)" stroke="'+col+'" stroke-width="'+(mid?1.6:1)+'" stroke-opacity="'+(mid?1:0.55)+'"/>';
+    s+='<rect x="'+(cxx-4)+'" y="'+(topY-11)+'" width="8" height="11" rx="2" fill="#0d2137"/>';
+  }
+  // 물방울: 원뿔 내부에서만 보이도록 clip
+  s+='<g clip-path="url(#spclip)">';
+  var dur=(1.15-Math.min(0.5,(S.stgPressAct[0]||280)/1400)).toFixed(2); // 압력↑ → 빠르게
+  for(var i3=0;i3<N;i3++){
+    var cx3=cx0+i3*pitchPx;
+    for(var k=-2;k<=2;k++){
+      var tx=cx3+halfCov*(k/2), delay=(Math.abs(k)*0.13+i3*0.09).toFixed(2);
+      s+='<circle r="'+(k===0?2.2:1.7)+'" fill="'+col+'" fill-opacity="0.85">'
+       +'<animate attributeName="cx" values="'+cx3+';'+tx.toFixed(1)+'" dur="'+dur+'s" begin="'+delay+'s" repeatCount="indefinite"/>'
+       +'<animate attributeName="cy" values="'+topY+';'+faceY.toFixed(1)+'" dur="'+dur+'s" begin="'+delay+'s" repeatCount="indefinite"/>'
+       +'<animate attributeName="fill-opacity" values="0.95;0.95;0.1" dur="'+dur+'s" begin="'+delay+'s" repeatCount="indefinite"/></circle>';
+    }
+  }
+  s+='</g>';
   // 트레이 면
-  s+='<rect x="10" y="'+faceY+'" width="'+(W-20)+'" height="8" fill="#90a4ae" rx="2"/>';
-  s+='<text x="12" y="'+(faceY+22)+'" font-size="10" fill="#37474f">트레이면 · 이격 '+dist+'mm · 커버 '+cover.toFixed(0)+'mm</text>';
-  // 이격 화살표
-  s+='<line x1="'+(W-25)+'" y1="'+nozzleY+'" x2="'+(W-25)+'" y2="'+faceY+'" stroke="#b0bec5" stroke-width="1" stroke-dasharray="3,2"/>';
+  s+='<rect x="'+padX+'" y="'+faceY+'" width="'+(W-padX*2)+'" height="9" fill="#607d8b" rx="2"/>';
+  // 각도 표시(실제 각 호)
+  var arcR=Math.min(30,dist*scale*0.55), ax=Math.sin(half)*arcR, ay=Math.cos(half)*arcR, mcx=cx0+Math.floor(N/2)*pitchPx;
+  s+='<path d="M '+(mcx-ax).toFixed(1)+' '+(topY+ay).toFixed(1)+' A '+arcR.toFixed(1)+' '+arcR.toFixed(1)+' 0 0 1 '+(mcx+ax).toFixed(1)+' '+(topY+ay).toFixed(1)+'" fill="none" stroke="#0d2137" stroke-width="1.2"/>';
+  s+='<text x="'+(mcx+ax+4)+'" y="'+(topY+ay+4)+'" font-size="12" font-weight="700" fill="#0d2137">'+ang+'°</text>';
+  // 커버폭 치수선 (가운데 노즐)
+  s+='<line x1="'+(mcx-halfCov)+'" y1="'+(faceY+16)+'" x2="'+(mcx+halfCov)+'" y2="'+(faceY+16)+'" stroke="#1565c0" stroke-width="1.2"/>';
+  s+='<line x1="'+(mcx-halfCov)+'" y1="'+(faceY+12)+'" x2="'+(mcx-halfCov)+'" y2="'+(faceY+20)+'" stroke="#1565c0" stroke-width="1.2"/>';
+  s+='<line x1="'+(mcx+halfCov)+'" y1="'+(faceY+12)+'" x2="'+(mcx+halfCov)+'" y2="'+(faceY+20)+'" stroke="#1565c0" stroke-width="1.2"/>';
+  s+='<text x="'+mcx+'" y="'+(faceY+31)+'" font-size="12" fill="#1565c0" font-weight="700" text-anchor="middle">커버 '+coverMm.toFixed(0)+'mm</text>';
+  // 노즐 간격 치수선 (상단)
+  if(N>1){
+    s+='<line x1="'+cx0+'" y1="'+(topY-19)+'" x2="'+(cx0+pitchPx)+'" y2="'+(topY-19)+'" stroke="#6a1b9a" stroke-width="1.2"/>';
+    s+='<text x="'+(cx0+pitchPx/2)+'" y="'+(topY-23)+'" font-size="12" fill="#6a1b9a" font-weight="700" text-anchor="middle">간격 '+pitchMm.toFixed(0)+'mm</text>';
+  }
+  // 이격 치수선 (우측)
+  s+='<line x1="'+(W-8)+'" y1="'+topY+'" x2="'+(W-8)+'" y2="'+faceY+'" stroke="#546e7a" stroke-width="1" stroke-dasharray="3,2"/>';
+  s+='<text x="'+(W-11)+'" y="'+((topY+faceY)/2)+'" font-size="12" fill="#546e7a" font-weight="700" text-anchor="end">이격 '+dist+'mm</text>';
+  s+='<text x="'+padX+'" y="'+(faceY+31)+'" font-size="12" fill="#37474f">트레이면 · 세척계수 '+(R.distFactor*100).toFixed(0)+'%</text>';
   s+='</svg>';
   return s;
 }
