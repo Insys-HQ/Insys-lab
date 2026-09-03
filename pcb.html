@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>PCB 비전검사 헤더 로봇 — 방안 검토</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* pcb.html v1.0 — 인시스 AI혁신 연구개발실 (2026) */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;font-size:14px;line-height:1.6;color:#28323f;background:#eef1f4}
+nav{background:#16324f;width:100%}
+.nav-inner{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.nav-title{color:#f2f6fa;font-weight:700;font-size:15px}
+.nav-title small{display:block;font-size:11px;font-weight:400;color:#aec3d6}
+.dev-toggle{display:flex;border:1px solid #4a6a8a;border-radius:6px;overflow:hidden}
+.dev-toggle button{background:transparent;color:#c6d6e4;border:0;padding:4px 12px;font-family:inherit;font-size:12px;cursor:pointer}
+.dev-toggle button.on{background:#f2f6fa;color:#16324f;font-weight:700}
+.wrap{max-width:420px;margin:0 auto;padding:8px 12px}
+body.pc .wrap{max-width:1100px}
+.meta{font-size:12px;color:#5a6b7d;padding:6px 4px 4px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px}
+.menu{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;margin-bottom:8px}
+.menu .m-card{background:#fff;border:2px solid #d5dce4;border-radius:10px;padding:10px 12px;cursor:pointer;text-align:left;font-family:inherit}
+.menu .m-card .m-no{font-size:11px;font-weight:700;color:#5a6b7d}
+.menu .m-card .m-name{font-size:14px;font-weight:700;color:#16324f;margin-top:2px}
+.menu .m-card .m-desc{font-size:12px;color:#5a6b7d;margin-top:2px}
+.menu .m-card.sel{border-color:#16324f;background:#f4f8fc}
+.menu .m-card.sel .m-no{color:#b8541f}
+.menu .m-compare{grid-column:1/3;display:flex;align-items:center;justify-content:center;gap:6px}
+.menu .m-compare .m-name{margin-top:0}
+body.pc .menu{grid-template-columns:1fr 1fr 1fr}
+body.pc .menu .m-compare{grid-column:auto}
+.panel{display:none}
+.panel.show{display:block}
+.card{background:#fff;border:1px solid #dde3ea;border-radius:10px;padding:12px;margin-top:8px;margin-bottom:8px}
+.card h2{font-size:15px;color:#16324f;font-weight:700;padding-bottom:8px}
+.card h2 .tag{font-size:11px;font-weight:500;color:#fff;background:#16324f;border-radius:4px;padding:1px 8px;margin-left:6px;vertical-align:2px}
+.summary{background:#f4f8fc;border-left:3px solid #16324f;padding:8px 10px;font-size:13px;border-radius:0}
+.flow{list-style:none;margin-top:8px}
+.flow li{background:#fbfcfd;border:1px solid #e2e8ef;border-left:4px solid #8095a8;border-radius:0 8px 8px 0;padding:8px 10px;position:relative}
+.flow li+li{margin-top:8px}
+.flow li+li::before{content:"▼";position:absolute;top:-16px;left:14px;font-size:10px;color:#8095a8}
+.flow li.measure{border-left-color:#0d7a66}
+.flow li.drive{border-left-color:#16324f}
+.flow li.judge{border-left-color:#b8541f}
+.flow .f-t{font-weight:700;font-size:13px;color:#28323f}
+.flow .f-d{font-size:12px;color:#5a6b7d}
+.flow .f-loop{font-size:12px;color:#0d7a66;font-weight:500;margin-top:4px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:#5a6b7d;padding-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px}
+.pros{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px}
+body.pc .pros{grid-template-columns:1fr 1fr}
+.pros .p-box{border:1px solid #e2e8ef;border-radius:8px;padding:8px 10px}
+.pros .p-box h3{font-size:13px;padding-bottom:4px}
+.pros .p-box.good h3{color:#0d7a66}
+.pros .p-box.warn h3{color:#b8541f}
+.pros ul{padding-left:16px;font-size:12.5px;color:#3d4a58}
+.tbl-scroll{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:520px}
+th,td{border:1px solid #dde3ea;padding:6px 8px;text-align:left;vertical-align:top}
+th{background:#e8eef5;color:#16324f;font-weight:700;white-space:nowrap}
+td .win{color:#0d7a66;font-weight:700}
+.reco{background:#eef7f4;border-left:3px solid #0d7a66;padding:8px 10px;font-size:13px;margin-top:8px}
+.points{list-style:none;counter-reset:pt;margin-top:8px}
+.points li{counter-increment:pt;padding:8px 10px 8px 38px;position:relative;border:1px solid #e2e8ef;border-radius:8px;font-size:13px}
+.points li+li{margin-top:8px}
+.points li::before{content:counter(pt);position:absolute;left:10px;top:8px;width:20px;height:20px;background:#16324f;color:#fff;border-radius:50%;font-size:12px;font-weight:700;text-align:center;line-height:20px}
+footer{border-top:1px solid #d5dce4;margin-top:8px;padding:10px 4px 12px;font-size:12px;color:#5a6b7d;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px}
+footer b{color:#16324f}
+@media (min-width:768px){
+  body{font-size:16px}
+  .nav-title{font-size:17px}
+  .card h2{font-size:17px}
+  .summary,.reco,.points li{font-size:14px}
+  .flow .f-t{font-size:14px}
+  .flow .f-d,.legend,.meta{font-size:13px}
+  table,.pros ul{font-size:13.5px}
+  .menu .m-card .m-name{font-size:15px}
+  .menu .m-card .m-desc{font-size:13px}
+}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <div class="nav-title">PCB 납땜 비전검사 헤더 로봇 DIY — 방안 검토<small>인시스 AI혁신 연구개발실 · 2026-09-03 미팅 자료</small></div>
+    <div class="dev-toggle" role="tablist" aria-label="화면 선택">
+      <button id="btnMobile" class="on" onclick="setDevice('mobile')">모바일</button>
+      <button id="btnPc" onclick="setDevice('pc')">PC</button>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="meta"><span>검토 대상: 정렬 방식 2안</span><span>버전 <b id="verTop">v1.0</b></span></div>
+
+  <div class="menu">
+    <button class="m-card sel" id="menu1" onclick="showPanel(1)">
+      <span class="m-no">방안 1</span>
+      <span class="m-name">가이드 카메라 분리형</span>
+      <span class="m-desc">측정 전용 카메라로 1회 측정 · 1회 정렬</span>
+    </button>
+    <button class="m-card" id="menu2" onclick="showPanel(2)">
+      <span class="m-no">방안 2</span>
+      <span class="m-name">검사카메라 엣지 활용형</span>
+      <span class="m-desc">검사카메라 겸용 · 반복 수렴 정렬</span>
+    </button>
+    <button class="m-card m-compare" id="menu3" onclick="showPanel(3)">
+      <span class="m-name">비교 · 협의 포인트</span>
+    </button>
+  </div>
+
+  <!-- 방안 1 -->
+  <section class="panel show" id="panel1">
+    <div class="card">
+      <h2>방안 1 — 가이드 카메라 분리형<span class="tag">2카메라</span></h2>
+      <div class="summary">헤더에 측정 전용 가이드 카메라(+레이저 포인터)를 별도 장착. 거리·기울기·위치를 <b>1회 측정으로 확정</b>하고 4축 스테이지가 한 번에 법선 정렬하는 방식.</div>
+      <ol class="flow">
+        <li><span class="f-t">PCB 반입 · 정지</span><span class="f-d"> — 컨베이어 정지신호 수신(PLC 접점)</span></li>
+        <li class="measure"><span class="f-t">가이드 카메라 측정</span><span class="f-d"> — 거리 · 기울기 · 위치 (레이저 보조로 Z 확정)</span></li>
+        <li class="measure"><span class="f-t">보정량 계산</span><span class="f-d"> — X · Y · Rx · Ry 산출</span></li>
+        <li class="drive"><span class="f-t">4축 스테이지 구동</span><span class="f-d"> — 검사카메라 법선 정렬 (1회 이동)</span></li>
+        <li class="drive"><span class="f-t">검사 촬영</span><span class="f-d"> — 검사카메라 + 링 · 동축 조명</span></li>
+        <li class="judge"><span class="f-t">딥러닝 양불판정</span><span class="f-d"> — 납땜 상태 분류</span></li>
+        <li class="judge"><span class="f-t">화면 표시 · MES 전송</span><span class="f-d"> — 양품 / NG 구분 표시, 검사이력 전송</span></li>
+      </ol>
+      <div class="legend"><span><i style="background:#0d7a66"></i>측정 · 정렬(1차 목표)</span><span><i style="background:#16324f"></i>구동 · 촬영</span><span><i style="background:#b8541f"></i>판정 · 출력</span></div>
+    </div>
+    <div class="card">
+      <h2>장점 · 유의점</h2>
+      <div class="pros">
+        <div class="p-box good"><h3>장점</h3><ul>
+          <li>1회 측정 → 1회 이동, 택트타임 짧음</li>
+          <li>넓은 화각으로 초기 탐색 유리</li>
+          <li>레이저 보조로 거리(Z) 측정 정확</li>
+        </ul></div>
+        <div class="p-box warn"><h3>유의점</h3><ul>
+          <li>가이드 카메라 · 레이저 추가 비용 +50~80만원</li>
+          <li>두 카메라 간 좌표 변환 캘리브레이션 필요(복잡)</li>
+          <li>카메라 간 정합 오차가 정렬 정밀도에 직결</li>
+        </ul></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 방안 2 -->
+  <section class="panel" id="panel2">
+    <div class="card">
+      <h2>방안 2 — 검사카메라 엣지 활용형<span class="tag">1카메라</span></h2>
+      <div class="summary">별도 가이드 카메라 없이 <b>검사카메라의 프리뷰 영상에서 PCB 외곽 엣지를 검출</b>해 X·Y·θ 산출, 원근 왜곡으로 기울기, 초점 샤프니스로 거리를 추정. 보정 이동 후 재촬영으로 오차를 수렴시키는 반복 구조.</div>
+      <ol class="flow">
+        <li><span class="f-t">PCB 반입 · 정지</span><span class="f-d"> — 컨베이어 정지신호 수신(PLC 접점)</span></li>
+        <li class="drive"><span class="f-t">프리뷰 촬영</span><span class="f-d"> — 검사카메라 · 보조조명</span></li>
+        <li class="measure"><span class="f-t">엣지 검출 · 자세 추정</span><span class="f-d"> — X · Y · θ · 기울기 · 거리</span></li>
+        <li class="drive"><span class="f-t">스테이지 보정 구동</span><span class="f-d"> — 법선 정렬 이동</span></li>
+        <li class="measure"><span class="f-t">오차 확인</span><span class="f-d"> — 허용범위 수렴 판정</span><span class="f-loop">↻ 오차 초과 시 프리뷰 촬영부터 반복 (최대 2회)</span></li>
+        <li class="drive"><span class="f-t">검사 촬영</span><span class="f-d"> — 검사조명 ON · 고해상도</span></li>
+        <li class="judge"><span class="f-t">딥러닝 양불판정</span><span class="f-d"> — 납땜 상태 분류</span></li>
+        <li class="judge"><span class="f-t">화면 표시 · MES 전송</span><span class="f-d"> — 양품 / NG 구분 표시, 검사이력 전송</span></li>
+      </ol>
+      <div class="legend"><span><i style="background:#0d7a66"></i>측정 · 판단(1차 목표)</span><span><i style="background:#16324f"></i>구동 · 촬영</span><span><i style="background:#b8541f"></i>판정 · 출력</span></div>
+    </div>
+    <div class="card">
+      <h2>장점 · 유의점</h2>
+      <div class="pros">
+        <div class="p-box good"><h3>장점</h3><ul>
+          <li>카메라 1대 — 추가 비용 없음</li>
+          <li>단일 광축 — 캘리브레이션 단순</li>
+          <li>부족 시 가이드 카메라만 추가해 방안 1로 무손실 전환</li>
+        </ul></div>
+        <div class="p-box warn"><h3>유의점</h3><ul>
+          <li>거리(Z) 추정 정확도 낮음 → 반복 수렴으로 보완</li>
+          <li>반복 시 택트타임 +1~2초</li>
+          <li>조명 조건에 따른 엣지 검출 안정성 확인 필요</li>
+          <li>검사렌즈 화각에 PCB가 들어와야 성립</li>
+        </ul></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 비교 -->
+  <section class="panel" id="panel3">
+    <div class="card">
+      <h2>방안 비교</h2>
+      <div class="tbl-scroll"><table>
+        <tr><th>항목</th><th>방안 1 — 가이드 분리형</th><th>방안 2 — 엣지 활용형</th></tr>
+        <tr><td>카메라 구성</td><td>2대 (가이드 + 검사)</td><td class="win">1대 (검사 겸용)</td></tr>
+        <tr><td>추가 비용</td><td>+50~80만원</td><td class="win">없음</td></tr>
+        <tr><td>캘리브레이션</td><td>카메라 간 좌표 변환 (복잡)</td><td class="win">단일 광축 (단순)</td></tr>
+        <tr><td>거리(Z) 측정</td><td class="win">레이저 보조로 정확</td><td>샤프니스 추정 (낮음)</td></tr>
+        <tr><td>정렬 방식</td><td class="win">1회 측정 → 1회 이동</td><td>반복 수렴 (1~2회)</td></tr>
+        <tr><td>택트타임</td><td class="win">짧음</td><td>반복 시 +1~2초</td></tr>
+        <tr><td>초기 탐색</td><td class="win">넓은 화각 유리</td><td>검사렌즈 화각 의존</td></tr>
+        <tr><td>리스크</td><td>카메라 간 정합 오차</td><td>엣지 검출 안정성</td></tr>
+        <tr><td>확장성</td><td>—</td><td class="win">방안 1로 전환 가능</td></tr>
+      </table></div>
+      <div class="reco"><b>추천:</b> 방안 2로 시작 — 비용·구조가 단순하고 PCB 정지 위치가 일정(±수 mm)하다는 조건에서 반복 수렴으로 충분하며, 정밀도·택트 문제 확인 시 가이드 카메라만 추가해 방안 1로 전환.</div>
+    </div>
+    <div class="card">
+      <h2>미팅 협의 포인트</h2>
+      <ol class="points">
+        <li>검사카메라 화각(FOV)에 PCB 전체(장축 100mm)가 들어오는 렌즈로 갈지, 부분 촬영(분할 검사)으로 갈지 — 방안 2 성립의 핵심 전제</li>
+        <li>반복 수렴에 따른 택트타임 증가(+1~2초) 허용 여부</li>
+        <li>현장 조명 조건에서 PCB 외곽 엣지가 안정 검출되는지 — 보유 카메라로 간이 테스트 진행</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h2>공통 하드웨어 구성 (개략)</h2>
+      <div class="tbl-scroll"><table>
+        <tr><th>구분</th><th>추천 사양</th><th>개략 예산</th></tr>
+        <tr><td>XY 스테이지</td><td>스트로크 100mm · 리드스크류 + 클로즈드루프 스텝(NEMA23)</td><td>80~150만원</td></tr>
+        <tr><td>틸트(Rx·Ry)</td><td>2축 모터라이즈드 고니오 · 회전중심=카메라 초점</td><td>100~200만원</td></tr>
+        <tr><td>모션 컨트롤러</td><td>4축 보드 + 클로즈드루프 드라이버 · 이더넷/USB</td><td>30~60만원</td></tr>
+        <tr><td>검사 카메라</td><td>500만~1,200만 화소 글로벌셔터 + 저왜곡 렌즈</td><td>150~300만원</td></tr>
+        <tr><td>조명</td><td>링 + 동축 병용 (납땜 경면반사 대응)</td><td>50~100만원</td></tr>
+        <tr><td>제어 PC · SW</td><td>Windows + Python (OpenCV · PyTorch)</td><td>보유 PC 활용</td></tr>
+        <tr><td>정밀도 목표</td><td>위치 ±0.1mm / 각도 ±0.5°</td><td>—</td></tr>
+      </table></div>
+    </div>
+  </section>
+
+  <footer>
+    <span><b>인시스 AI혁신 연구개발실</b> · ys.kim@in-sys.co.kr</span>
+    <span>pcb.html <b id="verFoot">v1.0</b></span>
+  </footer>
+</div>
+
+<script>
+var APP_VERSION = "v1.0"; /* pcb.html v1.0 (2026) */
+document.getElementById("verTop").textContent = APP_VERSION;
+document.getElementById("verFoot").textContent = APP_VERSION;
+
+function showPanel(n){
+  for(var i=1;i<=3;i++){
+    document.getElementById("panel"+i).classList.toggle("show", i===n);
+    document.getElementById("menu"+i).classList.toggle("sel", i===n);
+  }
+}
+function setDevice(mode){
+  document.body.classList.toggle("pc", mode==="pc");
+  document.getElementById("btnMobile").classList.toggle("on", mode==="mobile");
+  document.getElementById("btnPc").classList.toggle("on", mode==="pc");
+}
+setDevice("mobile"); /* 초기값: 모바일 */
+</script>
+</body>
+</html>
