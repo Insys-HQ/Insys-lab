@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v9.3 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v9.4 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v9.3</span>
+    <span class="vb">v9.4</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v9.3 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v9.4 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v9.3
+// 트레이 세척·탈수·건조 시뮬레이터 v9.4
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='9.3';
+const VER='9.4';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -260,6 +260,8 @@ const S={
   dryTemp:65,dryAirVol:80,dryRecirc:75,heaterCount:1,
   // ★v9.2 트레이 열변형 방지 — 건조기 내부 허용 상한온도(하드 제약)
   trayMaxTemp:70,
+  // ★v9.4 온수 라디에이터 배관·밸브 / 습도 기반 댐퍼 제어
+  radDT:15, radPipeLen:20, rhCtrl:true, rhSetLow:65, rhSetHigh:70,
   // ★v9.3 건조 가열 방식: 전기히터 단독 / 히터+온수라디에이터 하이브리드
   dryHeatMode:'electric', dryRadRatio:60, dryLenAuto:true,   // ★v9.0 발주 검토 강건최적
   // ★v8.9 건조기 구성: 최소 길이, 팬 1대 담당 길이, 순환 덕트 풍속
@@ -806,9 +808,11 @@ function dryScenarioCurve(){
   });
   S.dryTemp=bk.t;
   // ② 라디에이터 분담률 스윕
-  const ratios=[0,20,40,60,80];
+  const ratios=[0,20,40,60,80,100];
   const radRows=ratios.map(function(rr){
-    if(rr===0){ S.dryHeatMode='electric'; } else { S.dryHeatMode='hybrid'; S.dryRadRatio=rr; }
+    if(rr===0){ S.dryHeatMode='electric'; }
+    else if(rr===100){ S.dryHeatMode='hotwater'; }
+    else { S.dryHeatMode='hybrid'; S.dryRadRatio=rr; }
     calcAll();
     const cst=cost();
     return {r:rr, elecHeat:R.dryElecKW, rad:R.dryRadKW, boiler:R.boilerTotalKW, rated:R.boilerRatedTotal,
@@ -820,6 +824,52 @@ function dryScenarioCurve(){
   _dryCurve={temps:tempRows, rads:radRows, hrs:hrs, base:base};
   _dryCurveKey=key;
   return _dryCurve;
+}
+// ★v9.4 온수 라디에이터 배관·밸브 산정 ─────────────────────────────
+// 강관/STS 호칭경별 내경(mm)
+const PIPE_ID={15:16.1, 20:21.6, 25:27.2, 32:35.5, 40:41.2, 50:52.7, 65:65.9, 80:78.1};
+// 25A 기준 표준 3-way 비례제어 밸브 Cv (호칭경별)
+const VALVE_CV={15:2.5, 20:4.0, 25:6.3, 32:10, 40:16, 50:25, 65:40, 80:63};
+// 온수 순환 유량 (LPM) = kW × 860 kcal/h ÷ (ΔT × 60)
+function hotWaterLPM(kw, dT){ return kw*860/(Math.max(1,dT)*60); }
+// Hazen-Williams 마찰손실 (mmAq/m) — C=100 (강관 경년)
+function pipeFrictionMmAqPerM(lpm, idMm){
+  const Q=lpm/60000, d=idMm/1000;
+  if(Q<=0||d<=0) return 0;
+  const hf=10.67*Math.pow(Q,1.852)/(Math.pow(100,1.852)*Math.pow(d,4.87));
+  return hf*1000;   // m/m → mm/m
+}
+function pipeVelocity(lpm, idMm){
+  const A=Math.PI*Math.pow(idMm/1000,2)/4;
+  return (lpm/60000)/Math.max(1e-9,A);
+}
+// 온수 순환 배관 권장 유속 ≤0.6 m/s (소음·에로전·펌프양정 억제) 기준 최소 호칭경
+function selectPipe(lpm){
+  const keys=Object.keys(PIPE_ID).map(Number).sort(function(a,b){return a-b;});
+  for(const k of keys){ if(pipeVelocity(lpm, PIPE_ID[k])<=0.6) return k; }
+  return keys[keys.length-1];
+}
+// 3-way 제어밸브 차압 (kPa) = (유량gpm / Cv)² × 6.895
+function valveDP(lpm, cv){ const gpm=lpm*0.264172; return Math.pow(gpm/Math.max(0.1,cv),2)*6.895; }
+
+// ★v9.4 건조실 내부 상대습도 추정 및 배기 댐퍼 비례제어 ─────────────
+function satHumidity(tC){                      // 포화 절대습도 kg/kg(DA)
+  const pws=610.94*Math.exp(17.625*tC/(tC+243.04));
+  return 0.622*pws/Math.max(1000,(101325-pws));
+}
+function dryRoomRH(evapKgH, airM3min, recircPct, tempC){
+  const mAir=airM3min*60*1.2;                                  // kg/h
+  const fresh=Math.max(0.05, 1-recircPct/100);                 // 신선공기 비율
+  const dw=evapKgH/Math.max(1, mAir*fresh);                    // 절대습도 상승
+  const w=0.010+dw;                                            // 외기 0.010 kg/kg 가정
+  const ws=satHumidity(tempC);
+  return Math.min(100, Math.max(5, w/ws*100));
+}
+// RH 기반 배기 댐퍼 비례 개방률(%) — RH≤65 순환유지 / RH>70 비례 개방(최대 45%)
+function exhaustDamper(rh){
+  if(rh<=65) return 20;                        // 최소 배기(신선공기 확보)
+  if(rh>=85) return 45;
+  return Math.round(20 + (rh-65)/(85-65)*25);  // 65→85% 구간 20→45% 비례
 }
 function dryerKW(res,airVol,dT,recirc){const evap=res*2260/3600;const airH=(airVol/60)*1.2*1005*dT/1000;return evap+airH*(1-recirc/100);}
 // 트레이 잔류수분 — 평판이라 탈수 효율 좋음 (개당 30g 기준)
@@ -895,7 +945,7 @@ function bindSlider(id){
   el.addEventListener('input',()=>{rg.value=el.value;el.classList.add('s-user');onChange(id);});
 }
 function syncState(){
-  ['dryMinLen','dryFanCover','dryDuctVel','dryTarget','dewatTarget','trayMaxTemp','dryRadRatio','trayW','trayD','trayT','pocketCount','qty','dlv','wHole','wSprayAngle','wTiltAngle','wOverlap','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
+  ['dryMinLen','dryFanCover','dryDuctVel','dryTarget','dewatTarget','trayMaxTemp','dryRadRatio','radDT','radPipeLen','rhSetLow','rhSetHigh','trayW','trayD','trayT','pocketCount','qty','dlv','wHole','wSprayAngle','wTiltAngle','wOverlap','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
   if(!S.wDistAuto){const nd=gi('wNozzleDist'); if(nd&&nd.value!=='')S.wNozzleDist=+nd.value;}
   const bt=gi('boilerType');if(bt)S.boilerType=bt.value;
   const wi=gi('wTankIns');if(wi)S.wTankIns=wi.checked;
@@ -916,7 +966,8 @@ function syncState(){
   const pm=gi('pumpMode');if(pm)S.pumpMode=pm.value;
   const fp=gi('fanPhase');if(fp)S.fanPhase=+fp.value;
   const hm=gi('dryHeatMode');if(hm)S.dryHeatMode=hm.value;
-  const dla=gi('dryLenAuto');if(dla)S.dryLenAuto=dla.checked;   // ★v9.1 select 값은 문자열 → 숫자 변환
+  const dla=gi('dryLenAuto');if(dla)S.dryLenAuto=dla.checked;
+  const rc2=gi('rhCtrl');if(rc2)S.rhCtrl=rc2.checked;   // ★v9.1 select 값은 문자열 → 숫자 변환
   for(let i=0;i<3;i++){const pl=gi('stgPumpLpm'+i); if(pl&&pl.value!=='')S.stgPumpLpm[i]=+pl.value;}
   const nl=gi('nozzleLayout');if(nl)S.nozzleLayout=nl.value;
   const tm=gi('stgTankMode');if(tm)S.stgTankMode=tm.value;
@@ -1144,12 +1195,32 @@ function calcAll(){
   // 포켓 개수 → 트레이당 잔수 증가 (탈수 부담)
   const pocketWater = 1 + S.pocketCount*0.02; // 포켓당 잔수 2%↑
   const residual = residualWater(qtyH, S.knifePass, S.knifeAng, S.knifePress, S.knifeSlot, S.knifeGap, blowerRatio) * pocketWater;
+  // ★v9.4 내부 습도 추정 → 배기 댐퍼 비례제어 → 실효 순환율 재계산
+  const evapKgH = residual;                         // 증발 대상 수분 (L/h ≈ kg/h)
+  const rhRaw   = dryRoomRH(evapKgH, S.dryAirVol, S.dryRecirc, S.dryTemp);
+  const damperExh = S.rhCtrl ? exhaustDamper(rhRaw) : (100-S.dryRecirc);
+  const recircEff = S.rhCtrl ? (100-damperExh) : S.dryRecirc;    // 제어 후 실효 순환율
+  const rhCtrlOn  = !!S.rhCtrl;
+  const rhAfter   = dryRoomRH(evapKgH, S.dryAirVol, recircEff, S.dryTemp);
+  const rhState   = rhAfter<=(S.rhSetLow||65) ? 'low' : (rhAfter>(S.rhSetHigh||70) ? 'high' : 'mid');
   const dryKW=dryerKW(residual,S.dryAirVol,S.dryTemp-20,S.dryRecirc);
   // ★v9.3 가열 분담: 하이브리드 시 라디에이터(온수)가 일부를 담당 → 전기히터 용량 감소
-  const radRatio = (S.dryHeatMode==='hybrid') ? Math.min(90, Math.max(0, S.dryRadRatio))/100 : 0;
+  const radRatio = (S.dryHeatMode==='hotwater') ? 1
+                 : (S.dryHeatMode==='hybrid') ? Math.min(90, Math.max(0, S.dryRadRatio))/100 : 0;
   const dryRadKW  = dryKW * radRatio;              // 온수 라디에이터 분담 (보일러 부하로 이관)
   const dryElecKW = dryKW - dryRadKW;              // 전기 덕트히터 분담
   const radLoadKW = dryRadKW * 1.10;               // 배관·열교환 손실 10% 가산
+  // ★v9.4 온수 배관·밸브 산정 (설계부하 = 라디에이터 분담분, 최소 5kW 기준으로 규격 산정)
+  const radDesignKW = Math.max(5, radLoadKW);
+  const radLPM  = hotWaterLPM(radDesignKW, S.radDT||15);
+  const radPipe = selectPipe(radLPM);
+  const radPipeID = PIPE_ID[radPipe];
+  const radVel  = pipeVelocity(radLPM, radPipeID);
+  const radFricPerM = pipeFrictionMmAqPerM(radLPM, radPipeID);
+  const radFricTotal = radFricPerM * (S.radPipeLen||20) * 1.3;   // 곡관·부속 30% 가산
+  const radCv   = VALVE_CV[radPipe];
+  const radValveDP = valveDP(radLPM, radCv);
+  const radAuthority = radValveDP/Math.max(0.1,(radValveDP + radFricTotal*0.00981));  // 밸브 권한
 
   // ★v7.1 열풍기 대수 → 대당 부하(20kW 상한) 판정, 부족 시 건조효율 저하 연동
   const heaterPerUnit = dryKW/Math.max(1,S.heaterCount);
@@ -1257,7 +1328,8 @@ function calcAll(){
   // ★v7.0 건조효율: 온도·풍량·순환 + 잔수(탈수 결과) 연동 — 세척→탈수→건조 체인 연결
   const resPen = 1 - Math.min(0.30, Math.max(0, residual/(qtyH*0.03)-0.05)*0.5);
     // ★v8.0 순환 재사용 포화: 60~75%가 최적, 과다 순환은 습공기 포화로 건조력 저하
-  const recircF = S.dryRecirc<=75 ? (1 + S.dryRecirc*0.0012) : (1.09 - (S.dryRecirc-75)*0.006);
+  // ★v9.4 순환 이득은 실효 순환율에 비례, 손실은 '습도 포화'에서 발생 → RH 기준으로 페널티
+  const recircF = Math.max(0.75, 1 + recircEff*0.0012 - Math.max(0, rhAfter-(S.rhSetLow||65))*0.004);
   const tempOver = S.dryTemp > (S.trayMaxTemp||70);   // ★v9.2 트레이 열변형 위험
   const dryEff=Math.min(99,Math.max(30,(56+S.dryTemp*0.25+S.dryAirVol*0.22)*recircF*resPen*heaterFactor));
   // 노즐 배열 정보 (분사각·이격 연동)
@@ -1419,7 +1491,7 @@ function calcAll(){
   const elecTotal = elecBase + convMotorKW + siroFanKW;
   const elecReal = elecRealBase + convLoadKW + siroFanKW*0.85;
 
-  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,filterFactor,fScore,heaterPerUnit,heaterOK,heaterFactor,convLoadKW,nClipPairs,trayOnLine,loadKg,convMotorKW,tankBottomMax,cascadeOK,topStage,nozPitch,angImpact,slantD,tiltF,ovF,altF,effCovH,dryLenBySpeed,dryLenGovern,dryFanN,airPerFan,heatPerFan,siroModel,siroShort,siroTotalKW,recircQ,dryDuctDia,ductPerSide,siroFanKW,tempOver,dryLenByEff,lenBoost,effGapR,radRatio,dryRadKW,dryElecKW,radLoadKW,boilerRatedTotal,airNeed,airUse,ductStatic,ductRunM,fanByLen,fanByAir,dryNeedDwell,rinseF,rinseNeedLph,recircF,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
+  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,filterFactor,fScore,heaterPerUnit,heaterOK,heaterFactor,convLoadKW,nClipPairs,trayOnLine,loadKg,convMotorKW,tankBottomMax,cascadeOK,topStage,nozPitch,angImpact,slantD,tiltF,ovF,altF,effCovH,dryLenBySpeed,dryLenGovern,dryFanN,airPerFan,heatPerFan,siroModel,siroShort,siroTotalKW,recircQ,dryDuctDia,ductPerSide,siroFanKW,tempOver,radDesignKW,radLPM,radPipe,radPipeID,radVel,radFricPerM,radFricTotal,radCv,radValveDP,radAuthority,evapKgH,rhRaw,rhAfter,damperExh,recircEff,rhCtrlOn,rhState,dryLenByEff,lenBoost,effGapR,radRatio,dryRadKW,dryElecKW,radLoadKW,boilerRatedTotal,airNeed,airUse,ductStatic,ductRunM,fanByLen,fanByAir,dryNeedDwell,rinseF,rinseNeedLph,recircF,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
 }
 
 // ── 좌측 렌더 ──
@@ -1730,8 +1802,8 @@ function renderLeft(){
       +sliderHTML('dryRecirc','♻️ 순환 재사용','%',0,90,5,S.dryRecirc,60,80)
       +'<div class="g3" style="margin-top:6px;">'+fld('dryMinLen','건조기 최소길이','mm',S.dryMinLen)+fld('dryFanCover','팬 1대 담당','mm',S.dryFanCover)+fld('dryDuctVel','덕트 풍속','m/s',S.dryDuctVel)+'</div>'
       +'<div class="st">🔥 가열 방식 · 온도별 시뮬레이션</div>'
-      +'<div class="g2">'+sel('dryHeatMode','가열 방식',[['electric','전기 덕트히터 단독'],['hybrid','히터 + 온수 라디에이터 (하이브리드)']],S.dryHeatMode)
-      +(S.dryHeatMode==='hybrid'?fld('dryRadRatio','라디에이터 분담','%',S.dryRadRatio):'<div class="fl"><label>라디에이터 분담</label><input type="text" value="미적용(전기 100%)" readonly style="background:#eef4fa;border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#5a7088;font-family:inherit;"></div>')+'</div>'
+      +'<div class="g2">'+sel('dryHeatMode','열원 선택',[['electric','전기 덕트히터 단독'],['hotwater','온수 코일(라디에이터) 단독'],['hybrid','온수 + 전기 하이브리드']],S.dryHeatMode)
+      +(S.dryHeatMode==='hybrid'?fld('dryRadRatio','온수 분담','%',S.dryRadRatio):'<div class="fl"><label>온수 분담</label><input type="text" value="'+(S.dryHeatMode==='hotwater'?'100% (전기히터 없음)':'0% (전기 100%)')+'" readonly style="background:#eef4fa;border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#5a7088;font-family:inherit;"></div>')+'</div>'
       +'<label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1565c0;margin:6px 0;cursor:pointer;"><input type="checkbox" id="dryLenAuto" '+(S.dryLenAuto?'checked':'')+'> 📏 건조기 길이 자동 — 목표 미달분을 체류(길이)로 보완</label>'
       +(function(){
           var cv=dryScenarioCurve();
@@ -1782,12 +1854,51 @@ function renderLeft(){
             +'💰 <b>현재 선택: 라디에이터 '+cur.r+'% 분담</b> — 전기히터 '+cur.elecHeat.toFixed(1)+'kW / 라디에이터 '+cur.rad.toFixed(1)+'kW<br>'
             +'· 보일러 운전부하 '+cur.boiler.toFixed(1)+'kW · 정격 <b>'+cur.rated.toFixed(1)+'kW</b>로 증설 필요<br>'
             +'· 월 전기 '+cur.elec.toLocaleString()+'원 + 가스 '+cur.gas.toLocaleString()+'원 = <b>'+cur.tot.toLocaleString()+'원</b><br>'
-            +(cur.save>0?'· 전기 단독 대비 <b>월 '+cur.save.toLocaleString()+'원 · 연 '+(cur.save*12).toLocaleString()+'원 절감</b> (전기요금만 '+cur.elecSave.toLocaleString()+'원 감소)':'· 전기 단독 기준')
+            +'<div style="margin-top:6px;padding:7px 9px;border-radius:7px;background:#fff;border:1.5px solid '+(cur.save>0?'#a5d6a7':'#cde3f0')+';">'
+            +'<b>📉 통합 손익 (전기 단독 대비)</b><br>'
+            +'전기 절감 <b style="color:#1565c0;">−'+cur.elecSave.toLocaleString()+'원</b> · 가스 증가 <b style="color:#ef6c00;">+'+(cur.gas-cv.base.gas).toLocaleString()+'원</b><br>'
+            +'= 순 절감 <b style="color:'+(cur.save>0?'#1b5e20':'#c62828')+';">'+(cur.save>0?'월 '+cur.save.toLocaleString()+'원 · 연 '+(cur.save*12).toLocaleString()+'원':'월 '+cur.save.toLocaleString()+'원 (손해)')+'</b></div>'
             +'</div>'):'';
           return '<div style="background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px;margin:6px 0;">'
             +'<div style="font-size:13px;font-weight:800;color:#0d2137;margin-bottom:6px;">♨️ 라디에이터 분담률별 에너지비 (파랑=전기 / 주황=가스)</div>'
             +g+lb+tb+'</div>'+msg;
         })()
+      +(S.dryHeatMode!=='electric' ? (
+         '<div class="st">♨️ 온수 라디에이터 배관·밸브 사양</div>'
+        +'<div class="g2">'+fld('radDT','설계 온도차 ΔT','°C',S.radDT)+fld('radPipeLen','배관 연장','m',S.radPipeLen)+'</div>'
+        +'<table class="tbl" style="margin-top:6px;"><thead><tr><th>항목</th><th>산출값</th><th>사양</th></tr></thead><tbody>'
+        +'<tr><td style="text-align:left;font-weight:700;">설계 부하</td><td class="hi">'+R.radDesignKW.toFixed(1)+'kW</td><td style="text-align:left;font-size:13px;">라디에이터 분담 + 배관손실 10%</td></tr>'
+        +'<tr><td style="text-align:left;font-weight:700;">순환 유량</td><td class="hi">'+R.radLPM.toFixed(1)+' LPM</td><td style="text-align:left;font-size:13px;">kW×860 ÷ (ΔT'+S.radDT+'°C × 60)</td></tr>'
+        +'<tr><td style="text-align:left;font-weight:700;">배관 관경</td><td class="hi">'+R.radPipe+'A (내경 '+R.radPipeID+'mm)</td><td style="text-align:left;font-size:13px;">강관/STS · 유속 '+R.radVel.toFixed(2)+' m/s'+(R.radVel<=1.2?' ✅':' ⚠️ 과속')+'</td></tr>'
+        +'<tr><td style="text-align:left;font-weight:700;">마찰 손실</td><td class="hi">'+R.radFricPerM.toFixed(1)+' mmAq/m</td><td style="text-align:left;font-size:13px;">연장 '+S.radPipeLen+'m + 부속 30% = <b>'+R.radFricTotal.toFixed(0)+'mmAq</b></td></tr>'
+        +'<tr><td style="text-align:left;font-weight:700;">제어 밸브</td><td class="hi">'+R.radPipe+'A 3-way</td><td style="text-align:left;font-size:13px;">비례제어 전동 · Cv '+R.radCv+' · 0~10V · 차압 '+R.radValveDP.toFixed(1)+'kPa · 권한 '+(R.radAuthority*100).toFixed(0)+'%</td></tr>'
+        +'</tbody></table>'
+        +'<div class="chbox" style="background:#eef6fb;border-color:#cde3f0;color:#0b5a80;">🔧 <b>부속 사양 (발주 명기 항목)</b><br>'
+        +'· 3-way 비례제어 전동밸브 '+R.radPipe+'A (Cv '+R.radCv+', 0~10V 입력, 바이패스 라인 구성 — 부하 변동 시 코일 유량만 조절, 보일러 순환량은 일정 유지)<br>'
+        +'· 코일 <b>상단 자동 에어벤트</b> — 에어포켓으로 인한 열전달 저하·소음 방지 (수동 벤트 병설 권장)<br>'
+        +'· 코일 <b>최하단 드레인 밸브</b> — 동절기 비가동 시 전량 배수, 동파 방지<br>'
+        +'· 순환펌프 양정 = 배관손실 '+R.radFricTotal.toFixed(0)+' + 밸브 '+(R.radValveDP*102).toFixed(0)+' + 코일 저항 여유 → <b>'+((R.radFricTotal+R.radValveDP*102)*1.3/1000).toFixed(2)+'m 이상</b><br>'
+        +'· 배관 보온 25mm 이상, 옥외 노출부는 열선 동파방지 병행</div>'
+       ) : '')
+      +'<div class="st">🌡️ 온·습도 연동 배기 댐퍼 비례제어</div>'
+      +'<label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1565c0;margin:4px 0;cursor:pointer;"><input type="checkbox" id="rhCtrl" '+(S.rhCtrl?'checked':'')+'> 습도 기반 자동 댐퍼 제어 사용</label>'
+      +'<div class="g2">'+fld('rhSetLow','순환유지 RH 이하','%',S.rhSetLow)+fld('rhSetHigh','배기개방 RH 초과','%',S.rhSetHigh)+'</div>'
+      +'<div class="chbox" style="background:'+(R.rhState==='high'?'#fff3e0':(R.rhState==='mid'?'#eef6fb':'#e8f5e9'))+';border-color:'+(R.rhState==='high'?'#ffcc80':(R.rhState==='mid'?'#cde3f0':'#a5d6a7'))+';color:'+(R.rhState==='high'?'#e65100':(R.rhState==='mid'?'#0b5a80':'#1b5e20'))+';">'
+      +'💧 <b>건조실 내부 습도 '+R.rhAfter.toFixed(0)+'% RH</b> (제어 전 '+R.rhRaw.toFixed(0)+'%) · 증발부하 '+R.evapKgH.toFixed(2)+'kg/h · '+S.dryTemp+'°C<br>'
+      +'· 배기 댐퍼 개방 <b>'+R.damperExh+'%</b> → 실효 순환율 <b>'+R.recircEff+'%</b>'+(R.rhCtrlOn?' (자동제어)':' (수동 고정)')+'<br>'
+      +'· 제어 로직: RH ≤ '+S.rhSetLow+'% → 배기 최소 20% 유지(열풍 재사용 극대화) / RH > '+S.rhSetHigh+'% → 배기 비례 개방 최대 45%<br>'
+      +'· '+(R.rhState==='low'?'✅ 저습 구간 — 순환 '+R.recircEff+'% 유지로 열 회수 극대화'
+            :(R.rhState==='mid'?'🔄 중간 구간 — 댐퍼 비례 조절 중'
+            :'⚠️ 고습 구간 — 배기 확대 중. 저온 건조에서는 포화되기 쉬우므로 풍량 증대 또는 온도 소폭 상향 검토'))+'</div>'
+      +'<div class="chbox" style="background:#f5f7fa;border-color:#dfe6ee;color:#37474f;">'
+      +'🔌 <b>PLC I/O 포인트 (건조부 제어)</b><br>'
+      +'· AI-1 건조실 온·습도 복합센서 (4~20mA, 2점 — 입구측·출구측)<br>'
+      +'· AO-1 배기 댐퍼 액추에이터 (0~10V 비례, 개방 0~100%)<br>'
+      +'· AO-2 순환 댐퍼 액추에이터 (0~10V 비례, 배기와 연동 역동작)<br>'
+      +(S.dryHeatMode!=='electric'?'· AO-3 온수 3-way 비례제어 밸브 (0~10V, '+R.radPipe+'A Cv'+R.radCv+')<br>':'')
+      +(S.dryHeatMode!=='hotwater'?'· AO-4 전기히터 SSR 출력 (0~10V 위상제어, '+R.dryElecKW.toFixed(1)+'kW)<br>':'')
+      +'· DI 과열 인터록 (건조실 상한온도 '+(S.trayMaxTemp+5)+'°C 초과 시 히터·밸브 강제 차단)<br>'
+      +'· DO 시로코팬 '+R.dryFanN+'대 운전 출력 (팬 정지 시 가열 인터록)</div>'
       +'<div class="st">건조기 구성 (상부 시로코팬 · 측면 순환덕트)</div>'
       +'<div class="chbox" style="background:#fff3e0;border-color:#ffcc80;color:#e65100;">📏 <b>건조기 길이 '+S.dryLen+'mm</b> — 컨베이어 속도 '+R.speedMmin.toFixed(2)+'m/min × 필요체류 '+R.dryNeedDwell.toFixed(0)+'초 → 속도기준 '+R.dryLenBySpeed+'mm'
       +(R.dryLenGovern==='min'?' → <b>최소길이 '+S.dryMinLen+'mm 적용</b> (팬 배치 공간 확보)':' → <b>속도 조건이 지배</b> (최소길이 초과)')+'<br>'
@@ -1888,7 +1999,21 @@ function renderLeft(){
             +row('모듈(세척/탈수/건조)', S.washDryLen+'/'+S.dewatLen+'/'+S.dryLen, b.wl+'/'+b.dl+'/'+b.drl,'')
             +row('전기 정격', R.elecTotal.toFixed(1)+'kW', b.elec.toFixed(1)+'kW', (b.elec-R.elecTotal).toFixed(1)+'kW')
             +'<tr style="background:#e8f5e9;"><td style="text-align:left;font-weight:800;">월 에너지비</td><td style="font-weight:800;">'+curCost.toLocaleString()+'원</td><td style="font-weight:800;color:#1b5e20;">'+b.cost.toLocaleString()+'원</td><td style="font-weight:800;color:'+(diff>0?'#1b5e20':'#7a90a4')+';">'+(diff>0?'−'+diff.toLocaleString()+'원':'현재가 유리')+'</td></tr>'
+            +row('열원 배관·밸브', (S.dryHeatMode!=='electric'? R.radPipe+'A · '+R.radLPM.toFixed(1)+'LPM · Cv'+R.radCv : '해당없음'), (b.rr>0?'온수계통 필요':'해당없음'),'')
+            +row('습도·배기댐퍼', R.rhAfter.toFixed(0)+'%RH · 배기 '+R.damperExh+'%', '자동 비례제어','')
             +'</tbody></table>'
+            +(function(){
+                var cv2=dryScenarioCurve();
+                var rr=(S.dryHeatMode==='hotwater'?100:(S.dryHeatMode==='hybrid'?S.dryRadRatio:0));
+                var cur2=cv2.rads.find(function(x){return x.r===rr;});
+                if(!cur2) return '';
+                var eSave=cv2.base.elec-cur2.elec, gUp=cur2.gas-cv2.base.gas, net=eSave-gUp;
+                return '<table class="tbl" style="margin-top:8px;"><thead><tr><th colspan="3">📉 열원 전환 통합 손익 (전기 단독 대비)</th></tr></thead><tbody>'
+                  +'<tr><td style="text-align:left;font-weight:700;">전기요금 절감</td><td class="hi" style="color:#1565c0;">−'+eSave.toLocaleString()+'원/월</td><td style="text-align:left;font-size:13px;">전기히터 '+cv2.base.elecHeat.toFixed(1)+' → '+cur2.elecHeat.toFixed(1)+'kW</td></tr>'
+                  +'<tr><td style="text-align:left;font-weight:700;">가스요금 증가</td><td class="hi" style="color:#ef6c00;">+'+gUp.toLocaleString()+'원/월</td><td style="text-align:left;font-size:13px;">보일러 '+cv2.base.boiler.toFixed(1)+' → '+cur2.boiler.toFixed(1)+'kW (정격 '+cur2.rated.toFixed(1)+'kW)</td></tr>'
+                  +'<tr style="background:'+(net>0?'#e8f5e9':'#ffebee')+';"><td style="text-align:left;font-weight:800;">순 절감</td><td class="hi" style="font-size:16px;color:'+(net>0?'#1b5e20':'#c62828')+';">'+(net>0?'−':'+')+Math.abs(net).toLocaleString()+'원/월</td><td style="text-align:left;font-weight:800;color:'+(net>0?'#1b5e20':'#c62828')+';">연간 '+(net>0?'−':'+')+Math.abs(net*12).toLocaleString()+'원</td></tr>'
+                  +'</tbody></table>';
+              })()
             +'<div class="chbox" style="background:'+(diff>0?'#e8f5e9':'#eef6fb')+';border-color:'+(diff>0?'#a5d6a7':'#cde3f0')+';color:'+(diff>0?'#1b5e20':'#0b5a80')+';">'
             +(diff>0?'💰 최적 추천안 채택 시 <b>월 '+diff.toLocaleString()+'원 · 연 '+(diff*12).toLocaleString()+'원</b> 절감 (목표 세척95/탈수'+S.dewatTarget+'/건조'+S.dryTarget+'% 모두 충족)'
                     :'✅ 현재 선택이 최적 추천과 동등하거나 더 유리합니다')+'</div></div></div>'
@@ -1966,7 +2091,7 @@ function renderLeft(){
       const needRerender =
         el.id==='boilerType'||el.id==='containerType'||el.id==='supplyMode'||el.id==='aux1st'
         ||el.id==='meshFilter'||el.id==='sludgeFilter'||el.id==='pumpStrainer'
-        ||el.id==='drainMode'||el.id==='stgTankMode'||el.id==='dlv'||el.id==='wAutoArray'||el.id==='wDistAuto'||el.id==='pumpMode'||el.id==='wTiltAlt'||el.id==='wTiltAngle'||el.id==='wOverlap'||el.id==='dewatTarget'||el.id==='dryTarget'||el.id==='fanPhase'||el.id==='dryHeatMode'||el.id==='dryRadRatio'||el.id==='dryLenAuto'||el.id==='dryTemp'||el.id==='trayMaxTemp'||el.id==='rate'||el.id==='nozzleLayout'||el.id==='pocketCount'||el.id==='wSprayAngle'||el.id==='rinseWater'
+        ||el.id==='drainMode'||el.id==='stgTankMode'||el.id==='dlv'||el.id==='wAutoArray'||el.id==='wDistAuto'||el.id==='pumpMode'||el.id==='wTiltAlt'||el.id==='wTiltAngle'||el.id==='wOverlap'||el.id==='dewatTarget'||el.id==='dryTarget'||el.id==='fanPhase'||el.id==='dryHeatMode'||el.id==='dryRadRatio'||el.id==='rhCtrl'||el.id==='radDT'||el.id==='radPipeLen'||el.id==='dryLenAuto'||el.id==='dryTemp'||el.id==='trayMaxTemp'||el.id==='rate'||el.id==='nozzleLayout'||el.id==='pocketCount'||el.id==='wSprayAngle'||el.id==='rinseWater'
         ||(el.id&&el.id.startsWith('stgType'))
         ||['washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch','qty','tempSensor','rinseTemp','rinseWater','hours','days','targetMonth','workers','wage','trayW','trayD','trayT','wHole','wSprayAngle','wNozzleDist'].indexOf(el.id)>=0||(el.id&&el.id.startsWith('directValve'))
         ||(el.id&&el.id.startsWith('stg'));
