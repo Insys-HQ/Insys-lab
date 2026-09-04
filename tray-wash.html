@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v9.5 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v9.6 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v9.5</span>
+    <span class="vb">v9.6</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v9.5 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v9.6 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v9.5
+// 트레이 세척·탈수·건조 시뮬레이터 v9.6
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='9.5';
+const VER='9.6';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -230,7 +230,7 @@ const S={
   wDistAuto:true, pumpMode:'auto', stgPumpLpm:[0,0,0], stgPressAct:[280,200,120],
   // 단계별 독립 설정 [1차, 2차, 3차헹굼]
   stgPress:[200,144,120], stgCol:[3,3,2], stgRow:[4,4,2], stgType:['wash','wash','rinse'],
-  stgLen:[1200,1200,800],  // 단별 조 길이 (세척·세척·헹굼)
+stgLen:[1400,1400,700],   // ★v9.6 발주 검토 확정 — 저수조 회전율·깊이 여유 확보  // 단별 조 길이 (세척·세척·헹굼)
   stgLenAuto:true,  // ★v7.0 조길이 자동: 세로줄 노즐수×줄간격 연동
   // ★v7.1 최적화 목표 효율 (%)
   optTgtWash:95, optTgtDewat:95, optTgtDry:95, optResult:null,
@@ -463,8 +463,9 @@ function tankUnderBath(volL, bathLenMm, widthMm, maxWidthMm, fill, frameGapMm, m
   // ★v8.4 프레임 구조상 저수조는 조 길이보다 짧아야 함 → 양측 프레임 여유 공제
   const gap = (frameGapMm===undefined?100:frameGapMm);
   let L = Math.round((bathLenMm - gap*2)/10)*10;
-  if(L >= bathLenMm) L = Math.round((bathLenMm-20)/10)*10;   // 최소 20mm는 반드시 작게
-  L = Math.max(300, Math.min(L, bathLenMm-20));
+  // ★v9.6 조가 짧아도 저수조는 반드시 조보다 작아야 함 (하한 100mm, 프레임 여유 우선)
+  L = Math.min(L, bathLenMm-20);
+  L = Math.max(100, L);
   let W = widthMm, D = volL*1e6/(W*L*fill);
   // ★v9.0 폭 확대는 설비 폭 한도까지만 — 초과 오버슈트 방지 (저수조가 설비보다 넓어지는 결함)
   while(D>900 && W<maxWidthMm){ W = Math.min(maxWidthMm, W+50); D = volL*1e6/(W*L*fill); }
@@ -983,6 +984,8 @@ function syncState(){
   ['meshFilter','sludgeFilter','pumpStrainer','autoBackwash'].forEach(id=>{const e=gi(id);if(e)S[id]=e.checked;});
   ['meshSize','sludgeMesh','strainerMesh'].forEach(id=>{const e=gi(id);if(e&&e.value)S[id]=+e.value;});
   const la=gi('stgLenAuto'); if(la)S.stgLenAuto=la.checked;
+  // ★v9.6 트레이 허용온도 초과 입력 차단 — 시방 확정값이 열변형 조건을 넘지 않도록
+  if(S.dryTemp > S.trayMaxTemp){ S.dryTemp = S.trayMaxTemp; const dte=gi('dryTemp'); if(dte){dte.value=S.dryTemp; const dr=gi('rg-dryTemp'); if(dr)dr.value=S.dryTemp;} }
   ['optTgtWash','optTgtDewat','optTgtDry'].forEach(k=>{const e=gi(k); if(e&&e.value!=='')S[k]=+e.value;});
   // 단계별 배열 동기화
   for(let i=0;i<4;i++){
@@ -1078,6 +1081,13 @@ function calcAll(){
     washPumpTotal += pkw;
     washFlowTotal += flow;
     washWaterTotal += water;
+    // ★v9.6 자동 조길이는 하부 저수조 용량(회전율)까지 만족해야 함 — 부족하면 조를 연장
+    if(S.stgLenAuto){
+      const needTank = tankOptimal(flow, S.stgTurnover[i]||3);
+      const maxW = S.trayD*CH + 400 - 120;
+      const needLenTank = Math.ceil((needTank*1e6/(maxW*900*0.75) + (S.tankFrameGap||100)*2)/100)*100;
+      if(needLenTank > S.stgLen[i]) S.stgLen[i] = needLenTank;
+    }
     stgDetail.push({idx:i, press, pressSet, pressDrop, nPerFace, nozTotal, nH, nL, col:nH, row:nL, pumpReq, pumpRated, flow, pkw, isRinse, water});
   }
   const washFlow = washFlowTotal;
@@ -1097,15 +1107,16 @@ function calcAll(){
     dimH = S.stgTankH[i]||800;
     // ★v8.3 저수조 길이 = 해당 단 조 길이 (하부 수납) — 초과 불가
     const bathLen = S.stgLen[i]||1000;
-    const maxTankW = S.trayD*CH + 400;   // 설비 폭 내에서만 확장 가능
+    const maxTankW = S.trayD*CH + 400 - 120;   // ★v9.6 설비 폭 − 양측 프레임 60mm씩 (제작 간섭 방지)
     const minDep = (S.stgType[i]==='rinse') ? (S.rinseMinDepth||600) : 300;  // ★v8.5 헹굼조 최소 깊이
-    let tankLenOver=false, tankReqLen=0;
+    let tankLenOver=false, tankReqLen=0, depthMax=false;
     if(S.stgTankMode==='auto'){
       const need = optTank;
       const dm = tankUnderBath(need, bathLen, fixW, maxTankW, 0.75, S.tankFrameGap, minDep);
       dimW = dm.W; dimD = dm.L; dimH = dm.D;
       tankL_i = dm.realVol;                       // 조 길이에 맞춘 실제 유효용량
       tankLenOver = dm.over || (tankL_i < need*0.95);
+      if(dm.D>=900) depthMax=true;   // ★v9.6 깊이 상한 도달 — 증설 여유 없음
       if(tankLenOver) tankReqLen = Math.ceil((need*1e6/(dm.W*900*0.75) + S.tankFrameGap*2)/50)*50;  // 필요 조 길이(프레임 포함)
     } else if(S.stgTankMode==='volume'){
       const need = S.stgTank[i]||optTank;
@@ -1115,7 +1126,7 @@ function calcAll(){
       tankLenOver = dm.over || (tankL_i < need*0.95);
       if(tankLenOver) tankReqLen = Math.ceil((need*1e6/(dm.W*900*0.75) + S.tankFrameGap*2)/50)*50;
     } else { // dim: 치수 입력 → 용량 역산 (길이는 조 길이로 제한)
-      dimW = S.stgTankW[i]||fixW;
+      dimW = Math.min(S.stgTankW[i]||fixW, maxTankW);   // ★v9.6 설비 폭 초과 방지
       const dimMaxLen = Math.max(300, bathLen - S.tankFrameGap*2);
       dimD = Math.min(S.stgTankD[i]||dimMaxLen, dimMaxLen);
       dimH = Math.max(S.stgTankH[i]||600, minDep);
@@ -1127,7 +1138,7 @@ function calcAll(){
     const actTurnover = d.flow>0 ? tankL_i/d.flow : 0;
     totalTankL += tankL_i;
     washHeaterTotal += heater_i;
-    stgTanks.push({idx:i,active:true,tankL:tankL_i,optTank,heater:heater_i,flow:d.flow,turnover,actTurnover,dimW,dimD,dimH,tankLenOver,tankReqLen,bathLen});
+    stgTanks.push({idx:i,active:true,tankL:tankL_i,optTank,heater:heater_i,flow:d.flow,turnover,actTurnover,dimW,dimD,dimH,tankLenOver,tankReqLen,bathLen,depthMax});
   }
   // ★v8.5 캐스케이드 오버플로우 레벨: 헹굼조(최종단) 상단이 가장 높고 상류로 갈수록 낮아짐 (3→2→1 자연 유하)
   //   기준면 = 세척조 하단 - 필터공간(철망·슬러지 필터 설치)
@@ -1688,7 +1699,8 @@ function renderLeft(){
             volCell='<span class="hi" style="color:#43a047;">'+t.tankL+'L(자동)</span>';
             dimCell='<input type="number" id="stgTankW'+t.idx+'" value="'+t.dimW+'" style="'+stI+'">×<input type="number" id="stgTankD'+t.idx+'" value="'+t.dimD+'" style="'+stI+'">×<input type="number" id="stgTankH'+t.idx+'" value="'+t.dimH+'" style="'+stI+'">';
           }
-          var overMark = t.tankLenOver ? ' <span style="color:#c62828;font-weight:700;font-size:13px;">⚠️용량부족 · 조길이 '+t.tankReqLen+'mm 필요</span>' : '';
+          var overMark = (t.tankLenOver ? ' <span style="color:#c62828;font-weight:700;font-size:13px;">⚠️용량부족 · 조길이 '+t.tankReqLen+'mm 필요</span>' : '')
+            + (t.depthMax ? ' <span style="color:#e65100;font-weight:700;font-size:13px;">⚠️깊이 상한 900mm — 증설 여유 없음</span>' : '');
           var lenOK = t.dimD < t.bathLen;
           var lenCell = '<span style="font-size:13px;font-weight:700;color:'+(lenOK?'#1b5e20':'#c62828')+';">'+t.bathLen+'<span style="font-weight:400;color:#5a7088;">→'+t.dimD+'</span>'+(lenOK?' ✅':' ❌')+'</span>';
           var lvlCell = '<span style="font-size:13px;font-weight:700;color:#0d47a1;">-'+t.topDrop+'mm</span><br><span style="font-size:13px;color:#5a7088;">'+(t.overflowTo===null?'최하류·배수':'→'+(t.overflowTo+1)+'단')+'</span>';
@@ -1797,7 +1809,7 @@ function renderLeft(){
   }else if(_tab==='dry'){
     h='<div class="card"><div class="ch"><span class="ci">🔥</span><span class="cl">건조부 (열풍)</span><span class="cq">저부하</span></div><div class="cb">'
       +'<div class="chbox">🍽️ 트레이는 얇은 평판이라 잔류수분이 적어 <b>건조 열부하가 낮습니다</b>. 탈수가 좋으면 건조온도·풍량을 낮춰 에너지를 아낄 수 있습니다.</div>'
-      +sliderHTML('dryTemp','🌡️ 열풍 온도','°C',40,80,5,S.dryTemp,55,S.trayMaxTemp)
+      +sliderHTML('dryTemp','🌡️ 열풍 온도','°C',40,Math.min(80,S.trayMaxTemp),5,Math.min(S.dryTemp,S.trayMaxTemp),55,S.trayMaxTemp)
       +sliderHTML('dryAirVol','🌀 열풍 풍량','m³/min',10,80,5,S.dryAirVol,20,40)
       +sliderHTML('dryRecirc','♻️ 순환 재사용','%',0,90,5,S.dryRecirc,60,80)
       +'<div class="g3" style="margin-top:6px;">'+fld('dryMinLen','건조기 최소길이','mm',S.dryMinLen)+fld('dryFanCover','팬 1대 담당','mm',S.dryFanCover)+fld('dryDuctVel','덕트 풍속','m/s',S.dryDuctVel)+'</div>'
