@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>인텍코리아 보관용량 산출 v2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  /* ── Mobile-First ── */
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Noto Sans KR',sans-serif;}
+  :root{
+    --ink:#1e293b; --ink2:#334155; --sub:#64748b; --line:#e2e8f0;
+    --bg:#f1f5f9; --card:#ffffff; --navy:#1e3a5f; --blue:#2563eb;
+    --blue-l:#eff6ff; --green:#047857; --green-l:#ecfdf5; --amber:#b45309; --amber-l:#fffbeb;
+    --tray:#2563eb; --box:#047857; --plt:#b45309;
+  }
+  html{font-size:14px;}
+  body{background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;}
+  @media (min-width:768px){ html{font-size:16px;} body{font-size:16px;} }
+
+  /* nav */
+  nav{background:var(--navy);width:100%;}
+  .nav-inner{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+  .nav-title{color:#fff;font-weight:700;font-size:1.05rem;}
+  .nav-sub{color:#cbd5e1;font-size:.78rem;}
+  .nav-right{display:flex;align-items:center;gap:8px;}
+  .ver-badge{background:rgba(255,255,255,.15);color:#e2e8f0;font-size:.72rem;padding:2px 8px;border-radius:10px;}
+  .view-tabs{display:flex;background:rgba(255,255,255,.12);border-radius:8px;overflow:hidden;}
+  .view-tabs button{border:none;background:transparent;color:#cbd5e1;font-size:.78rem;padding:5px 12px;cursor:pointer;}
+  .view-tabs button.on{background:#fff;color:var(--navy);font-weight:700;}
+
+  .container{max-width:1100px;margin:0 auto;padding:8px 12px;}
+  body.mobile-view .container{max-width:430px;}
+
+  section{margin-top:8px;margin-bottom:8px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:0 1px 3px rgba(15,23,42,.06);}
+
+  /* 카테고리 섹션 */
+  .cat-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;border-top:4px solid var(--c);}
+  .cat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .cat-title{font-size:1rem;font-weight:900;color:var(--c);}
+  .cat-sub{font-size:.72rem;color:var(--sub);}
+
+  /* 품목 행 */
+  .row-card{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px;background:#fbfdff;}
+  .row-top{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+  .row-top input.name{flex:1;font-weight:700;font-size:.92rem;color:var(--ink);border:none;border-bottom:1.5px solid var(--line);border-radius:0;padding:3px 2px;background:transparent;}
+  .row-top input.name:focus{outline:none;border-bottom-color:var(--blue);}
+  .del-btn{border:1px solid #fecaca;background:#fef2f2;color:#b91c1c;border-radius:8px;font-size:.72rem;padding:3px 8px;cursor:pointer;white-space:nowrap;}
+
+  .fld-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px 8px;}
+  @media (min-width:768px){ .fld-grid{grid-template-columns:repeat(4,1fr);} }
+  body.mobile-view .fld-grid{grid-template-columns:repeat(2,1fr) !important;}
+  .fld{display:flex;flex-direction:column;gap:2px;}
+  .fld label{font-size:.7rem;color:var(--sub);}
+  .fld input, .sc-row input{border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:.88rem;color:var(--ink);width:100%;background:#fff;}
+  .fld input:focus{outline:none;border-color:var(--blue);}
+  .dim3{display:flex;gap:3px;align-items:center;}
+  .dim3 input{min-width:0;}
+  .dim3 span{color:var(--sub);font-size:.78rem;}
+  .fld.wide{grid-column:1/-1;}
+  @media (min-width:768px){ .fld.wide{grid-column:span 2;} }
+  body.mobile-view .fld.wide{grid-column:1/-1 !important;}
+
+  /* 행 결과 */
+  .row-res{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);font-size:.78rem;color:var(--sub);}
+  .row-res b{color:var(--ink2);font-weight:700;}
+  .row-res .hl{color:var(--c);font-weight:900;}
+
+  /* 카테고리 소계 */
+  .cat-sum{display:flex;flex-wrap:wrap;gap:4px 16px;background:var(--bg);border-radius:8px;padding:6px 10px;font-size:.8rem;color:var(--ink2);}
+  .cat-sum b{font-weight:900;color:var(--c);}
+
+  .add-btn{width:100%;border:1.5px dashed #94a3b8;background:#f8fafc;color:var(--ink2);border-radius:10px;padding:8px;font-size:.85rem;font-weight:500;cursor:pointer;margin-top:2px;}
+  .add-btn:hover{background:var(--blue-l);border-color:var(--blue);color:var(--blue);}
+
+  /* 전체 합계 */
+  .sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  body.mobile-view .sum-grid{grid-template-columns:repeat(3,1fr) !important;}
+  .sum-box{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--blue-l);text-align:center;}
+  .sum-box .lb{font-size:.72rem;color:var(--sub);}
+  .sum-box .vl{font-size:1.2rem;font-weight:900;color:var(--navy);line-height:1.3;}
+  .sum-box .un{font-size:.72rem;color:var(--sub);font-weight:400;}
+  .sum-box.g{background:var(--green-l);} .sum-box.g .vl{color:var(--green);}
+  .sum-box.a{background:var(--amber-l);} .sum-box.a .vl{color:var(--amber);}
+  .sum-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.8rem;}
+  .sum-table th{background:#f8fafc;color:var(--ink2);font-weight:500;border:1px solid var(--line);padding:4px 6px;font-size:.74rem;}
+  .sum-table td{border:1px solid var(--line);padding:4px 6px;text-align:right;color:var(--ink);}
+  .sum-table td.l{text-align:left;font-weight:500;color:var(--ink2);}
+  .sum-table tr.tot td{background:var(--blue-l);font-weight:900;color:var(--navy);}
+  h2{font-size:.95rem;color:var(--ink2);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--blue);display:inline-block;}
+
+  /* 시나리오 */
+  .sc-row{display:flex;gap:6px;flex-wrap:wrap;}
+  .sc-row input{flex:1;min-width:120px;}
+  .btn{border:none;border-radius:8px;padding:7px 14px;font-size:.85rem;font-weight:500;cursor:pointer;}
+  .btn.primary{background:var(--blue);color:#fff;}
+  .btn.ghost{background:#f1f5f9;color:var(--ink2);border:1px solid var(--line);}
+  .sc-list{margin-top:8px;display:flex;flex-direction:column;gap:6px;}
+  .sc-item{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:.82rem;background:#fff;}
+  .sc-item .nm{flex:1;font-weight:500;color:var(--ink);}
+  .sc-item .dt{color:var(--sub);font-size:.72rem;}
+  .empty{color:var(--sub);font-size:.8rem;text-align:center;padding:6px;}
+
+  footer{max-width:1100px;margin:0 auto;padding:8px 16px 20px;display:flex;justify-content:space-between;color:var(--sub);font-size:.74rem;}
+  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:8px 18px;border-radius:20px;font-size:.82rem;opacity:0;pointer-events:none;transition:opacity .25s;z-index:99;}
+  #toast.show{opacity:1;}
+</style>
+</head>
+<body class="mobile-view">
+
+<nav>
+  <div class="nav-inner">
+    <div>
+      <div class="nav-title">인텍코리아 보관용량 산출</div>
+      <div class="nav-sub">트레이·박스·파렛트 세척대기품 보관 공간·무게 · 인시스 AI혁신 연구개발실</div>
+    </div>
+    <div class="nav-right">
+      <div class="view-tabs">
+        <button id="tabMobile" class="on" onclick="setView('mobile')">모바일</button>
+        <button id="tabPC" onclick="setView('pc')">PC</button>
+      </div>
+      <span class="ver-badge" id="verBadge"></span>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- 구분별 품목 목록 -->
+  <section id="catsWrap"></section>
+
+  <!-- 전체 합계 -->
+  <section class="card">
+    <h2><span class="dot"></span>전체 합산 (인텍코리아 보관 소요)</h2>
+    <div class="sum-grid">
+      <div class="sum-box"><div class="lb">총 보관수량</div><div class="vl" id="sumQty">0</div><div class="un">개</div></div>
+      <div class="sum-box g"><div class="lb">총 보관용량</div><div class="vl" id="sumVol">0</div><div class="un">m³</div></div>
+      <div class="sum-box a"><div class="lb">총 무게</div><div class="vl" id="sumWt">0</div><div class="un">ton (<span id="sumWtKg">0</span> kg)</div></div>
+    </div>
+    <table class="sum-table" id="sumTable"></table>
+  </section>
+
+  <!-- 시나리오 저장 -->
+  <section class="card">
+    <h2><span class="dot"></span>시나리오 저장 · 불러오기 (Firebase)</h2>
+    <div class="sc-row">
+      <input type="text" id="scName" placeholder="시나리오명 (예: 2027 파렛트 포함안)">
+      <button class="btn primary" onclick="saveScenario()">저장</button>
+      <button class="btn ghost" onclick="loadScenarioList()">목록 새로고침</button>
+    </div>
+    <div class="sc-list" id="scList"><div class="empty">저장된 시나리오를 불러오는 중...</div></div>
+  </section>
+
+</div>
+
+<footer>
+  <span>인시스 AI혁신 연구개발실 · 2026</span>
+  <span id="verFoot"></span>
+</footer>
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ═══ 버전 ═══ */
+const APP_VERSION = "v2.0";
+document.getElementById('verBadge').textContent = APP_VERSION;
+document.getElementById('verFoot').textContent = APP_VERSION;
+
+/* ═══ Firebase ═══ */
+const firebaseConfig = {
+  apiKey:            "AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",
+  authDomain:        "insys-work.firebaseapp.com",
+  projectId:         "insys-work",
+  storageBucket:     "insys-work.firebasestorage.app",
+  messagingSenderId: "225275784859",
+  appId:             "1:225275784859:web:bd12815c6dc47c0c49e03e"
+};
+const db = getFirestore(initializeApp(firebaseConfig));
+const COL = "intek_storage";
+
+/* ═══ 데이터 구조: 트레이/박스/파렛트 3구분, 구분별 품목 목록 ═══
+   품목: name, w/d/h(적재시 크기 mm), wt(적재단위 무게 kg), qty(일일 수량), days(보관일수) */
+const CATS = [
+  { key:"tray", title:"트레이", color:"var(--tray)" },
+  { key:"box",  title:"박스",   color:"var(--box)"  },
+  { key:"plt",  title:"파렛트 (2027년~)", color:"var(--plt)" }
+];
+
+let data = {
+  tray: [ { name:"트레이 A (예시)", w:400,  d:300,  h:150, wt:0.8, qty:5600, days:3 } ],
+  box:  [ { name:"박스 A (예시)",   w:600,  d:400,  h:300, wt:1.8, qty:800,  days:3 } ],
+  plt:  [ { name:"파렛트 (예시)",   w:1100, d:1100, h:150, wt:25,  qty:200,  days:2 } ]
+};
+
+/* ═══ 계산 ═══ */
+function calcRow(r){
+  const totQty = Math.round((r.qty||0) * (r.days||0));                 // 보관수량 = 수량 × 보관일수
+  const vol    = totQty * (r.w||0)*(r.d||0)*(r.h||0)/1e9;              // 공간 m³ (적재시 크기 기준)
+  const wtKg   = totQty * (r.wt||0);                                   // 무게 kg
+  return { totQty, vol, wtKg };
+}
+
+/* ═══ 렌더링 ═══ */
+const wrap = document.getElementById('catsWrap');
+const fmt = n => (n||0).toLocaleString('ko-KR');
+
+function fld(label, cat, idx, key, val, step){
+  return `<div class="fld"><label>${label}</label>
+    <input type="number" min="0" step="${step||1}" value="${val}" oninput="updRow('${cat}',${idx},'${key}',this.value)"></div>`;
+}
+
+function render(){
+  wrap.innerHTML = CATS.map(c=>{
+    const rows = data[c.key];
+    return `
+    <div class="cat-card" style="--c:${c.color}">
+      <div class="cat-head">
+        <span class="cat-title">${c.title}</span>
+        <span class="cat-sub">품목 ${rows.length}건</span>
+      </div>
+      ${rows.map((r,i)=>`
+        <div class="row-card">
+          <div class="row-top">
+            <input class="name" type="text" value="${r.name}" placeholder="품목명" oninput="updRow('${c.key}',${i},'name',this.value)">
+            <button class="del-btn" onclick="delRow('${c.key}',${i})">삭제</button>
+          </div>
+          <div class="fld-grid">
+            <div class="fld wide"><label>적재시 크기 가로×세로×높이 (mm)</label>
+              <div class="dim3">
+                <input type="number" min="0" value="${r.w}" oninput="updRow('${c.key}',${i},'w',this.value)"><span>×</span>
+                <input type="number" min="0" value="${r.d}" oninput="updRow('${c.key}',${i},'d',this.value)"><span>×</span>
+                <input type="number" min="0" value="${r.h}" oninput="updRow('${c.key}',${i},'h',this.value)">
+              </div>
+            </div>
+            ${fld("무게 (kg/개)", c.key, i, "wt", r.wt, 0.1)}
+            ${fld("수량 (개/일)", c.key, i, "qty", r.qty)}
+            ${fld("보관일수 (일)", c.key, i, "days", r.days, 0.5)}
+          </div>
+          <div class="row-res" id="res-${c.key}-${i}"></div>
+        </div>`).join('')}
+      <div class="cat-sum" id="catsum-${c.key}"></div>
+      <button class="add-btn" onclick="addRow('${c.key}')">＋ ${c.title} 품목 추가</button>
+    </div>`;
+  }).join('');
+  calcAll();
+}
+
+function calcAll(){
+  let gQty=0, gVol=0, gWt=0;
+  const catTotals = [];
+  CATS.forEach(c=>{
+    let cQty=0, cVol=0, cWt=0;
+    data[c.key].forEach((r,i)=>{
+      const x = calcRow(r);
+      cQty+=x.totQty; cVol+=x.vol; cWt+=x.wtKg;
+      const el = document.getElementById(`res-${c.key}-${i}`);
+      if(el) el.innerHTML =
+        `<span>보관수량 <b>${fmt(x.totQty)}</b> 개</span>`+
+        `<span>공간 <span class="hl">${x.vol.toFixed(2)}</span> m³</span>`+
+        `<span>무게 <span class="hl">${fmt(Math.round(x.wtKg))}</span> kg</span>`;
+    });
+    const cs = document.getElementById(`catsum-${c.key}`);
+    if(cs) cs.innerHTML =
+      `<span>${c.title} 소계</span>`+
+      `<span>수량 <b>${fmt(cQty)}</b> 개</span>`+
+      `<span>공간 <b>${cVol.toFixed(2)}</b> m³</span>`+
+      `<span>무게 <b>${fmt(Math.round(cWt))}</b> kg</span>`;
+    catTotals.push({ title:c.title, cQty, cVol, cWt });
+    gQty+=cQty; gVol+=cVol; gWt+=cWt;
+  });
+  document.getElementById('sumQty').textContent  = fmt(gQty);
+  document.getElementById('sumVol').textContent  = gVol.toFixed(1);
+  document.getElementById('sumWt').textContent   = (gWt/1000).toFixed(2);
+  document.getElementById('sumWtKg').textContent = fmt(Math.round(gWt));
+  document.getElementById('sumTable').innerHTML =
+    `<tr><th>구분</th><th>보관수량 (개)</th><th>공간 (m³)</th><th>무게 (kg)</th></tr>`+
+    catTotals.map(t=>`<tr><td class="l">${t.title}</td><td>${fmt(t.cQty)}</td><td>${t.cVol.toFixed(2)}</td><td>${fmt(Math.round(t.cWt))}</td></tr>`).join('')+
+    `<tr class="tot"><td class="l">전체 합계</td><td>${fmt(gQty)}</td><td>${gVol.toFixed(2)}</td><td>${fmt(Math.round(gWt))}</td></tr>`;
+}
+
+/* ═══ 행 조작 ═══ */
+window.updRow = (cat,i,key,val)=>{
+  data[cat][i][key] = (key==='name') ? val : parseFloat(val)||0;
+  if(key==='name') return;
+  calcAll();
+};
+window.delRow = (cat,i)=>{
+  if(!confirm(`'${data[cat][i].name||'품목'}'을(를) 삭제할까요?`)) return;
+  data[cat].splice(i,1); render();
+};
+window.addRow = (cat)=>{
+  data[cat].push({ name:"", w:0, d:0, h:0, wt:0, qty:0, days:1 });
+  render();
+};
+window.calcAll = calcAll;
+
+/* ═══ 화면 전환 ═══ */
+window.setView = (v)=>{
+  document.body.classList.toggle('mobile-view', v==='mobile');
+  document.getElementById('tabMobile').classList.toggle('on', v==='mobile');
+  document.getElementById('tabPC').classList.toggle('on', v==='pc');
+};
+
+/* ═══ 시나리오 저장/불러오기 ═══ */
+const toast = (m)=>{ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); };
+
+window.saveScenario = async ()=>{
+  const name = document.getElementById('scName').value.trim();
+  if(!name){ toast('시나리오명을 입력하세요'); return; }
+  try{
+    await addDoc(collection(db, COL), {
+      name, data, savedAt: new Date().toISOString(), ver: APP_VERSION
+    });
+    toast('저장 완료'); document.getElementById('scName').value='';
+    loadScenarioList();
+  }catch(e){ console.error(e); toast('저장 실패: '+e.message); }
+};
+
+window.loadScenarioList = async ()=>{
+  const list = document.getElementById('scList');
+  try{
+    const snap = await getDocs(query(collection(db, COL), orderBy('savedAt','desc')));
+    if(snap.empty){ list.innerHTML = '<div class="empty">저장된 시나리오가 없습니다.</div>'; return; }
+    list.innerHTML = '';
+    snap.forEach(d=>{
+      const s = d.data();
+      const row = document.createElement('div');
+      row.className='sc-item';
+      row.innerHTML = `<span class="nm">${s.name}</span><span class="dt">${(s.savedAt||'').slice(0,10)}</span>`;
+      const bLoad = document.createElement('button'); bLoad.className='btn ghost'; bLoad.textContent='불러오기';
+      bLoad.onclick = ()=>{
+        if(s.data && s.data.tray){ data = s.data; render(); toast(`'${s.name}' 불러옴`); }
+        else toast('이전 버전(v1.x) 데이터라 불러올 수 없습니다');
+      };
+      const bDel = document.createElement('button'); bDel.className='del-btn'; bDel.textContent='삭제';
+      bDel.onclick = async ()=>{ if(!confirm(`'${s.name}' 시나리오를 삭제할까요?`))return; await deleteDoc(doc(db, COL, d.id)); loadScenarioList(); toast('삭제 완료'); };
+      row.appendChild(bLoad); row.appendChild(bDel);
+      list.appendChild(row);
+    });
+  }catch(e){
+    console.error(e);
+    list.innerHTML = '<div class="empty">불러오기 실패 — Firestore 보안규칙에 intek_storage 컬렉션 허용이 필요할 수 있습니다.</div>';
+  }
+};
+
+render();
+loadScenarioList();
+</script>
+</body>
+</html>
