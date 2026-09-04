@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v9.0 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v9.1 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v9.0</span>
+    <span class="vb">v9.1</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v9.0 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v9.1 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v9.0
+// 트레이 세척·탈수·건조 시뮬레이터 v9.1
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='9.0';
+const VER='9.1';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -259,7 +259,8 @@ const S={
   // 건조
   dryTemp:90,dryAirVol:40,dryRecirc:75,heaterCount:1,   // ★v9.0 발주 검토 강건최적
   // ★v8.9 건조기 구성: 최소 길이, 팬 1대 담당 길이, 순환 덕트 풍속
-  dryMinLen:3000, dryFanCover:1000, dryDuctVel:12,
+  dryMinLen:3000, dryFanCover:1000, dryDuctVel:12, dryTarget:95, fanPhase:3,
+  dewatTarget:95,   // ★v9.1 탈수 목표(%) — 절감 분석 기준
   // 온수/유틸
   boilerType:'gas',boilerTankL:1000,boilerIns:true,inletTemp:15,convKW:1.5,
   // 급수 방식: cascade(역류) or direct(직공급), 헹굼 청수량, 1차 보조급수
@@ -636,23 +637,90 @@ function knifeLength(faceHmm, incidenceDeg){
 function blowerKW(air,p,eff){return (air/60)*p*1000/eff/1000;}
 // ★v8.9 히터 내장 시로코팬 라인업 (일반 유통 사양 기준 — 발주 전 제작사 확인 필요)
 //  모터kW / 풍량 m³/min / 정압 Pa / 내장히터 kW / 토출·순환 덕트경(A)
+// ★v9.1 시로코팬 라인업 — 실측 검증 모델(TFB-F19DS) 기준으로 재구성
+//  ※ 시로코팬은 송풍 전용(히터 미내장) → 가열은 별도 덕트히터/열원으로 구성
+//  풍량 m³/h, 정압 mmAq(1mmAq≈9.81Pa), 소비전력 W, 흡입·토출구 Ø
 const SIROCCO=[
-  {kw:0.75, air:30,  sp:500,  heat:9,  duct:200},
-  {kw:1.5,  air:50,  sp:700,  heat:15, duct:250},
-  {kw:2.2,  air:70,  sp:900,  heat:21, duct:300},
-  {kw:3.7,  air:100, sp:1100, heat:30, duct:350},
-  {kw:5.5,  air:140, sp:1300, heat:45, duct:400},
-  {kw:7.5,  air:180, sp:1500, heat:60, duct:450}
+  {no:1, name:'TFB-F10AS', hp:'0.04', ph:1, kw:0.03,  m3h:216,  mmaq:10, amp:0.2, watt:30,   duct:100, blade:100, pole:4, kg:3.2},
+  {no:2, name:'TFB-F14AS', hp:'0.06', ph:1, kw:0.047, m3h:324,  mmaq:14, amp:0.3, watt:47,   duct:125, blade:125, pole:4, kg:4.3},
+  {no:3, name:'TFB-F16BS', hp:'0.26', ph:1, kw:0.195, m3h:1000, mmaq:23, amp:0.7, watt:195,  duct:150, blade:160, pole:4, kg:5.6},
+  {no:4, name:'TFB-F19DS', hp:'0.30', ph:1, kw:0.26,  m3h:1450, mmaq:30, amp:1.7, watt:260,  duct:200, blade:180, pole:4, kg:11},
+  {no:5, name:'TFB-F19DT', hp:'0.30', ph:3, kw:0.19,  m3h:1500, mmaq:31, amp:1.4, watt:190,  duct:200, blade:180, pole:4, kg:11},
+  {no:6, name:'TFB-G25DS', hp:'0.5',  ph:1, kw:0.40,  m3h:2400, mmaq:24, amp:2.1, watt:400,  duct:250, blade:250, pole:6, kg:20, quiet:true},
+  {no:7, name:'TFB-G25DT', hp:'0.5',  ph:3, kw:0.36,  m3h:2400, mmaq:25, amp:1.9, watt:360,  duct:250, blade:250, pole:6, kg:20, quiet:true},
+  {no:8, name:'TFB-F28FS', hp:'1.5',  ph:1, kw:1.525, m3h:3800, mmaq:55, amp:7.2, watt:1525, duct:250, blade:250, pole:4, kg:24},
+  {no:9, name:'TFB-F28FT', hp:'1.5',  ph:3, kw:1.60,  m3h:3800, mmaq:52, amp:5.7, watt:1600, duct:250, blade:250, pole:4, kg:23},
+  {no:10,name:'TFB-G29ES', hp:'1',    ph:1, kw:0.52,  m3h:3000, mmaq:30, amp:2.6, watt:520,  duct:300, blade:250, pole:6, kg:22, quiet:true},
+  {no:11,name:'TFB-G29ET', hp:'1',    ph:3, kw:0.51,  m3h:2800, mmaq:29, amp:2.0, watt:510,  duct:300, blade:250, pole:6, kg:22, quiet:true},
+  {no:12,name:'TFB-F29FS', hp:'2',    ph:1, kw:1.76,  m3h:4500, mmaq:67, amp:8.2, watt:1760, duct:300, blade:250, pole:4, kg:25},
+  {no:13,name:'TFB-F29FT', hp:'2',    ph:3, kw:1.66,  m3h:4500, mmaq:65, amp:5.3, watt:1660, duct:300, blade:250, pole:4, kg:25},
+  {no:14,name:'TFB-F30FS', hp:'2.5',  ph:1, kw:1.735, m3h:5830, mmaq:66, amp:8.3, watt:1735, duct:300, blade:250, pole:4, kg:28},
+  {no:15,name:'TFB-F30FT', hp:'2.5',  ph:3, kw:1.69,  m3h:5830, mmaq:66, amp:5.3, watt:1690, duct:300, blade:250, pole:4, kg:28}
 ];
-// 대당 필요 풍량·히터를 모두 만족하는 최소 기종 선정 (없으면 최대 기종 + 부족 표시)
-function selectSirocco(airPerUnit, heatPerUnit){
-  for(const m of SIROCCO){ if(m.air>=airPerUnit && m.heat>=heatPerUnit) return {m:m, short:false}; }
-  return {m:SIROCCO[SIROCCO.length-1], short:true};
-}
 // 측면 순환 원형 덕트 내경 (풍속 기준) — Q[m³/min], v[m/s]
 function ductDiaMm(qM3min, vMs){
-  const A=(qM3min/60)/Math.max(1,vMs);        // m²
-  return Math.ceil(Math.sqrt(4*A/Math.PI)*1000/25)*25;  // 25mm 단위 올림
+  const A=(qM3min/60)/Math.max(1,vMs);
+  return Math.ceil(Math.sqrt(4*A/Math.PI)*1000/25)*25;   // 25mm 단위 올림
+}
+// 순환 덕트 압력손실 추정 (mmAq) — 직관 길이 마찰 + 곡관·후드 국부손실
+function ductLossMmAq(qM3min, diaMm, runLenM, elbows){
+  const v=(qM3min/60)/(Math.PI*Math.pow(diaMm/2000,2));      // m/s
+  const pv=1.2*v*v/2;                                        // 동압 Pa
+  const fric=0.02*(runLenM/Math.max(0.05,diaMm/1000))*pv;    // 직관 마찰
+  const local=(elbows*0.35 + 1.2)*pv;                         // 곡관 + 흡·토출 후드
+  return Math.max(3, (fric+local)/9.81);                      // Pa → mmAq
+}
+// 필요 풍량·정압을 모두 만족하는 최소 기종 선정 (없으면 최대 기종 + 부족 표시)
+function selectSirocco(airPerUnitM3min, staticMmAq, preferPhase){
+  const need=airPerUnitM3min*60;
+  const ok=SIROCCO.filter(function(m){ return m.m3h>=need && m.mmaq>=staticMmAq; });
+  if(!ok.length){
+    // 정압만 만족하는 최대 풍량 기종을 반환하고 부족 표시
+    const byP=SIROCCO.filter(function(m){return m.mmaq>=staticMmAq;});
+    const pick=(byP.length?byP:SIROCCO).slice().sort(function(a,b){return b.m3h-a.m3h;})[0];
+    return {m:pick, short:true};
+  }
+  const ph=preferPhase||3;
+  const pref=ok.filter(function(m){return m.ph===ph;});
+  const pool=pref.length?pref:ok;
+  pool.sort(function(a,b){ return a.watt-b.watt || a.m3h-b.m3h; });   // 소비전력 최소 우선
+  return {m:pool[0], short:false};
+}
+// 건조 목표(%)를 만족하는 데 필요한 총 풍량 역산 (온도·순환·잔수 조건 하)
+function airVolForTarget(target, temp, recircF, resPen, heaterF){
+  const base=target/Math.max(0.3, recircF*resPen*heaterF);
+  return Math.max(5, (base - 56 - temp*0.25)/0.22);
+}
+// ★v9.1 탈수 목표별 최소 소비전력 곡선 — 목표를 낮출 때의 월 전기료 절감액 산출
+let _dwCurveKey='', _dwCurve=null;
+function dewatCostCurve(){
+  const key=[S.qty,S.trayW,S.trayD,S.pocketCount,S.knifeSlot,S.knifeAng,S.blowerPerN,S.hours,S.days,S.rate,S.dewatTarget].join('|');
+  if(key===_dwCurveKey && _dwCurve) return _dwCurve;
+  const bk={p:S.knifePass, pr:S.knifePress, v:S.knifeVel, g:S.knifeGap};
+  const prevNoSync=_noSync; _noSync=true;
+  const targets=[80,85,90,95,97,99];
+  const rows=targets.map(function(t){
+    let best=null;
+    for(let ps=1; ps<=6; ps++){
+      for(let kp=8; kp<=40; kp+=2){
+        S.knifePass=ps; S.knifePress=kp; S.knifeVel=Math.round(knifeExitVel(kp)/5)*5;
+        calcAll();
+        if(R.blowerSel.blowerShortage) continue;
+        if(R.dewatEff+0.001 < t) continue;
+        if(!best || R.blowKW < best.kw-0.01){ best={kw:R.blowKW, ps:ps, kp:kp, eff:R.dewatEff, len:S.dewatLen}; }
+      }
+    }
+    return {t:t, ok:!!best, kw:best?best.kw:null, ps:best?best.ps:null, kp:best?best.kp:null, len:best?best.len:null};
+  });
+  S.knifePass=bk.p; S.knifePress=bk.pr; S.knifeVel=bk.v; S.knifeGap=bk.g;
+  calcAll(); _noSync=prevNoSync;
+  const hrs=S.hours*S.days;                       // 월 가동시간
+  rows.forEach(function(r){ r.won = r.ok ? Math.round(r.kw*hrs*S.rate) : null; });
+  const base=rows.find(function(r){return r.t===99;}) || rows[rows.length-1];
+  rows.forEach(function(r){ r.save = (r.ok&&base.ok) ? (base.won - r.won) : null; });
+  _dwCurve={rows:rows, hrs:hrs, base:base};
+  _dwCurveKey=key;
+  return _dwCurve;
 }
 function dryerKW(res,airVol,dT,recirc){const evap=res*2260/3600;const airH=(airVol/60)*1.2*1005*dT/1000;return evap+airH*(1-recirc/100);}
 // 트레이 잔류수분 — 평판이라 탈수 효율 좋음 (개당 30g 기준)
@@ -728,7 +796,7 @@ function bindSlider(id){
   el.addEventListener('input',()=>{rg.value=el.value;el.classList.add('s-user');onChange(id);});
 }
 function syncState(){
-  ['dryMinLen','dryFanCover','dryDuctVel','trayW','trayD','trayT','pocketCount','qty','dlv','wHole','wSprayAngle','wTiltAngle','wOverlap','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
+  ['dryMinLen','dryFanCover','dryDuctVel','dryTarget','dewatTarget','trayW','trayD','trayT','pocketCount','qty','dlv','wHole','wSprayAngle','wTiltAngle','wOverlap','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
   if(!S.wDistAuto){const nd=gi('wNozzleDist'); if(nd&&nd.value!=='')S.wNozzleDist=+nd.value;}
   const bt=gi('boilerType');if(bt)S.boilerType=bt.value;
   const wi=gi('wTankIns');if(wi)S.wTankIns=wi.checked;
@@ -747,6 +815,7 @@ function syncState(){
   const wd=gi('wDistAuto');if(wd)S.wDistAuto=wd.checked;
   const tAlt=gi('wTiltAlt');if(tAlt)S.wTiltAlt=tAlt.checked;
   const pm=gi('pumpMode');if(pm)S.pumpMode=pm.value;
+  const fp=gi('fanPhase');if(fp)S.fanPhase=+fp.value;   // ★v9.1 select 값은 문자열 → 숫자 변환
   for(let i=0;i<3;i++){const pl=gi('stgPumpLpm'+i); if(pl&&pl.value!=='')S.stgPumpLpm[i]=+pl.value;}
   const nl=gi('nozzleLayout');if(nl)S.nozzleLayout=nl.value;
   const tm=gi('stgTankMode');if(tm)S.stgTankMode=tm.value;
@@ -1140,17 +1209,29 @@ function calcAll(){
   S.dryLen = Math.max(S.dryMinLen||3000, dryLenBySpeed);
   const dryLenGovern = (S.dryLen>dryLenBySpeed) ? 'min' : 'speed';   // 어느 조건이 길이를 결정했는지
   // 상부 시로코팬: 길이를 팬 1대 담당 구간으로 나눠 대수 산정 (최소 3대)
-  const dryFanN = Math.max(3, Math.ceil(S.dryLen/Math.max(500, S.dryFanCover)));
-  const airPerFan = S.dryAirVol/dryFanN;
-  const heatPerFan = dryKW/dryFanN;
-  const siro = selectSirocco(airPerFan, heatPerFan);
-  const siroModel = siro.m, siroShort = siro.short;
-  const siroTotalKW = (siroModel.kw + siroModel.heat) * dryFanN;      // 팬동력+히터 총 정격
-  // 측면 원형 순환 덕트: 순환 풍량을 좌우 2계통으로 분배
-  const recircQ = S.dryAirVol * (S.dryRecirc/100);
+  // ★v9.1 건조 목표(%)를 만족하는 데 필요한 풍량 역산 → 설정 풍량과 비교
+  const recircF0 = S.dryRecirc<=75 ? (1 + S.dryRecirc*0.0012) : (1.09 - (S.dryRecirc-75)*0.006);
+  const resPen0 = 1 - Math.min(0.30, Math.max(0, residual/(qtyH*0.03)-0.05)*0.5);
+  const airNeed = airVolForTarget(S.dryTarget||95, S.dryTemp, recircF0, resPen0, 1);
+  const airUse = Math.max(S.dryAirVol, airNeed);        // 목표 미달이면 필요 풍량까지 상향 권고
+  // 팬 대수: 길이 배치 조건과 풍량 조건 중 큰 쪽
+  const fanByLen = Math.max(2, Math.ceil(S.dryLen/Math.max(500, S.dryFanCover)));
+  // 측면 원형 순환 덕트 (좌·우 2계통)
+  const recircQ = airUse * (S.dryRecirc/100);
   const ductQPerSide = recircQ/2;
   const dryDuctDia = ductDiaMm(ductQPerSide, S.dryDuctVel);
-  const ductPerSide = Math.max(1, Math.ceil(dryFanN/2));              // 측면 계통당 분기 수
+  // 순환 경로 길이 = 건조기 길이 + 상하 왕복(높이×2), 곡관 4개소 가정
+  const ductRunM = (S.dryLen + (S.trayW + 400 + (S.filterGap||200) + 900 + 300)*2)/1000;   // 건조기 길이 + 상하 왕복(설비 높이 추정)
+  const ductStatic = ductLossMmAq(ductQPerSide, dryDuctDia, ductRunM, 4);
+  // 풍량 조건 기준 대수 → 길이 조건과 비교해 큰 쪽 채택
+  let dryFanN = fanByLen, siro = selectSirocco(airUse/fanByLen, ductStatic, S.fanPhase);
+  while(siro.short && dryFanN < 12){ dryFanN++; siro = selectSirocco(airUse/dryFanN, ductStatic, S.fanPhase); }
+  const airPerFan = airUse/dryFanN;
+  const siroModel = siro.m, siroShort = siro.short;
+  const heatPerFan = dryKW/dryFanN;                     // 별도 덕트히터 대당 용량
+  const siroTotalKW = (siroModel.watt/1000*dryFanN) + dryKW;   // 팬 실소비전력 + 가열부하
+  const ductPerSide = Math.max(1, Math.ceil(dryFanN/2));
+  const fanByAir = Math.max(1, Math.ceil(airUse/(siroModel.m3h/60)));
   const convTotalLen = S.inLen + S.washDryLen + S.dewatLen + S.dryLen + S.outLen + gapTotal;
   // ── 설비 각부 치수 (트레이·설계값 연동) ──
   // 폭 = 2CH × 트레이깊이 + 격벽100 + 양측프레임150×2
@@ -1219,11 +1300,11 @@ function calcAll(){
   const convLoadKW = Math.round((loadKg*9.81*0.35*speedMs/0.6/1000 + 0.25)*1000)/1000;
   const convMotorKW = [0.4,0.75,1.5,2.2,3.7,5.5].find(function(k){return k>=convLoadKW*2.5;})||7.5;
   S.convKW = convMotorKW;
-  const siroFanKW = siroModel.kw * dryFanN;    // ★v8.9 상부 시로코팬 모터 동력 (기존 누락분)
+  const siroFanKW = siroModel.watt/1000 * dryFanN;    // 상부 시로코팬 실소비전력
   const elecTotal = elecBase + convMotorKW + siroFanKW;
   const elecReal = elecRealBase + convLoadKW + siroFanKW*0.85;
 
-  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,filterFactor,fScore,heaterPerUnit,heaterOK,heaterFactor,convLoadKW,nClipPairs,trayOnLine,loadKg,convMotorKW,tankBottomMax,cascadeOK,topStage,nozPitch,angImpact,slantD,tiltF,ovF,altF,effCovH,dryLenBySpeed,dryLenGovern,dryFanN,airPerFan,heatPerFan,siroModel,siroShort,siroTotalKW,recircQ,dryDuctDia,ductPerSide,siroFanKW,dryNeedDwell,rinseF,rinseNeedLph,recircF,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
+  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,filterFactor,fScore,heaterPerUnit,heaterOK,heaterFactor,convLoadKW,nClipPairs,trayOnLine,loadKg,convMotorKW,tankBottomMax,cascadeOK,topStage,nozPitch,angImpact,slantD,tiltF,ovF,altF,effCovH,dryLenBySpeed,dryLenGovern,dryFanN,airPerFan,heatPerFan,siroModel,siroShort,siroTotalKW,recircQ,dryDuctDia,ductPerSide,siroFanKW,airNeed,airUse,ductStatic,ductRunM,fanByLen,fanByAir,dryNeedDwell,rinseF,rinseNeedLph,recircF,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
 }
 
 // ── 좌측 렌더 ──
@@ -1458,6 +1539,48 @@ function renderLeft(){
     var go=gapOptimal(S.knifeSlot);
     h='<div class="card"><div class="ch"><span class="ci">💨</span><span class="cl">탈수부 — 이 설비의 핵심</span><span class="cq">앞뒤 4패스 × 2CH</span></div><div class="cb">'
       +'<div class="chbox" style="background:#fff8f0;border-color:#ffd9a8;color:#8a5a00;">🎯 <b>세척보다 탈수가 관건</b>입니다. 세워진 트레이가 <b>면당 4번(4-pass) 에어나이프를 통과</b>해야 완전 탈수됩니다.<br>앞면 4 + 뒷면 4 = 채널당 8개, <b>2CH → 총 '+kt+'개 에어나이프</b></div>'
+      +'<div class="st">🎯 탈수 목표 설정 · 에너지 절감 분석</div>'
+      +'<div class="g2">'+fld('dewatTarget','탈수 목표','%',S.dewatTarget)+fld('rate','전기 단가','원/kWh',S.rate)+'</div>'
+      +(function(){
+          var cv=dewatCostCurve();
+          var cur=cv.rows.find(function(r){return r.t===S.dewatTarget;});
+          var max=Math.max.apply(null, cv.rows.filter(function(r){return r.ok;}).map(function(r){return r.won;}));
+          var W=320,H=176,padL=8,padB=34,padT=8,bw=(W-padL*2)/cv.rows.length;
+          var g='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">';
+          cv.rows.forEach(function(r,i){
+            var x=padL+i*bw+bw*0.16, w=bw*0.68;
+            var hgt=r.ok? (H-padT-padB)*(r.won/Math.max(1,max)) : 0;
+            var y=H-padB-hgt;
+            var sel=(r.t===S.dewatTarget);
+            g+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+Math.max(1,hgt).toFixed(1)+'" rx="3" fill="'+(sel?'#1565c0':(r.ok?'#90caf9':'#ef9a9a'))+'"/>';
+          });
+          g+='<line x1="'+padL+'" y1="'+(H-padB)+'" x2="'+(W-padL)+'" y2="'+(H-padB)+'" stroke="#b0bec5" stroke-width="1"/>';
+          g+='</svg>';
+          var lbl='<div style="display:grid;grid-template-columns:repeat('+cv.rows.length+',1fr);gap:2px;margin-top:2px;">'
+            +cv.rows.map(function(r){
+                return '<div style="text-align:center;font-size:13px;line-height:1.35;color:'+(r.t===S.dewatTarget?'#0d47a1':'#5a7088')+';font-weight:'+(r.t===S.dewatTarget?'800':'600')+';">'
+                  +r.t+'%<br>'+(r.ok?(r.won/10000).toFixed(0)+'만':'불가')+'</div>';
+              }).join('')+'</div>';
+          var rows='<table class="tbl" style="margin-top:6px;"><thead><tr><th>목표</th><th>최소 구성</th><th>블로워</th><th>월 전기료</th><th>절감(99% 대비)</th></tr></thead><tbody>'
+            +cv.rows.map(function(r){
+              if(!r.ok) return '<tr style="opacity:.5;"><td>'+r.t+'%</td><td colspan="4" style="color:#c62828;">현재 조건으로 달성 불가</td></tr>';
+              var sel=(r.t===S.dewatTarget);
+              return '<tr'+(sel?' style="background:#e3f2fd;font-weight:800;"':'')+'><td>'+r.t+'%</td><td style="font-size:13px;">'+r.ps+'패스 '+r.kp+'kPa</td><td>'+r.kw.toFixed(1)+'kW</td><td>'+r.won.toLocaleString()+'원</td><td style="color:'+(r.save>0?'#1b5e20':'#5a7088')+';font-weight:800;">'+(r.save>0?'−'+r.save.toLocaleString()+'원':'기준')+'</td></tr>';
+            }).join('')+'</tbody></table>';
+          var msg='';
+          if(cur&&cur.ok){
+            msg='<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">'
+              +'💰 <b>목표 '+S.dewatTarget+'% 최소 구성 = '+cur.ps+'패스 · '+cur.kp+'kPa · 블로워 '+cur.kw.toFixed(1)+'kW</b><br>'
+              +'월 전기료 <b>'+cur.won.toLocaleString()+'원</b> ('+S.hours+'h × '+S.days+'일 = '+cv.hrs+'시간, '+S.rate+'원/kWh)<br>'
+              +(cur.save>0?'99% 목표 대비 <b>월 '+cur.save.toLocaleString()+'원 절감</b> · 연 <b>'+(cur.save*12).toLocaleString()+'원</b>':'최고 목표 기준(절감 없음)')
+              +'</div>';
+          } else {
+            msg='<div class="chbox" style="background:#ffebee;border-color:#ef9a9a;color:#b71c1c;">⚠️ 목표 '+S.dewatTarget+'%는 현재 조건(슬롯 '+S.knifeSlot+'mm · 입사각 '+S.knifeAng+'°)으로 달성 불가 — 슬롯을 좁히거나 입사각을 조정하십시오.</div>';
+          }
+          return '<div style="background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px;margin:6px 0;">'
+            +'<div style="font-size:13px;font-weight:800;color:#0d2137;margin-bottom:6px;">📊 탈수 목표별 월 전기료 (목표를 낮출수록 절감)</div>'
+            +g+lbl+rows+'</div>'+msg;
+        })()
       +'<div class="st">에어나이프 구성</div>'
       +sliderHTML('knifePass','🔪 면당 통과 횟수','pass',1,6,1,S.knifePass,3,4)
       +'<div class="chbox">📊 <b>총 에어나이프 = '+S.knifePass+'패스 × 앞뒤2면 × 2CH = <span style="font-size:17px;">'+kt+'개</span></b></div>'
@@ -1495,12 +1618,18 @@ function renderLeft(){
       +'<div class="chbox" style="background:#fff3e0;border-color:#ffcc80;color:#e65100;">📏 <b>건조기 길이 '+S.dryLen+'mm</b> — 컨베이어 속도 '+R.speedMmin.toFixed(2)+'m/min × 필요체류 '+R.dryNeedDwell.toFixed(0)+'초 → 속도기준 '+R.dryLenBySpeed+'mm'
       +(R.dryLenGovern==='min'?' → <b>최소길이 '+S.dryMinLen+'mm 적용</b> (팬 배치 공간 확보)':' → <b>속도 조건이 지배</b> (최소길이 초과)')+'<br>'
       +'속도가 빨라지면 길이도 자동으로 늘어납니다.</div>'
+      +'<div class="g2">'+fld('dryTarget','건조 목표','%',S.dryTarget)+sel('fanPhase','팬 전원',[[3,'삼상 220/380V (연속운전 권장)'],[1,'단상 220V']],S.fanPhase)+'</div>'
+      +'<div class="chbox" style="background:'+(R.airNeed>S.dryAirVol?'#fff8e1':'#e8f5e9')+';border-color:'+(R.airNeed>S.dryAirVol?'#ffe082':'#a5d6a7')+';color:'+(R.airNeed>S.dryAirVol?'#e65100':'#1b5e20')+';">'
+      +'🎯 <b>건조 목표 '+S.dryTarget+'%</b> · 현재 '+R.dryEff.toFixed(1)+'% → 필요 풍량 <b>'+R.airNeed.toFixed(1)+'m³/min</b> (온도 '+S.dryTemp+'°C · 순환 '+S.dryRecirc+'% · 잔수 '+R.residual.toFixed(2)+'L/h 조건)<br>'
+      +(R.airNeed>S.dryAirVol?'⚠️ 설정 풍량 '+S.dryAirVol+'m³/min로는 목표 미달 — 팬 선정은 <b>'+R.airUse.toFixed(1)+'m³/min</b> 기준으로 산정했습니다':'✅ 설정 풍량 '+S.dryAirVol+'m³/min으로 목표 달성')+'</div>'
       +'<div class="chbox" style="background:'+(R.siroShort?'#ffebee':'#e8f5e9')+';border-color:'+(R.siroShort?'#ef9a9a':'#a5d6a7')+';color:'+(R.siroShort?'#b71c1c':'#1b5e20')+';">'
-      +'🌀 <b>히터 내장 시로코팬 '+R.dryFanN+'대</b> (상부 배치 · '+S.dryFanCover+'mm 간격)<br>'
-      +'· 대당 부담 풍량 '+R.airPerFan.toFixed(1)+'m³/min · 히터 '+R.heatPerFan.toFixed(1)+'kW<br>'
-      +'· 선정 기종 <b>'+R.siroModel.kw+'kW / '+R.siroModel.air+'m³·min⁻¹ / '+R.siroModel.sp+'Pa / 내장히터 '+R.siroModel.heat+'kW / 덕트 '+R.siroModel.duct+'A</b><br>'
-      +'· 총 정격 <b>'+R.siroTotalKW.toFixed(1)+'kW</b> (팬동력 '+R.siroFanKW.toFixed(2)+' + 내장히터 '+(R.siroModel.heat*R.dryFanN).toFixed(0)+'kW, '+R.dryFanN+'대) · 실제 건조 열부하 '+R.dryKW.toFixed(1)+'kW'
-      +(R.siroShort?'<br>❌ 라인업 최대 기종으로도 부족 — 팬 대수를 늘리거나 풍량·온도를 낮추십시오':' ✅ 여유 있음')+'</div>'
+      +'🌀 <b>추천 시로코팬 — '+R.siroModel.name+' × '+R.dryFanN+'대</b><br>'
+      +'· 근거: 건조기 '+S.dryLen+'mm ÷ 팬담당 '+S.dryFanCover+'mm = '+R.fanByLen+'대(배치) / 풍량 '+R.airUse.toFixed(1)+'m³·min⁻¹ ÷ 기종 '+(R.siroModel.m3h/60).toFixed(1)+' = '+R.fanByAir+'대(풍량) → <b>'+R.dryFanN+'대</b><br>'
+      +'· 사양: '+R.siroModel.hp+'마력 / '+(R.siroModel.ph===3?'삼상':'단상')+' / 풍량 '+R.siroModel.m3h+'m³·h⁻¹ / 정압 '+R.siroModel.mmaq+'mmAq / 소비 '+R.siroModel.watt+'W / 흡토출 Ø'+R.siroModel.duct+' / '+R.siroModel.kg+'kg'+(R.siroModel.quiet?' / 저소음 6극':'')+'<br>'
+      +'· 대당 부담 '+R.airPerFan.toFixed(1)+'m³·min⁻¹ ('+(R.airPerFan*60).toFixed(0)+'m³/h) · 필요 정압 '+R.ductStatic.toFixed(0)+'mmAq vs 기종 '+R.siroModel.mmaq+'mmAq<br>'
+      +'· 팬 총 소비전력 <b>'+R.siroFanKW.toFixed(2)+'kW</b> ('+R.siroModel.watt+'W × '+R.dryFanN+'대)<br>'
+      +'· ⚠️ 시로코팬은 <b>송풍 전용</b> — 가열은 별도 덕트히터 필요: 총 <b>'+R.dryKW.toFixed(1)+'kW</b> (대당 '+R.heatPerFan.toFixed(1)+'kW)'
+      +(R.siroShort?'<br>❌ 라인업 최대 기종으로도 부족 — 팬 담당길이를 줄이거나 온도를 올려 풍량을 낮추십시오':' ✅ 풍량·정압 모두 여유')+'</div>'
       +'<div class="chbox" style="background:#eef6fb;border-color:#cde3f0;color:#0b5a80;">'
       +'🔄 <b>측면 원형 순환덕트</b> — 상부 팬 토출 → 트레이 통과 → 측면 회수 → 팬 흡입(폐열 재사용 '+S.dryRecirc+'%)<br>'
       +'· 순환 풍량 '+R.recircQ.toFixed(1)+'m³/min → 좌·우 2계통 분배 '+(R.recircQ/2).toFixed(1)+'m³/min<br>'
@@ -1627,7 +1756,7 @@ function renderLeft(){
       const needRerender =
         el.id==='boilerType'||el.id==='containerType'||el.id==='supplyMode'||el.id==='aux1st'
         ||el.id==='meshFilter'||el.id==='sludgeFilter'||el.id==='pumpStrainer'
-        ||el.id==='drainMode'||el.id==='stgTankMode'||el.id==='dlv'||el.id==='wAutoArray'||el.id==='wDistAuto'||el.id==='pumpMode'||el.id==='wTiltAlt'||el.id==='wTiltAngle'||el.id==='wOverlap'||el.id==='nozzleLayout'||el.id==='pocketCount'||el.id==='wSprayAngle'||el.id==='rinseWater'
+        ||el.id==='drainMode'||el.id==='stgTankMode'||el.id==='dlv'||el.id==='wAutoArray'||el.id==='wDistAuto'||el.id==='pumpMode'||el.id==='wTiltAlt'||el.id==='wTiltAngle'||el.id==='wOverlap'||el.id==='dewatTarget'||el.id==='dryTarget'||el.id==='fanPhase'||el.id==='rate'||el.id==='nozzleLayout'||el.id==='pocketCount'||el.id==='wSprayAngle'||el.id==='rinseWater'
         ||(el.id&&el.id.startsWith('stgType'))
         ||['washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch','qty','tempSensor','rinseTemp','rinseWater','hours','days','targetMonth','workers','wage','trayW','trayD','trayT','wHole','wSprayAngle','wNozzleDist'].indexOf(el.id)>=0||(el.id&&el.id.startsWith('directValve'))
         ||(el.id&&el.id.startsWith('stg'));
