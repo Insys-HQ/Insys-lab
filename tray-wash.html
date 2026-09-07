@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v10.3 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v10.4 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v10.3</span>
+    <span class="vb">v10.4</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v10.3 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v10.4 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v10.3
+// 트레이 세척·탈수·건조 시뮬레이터 v10.4
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='10.3';
+const VER='10.4';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -1242,7 +1242,10 @@ function calcAll(){
   actStages.forEach(function(i){ sumStageLen += (S.stgLen[i]||1000); });
   const stageGap = 150; // 단 사이 격벽
   const activeCount = actStages.length;
-  S.washDryLen = Math.round(sumStageLen + stageGap*Math.max(0,activeCount-1) + 200);
+  const washEndClear = 200;   // 조 전후 여유(입·출구측 물막이)
+  S.washDryLen = Math.round(sumStageLen + stageGap*Math.max(0,activeCount-1) + washEndClear);
+  const washLenBreak = { sum:sumStageLen, gap:stageGap, nGap:Math.max(0,activeCount-1), end:washEndClear,
+                         parts:actStages.map(function(i){return S.stgLen[i]||1000;}), total:S.washDryLen };
   const washHeaterEach = washHeaterTotal/Math.max(1,actStages.length);
   const nPerFace = stgDetail.length?stgDetail[0].nPerFace:16;
   // 배수: single=공통1개(캐스케이드 최종 1단만), perstage=단별
@@ -1598,9 +1601,10 @@ function calcAll(){
   // 모듈별 치수
   const modules = [
     {nm:'입구', L:S.inLen, W:equipWidth, H:equipHeight, note:'투입부'},
-    {nm:'세척조', L:S.washDryLen, W:equipWidth, H:equipHeight, note:'세척단수 연동 · 상부독립'},
-    {nm:'탈수조', L:S.dewatLen, W:equipWidth, H:equipHeight, note:'나이프 패스 · 상부독립'},
-    {nm:'건조기', L:S.dryLen, W:equipWidth, H:equipHeight, note:'건조 연동 · 상부독립'},
+    {nm:'세척조', L:S.washDryLen, W:equipWidth, H:equipHeight,
+      note:'조 '+washLenBreak.parts.join('+')+' + 격벽'+(washLenBreak.gap*washLenBreak.nGap)+' + 전후'+washLenBreak.end},
+    {nm:'탈수조', L:S.dewatLen, W:equipWidth, H:equipHeight, note:'나이프 '+S.knifePass+'패스×300 + 전후 400'},
+    {nm:'건조기', L:S.dryLen, W:equipWidth, H:equipHeight, note:(dryLenGovern==='min'?'최소길이 '+S.dryMinLen+'mm 적용':'속도×체류 기준 '+dryLenBySpeed+'mm')},
     {nm:'출구', L:S.outLen, W:equipWidth, H:equipHeight, note:'배출부'}
   ];
   // 컨테이너 판정
@@ -1659,7 +1663,7 @@ function calcAll(){
   const elecTotal = elecBase + convMotorKW + siroFanKW;
   const elecReal = elecRealBase + convLoadKW + siroFanKW*0.85;
 
-  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,filterFactor,fScore,heaterPerUnit,heaterOK,heaterFactor,convLoadKW,nClipPairs,trayOnLine,loadKg,convMotorKW,tankBottomMax,cascadeOK,topStage,nozPitch,angImpact,coverRatioH,slantD,tiltF,ovF,altF,effCovH,dryLenBySpeed,dryLenGovern,dryFanN,airPerFan,heatPerFan,siroModel,siroShort,siroTotalKW,recircQ,dryDuctDia,ductPerSide,siroFanKW,tempOver,bagFlowLpm,bagN,bagSize,bagInitDP,skimmerN,susMeshUm,recoverLph,recovTankL,recovW,recovLen,recovDepth,recovTopRise,gravityOK,rinseMakeupLph,rinseIdx,tankBufferMin,needTankL,tankOK,tankAmple,peakFactor,tankTurnMin,tankTurnOK,heatUpMin,boilerLossKW,radDesignKW,radLPM,radPipe,radPipeID,radVel,radFricPerM,radFricTotal,radCv,radValveDP,radAuthority,evapKgH,rhRaw,rhAfter,damperExh,recircEff,rhCtrlOn,rhState,dryLenByEff,lenBoost,effGapR,radRatio,dryRadKW,dryElecKW,radLoadKW,boilerRatedTotal,airNeed,airUse,ductStatic,ductRunM,fanByLen,fanByAir,dryNeedDwell,rinseF,rinseNeedLph,recircF,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
+  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,filterFactor,fScore,heaterPerUnit,heaterOK,heaterFactor,convLoadKW,nClipPairs,trayOnLine,loadKg,convMotorKW,tankBottomMax,cascadeOK,topStage,nozPitch,angImpact,coverRatioH,washLenBreak,slantD,tiltF,ovF,altF,effCovH,dryLenBySpeed,dryLenGovern,dryFanN,airPerFan,heatPerFan,siroModel,siroShort,siroTotalKW,recircQ,dryDuctDia,ductPerSide,siroFanKW,tempOver,bagFlowLpm,bagN,bagSize,bagInitDP,skimmerN,susMeshUm,recoverLph,recovTankL,recovW,recovLen,recovDepth,recovTopRise,gravityOK,rinseMakeupLph,rinseIdx,tankBufferMin,needTankL,tankOK,tankAmple,peakFactor,tankTurnMin,tankTurnOK,heatUpMin,boilerLossKW,radDesignKW,radLPM,radPipe,radPipeID,radVel,radFricPerM,radFricTotal,radCv,radValveDP,radAuthority,evapKgH,rhRaw,rhAfter,damperExh,recircEff,rhCtrlOn,rhState,dryLenByEff,lenBoost,effGapR,radRatio,dryRadKW,dryElecKW,radLoadKW,boilerRatedTotal,airNeed,airUse,ductStatic,ductRunM,fanByLen,fanByAir,dryNeedDwell,rinseF,rinseNeedLph,recircF,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
 }
 
 // ── 좌측 렌더 ──
@@ -1738,6 +1742,13 @@ function renderLeft(){
     }
     stgHtml+='</div>';
     stgHtml = optHtml + stgHtml;
+    // ★v10.4 세척조 길이 검산식 — 표시값을 손으로 따라 계산할 수 있어야 한다
+    stgHtml += '<div class="chbox" style="background:#eef6fb;border-color:#cde3f0;color:#0b5a80;">'
+      +'📐 <b>세척조 길이 검산</b> = 조 길이 합 + 단간 격벽 + 전후 여유<br>'
+      +'<b>'+R.washLenBreak.parts.join(' + ')+' = '+R.washLenBreak.sum+'</b>'
+      +' + 격벽 '+R.washLenBreak.gap+'×'+R.washLenBreak.nGap+'('+(R.washLenBreak.gap*R.washLenBreak.nGap)+')'
+      +' + 전후 '+R.washLenBreak.end
+      +' = <b>세척조 '+R.washLenBreak.total+'mm</b></div>';
 
     var coverMmOverlap = R.nozzleInfo.coverW - R.nozPitch;   // 인접 노즐 중첩량(mm)
         h='<div class="card"><div class="ch"><span class="ci">💧</span><span class="cl">세척부 설계 (단계별 독립)</span><span class="cq">실시간 연동</span></div><div class="cb">'
