@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v9.7 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v9.8 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v9.7</span>
+    <span class="vb">v9.8</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v9.7 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v9.8 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v9.7
+// 트레이 세척·탈수·건조 시뮬레이터 v9.8
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='9.7';
+const VER='9.8';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -990,13 +990,18 @@ function syncState(){
   // 단계별 배열 동기화
   for(let i=0;i<4;i++){
     const p=gi('stgPress'+i); if(p&&p.value!=='') S.stgPress[i]=Math.round(+p.value*100);
-    const c=gi('stgCol'+i); if(c&&c.value!=='' && !S.wAutoArray) S.stgCol[i]=+c.value;
-    const r=gi('stgRow'+i); if(r&&r.value!=='' && !S.wAutoArray) S.stgRow[i]=+r.value;
+    // ★v9.8 자동배열 중에도 직접 수정 가능 — 수정하면 자동 해제
+    const c=gi('stgCol'+i);
+    if(c&&c.value!==''){ const v=Math.max(1, Math.round(+c.value));
+      if(!S.wAutoArray) S.stgCol[i]=v; else if(v!==S.stgCol[i]){ S.wAutoArray=false; const ax=gi('wAutoArray'); if(ax)ax.checked=false; S.stgCol[i]=v; } }
+    const r=gi('stgRow'+i);
+    if(r&&r.value!==''){ const v=Math.max(1, Math.round(+r.value));
+      if(!S.wAutoArray) S.stgRow[i]=v; else if(v!==S.stgRow[i]){ S.wAutoArray=false; const ax=gi('wAutoArray'); if(ax)ax.checked=false; S.stgRow[i]=v; } }
     const sl=gi('stgLen'+i);
     if(sl&&sl.value!==''){
       const v=Math.max(300, Math.round(+sl.value/100)*100);   // ★v9.0 100mm 단위로 정규화
       if(!S.stgLenAuto) S.stgLen[i]=v;
-      else if(v!==S.stgLen[i]) { S.stgLenAuto=false; S.stgLen[i]=v; }  // 직접 수정 시 자동 해제
+      else if(v!==S.stgLen[i]) { S.stgLenAuto=false; const lx=gi('stgLenAuto'); if(lx)lx.checked=false; S.stgLen[i]=v; }  // 직접 수정 시 자동 해제
     }
   }
 }
@@ -1532,7 +1537,7 @@ function renderLeft(){
         +'전기 <b>'+orv.elec.toFixed(1)+'kW</b> · 총길이 <b>'+orv.totalLen+'mm</b> ('+(orv.fitL?'40ft 적재 가능':'⚠️ 40ft 초과')+')</div>':'')
       +'</div>';
     stgHtml='<label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1565c0;margin-bottom:6px;cursor:pointer;"><input type="checkbox" id="stgLenAuto" '+(S.stgLenAuto?'checked':'')+'> 📏 조 길이 자동 산정 — 세로줄 노즐 수×줄간격 연동 (줄 추가 → 조길이↑ → 체류·효율↑)</label>'
-      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">';
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px;">';
     for(var i=0;i<3;i++){
       var isRinse=(S.stgType[i]==='rinse');
       var active=(R.actStages.indexOf(i)>=0);
@@ -1555,10 +1560,18 @@ function renderLeft(){
         +'</div>'
         +'<label style="font-size:13px;color:#5a7088;">분사압력(bar)</label>'
         +'<input type="number" step="0.1" id="stgPress'+i+'" value="'+(S.stgPress[i]/100).toFixed(1)+'"'+dis+' style="width:100%;border:1.5px solid #c5d5e5;border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:'+inpBg+';margin-bottom:5px;">'
-        +'<label style="font-size:13px;color:#5a7088;">↕️ 높이방향 노즐(개/열)'+(S.wAutoArray?' <span style="color:#1b5e20;font-weight:800;">자동</span>':'')+'</label>'
-        +'<input type="number" id="stgCol'+i+'" value="'+S.stgCol[i]+'"'+(S.wAutoArray?' disabled':dis)+' style="width:100%;border:1.5px solid '+(S.wAutoArray?'#a5d6a7':'#c5d5e5')+';border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:'+(S.wAutoArray&&active?'#e8f5e9':inpBg)+';margin-bottom:5px;">'
-        +'<label style="font-size:13px;color:#5a7088;">➡️ 길이방향 노즐 줄(열)'+(S.wAutoArray?' <span style="color:#1b5e20;font-weight:800;">자동</span>':'')+'</label>'
-        +'<input type="number" id="stgRow'+i+'" value="'+S.stgRow[i]+'"'+(S.wAutoArray?' disabled':dis)+' style="width:100%;border:1.5px solid '+(S.wAutoArray?'#a5d6a7':'#c5d5e5')+';border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:'+(S.wAutoArray&&active?'#e8f5e9':inpBg)+';margin-bottom:5px;">'
+        +'<label style="font-size:13px;color:#5a7088;">↕️ 높이방향 노즐(개/열)'+(S.wAutoArray?' <span style="color:#1b5e20;font-weight:800;">자동</span>':' <span style="color:#0d47a1;font-weight:800;">수동</span>')+'</label>'
+        +'<div style="display:flex;gap:3px;margin-bottom:5px;">'
+        +'<button type="button" class="nzbtn" data-nz="col" data-i="'+i+'" data-d="-1"'+(active?'':' disabled')+' style="flex:none;width:28px;border:1.5px solid #c5d5e5;border-radius:5px;background:#f4f8fb;font-size:14px;font-weight:800;color:#0d47a1;font-family:inherit;cursor:pointer;">−</button>'
+        +'<input type="number" min="1" id="stgCol'+i+'" value="'+S.stgCol[i]+'"'+dis+' style="flex:1;min-width:0;border:1.5px solid '+(S.wAutoArray?'#a5d6a7':'#c5d5e5')+';border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:700;text-align:center;background:'+(S.wAutoArray&&active?'#e8f5e9':inpBg)+';">'
+        +'<button type="button" class="nzbtn" data-nz="col" data-i="'+i+'" data-d="1"'+(active?'':' disabled')+' style="flex:none;width:28px;border:1.5px solid #c5d5e5;border-radius:5px;background:#f4f8fb;font-size:14px;font-weight:800;color:#0d47a1;font-family:inherit;cursor:pointer;">+</button>'
+        +'</div>'
+        +'<label style="font-size:13px;color:#5a7088;">➡️ 길이방향 노즐 줄(열)'+(S.wAutoArray?' <span style="color:#1b5e20;font-weight:800;">자동</span>':' <span style="color:#0d47a1;font-weight:800;">수동</span>')+'</label>'
+        +'<div style="display:flex;gap:3px;margin-bottom:5px;">'
+        +'<button type="button" class="nzbtn" data-nz="row" data-i="'+i+'" data-d="-1"'+(active?'':' disabled')+' style="flex:none;width:28px;border:1.5px solid #c5d5e5;border-radius:5px;background:#f4f8fb;font-size:14px;font-weight:800;color:#0d47a1;font-family:inherit;cursor:pointer;">−</button>'
+        +'<input type="number" min="1" id="stgRow'+i+'" value="'+S.stgRow[i]+'"'+dis+' style="flex:1;min-width:0;border:1.5px solid '+(S.wAutoArray?'#a5d6a7':'#c5d5e5')+';border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:700;text-align:center;background:'+(S.wAutoArray&&active?'#e8f5e9':inpBg)+';">'
+        +'<button type="button" class="nzbtn" data-nz="row" data-i="'+i+'" data-d="1"'+(active?'':' disabled')+' style="flex:none;width:28px;border:1.5px solid #c5d5e5;border-radius:5px;background:#f4f8fb;font-size:14px;font-weight:800;color:#0d47a1;font-family:inherit;cursor:pointer;">+</button>'
+        +'</div>'
         +(S.pumpMode==='fixed'&&active?'<label style="font-size:13px;color:#5a7088;">펌프 정격유량(LPM)</label><input type="number" id="stgPumpLpm'+i+'" value="'+(S.stgPumpLpm[i]>0?S.stgPumpLpm[i]:(d.pumpReq||0))+'"'+dis+' style="width:100%;border:1.5px solid #ffcc80;border-radius:5px;padding:4px;font-size:13px;font-family:inherit;font-weight:600;background:#fff8e1;margin-bottom:5px;">':'')
         +(active
           ?'<div style="font-size:13px;color:'+tc+';font-weight:600;line-height:1.5;border-top:1px dashed '+bd+';padding-top:5px;">'
@@ -2073,6 +2086,18 @@ function renderLeft(){
   if(_tab==='dewat' && gi('blowerInfo')) renderBlowerInfo();
   if(_tab==='balance' && gi('balanceChart')) setTimeout(drawBalanceChart,30);
   L.querySelectorAll('.sv-n').forEach(el=>{updateSlider(el.id);bindSlider(el.id);});
+  L.querySelectorAll('.nzbtn').forEach(function(b){
+    b.addEventListener('click',function(){
+      const i=+b.dataset.i, d=+b.dataset.d, k=b.dataset.nz;
+      S.wAutoArray=false;                                  // ★v9.8 버튼 조작 시 자동배열 해제
+      if(k==='col') S.stgCol[i]=Math.max(1, S.stgCol[i]+d);
+      else          S.stgRow[i]=Math.max(1, S.stgRow[i]+d);
+      // 입력칸 DOM도 즉시 갱신 (calcAll 내 syncState가 옛 값으로 되돌리는 것 방지)
+      const ie=gi((k==='col'?'stgCol':'stgRow')+i);
+      if(ie) ie.value=(k==='col'?S.stgCol[i]:S.stgRow[i]);
+      calcAll(); renderLeft(); renderRight();
+    });
+  });
   L.querySelectorAll('.lenbtn').forEach(function(b){
     b.addEventListener('click',function(){
       const i=+b.dataset.len, d=+b.dataset.d;
