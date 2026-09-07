@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v10.0 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v10.1 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v10.0</span>
+    <span class="vb">v10.1</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v10.0 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v10.1 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v10.0
+// 트레이 세척·탈수·건조 시뮬레이터 v10.1
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='10.0';
+const VER='10.1';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -1339,9 +1339,10 @@ function calcAll(){
     const isRinse=(S.stgType[i]==='rinse');
     const press=S.stgPressAct[i]||S.stgPress[i]||200;   // ★v8.0 펌프 운전점 실제 압력 사용
     const nP=(S.stgCol[i]||4)*(S.stgRow[i]||4);
-    const pressF=Math.min(1.7,Math.pow(press/280,0.6));
-    const nozF=Math.min(1.7,Math.pow(nP/refNoz,0.5));
-    let baseRem=isRinse?(0.85*(0.55+0.45*rinseF)):(0.40+0.28*pressF+0.17*nozF);
+    const pressF=Math.min(1.6,Math.pow(press/280,0.6));
+    const nozF=Math.min(1.2,Math.pow(nP/refNoz,0.5));
+    // ★v10.1 압력 비중 확대 — 저압에서는 실제로 세척이 되지 않아야 한다(상수항 축소)
+    let baseRem=isRinse?(0.85*(0.55+0.45*rinseF)):(0.10+0.55*pressF+0.20*nozF);
     baseRem *= angImpact;   // ★v8.0 분사각별 타격력 (광각일수록 세척력 저하)
     const tempF=isRinse?1:(0.85+(S.wTemp-40)*0.006);
     // ★v7.1 헹굼은 이미 세척된 표면의 잔류물 제거 → 오염저항 영향 40%만 적용
@@ -1407,14 +1408,41 @@ function calcAll(){
   const speedMminRec = S.qty*(S.trayPitch/1000)/60;
   const speedMsRec = speedMminRec/60;
   const recWashLen = Math.ceil(needDwellSum * speedMsRec * 1000 * 1.2 / 100)*100;
-  // 2) 단수 줄면 남은 단 강화 필요 → 추천 압력 (효율 부족분 보상)
-  //    3단 대비 부족한 효율을 압력으로 보상
   const effGap = Math.max(0, tgtWashEff - washEff);
-  const recPress1 = Math.round(Math.min(400, 280 + effGap*8)/10)*10; // 1차 추천 압력 (10단위)
-  // 3) 추천 노즐수 (트레이 면적 기반, 오염도 가중)
-  const faceArea = S.trayD * S.trayW / 1e6; // m²
-  const recNozPerFace = Math.max(6, Math.round(faceArea * (30 + S.dlv*8)));
-  // 4) 추천 온도 (오염도 높으면 상향)
+  // ★v10.1 추천값을 현재 물리 모델과 정합하게 산출 (경험식 → 실제 제약 기반)
+  // 2) 추천 노즐: 높이방향은 커버율 100% 최소 개수, 길이방향은 필요 체류 확보 최소 줄 수
+  const recNozH = Math.max(2, Math.ceil(S.trayW/Math.max(1,effCovH)));            // 미세척 밴드 방지
+  const rowPitchRec = Math.max(200, Math.round(nozPitch/10)*10);
+  const recNozL = Math.max(2, Math.ceil((stageNeedSec(0)*speedMsRec*1000 - 250)/rowPitchRec));
+  // 헹굼단도 높이방향 커버는 동일 필요 — 줄 수만 축소 (커버가 뚫리면 전 단이 무의미)
+  const recNozPerFace = recNozH*recNozL;
+  // 3) 추천 조 길이: 노즐 줄 기반 + 저수조 회전율 확보 길이 중 큰 쪽 (사용 단 합계)
+  let recWashLenSum = 0;
+  actStages.forEach(function(i){
+    const nL_i = (i===2) ? Math.max(2, Math.round(recNozL*0.6)) : recNozL;
+    let Li = Math.ceil((nL_i*rowPitchRec + 250)/100)*100;
+    const d_i = stgDetail[i];
+    if(d_i){
+      const needTank_i = tankOptimal(d_i.flow, S.stgTurnover[i]||3);
+      const maxW_i = S.trayD*CH + 400 - 120;
+      const Ltank = Math.ceil((needTank_i*1e6/(maxW_i*900*0.75) + (S.tankFrameGap||100)*2)/100)*100;
+      if(Ltank>Li) Li=Ltank;
+    }
+    recWashLenSum += Li;
+  });
+  const recWashLen2 = recWashLenSum + (actStages.length-1)*100;
+  // 4) 추천 압력: 목표 세척효율을 만족하는 최소 압력을 현재 조건에서 역산 (10kPa 단위)
+  //    효율은 pressF=(P/280)^0.6 에 비례 → 부족분만큼 압력을 올려 보정
+  const pressNow = S.stgPressAct[0]||S.stgPress[0]||200;
+  let recPress1 = pressNow;
+  if(effGap>0.05 && washEff>0){
+    const ratio = Math.min(2.2, tgtWashEff/washEff);
+    recPress1 = Math.min(400, pressNow*Math.pow(ratio, 1/0.6));
+  } else if(washEff > tgtWashEff+1.5){
+    recPress1 = Math.max(100, pressNow*Math.pow(tgtWashEff/washEff, 1/0.6));   // 과잉이면 낮춰 절전
+  }
+  recPress1 = Math.round(recPress1/10)*10;
+  // 5) 추천 온도 (오염도 연동, 상한 75°C)
   const recTemp = Math.min(75, 55 + S.dlv*2);
   // 5) 추천 컨베이어 속도 (목표 CAPA 달성 최소)
   const recSpeed = speedMminRec; // 현재 처리량 기준
@@ -1424,9 +1452,10 @@ function calcAll(){
   const setNozPerFace = (S.stgCol[0]||4)*(S.stgRow[0]||4);
   const setTemp = S.wTemp;
   // 편차 판정
-  const lenDiff = setWashLen - recWashLen;
+  const lenDiff = setWashLen - recWashLen2;
   const recommend = {
-    washLen:recWashLen, press1:recPress1, nozPerFace:recNozPerFace, temp:recTemp, speed:recSpeed, washEff:tgtWashEff,
+    washLen:recWashLen2, press1:recPress1, nozPerFace:recNozPerFace, nozH:recNozH, nozL:recNozL,
+    coverNeed:recNozH, temp:recTemp, speed:recSpeed, washEff:tgtWashEff,
     setWashLen, setPress1, setNozPerFace, setTemp, setSpeed:speedMminRec, setWashEff:washEff,
     lenDiff, effGap
   };
@@ -1679,6 +1708,7 @@ function renderLeft(){
       +'<div class="chbox" style="background:#f1f8e9;border-color:#c5e1a5;color:#33691e;">📐 <b>노즐 팬 경사 '+S.wTiltAngle+'° · 겹침 '+S.wOverlap+'%</b> — 트레이면 충돌은 <b>직각 유지</b>(타격력 손실 없음)<br>'
       +'· 헤더 배관은 수직 유지 · 팬 길이 '+R.nozzleInfo.coverW.toFixed(0)+'mm(불변) → 높이방향 유효커버 <b>'+R.effCovH.toFixed(0)+'mm</b> (×cos'+S.wTiltAngle+'°)<br>'
       +'· 노즐 간격 <b>'+R.nozPitch.toFixed(0)+'mm</b>로 좁아짐 (= 유효커버 × (1−겹침 '+S.wOverlap+'%))<br>'
+      +((S.stgPress[0]<150)?'· ⚠️ <b>1차 압력 '+(S.stgPress[0]/100).toFixed(1)+'bar는 실무 권장 하한(1.5bar) 미만</b> — 모델상 효율이 나와도 실제 오염 제거는 검증 필요. 샘플 테스트 전에는 1.5bar 이상으로 설계하십시오.<br>':'')
       +'· <b>높이방향 커버율 '+(R.coverRatioH*100).toFixed(0)+'%</b>'
       +(R.coverRatioH>=1?' ✅ 트레이 높이 전면 커버'
         :' ❌ <b>미세척 밴드 발생</b> — 높이방향 노즐 '+Math.ceil(S.trayW/R.effCovH)+'개/열 이상 필요 (현재 '+S.stgCol[0]+'개, 커버 '+(S.stgCol[0]*R.effCovH).toFixed(0)+'/'+S.trayW+'mm)')+'<br>'
