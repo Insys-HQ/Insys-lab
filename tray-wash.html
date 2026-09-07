@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v9.6 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v9.7 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v9.6</span>
+    <span class="vb">v9.7</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v9.6 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v9.7 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v9.6
+// 트레이 세척·탈수·건조 시뮬레이터 v9.7
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='9.6';
+const VER='9.7';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -1614,19 +1614,16 @@ function renderLeft(){
       +sliderHTML('wTiltAngle','📐 노즐 팬 경사각(진행방향 수직 기준)','°',0,45,5,S.wTiltAngle,15,35)
       +sliderHTML('wOverlap','🔁 분사 겹침률','%',0,60,5,S.wOverlap,20,40)
       +'<div class="g2"><div class="fl"><label>팬 경사 방향</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="wTiltAlt" '+(S.wTiltAlt?'checked':'')+'> 노즐마다 좌·우 교대(V자)</label></div><div></div></div>'
-      +'<div style="background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px;margin:6px 0;">'
-      +'<div style="font-size:13px;font-weight:800;color:#0d2137;margin-bottom:6px;">📐 노즐 팬 경사 — 좌: Before(팬 수직) / 우: After(팬 '+S.wTiltAngle+'° 경사)</div>'
-      +fanPlanSVG()
       +(function(){
           var sBar=Math.max(20, R.nozzleInfo.coverW*(1-S.wOverlap/100));
           var rawB=S.trayW/sBar, rawA=S.trayW/Math.max(20, R.nozzleInfo.coverW*Math.cos(S.wTiltAngle*Math.PI/180)*(1-S.wOverlap/100));
           var nB=Math.max(2,Math.ceil(rawB)), nA=Math.max(2,Math.ceil(rawA));
           var nextDeg=null;
           for(var d=S.wTiltAngle+1; d<=60; d++){ if(Math.ceil(S.trayW/Math.max(20,R.nozzleInfo.coverW*Math.cos(d*Math.PI/180)*(1-S.wOverlap/100)))>nA){ nextDeg=d; break; } }
-          return '<div style="font-size:13px;color:#37474f;margin-top:6px;line-height:1.6;">갈색 = 헤더 배관(<b>수직 그대로</b>) · 삼각형 = 각 노즐의 분사 팬 · 파란 선 = 높이방향 투영 간격<br>'
-          +'<b>개별 노즐의 팬만</b> 기울이면 높이방향 유효커버가 cos배로 줄어듭니다 — 팬 '+R.nozzleInfo.coverW.toFixed(0)+' → <b>'+R.effCovH.toFixed(0)+'mm</b><br>'
+          return '<div class="chbox" style="background:#f3e5f5;border-color:#ce93d8;color:#4a148c;">'
+          +'📐 <b>팬 경사에 따른 노즐 수량</b> — 팬 길이 '+R.nozzleInfo.coverW.toFixed(0)+'mm → 높이방향 유효커버 <b>'+R.effCovH.toFixed(0)+'mm</b> (×cos'+S.wTiltAngle+'°)<br>'
           +'필요 노즐 <b>'+rawB.toFixed(1)+'EA → '+rawA.toFixed(1)+'EA</b> (실제 설치 '+nB+'EA → <b>'+nA+'EA</b>)'
-          +(nA>nB?' ✅ 증가':(nextDeg?' — 올림 때문에 아직 동수, <b>'+nextDeg+'° 이상</b>에서 '+(nA+1)+'EA로 증가':''))+'</div></div>';
+          +(nA>nB?' ✅ 증가':(nextDeg?' — 올림 때문에 아직 동수, <b>'+nextDeg+'° 이상</b>에서 '+(nA+1)+'EA로 증가':''))+'</div>';
         })()
       +'<div class="chbox" style="background:#f1f8e9;border-color:#c5e1a5;color:#33691e;">📐 <b>노즐 팬 경사 '+S.wTiltAngle+'° · 겹침 '+S.wOverlap+'%</b> — 트레이면 충돌은 <b>직각 유지</b>(타격력 손실 없음)<br>'
       +'· 헤더 배관은 수직 유지 · 팬 길이 '+R.nozzleInfo.coverW.toFixed(0)+'mm(불변) → 높이방향 유효커버 <b>'+R.effCovH.toFixed(0)+'mm</b> (×cos'+S.wTiltAngle+'°)<br>'
@@ -2281,60 +2278,6 @@ function renderCost(){
 // 바를 진행방향 수직에서 rot만큼 기울이면 같은 트레이 높이 안의 바 길이가 1/cos 배가 되어
 // 바 위 노즐 간격(팬 길이 기준)은 그대로인데 노즐 수가 늘고, 높이방향 투영 간격이 좁아져 겹침이 생긴다.
 // ★v8.9 노즐 배치 도해 — 헤더 배관은 수직 그대로, 개별 노즐의 분사 팬만 기울임
-function fanPlanSVG(){
-  const rot=(S.wTiltAngle||0), rad=rot*Math.PI/180;
-  const half=(S.wSprayAngle||60)/2*Math.PI/180;
-  const fanMm=coverWidth(S.wSprayAngle, S.wNozzleDist);
-  const ovR=Math.min(70,Math.max(0,S.wOverlap))/100;
-  const nBefore=Math.max(3, Math.ceil(S.trayW/Math.max(20, fanMm*(1-ovR))));
-  const nAfter =Math.max(3, Math.ceil(S.trayW/Math.max(20, fanMm*Math.cos(rad)*(1-ovR))));
-  const W=320, H=210, gap=16, padT=12, padB=26;
-  const panelW=(W-gap)/2;
-  const yH=H-padT-padB, y0=padT;
-  // 패널 높이 = 트레이 높이(실척) → 팬 폭·간격·겹침이 실제 비율대로 보이게 함
-  const sc=Math.min(yH/Math.max(50,S.trayW), (panelW-30)/Math.max(30,S.wNozzleDist*1.25));
-  const fanL=S.wNozzleDist*sc;                  // 노즐→트레이면 도달거리(실척)
-  function panel(x0, tiltDeg, n, col, lineCol, cid){
-    const r=tiltDeg*Math.PI/180;
-    var g='<clipPath id="'+cid+'"><rect x="'+(x0+1)+'" y="'+y0+'" width="'+(panelW-2)+'" height="'+yH+'"/></clipPath>';
-    g+='<rect x="'+(x0+1)+'" y="'+y0+'" width="'+(panelW-2)+'" height="'+yH+'" fill="#fbfcfd" stroke="#cfd8e3" stroke-width="1"/>';
-    g+='<g clip-path="url(#'+cid+')">';
-    const px=x0+panelW-16;                      // 헤더 배관 X (우측)
-    for(let k=0;k<n;k++){
-      const ny=y0+yH*(k+0.5)/n;
-      const dir=(S.wTiltAlt && k%2===1)?-1:1;
-      const a=r*dir;                            // 팬 축 기울기
-      // 팬 축 단위벡터(좌측 방향) 및 부채꼴 두 모서리 (실제 분사각 적용)
-      const ax=-Math.cos(a), ay=Math.sin(a);
-      const e1x=-Math.cos(a-half), e1y=Math.sin(a-half);
-      const e2x=-Math.cos(a+half), e2y=Math.sin(a+half);
-      const L=fanL/Math.cos(half);
-      g+='<polygon points="'+px+','+ny.toFixed(1)+' '
-        +(px+e1x*L).toFixed(1)+','+(ny+e1y*L).toFixed(1)+' '
-        +(px+e2x*L).toFixed(1)+','+(ny+e2y*L).toFixed(1)
-        +'" fill="'+col+'" fill-opacity="0.26" stroke="'+lineCol+'" stroke-width="1" stroke-linejoin="round"/>';
-      // 팬 중심선
-      g+='<line x1="'+px+'" y1="'+ny.toFixed(1)+'" x2="'+(px+ax*fanL).toFixed(1)+'" y2="'+(ny+ay*fanL).toFixed(1)+'" stroke="'+lineCol+'" stroke-width="0.8" stroke-dasharray="3,3" stroke-opacity="0.7"/>';
-      // 노즐 몸체 (팬 방향으로 기울여 배관에 부착)
-      g+='<g transform="rotate('+(-tiltDeg*dir)+','+px+','+ny.toFixed(1)+')">'
-        +'<rect x="'+(px-11)+'" y="'+(ny-4).toFixed(1)+'" width="11" height="8" rx="1.5" fill="#16283c"/></g>';
-    }
-    g+='</g>';
-    // 헤더 배관 — 항상 수직 (클립 밖, 전체 표시)
-    g+='<line x1="'+px+'" y1="'+(y0-2)+'" x2="'+px+'" y2="'+(y0+yH+2)+'" stroke="#6d4c41" stroke-width="6" stroke-linecap="round"/>';
-    return g;
-  }
-  var s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">';
-  s+=panel(0, 0, nBefore, '#b0bec5', '#546e7a', 'fpB');
-  s+=panel(panelW+gap, rot, nAfter, '#81c784', '#2e7d32', 'fpA');
-  // Before → After 화살표
-  s+='<polygon points="'+(panelW+3)+','+(y0+yH/2-5)+' '+(panelW+gap-3)+','+(y0+yH/2)+' '+(panelW+3)+','+(y0+yH/2+5)+'" fill="#78909c"/>';
-  // 트레이 진행방향
-  s+='<line x1="6" y1="'+(H-12)+'" x2="'+(W-14)+'" y2="'+(H-12)+'" stroke="#455a64" stroke-width="1.4"/>';
-  s+='<polygon points="'+(W-4)+','+(H-12)+' '+(W-14)+','+(H-16.5)+' '+(W-14)+','+(H-7.5)+'" fill="#455a64"/>';
-  s+='</svg>';
-  return s;
-}
 function nozzleSVG(){
   const ang=S.wSprayAngle, dist=S.wNozzleDist;
   const half=ang/2*Math.PI/180;
