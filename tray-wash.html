@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v9.8 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v9.9 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v9.8</span>
+    <span class="vb">v9.9</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v9.8 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v9.9 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v9.8
+// 트레이 세척·탈수·건조 시뮬레이터 v9.9
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='9.8';
+const VER='9.9';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -596,6 +596,13 @@ function optimizeAll(){
   _noSync=false;                 // DOM 갱신 완료 후에만 역동기화 재개
 }
 function stageNeedSec(i){ return (S.stgType[i]==='rinse') ? (5+S.dlv) : (8+S.dlv*3); }
+// ★v9.9 밀폐 보온탱크 대기손실 — 표면적(체적^2/3) 기반. 개방형 조 손실식과 구분해야 함
+//   A ≈ 6×(V/1000)^(2/3) m² · U = 보온 0.5 / 무보온 5.0 W/m²K · 주위 20°C
+function tankStandbyKW(volL, tempC, insulated){
+  const A=6*Math.pow(Math.max(1,volL)/1000, 2/3);
+  const U=insulated?0.5:5.0;
+  return A*U*Math.max(0,tempC-20)/1000;
+}
 function heaterMaintainKW(t,temp,ins){return t*(ins?0.022:0.045)*(Math.max(0,temp-20)/40);}
 // 에어나이프 1개 풍량 (m³/min): 슬롯길이 × 슬롯폭 × 풍속
 function knifeFlow1(lenMm, slotMm, velMs){ return (lenMm/1000)*(slotMm/1000)*velMs*60; }
@@ -1285,11 +1292,26 @@ function calcAll(){
     cascadeRatio = 0; directRatio = 100;
   }
     const supplyFresh = freshWater;
-  const boilerLossKW=heaterMaintainKW(S.boilerTankL,target,S.boilerIns);
+  const boilerLossKW=tankStandbyKW(S.boilerTankL,target,S.boilerIns);   // ★v9.9 밀폐 탱크 기준
   // ★v9.3 건조 라디에이터 분담분을 보일러 부하에 가산 → 보일러 용량 증가
   // 운전부하는 전기히터와 동일한 운전율(0.7)로 비교해야 공정 — 정격은 100% 기준
   const boilerTotalKW=boilerRunKW + radLoadKW*0.7;
-  const boilerRatedTotal = boilerRatedKW + radLoadKW*1.15;   // 정격은 라디에이터 전량 + 여유
+  // ★v9.9 보일러 탱크 = 축열 버퍼 — 피크 부하를 흡수해 보일러 정격을 낮춘다
+  //   저장 열량 Q[kcal] = V[L] × 축열 가용 온도차, 커버 시간 t[min] 필요열 = kW×860×t/60
+  const tankDT = 10;                                   // 축열 가용 온도차(설정온도 − 사용 하한)
+  const bufferTargetMin = 10;                          // 목표 버퍼 커버 시간
+  const tankBufferMin = (S.boilerTankL*tankDT)/Math.max(0.1, boilerTotalKW*860/60);
+  const needTankL = Math.ceil(boilerTotalKW*860*(bufferTargetMin/60)/tankDT/50)*50;
+  const tankOK = S.boilerTankL >= needTankL;
+  const tankAmple = S.boilerTankL >= needTankL*2;
+  // 버퍼가 충분하면 정격을 평균부하 기준으로, 부족하면 피크 대응으로 상향
+  const peakFactor = tankAmple ? 0.92 : (tankOK ? 1.0 : 1.25);
+  const boilerRatedTotal = (boilerRatedKW + radLoadKW*1.15) * peakFactor;
+  // 건조 온수코일이 탱크에서 뽑아가는 순환 — 탱크 회전시간이 짧으면 공급온도 강하
+  const tankTurnMin = radLPM>0 ? S.boilerTankL/radLPM : 0;
+  const tankTurnOK = (radLPM<=0) || tankTurnMin>=5;
+  // 초기 승온 시간 (유입수온 → 설정온도)
+  const heatUpMin = boilerRatedTotal>0 ? (S.boilerTankL*(target-S.inletTemp))/(boilerRatedTotal*860/60) : 0;
   const elecHeater=(S.boilerType==='electric')?boilerTotalKW:0;
   const gasLoad=(S.boilerType==='gas')?boilerTotalKW:0;
   const washHeatElec=washHeaterTotal*0.4; // 외부보일러 공급 시 세척조 보조 유지만
@@ -1507,7 +1529,7 @@ function calcAll(){
   const elecTotal = elecBase + convMotorKW + siroFanKW;
   const elecReal = elecRealBase + convLoadKW + siroFanKW*0.85;
 
-  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,filterFactor,fScore,heaterPerUnit,heaterOK,heaterFactor,convLoadKW,nClipPairs,trayOnLine,loadKg,convMotorKW,tankBottomMax,cascadeOK,topStage,nozPitch,angImpact,slantD,tiltF,ovF,altF,effCovH,dryLenBySpeed,dryLenGovern,dryFanN,airPerFan,heatPerFan,siroModel,siroShort,siroTotalKW,recircQ,dryDuctDia,ductPerSide,siroFanKW,tempOver,radDesignKW,radLPM,radPipe,radPipeID,radVel,radFricPerM,radFricTotal,radCv,radValveDP,radAuthority,evapKgH,rhRaw,rhAfter,damperExh,recircEff,rhCtrlOn,rhState,dryLenByEff,lenBoost,effGapR,radRatio,dryRadKW,dryElecKW,radLoadKW,boilerRatedTotal,airNeed,airUse,ductStatic,ductRunM,fanByLen,fanByAir,dryNeedDwell,rinseF,rinseNeedLph,recircF,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
+  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,filterFactor,fScore,heaterPerUnit,heaterOK,heaterFactor,convLoadKW,nClipPairs,trayOnLine,loadKg,convMotorKW,tankBottomMax,cascadeOK,topStage,nozPitch,angImpact,slantD,tiltF,ovF,altF,effCovH,dryLenBySpeed,dryLenGovern,dryFanN,airPerFan,heatPerFan,siroModel,siroShort,siroTotalKW,recircQ,dryDuctDia,ductPerSide,siroFanKW,tempOver,tankBufferMin,needTankL,tankOK,tankAmple,peakFactor,tankTurnMin,tankTurnOK,heatUpMin,boilerLossKW,radDesignKW,radLPM,radPipe,radPipeID,radVel,radFricPerM,radFricTotal,radCv,radValveDP,radAuthority,evapKgH,rhRaw,rhAfter,damperExh,recircEff,rhCtrlOn,rhState,dryLenByEff,lenBoost,effGapR,radRatio,dryRadKW,dryElecKW,radLoadKW,boilerRatedTotal,airNeed,airUse,ductStatic,ductRunM,fanByLen,fanByAir,dryNeedDwell,rinseF,rinseNeedLph,recircF,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
 }
 
 // ── 좌측 렌더 ──
@@ -1956,6 +1978,18 @@ function renderLeft(){
       +'<div class="g2">'+sel('boilerType','열원',[['gas','가스보일러'],['electric','전기보일러']],S.boilerType)
       +'<div class="fl"><label>보일러 탱크 단열</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="boilerIns" '+(S.boilerIns?'checked':'')+'> 단열재 적용</label></div></div>'
       +'<div class="g3" style="margin-top:6px;">'+fld('boilerTankL','보일러탱크','L',S.boilerTankL)+fld('inletTemp','유입수온','°C',S.inletTemp)+fld('rinseTemp','헹굼온도','°C',S.rinseTemp)+'</div>'
+      +'<div class="chbox" style="background:'+(R.tankOK?(R.tankAmple?'#e8f5e9':'#eef6fb'):'#fff3e0')+';border-color:'+(R.tankOK?(R.tankAmple?'#a5d6a7':'#cde3f0'):'#ffcc80')+';color:'+(R.tankOK?(R.tankAmple?'#1b5e20':'#0b5a80'):'#e65100')+';">'
+      +'🛢️ <b>보일러 탱크 '+S.boilerTankL+'L — 축열 버퍼 역할</b><br>'
+      +'· 온수 총 수요 '+R.boilerTotalKW.toFixed(1)+'kW'+(R.dryRadKW>0?' (그중 건조 온수코일 '+R.dryRadKW.toFixed(1)+'kW)':'')+' · 필요 탱크 <b>'+R.needTankL+'L</b> (버퍼 10분 기준)<br>'
+      +'· 현재 탱크 커버 시간 <b>'+R.tankBufferMin.toFixed(1)+'분</b> → '
+      +(R.tankAmple?'✅ <b>충분</b> — 피크 흡수로 보일러 정격 8% 감축 적용'
+        :(R.tankOK?'✅ 적정 — 평균부하 기준 정격 산정'
+        :'⚠️ <b>부족</b> — 피크 대응 위해 보일러 정격 25% 상향 적용'))+'<br>'
+      +'· 보일러 정격 <b>'+R.boilerRatedTotal.toFixed(1)+'kW</b> (계수 ×'+R.peakFactor.toFixed(2)+') · 운전 '+R.boilerTotalKW.toFixed(1)+'kW · 탱크 대기손실 '+R.boilerLossKW.toFixed(2)+'kW<br>'
+      +'· 초기 승온 시간 '+R.heatUpMin.toFixed(0)+'분 (유입 '+S.inletTemp+'°C → 설정온도)'
+      +(R.dryRadKW>0?('<br>· 건조 온수코일 순환 '+R.radLPM.toFixed(1)+'LPM → 탱크 회전 '+R.tankTurnMin.toFixed(1)+'분 '
+        +(R.tankTurnOK?'✅ 공급온도 안정':'⚠️ 5분 미만 — 탱크 증설 또는 코일 유량 저감 필요')):'')
+      +'<br>· 탱크를 키우면 축열이 늘어 보일러를 작게 쓸 수 있지만 대기손실·승온시간은 증가합니다.</div>'
       +'<div class="st">온수 공급 방식 (전 조 60°C)</div>'
       +'<div class="g2">'+sel('supplyMode','공급 방식',[['hybrid','하이브리드(캐스케이드+직공급)'],['cascade','캐스케이드만'],['direct','전 조 직공급']],S.supplyMode)+fld('rinseWater','헹굼 청수량','L/h',S.rinseWater)+'</div>'
       +'<div class="chbox" style="background:#e1f5fe;border-color:#81d4fa;color:#01579b;">♨️ <b>전 조 '+S.rinseTemp+'°C 온수 공급</b> (세척1·2 + 헹굼 모두)<br>'
