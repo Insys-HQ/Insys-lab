@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v10.4 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v10.5 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v10.4</span>
+    <span class="vb">v10.5</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v10.4 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v10.5 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v10.4
+// 트레이 세척·탈수·건조 시뮬레이터 v10.5
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='10.4';
+const VER='10.5';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -1788,7 +1788,7 @@ function renderLeft(){
       +'<label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1565c0;margin:4px 0;cursor:pointer;"><input type="checkbox" id="wDistAuto" '+(S.wDistAuto?'checked':'')+'> ↔️ 이격거리 자동 — 분사각 최적점 추종 (현재 '+S.wSprayAngle+'° → 최적 '+R.nozzleInfo.distOpt.opt+'mm)</label>'
       +sliderHTML('wNozzleDist','↔️ 트레이면 이격거리','mm',30,300,10,S.wNozzleDist,R.nozzleInfo.distOpt.lo,R.nozzleInfo.distOpt.hi)
       +sliderHTML('wTiltAngle','📐 노즐 팬 경사각(진행방향 수직 기준)','°',0,45,5,S.wTiltAngle,15,35)
-      +sliderHTML('wOverlap','🔁 분사 겹침률','%',0,60,5,S.wOverlap,20,40)
+      +sliderHTML('wOverlap','🔁 분사 겹침률','%',0,60,5,S.wOverlap,15,40)
       +'<div class="g2"><div class="fl"><label>팬 경사 방향</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="wTiltAlt" '+(S.wTiltAlt?'checked':'')+'> 노즐마다 좌·우 교대(V자)</label></div><div></div></div>'
       +(function(){
           var sBar=Math.max(20, R.nozzleInfo.coverW*(1-S.wOverlap/100));
@@ -1976,7 +1976,7 @@ function renderLeft(){
             +g+lbl+rows+'</div>'+msg;
         })()
       +'<div class="st">에어나이프 구성</div>'
-      +sliderHTML('knifePass','🔪 면당 통과 횟수','pass',1,6,1,S.knifePass,3,4)
+      +sliderHTML('knifePass','🔪 면당 통과 횟수','pass',1,6,1,S.knifePass,4,6)
       +'<div class="chbox">📊 <b>총 에어나이프 = '+S.knifePass+'패스 × 앞뒤2면 × 2CH = <span style="font-size:17px;">'+kt+'개</span></b></div>'
       +sliderHTML('knifeSlot','📏 슬릿 폭','mm',0.3,2,0.1,S.knifeSlot,0.5,1.2)
       +sliderHTML('knifeAng','📐 입사각 (물 미는 각도)','°',30,90,5,S.knifeAng,45,60)
@@ -1987,7 +1987,7 @@ function renderLeft(){
       +'• <b>30°이하</b>: 스치듯 지나가 힘 부족<br>'
       +'📏 입사각 '+S.knifeAng+'° → 나이프 길이 <b>'+R.knifeLen.toFixed(0)+'mm</b> (면높이 '+S.trayD+'mm 커버) · 에어 경로 '+R.slantDist.toFixed(0)+'mm</div>'
       +sliderHTML('knifeVel','💨 토출 속도','m/s',40,180,5,S.knifeVel,90,130)
-      +sliderHTML('knifePress','🔧 나이프 압력','kPa',5,40,1,S.knifePress,15,25)
+      +sliderHTML('knifePress','🔧 나이프 압력','kPa',5,40,1,S.knifePress,12,25)
       +'<div class="chbox" style="background:#eef6fb;border-color:#cde3f0;color:#0b5a80;">🔗 <b>토출속도 ↔ 정압 양방향 연동</b> — 속도를 올리면 필요 정압('+velToPress(S.knifeVel)+'kPa)이, 정압을 올리면 실토출속도('+R.knifeVelReal.toFixed(0)+'m/s)가 자동 계산됩니다.</div>'
       +'<div class="st">이격거리 (나이프 끝 ↔ 트레이 면)</div>'
       +sliderHTML('knifeGap','↔️ 이격거리','mm',20,150,5,S.knifeGap,go.lo,go.hi)
@@ -2004,8 +2004,8 @@ function renderLeft(){
   }else if(_tab==='dry'){
     h='<div class="card"><div class="ch"><span class="ci">🔥</span><span class="cl">건조부 (열풍)</span><span class="cq">저부하</span></div><div class="cb">'
       +'<div class="chbox">🍽️ 트레이는 얇은 평판이라 잔류수분이 적어 <b>건조 열부하가 낮습니다</b>. 탈수가 좋으면 건조온도·풍량을 낮춰 에너지를 아낄 수 있습니다.</div>'
-      +sliderHTML('dryTemp','🌡️ 열풍 온도','°C',40,Math.min(80,S.trayMaxTemp),5,Math.min(S.dryTemp,S.trayMaxTemp),55,S.trayMaxTemp)
-      +sliderHTML('dryAirVol','🌀 열풍 풍량','m³/min',10,80,5,S.dryAirVol,20,40)
+      +sliderHTML('dryTemp','🌡️ 열풍 온도','°C',40,Math.min(80,S.trayMaxTemp),5,Math.min(S.dryTemp,S.trayMaxTemp),45,S.trayMaxTemp)
+      +sliderHTML('dryAirVol','🌀 열풍 풍량','m³/min',10,120,5,S.dryAirVol,40,100)
       +sliderHTML('dryRecirc','♻️ 순환 재사용','%',0,90,5,S.dryRecirc,60,80)
       +'<div class="g3" style="margin-top:6px;">'+fld('dryMinLen','건조기 최소길이','mm',S.dryMinLen)+fld('dryFanCover','팬 1대 담당','mm',S.dryFanCover)+fld('dryDuctVel','덕트 풍속','m/s',S.dryDuctVel)+'</div>'
       +'<div class="st">🔥 가열 방식 · 온도별 시뮬레이션</div>'
