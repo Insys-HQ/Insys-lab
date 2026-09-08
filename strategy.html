@@ -9,7 +9,7 @@
 <title>피지컬 AI 시대 인시스 사업전략</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* ===== strategy.html  v1.0  (2026-09-08) ===== */
+/* ===== strategy.html  v2.0  (2026-09-08) — B안(운영 중심) 기준 전면 재작성 ===== */
 :root{
   --navy:#1B2A4A;
   --steel:#2C6E9B;
@@ -21,6 +21,8 @@
   --pastel:#E7EEF6;
   --signal:#9A5B12;
   --signalbg:#FBF3E6;
+  --gray:#6B7480;
+  --graybg:#EFF1F4;
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
@@ -80,6 +82,11 @@ strong{font-weight:700; color:var(--navy);}
 .meta div{font-size:0.8em; color:#B9CDE2; font-weight:300;}
 .meta b{color:#FFFFFF; font-weight:500;}
 
+/* ===== revision notice ===== */
+.rev{background:var(--graybg); border:1px solid #D5D9DF; border-radius:8px; padding:10px 12px; margin:8px 0;}
+.rev h3{color:var(--gray); font-size:0.88em; margin-bottom:3px;}
+.rev p{font-size:0.88em; color:#4E5763; margin:0;}
+
 /* ===== thesis ===== */
 .thesis{
   background:var(--pastel); border:1px solid #C3D5E8; border-left:5px solid var(--steel);
@@ -94,8 +101,9 @@ body.view-pc .grid2{grid-template-columns:1fr 1fr;}
 @media (min-width:768px){ body:not(.view-mobile) .grid2{grid-template-columns:1fr 1fr;} }
 
 .box{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px;}
-.box.risk{border-top:3px solid #B0651A;}
-.box.asset{border-top:3px solid var(--steel);}
+.box.drop{border-top:3px solid #9AA3AE;}
+.box.keep{border-top:3px solid var(--steel);}
+.box.drop h3{color:var(--gray);}
 ul{margin:0; padding-left:17px;}
 li{margin:0 0 4px;}
 li:last-child{margin-bottom:0;}
@@ -106,6 +114,7 @@ table{width:100%; border-collapse:collapse; font-size:0.9em; min-width:430px;}
 th,td{border:1px solid var(--line); padding:6px 8px; text-align:left; vertical-align:top;}
 th{background:var(--pastel); color:var(--navy); font-weight:700; white-space:nowrap;}
 td.stage{font-weight:700; color:var(--steel); white-space:nowrap;}
+td.old{color:var(--gray); text-decoration:line-through;}
 
 /* ===== action list ===== */
 .act{display:flex; gap:10px; padding:9px 0; border-bottom:1px dashed var(--line);}
@@ -121,11 +130,11 @@ td.stage{font-weight:700; color:var(--steel); white-space:nowrap;}
   background:var(--pastel); border-radius:3px; padding:1px 6px; margin-left:5px; vertical-align:1px;
 }
 
-/* ===== avoid ===== */
-.avoid{background:var(--signalbg); border:1px solid #E7D3B0; border-radius:8px; padding:12px; margin:8px 0;}
-.avoid h2{border-left-color:#B0651A; color:var(--signal);}
-.avoid li{color:#6E4A16;}
-.avoid li b{color:var(--signal);}
+/* ===== guard ===== */
+.guard{background:var(--signalbg); border:1px solid #E7D3B0; border-radius:8px; padding:12px; margin:8px 0;}
+.guard h2{border-left-color:#B0651A; color:var(--signal);}
+.guard li{color:#6E4A16;}
+.guard li b{color:var(--signal);}
 
 /* ===== kpi ===== */
 .kpi{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
@@ -159,9 +168,9 @@ footer .ver{font-weight:700; color:var(--navy);}
 <div id="wrap">
 
   <div class="cover">
-    <div class="kind">경영전략 검토 보고</div>
-    <h1>피지컬 AI 시대,<br>인시스는 무엇을 파는 회사가 되는가</h1>
-    <p class="lead">인력 도급에서 로봇 운영 도급으로 — 2026~2030 전환 로드맵</p>
+    <div class="kind">경영전략 검토 보고 · 개정판</div>
+    <h1>로봇을 만들지 않는다.<br>로봇을 굴려 생산량을 책임진다.</h1>
+    <p class="lead">인력 제약을 상수로 놓고 다시 세운 인시스 피지컬 AI 전략 (2026~2030)</p>
     <div class="meta">
       <div>작성일 <b>2026-09-08</b></div>
       <div>담당 <b>AI혁신 연구개발실</b></div>
@@ -169,140 +178,175 @@ footer .ver{font-weight:700; color:var(--navy);}
     </div>
   </div>
 
+  <div class="rev">
+    <h3>v1.0 대비 변경</h3>
+    <p>초판은 인시스가 자동화 설비를 <strong>직접 제작하는 회사</strong>가 된다는 전제로 작성됐다. 연구 인력 충원이 구조적으로 어려운 조건에서 이 전제는 성립하지 않으므로, 설비 제작을 외부에 맡기고 <strong>요구정의·데이터·현장운영</strong>을 인시스가 갖는 방향으로 전면 수정한다.</p>
+  </div>
+
   <div class="thesis">
-    <p class="q">"사람을 파는 회사"에서 "사람과 로봇의 작업을 파는 회사"로 이동한다.</p>
-    <p>이동의 무기는 로봇 기술이 아니라 인시스가 이미 가진 <strong>현장 접근권과 작업 데이터</strong>다. 로봇 제조사는 공장 안에 들어가지 못하고, 인시스는 이미 계열사 현장에 상주해 있다.</p>
+    <p class="q">피지컬 AI에서 돈이 남는 자리는 로봇을 만드는 쪽이 아니라, 로봇을 굴려 생산량을 책임지는 쪽이다.</p>
+    <p>그 자리는 원래 인시스가 해오던 도급 사업의 연장선이다. 로봇 제조사는 공장 안에 들어와 살 수 없고, 인시스는 이미 살고 있다.</p>
   </div>
 
   <section>
-    <h2>1. 진단</h2>
+    <h2>1. 전략의 전제를 바꾼다</h2>
     <div class="grid grid2">
-      <div class="box risk">
-        <h3>정면으로 침식되는 것</h3>
+      <div class="box drop">
+        <h3>포기하는 것 — 제작사 노선</h3>
         <ul>
-          <li>검사·이송·포장·단순조립 — 인시스가 인력을 공급해 온 공정이 가장 먼저 자동화 대상이 된다.</li>
-          <li>즉 <strong>위협의 크기 = 현재 아웃소싱 매출 구조 그 자체</strong>이며, 대응 여부가 아니라 대응 속도의 문제다.</li>
-          <li>단가 경쟁만으로 방어하면 인건비 상승·노무 리스크에 그대로 노출된다.</li>
+          <li>설비를 자체 설계·제작해 납품하는 사업 모델. 엔지니어 3~4명이 3년간 전담해야 성립한다.</li>
+          <li>창원권 연구 인력 충원난은 몇 달째 해소되지 않는 <strong>구조적 조건</strong>이며 단기간에 바뀌지 않는다.</li>
+          <li>연내 시범기 1대 제작조차 현재 인력으로는 무리 — 목표에서 내린다.</li>
         </ul>
       </div>
-      <div class="box asset">
-        <h3>인시스만 가진 자산</h3>
+      <div class="box keep">
+        <h3>가져가는 것 — 운영사 노선</h3>
         <ul>
-          <li>7개 계열사 다수 현장에 대한 상시 접근권 — 피지컬 AI에서 가장 비싼 자원은 알고리즘이 아니라 실제 작업 데이터다.</li>
-          <li>PCB 비전검사·데이터 수집 파이프라인 등 자체 진행 중인 실증 과제.</li>
-          <li>Firebase 기반 사내 웹앱·관리 인프라 — 로봇 도입 시 MES·모니터링 레이어로 직결된다.</li>
+          <li>어떤 공정을 어떤 순서로 자동화할지 정하는 <strong>요구정의 역량</strong>.</li>
+          <li>현장에서만 나오는 <strong>작업 데이터</strong>의 축적과 소유.</li>
+          <li>로봇이 들어온 라인을 사람과 함께 굴리는 <strong>운영·도급 역량</strong>. 기존 사업과 그대로 연결된다.</li>
         </ul>
       </div>
     </div>
   </section>
 
   <section>
-    <h2>2. 3단계 전환 로드맵</h2>
+    <h2>2. 수정된 3단계 로드맵</h2>
     <div class="card">
       <div class="tw">
         <table>
           <thead>
-            <tr><th>단계</th><th>기간</th><th>포지션</th><th>수익모델</th><th>판정 기준</th></tr>
+            <tr><th>단계</th><th>기간</th><th>인시스의 역할</th><th>수익모델</th><th>판정 기준</th></tr>
           </thead>
           <tbody>
             <tr>
-              <td class="stage">1단계<br>내재화</td>
+              <td class="stage">1단계<br>요구정의</td>
               <td>~2027</td>
-              <td>자사 공정 자동화 실증</td>
+              <td>사양 작성·업체 선정·검증. 제작은 외주</td>
               <td>내부 원가절감</td>
-              <td>자체 제작 검사 셀 1기 양산 라인 투입</td>
+              <td>검사 셀 1기 도입 완료(외주 제작)</td>
             </tr>
             <tr>
-              <td class="stage">2단계<br>외판</td>
+              <td class="stage">2단계<br>도입대행</td>
               <td>2027~2029</td>
-              <td>자동화 셀 설계·제작·구축(SI)</td>
-              <td>설비 납품 + 유지보수</td>
-              <td>계열사 외 고객사 수주 3건</td>
+              <td>고객사 자동화 도입 설계·관리·시운전</td>
+              <td>도입 대행 수수료 + 관리비</td>
+              <td>계열사 외 고객사 도입 관리 2건</td>
             </tr>
             <tr>
-              <td class="stage">3단계<br>운영</td>
+              <td class="stage">3단계<br>운영도급</td>
               <td>2029~</td>
-              <td>로봇 운영 아웃소싱(RaaS)</td>
-              <td>대당 월 과금 / 생산량 과금</td>
-              <td>로봇 운영 도급 계약 매출 비중 15%</td>
+              <td>로봇＋감독인력 통합 운영</td>
+              <td>생산량 과금 / 월 운영비</td>
+              <td>통합 도급 계약 매출 비중 15%</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <p class="muted" style="margin-top:6px;">3단계가 실질 목표다. 인력 도급 계약을 <strong>로봇＋감독인력 통합 도급</strong>으로 갈아끼우면 기존 영업망과 계약구조를 그대로 쓰면서 단가는 오르고 인건비 리스크는 내려간다.</p>
+      <p class="muted" style="margin-top:6px;">기존 인력 도급 계약을 <strong>로봇＋감독인력 통합 도급</strong>으로 갈아끼우는 것이 최종 목표다. 영업망과 계약구조는 그대로 쓰면서 단가는 오르고 인건비 리스크는 내려간다.</p>
     </div>
   </section>
 
   <section>
-    <h2>3. 지금 착수할 5개 과제</h2>
+    <h2>3. 연내 목표 — 현실 수준으로 조정</h2>
+    <div class="card">
+      <div class="tw">
+        <table>
+          <thead><tr><th>항목</th><th>v1.0 목표</th><th>수정 목표</th><th>가능 근거</th></tr></thead>
+          <tbody>
+            <tr><td>설비</td><td class="old">시범기 1대 자체 제작</td><td><strong>사양서 확정 + 업체 견적 3건</strong></td><td>검토서·스펙 비교는 이미 진행 중</td></tr>
+            <tr><td>데이터</td><td class="old">공정 5종 데이터셋</td><td><strong>1종 (PCB 납땜 검사)</strong></td><td>현재 과제와 동일 범위</td></tr>
+            <tr><td>인력</td><td class="old">연구원 신규 채용</td><td><strong>외부 조달 채널 2개 가동</strong></td><td>채용 외 경로로 전환</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted" style="margin-top:6px;">사양서와 견적 확보는 현재 인력으로 가능한 범위다. 설비를 못 만들어서 후퇴하는 것이 아니라, 인시스가 실제로 잘하는 일에 목표를 맞추는 것이다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. 인력을 채용 아닌 방식으로 조달한다</h2>
     <div class="card">
       <div class="act">
         <div class="num">1</div>
         <div class="act-b">
-          <h3>PCB 비전검사 자체 제작을 전략 1호 과제로 격상<span class="tag">즉시</span></h3>
-          <p>검사기 한 대가 아니라 "인시스가 자동화 셀을 직접 설계·제작할 수 있다"는 최초 레퍼런스다. 성공하면 동일 구조를 타 고객사로 복제한다.</p>
+          <h3>거주지 요건을 버린다<span class="tag">효과 최대</span></h3>
+          <p>AI·비전 엔지니어에게 창원 거주를 요구하면 지원 모수가 사실상 사라진다. 원격 근무 + 월 1~2회 출장 조건으로 전환하면 모수가 수십 배가 된다. 개발 업무의 대부분은 원격으로 수행 가능하고, 현장 셋업 시점에만 방문하면 된다.</p>
         </div>
       </div>
       <div class="act">
         <div class="num">2</div>
         <div class="act-b">
-          <h3>데이터 수집을 연구가 아닌 자산 축적으로 재정의<span class="tag">3개월</span></h3>
-          <p>촉각 데이터·세그멘테이션·픽앤플레이스 연구의 목표를 <strong>계열사 공정 5종의 작업 데이터셋 축적</strong>으로 전환한다. 3년 뒤 이 데이터셋이 회사의 가장 비싼 자산이 된다.</p>
+          <h3>사람이 아니라 작업을 계약한다<span class="tag">즉시</span></h3>
+          <p>정규직 채용을 기다리지 않고 제어·모델학습을 각각 프로젝트 단위로 외주 계약한다. 인시스는 요구사양 작성·검증·통합만 내부에서 수행한다.</p>
         </div>
       </div>
       <div class="act">
         <div class="num">3</div>
         <div class="act-b">
-          <h3>공정 대체 순서 지도 작성<span class="tag">2개월</span></h3>
-          <p>계열사 전 공정을 자동화 난이도·인건비·불량손실 3축으로 점수화해 "언제 무엇이 로봇으로 넘어가는가"를 문서화한다. 이 지도가 없으면 투자도 인력계획도 근거가 없다.</p>
+          <h3>산학협력을 채용 파이프라인으로 쓴다<span class="tag">중기</span></h3>
+          <p>창원대·경상국립대 기계·전자·제어 연구실과 과제 단위로 협력하고, 참여 대학원생 중 적합한 인원만 졸업 시점에 채용한다. 창원에서 신입 연구 인력을 미리 확보하는 사실상 유일한 경로다.</p>
         </div>
       </div>
       <div class="act">
         <div class="num">4</div>
         <div class="act-b">
-          <h3>인력을 줄이지 말고 등급을 올린다<span class="tag">연내 설계</span></h3>
-          <p>작업자를 로봇 오퍼레이터·데이터 라벨러·셀 관리자로 재교육한다. 아웃소싱 회사가 고급 로봇운영 인력을 공급하면 인당 단가가 올라가고, 노무 리스크 관리 측면에서도 이 서사가 필요하다.</p>
+          <h3>병역특례 지정업체 요건을 확인한다<span class="tag">확인 필요</span></h3>
+          <p>KOITA 등록 연구개발전담부서를 이미 보유해 기본 요건 하나는 갖춘 상태다. 3년간 이탈이 없다는 점에서 경남권 제조기업에 유효한 수단이나, 선정 요건과 배정 절차는 매년 변경되므로 병무청 산업지원 담당 확인이 선행되어야 한다.</p>
         </div>
       </div>
       <div class="act">
         <div class="num">5</div>
         <div class="act-b">
-          <h3>연구개발실을 원가부서에서 수익부서로 재정의<span class="tag">연내</span></h3>
-          <p>이미 구축한 사내 웹앱·데이터 인프라를 외부 판매 가능한 제품 형태로 정리한다. 로봇 하드웨어보다 운영 소프트웨어에서 반복 매출이 나온다.</p>
+          <h3>도구로 인당 생산성을 올린다<span class="tag">진행 중</span></h3>
+          <p>사내 웹앱을 소수 인원으로 구축해 온 방식이 비전 모델 학습과 제어 코드에도 적용된다. 3명이 필요해 보이는 일이 1명＋도구로 되는 경우가 많다.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="avoid">
-    <h2>4. 하지 않을 것</h2>
+  <section class="guard">
+    <h2>5. 외주 전환의 방어선</h2>
+    <p style="color:#6E4A16; margin-bottom:6px;">제작을 외부에 맡기면 기술이 내재화되지 않고, 장기적으로 설비업체에 대한 협상력을 잃는다. 이를 막기 위해 계약 단계에서 다음을 반드시 확보한다.</p>
     <ul>
-      <li><b>범용 휴머노이드 추종</b> — 2030년 이전 제조현장 투자수익이 나오지 않는다.</li>
-      <li><b>대기업 로봇 SI와 정면 경쟁</b> — 특화 공정·소형 셀로 전장을 좁힌다.</li>
-      <li><b>솔루션 업체 통째 의존</b> — 내재화 없이는 3단계 진입이 불가능하다. 현재의 자체 제작 전환 판단은 유효하다.</li>
+      <li><b>검사 데이터 소유권은 인시스</b> — 학습 데이터·검사 이력을 인시스 자산으로 명시한다.</li>
+      <li><b>제어 로직·파라미터 접근권 확보</b> — 블랙박스 납품을 허용하지 않는다.</li>
+      <li><b>유지보수 종속 차단</b> — 소모품·수리를 특정 업체에만 의존하는 구조를 피한다.</li>
     </ul>
   </section>
 
   <section>
-    <h2>5. 2027년 판정 지표</h2>
-    <div class="kpi">
-      <div><div class="n">1기</div><div class="l">자체 제작 자동화 셀 양산 투입</div></div>
-      <div><div class="n">5종</div><div class="l">공정 작업 데이터셋 확보</div></div>
-      <div><div class="n">10명</div><div class="l">로봇 운영 인력 전환 교육</div></div>
-      <div><div class="n">3건</div><div class="l">외부 고객사 자동화 상담</div></div>
+    <h2>6. 하지 않을 것</h2>
+    <div class="card">
+      <ul>
+        <li><strong>범용 휴머노이드 추종</strong> — 2030년 이전 제조현장 투자수익이 나오지 않는다.</li>
+        <li><strong>설비 제작사와의 정면 경쟁</strong> — 인시스의 전장은 제작이 아니라 운영이다.</li>
+        <li><strong>인력 충원을 전제로 한 일정 수립</strong> — 채용 성공을 가정한 계획은 다시 세우지 않는다.</li>
+      </ul>
     </div>
+  </section>
+
+  <section>
+    <h2>7. 2027년 판정 지표</h2>
+    <div class="kpi">
+      <div><div class="n">1기</div><div class="l">검사 셀 도입 완료 (외주 제작)</div></div>
+      <div><div class="n">1종</div><div class="l">공정 작업 데이터셋 보유</div></div>
+      <div><div class="n">10명</div><div class="l">재직자 로봇 운영 전환 교육</div></div>
+      <div><div class="n">3채널</div><div class="l">외부 역량 조달 경로 가동</div></div>
+    </div>
+    <p class="muted" style="margin-top:6px;">네 번째 지표가 나머지 셋의 선행 조건이다. 조달 채널이 열리지 않으면 앞의 세 항목도 달성되지 않는다.</p>
   </section>
 
   <footer>
     <div>인시스 AI혁신 연구개발실 · 2026</div>
-    <div class="ver">strategy.html v1.0</div>
+    <div class="ver">strategy.html v2.0</div>
   </footer>
 
 </div>
 
 <script>
 /* strategy.html — version constant */
-var APP_VERSION = 'v1.0';
+var APP_VERSION = 'v2.0';
 
 function setView(mode){
   var b = document.body;
