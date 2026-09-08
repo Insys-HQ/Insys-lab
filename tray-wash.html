@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v10.9 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v11.0 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v10.9</span>
+    <span class="vb">v11.0</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v10.9 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v11.0 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v10.9
+// 트레이 세척·탈수·건조 시뮬레이터 v11.0
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='10.9';
+const VER='11.0';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -255,7 +255,7 @@ stgLen:[1200,1000,650],   // ★v9.6 발주 검토 확정 — 저수조 회전�
   meshFilter:true, meshSize:30, sludgeFilter:true, sludgeMesh:100,
   pumpStrainer:true, strainerMesh:50, autoBackwash:false, filterWaterSave:true,
   // 탈수
-  knifePass:6,knifeAng:60,knifeVel:90,knifePress:14,knifeSlot:1.0,knifeGap:30,knifeLen:600,blowerPerN:2,
+  knifePass:6,knifeAng:60,knifeVel:90,knifePress:14,knifeSlot:1.0,knifeGap:30,knifeLen:600,blowerPerN:1,
   // 건조
   dryTemp:65,dryAirVol:80,dryRecirc:75,heaterCount:1,
   // ★v9.2 트레이 열변형 방지 — 건조기 내부 허용 상한온도(하드 제약)
@@ -594,25 +594,26 @@ function optimizeAll(){
     for(let agl=40; agl<=70; agl+=10){
       for(const sl of [1.0,1.2,1.5]){
         for(let kp=12; kp<=30; kp+=2){
-        for(const gp of [30,35,40,45,50,55]){          // ★v10.9 이격도 탐색 (저압·근접 조합 포함)
-          S.knifePass=ps; S.knifeAng=agl; S.knifeSlot=sl; S.knifePress=kp; S.knifeGap=gp;
+        for(const gp of [30,35,40,45,50,55]){          // ★v10.9 이격도 탐색
+        for(const bn of [1,2,3,4]){                    // ★v11.0 블로워 배분도 탐색 (대당 규격이 달라져 전력 차이)
+          S.knifePass=ps; S.knifeAng=agl; S.knifeSlot=sl; S.knifePress=kp; S.knifeGap=gp; S.blowerPerN=bn;
           S.knifeVel=Math.round(knifeExitVel(kp)/5)*5;
           calcAll();
           if(R.blowerSel.blowerShortage || !R.dewatOK || !R.equipDim.fitL || !R.gapOK) continue;
           const hit=R.dewatEff>=tgtD;
-          const c={ps:ps,agl:agl,sl:sl,kp:kp,gp:gp,hit:hit,eff:R.dewatEff,kw:R.blowKW,cost:monthCost()};
+          const c={ps:ps,agl:agl,sl:sl,kp:kp,gp:gp,bn:bn,hit:hit,eff:R.dewatEff,kw:R.blowKW,cost:monthCost()};
           if(!bd) bd=c;
           else if(hit&&!bd.hit) bd=c;
           else if(hit&&bd.hit){ if(c.cost<bd.cost) bd=c; }
           else if(!hit&&!bd.hit){ if(c.eff>bd.eff+0.05) bd=c; }
-        }}
+        }}}
       }
     }
   }
   const dewatHit=!!(bd&&bd.hit);
   if(bd){
     S.knifePass=bd.ps; S.knifeAng=bd.agl; S.knifeSlot=bd.sl; S.knifePress=bd.kp;
-    S.knifeGap=bd.gp;
+    S.knifeGap=bd.gp; S.blowerPerN=bd.bn;
     S.knifeVel=Math.round(knifeExitVel(bd.kp)/5)*5;
     calcAll();
   }
@@ -1027,6 +1028,9 @@ function bindSlider(id){
   const el=gi(id),rg=gi('rg-'+id);if(!el||!rg)return;
   rg.addEventListener('input',()=>{el.value=rg.value;el.classList.add('s-user');onChange(id);});
   el.addEventListener('input',()=>{rg.value=el.value;el.classList.add('s-user');onChange(id);});
+  // ★v11.0 스피너·붙여넣기·포커스 이동으로 값이 바뀌면 input이 안 뜨는 경우가 있어 change도 바인딩
+  el.addEventListener('change',()=>{rg.value=el.value;el.classList.add('s-user');onChange(id);});
+  rg.addEventListener('change',()=>{el.value=rg.value;el.classList.add('s-user');onChange(id);});
 }
 function syncState(){
   ['dryMinLen','dryFanCover','dryDuctVel','dryTarget','dewatTarget','trayMaxTemp','dryRadRatio','bagMicron','bagDPclean','bagDPchange','susMesh','knifeCoreX','radDT','radPipeLen','recovBufferMin','recovHeadDrop','rhSetLow','rhSetHigh','trayW','trayD','trayT','pocketCount','qty','dlv','wHole','wSprayAngle','wTiltAngle','wOverlap','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
@@ -1108,7 +1112,7 @@ function onChange(id){
     const fe=gi(id); if(fe&&fe.focus) fe.focus();
     return;
   }
-  if(id==='knifeGap'||id==='knifeSlot'||id==='knifePress'||id==='knifeVel'||id==='knifeAng'||id==='knifePass'||id==='knifeCoreX'){
+  if(id==='knifeGap'||id==='knifeSlot'||id==='knifePress'||id==='knifeVel'||id==='knifeAng'||id==='knifePass'||id==='knifeCoreX'||id==='blowerPerN'||id==='knifeLen'){
     renderLeft(); renderRight();
     const rg2=gi('rg-'+id); if(rg2) rg2.focus();
     return;
@@ -2089,7 +2093,7 @@ function renderLeft(){
       +(go.short?' ⚠️ <b>정압이 낮아 30mm 이내로 붙여야 함 — 정압 상향 권고</b>':'')+'</div>'
       +'<div class="chbox" style="background:#eef6fb;border-color:#cde3f0;color:#0b5a80;">🔧 <b>기종별 트레이 높이 대응 구조</b>: 에어나이프를 <b>LM 리니어가이드 + 수동핸들(눈금자)</b> 또는 전동 액추에이터에 장착하여, 트레이 기종 변경 시 이격거리를 20~150mm 범위에서 손쉽게 조정. 상하 위치도 조정해 다양한 트레이 높이에 대응.</div>'
       +'<div class="st">링블로어 배분 자동 선정</div>'
-      +sliderHTML('blowerPerN','🔗 나이프 N개당 블로어 1대','개',1,4,1,S.blowerPerN,2,2)
+      +sliderHTML('blowerPerN','🔗 나이프 N개당 블로어 1대','개',1,4,1,S.blowerPerN,1,2)
       +'<div id="blowerInfo"></div>'
       +'<div class="note">💡 나이프 '+S.blowerPerN+'개당 링블로어 1대 → 총 '+kt+'개 ÷ '+S.blowerPerN+' = <b>'+Math.ceil(kt/S.blowerPerN)+'대</b>. 각 블로어 풍량·압력에 맞는 규격과 공급배관 굵기가 자동 산출됩니다.</div>'
       +'</div></div>';
