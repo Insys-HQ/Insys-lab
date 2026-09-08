@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v10.6 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v10.7 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v10.6</span>
+    <span class="vb">v10.7</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v10.6 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v10.7 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v10.6
+// 트레이 세척·탈수·건조 시뮬레이터 v10.7
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='10.6';
+const VER='10.7';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -515,6 +515,8 @@ function activeStages(combo, zn){
 //  제약(모두 만족해야 후보): 목표 효율 3종 · 높이 커버율 100% · 체류 충족
 //        · 저수조(조보다 짧음 / 회전 1.5~4분 / 깊이 ≤900) · 40ft 적재 · 블로워·팬 용량 충족
 //        · 건조온도 ≤ 트레이 허용온도 · 세척 1차 압력 ≥ 실무 하한 1.5bar
+// ★v10.7 최적 탐색 결과가 어떤 입력 조건에서 나온 것인지 식별하는 키 (변경 감지용)
+function optInputKey(){ return [S.qty,S.dlv,S.trayW,S.trayD,S.pocketCount,S.stageCombo,S.optTgtWash,S.optTgtDewat,S.optTgtDry,S.trayMaxTemp,S.rate,S.gasRate,S.boilerType].join('|'); }
 function optimizeAll(){
   syncState();
   const tgtW=S.optTgtWash, tgtD=S.optTgtDewat, tgtR=S.optTgtDry;
@@ -650,7 +652,7 @@ function optimizeAll(){
     pumpLpm:R.stgDetail[0]?R.stgDetail[0].pumpReq:0, nozTotal:R.stgDetail[0]?R.stgDetail[0].nozTotal:0,
     washLen:S.washDryLen, knifePass:S.knifePass, knifePress:S.knifePress,
     dryTemp:S.dryTemp, dryAirVol:S.dryAirVol, heaterCount:S.heaterCount, tank:S.boilerTankL,
-    elec:R.elecTotal, cost:monthCost(), totalLen:R.convTotalLen, fitL:R.equipDim.fitL};
+    elec:R.elecTotal, cost:monthCost(), totalLen:R.convTotalLen, fitL:R.equipDim.fitL, inputKey:optInputKey()};
   renderLeft(); renderRight();   // 새 S 기준으로 DOM 재작성
   _noSync=false;                 // DOM 갱신 완료 후에만 역동기화 재개
 }
@@ -1717,14 +1719,29 @@ function renderLeft(){
       +'<div><label style="font-size:13px;color:#5a7088;">목표 건조(%)</label><input type="number" id="optTgtDry" value="'+S.optTgtDry+'" style="width:100%;border:1.5px solid #90caf9;border-radius:5px;padding:5px;font-size:13px;font-family:inherit;font-weight:700;"></div>'
       +'<button id="btnOptimize" style="background:#1565c0;color:#fff;border:0;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;">최적조건 적용</button>'
       +'</div>'
-      +(orv?'<div style="margin-top:7px;padding:7px 9px;border-radius:7px;background:'+(orv.ok?'#e8f5e9':'#fff3e0')+';border:1.5px solid '+(orv.ok?'#a5d6a7':'#ffcc80')+';color:'+(orv.ok?'#1b5e20':'#e65100')+';font-size:13px;font-weight:600;line-height:1.6;">'
-        +(orv.ok?'✅ <b>목표 달성 조건 확정</b>':'⚠️ <b>일부 목표 미달 — 도달 가능한 최대치 적용</b>')+'<br>'
-        +'세척 <b>'+orv.washEff.toFixed(1)+'%</b>'+(orv.washHit?'✅':'⚠️')+' / 탈수 <b>'+orv.dewatEff.toFixed(1)+'%</b>'+(orv.dewatHit?'✅':'⚠️')+' / 건조 <b>'+orv.dryEff.toFixed(1)+'%</b>'+(orv.dryHit?'✅':'⚠️')+'<br>'
-        +'세척: 압력 '+orv.press+'kPa · 분사각 '+orv.ang+'° · 이격 '+orv.dist+'mm · 노즐간격 '+orv.pitch.toFixed(0)+'mm<br>'
-        +'노즐 팬 경사: '+orv.tilt+'° · 겹침 '+orv.ov+'% · V자 교대 · 타격계수 '+(orv.impact*100).toFixed(0)+'%<br>'
-        +'노즐: 길이 '+orv.row+'줄 × 높이 '+orv.col+'개 = '+(orv.col*orv.row)+'/면 (전체 '+orv.nozTotal+'개) · 펌프 '+orv.pumpLpm+'LPM · '+orv.temp+'°C · 세척조 '+orv.washLen+'mm<br>'
-        +'탈수: '+orv.knifePass+'패스 · '+orv.knifePress+'kPa / 건조: '+orv.dryTemp+'°C · '+orv.dryAirVol+'m³/min · 열풍기 '+orv.heaterCount+'대<br>'
-        +'전기 <b>'+orv.elec.toFixed(1)+'kW</b> · 총길이 <b>'+orv.totalLen+'mm</b> ('+(orv.fitL?'40ft 적재 가능':'⚠️ 40ft 초과')+')</div>':'')
+      +(function(){
+          // ★v10.7 실시간 비교 — 현재 설정(입력 즉시 반영) / 실시간 추천(R.recommend) / 최적 탐색(버튼 결과)
+          var rc=R.recommend, d0=R.stgDetail[0]||{};
+          var stale = orv && orv.inputKey!==optInputKey();
+          function row(nm,cur,rec,opt){ return '<tr><td style="text-align:left;font-weight:700;">'+nm+'</td><td style="font-weight:800;color:#0d47a1;">'+cur+'</td><td style="color:#1b5e20;font-weight:700;">'+rec+'</td><td style="color:'+(stale?'#9e9e9e':'#6a1b9a')+';">'+(opt===undefined?'—':opt)+'</td></tr>'; }
+          var t='<table class="tbl" style="margin-top:7px;"><thead><tr><th>항목</th><th>현재 설정<br>(실시간)</th><th>실시간 추천<br>(조건 기반)</th><th>최적 탐색<br>(버튼)'+(stale?'<br><span style="color:#c62828;font-size:13px;">입력 변경됨</span>':'')+'</th></tr></thead><tbody>'
+            +row('세척효율', R.washEff.toFixed(1)+'%'+(R.washEff>=S.optTgtWash?' ✅':' ⚠️'), rc.washEff+'% 목표'+(rc.pressCanReach?'':' ❌불가'), orv?orv.washEff.toFixed(1)+'%':undefined)
+            +row('1차 압력', (S.stgPress[0]/100).toFixed(2)+'bar', rc.pressCanReach?(rc.press1/100).toFixed(1)+'bar':'단수 부족', orv?(orv.press.split('/')[0]/100).toFixed(2)+'bar':undefined)
+            +row('노즐 (높이×길이)', S.stgCol[0]+'×'+S.stgRow[0]+'='+(S.stgCol[0]*S.stgRow[0])+'/면', rc.nozH+'×'+rc.nozL+'='+rc.nozPerFace+'/면', orv?orv.col+'×'+orv.row+'='+(orv.col*orv.row)+'/면':undefined)
+            +row('세척조 길이', S.washDryLen+'mm', rc.washLen+'mm', orv?orv.washLen+'mm':undefined)
+            +row('세척 온도', S.wTemp+'°C', rc.temp+'°C', orv?orv.temp+'°C':undefined)
+            +row('분사각·팬경사·겹침', S.wSprayAngle+'°·'+S.wTiltAngle+'°·'+S.wOverlap+'%', '—', orv?orv.ang+'°·'+orv.tilt+'°·'+orv.ov+'%':undefined)
+            +row('탈수 / 건조', R.dewatEff.toFixed(1)+'% / '+R.dryEff.toFixed(1)+'%', S.optTgtDewat+'% / '+S.optTgtDry+'%', orv?orv.dewatEff.toFixed(1)+'% / '+orv.dryEff.toFixed(1)+'%':undefined)
+            +row('전기 정격', R.elecTotal.toFixed(1)+'kW', '—', orv?orv.elec.toFixed(1)+'kW':undefined)
+            +row('총길이', R.convTotalLen+'mm'+(R.equipDim.fitL?'':' ⚠️40ft'), '—', orv?orv.totalLen+'mm':undefined)
+            +'</tbody></table>';
+          var msg='';
+          if(!rc.pressCanReach) msg='<div style="margin-top:6px;font-size:13px;color:#b71c1c;font-weight:700;">❌ 현재 단 구성으로는 4.0bar까지 올려도 최대 '+rc.washEffMax.toFixed(1)+'% — '+(rc.stagesNeeded==='13'?'1·3단 이상':rc.stagesNeeded==='all'?'1·2·3단 전체':'오염도·온도 재검토')+' 필요</div>';
+          else if(R.washEff<S.optTgtWash) msg='<div style="margin-top:6px;font-size:13px;color:#e65100;font-weight:700;">⚠️ 현재 '+R.washEff.toFixed(1)+'% — 추천 압력 '+(rc.press1/100).toFixed(1)+'bar 또는 노즐 '+rc.nozH+'×'+rc.nozL+'로 목표 도달</div>';
+          else msg='<div style="margin-top:6px;font-size:13px;color:#1b5e20;font-weight:700;">✅ 현재 설정으로 세척 목표 충족'+(R.washEff>S.optTgtWash+2?' — 추천 압력 '+(rc.press1/100).toFixed(1)+'bar까지 낮춰 절전 가능':'')+'</div>';
+          if(stale) msg+='<div style="margin-top:4px;font-size:13px;color:#7a90a4;">최적 탐색 열은 이전 실행 결과 — 입력이 바뀌었으니 다시 실행하면 갱신됩니다</div>';
+          return t+msg;
+        })()
       +'</div>';
     stgHtml='<label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#1565c0;margin-bottom:6px;cursor:pointer;"><input type="checkbox" id="stgLenAuto" '+(S.stgLenAuto?'checked':'')+'> 📏 조 길이 자동 산정 — 세로줄 노즐 수×줄간격 연동 (줄 추가 → 조길이↑ → 체류·효율↑)</label>'
       +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px;">';
