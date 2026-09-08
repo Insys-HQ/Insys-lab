@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>피지컬 AI 시대 인시스 사업전략</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ===== strategy.html  v1.0  (2026-09-08) ===== */
+:root{
+  --navy:#1B2A4A;
+  --steel:#2C6E9B;
+  --ink:#26303D;
+  --sub:#5B6673;
+  --line:#D8DEE6;
+  --bg:#F4F6F9;
+  --panel:#FFFFFF;
+  --pastel:#E7EEF6;
+  --signal:#9A5B12;
+  --signalbg:#FBF3E6;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Noto Sans KR',sans-serif;
+  font-size:14px; font-weight:400; line-height:1.62;
+  color:var(--ink); background:var(--bg);
+  -webkit-text-size-adjust:100%;
+}
+@media (min-width:768px){ body{font-size:16px;} }
+body.view-pc{font-size:16px;}
+
+/* ===== nav ===== */
+.nav{background:var(--navy); width:100%; position:sticky; top:0; z-index:20;}
+.nav-inner{
+  max-width:1100px; margin:0 auto; padding:8px 16px;
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+}
+.nav-title{color:#FFFFFF; font-weight:700; font-size:0.95em; letter-spacing:-0.2px;}
+.nav-title span{display:block; color:#A9BDD6; font-weight:300; font-size:0.78em; line-height:1.3;}
+.switch{display:flex; background:#2E4066; border-radius:6px; padding:2px;}
+.switch button{
+  font-family:inherit; font-size:0.78em; font-weight:500; color:#C3D2E5;
+  background:none; border:0; border-radius:4px; padding:5px 11px; cursor:pointer;
+}
+.switch button.on{background:#FFFFFF; color:var(--navy); font-weight:700;}
+.switch button:focus-visible{outline:2px solid #FFC777; outline-offset:1px;}
+
+/* ===== layout ===== */
+#wrap{max-width:1100px; margin:0 auto; padding:0 16px 24px;}
+body.view-mobile #wrap{max-width:430px;}
+section{margin:8px 0; padding:0;}
+.card{
+  background:var(--panel); border:1px solid var(--line); border-radius:8px;
+  padding:12px; margin:8px 0;
+}
+h2{
+  font-size:1.06em; font-weight:700; color:var(--navy);
+  margin:8px 0 6px; padding:0 0 0 9px; border-left:4px solid var(--steel);
+  line-height:1.35;
+}
+h3{font-size:0.97em; font-weight:700; color:var(--navy); margin:0 0 4px;}
+p{margin:0 0 6px;}
+p:last-child{margin-bottom:0;}
+strong{font-weight:700; color:var(--navy);}
+.muted{color:var(--sub); font-size:0.88em;}
+
+/* ===== cover ===== */
+.cover{
+  background:linear-gradient(160deg,#1B2A4A 0%,#2C4A72 100%);
+  border-radius:8px; color:#FFFFFF; padding:12px 14px; margin:8px 0;
+}
+.cover .kind{color:#9FC0E0; font-size:0.82em; font-weight:300;}
+.cover h1{font-size:1.42em; font-weight:900; line-height:1.28; margin:2px 0 6px; letter-spacing:-0.6px;}
+.cover .lead{color:#DCE7F3; font-weight:300; font-size:0.93em; margin:0 0 8px;}
+.meta{display:flex; flex-wrap:wrap; gap:4px 14px; border-top:1px solid rgba(255,255,255,.22); padding-top:7px;}
+.meta div{font-size:0.8em; color:#B9CDE2; font-weight:300;}
+.meta b{color:#FFFFFF; font-weight:500;}
+
+/* ===== thesis ===== */
+.thesis{
+  background:var(--pastel); border:1px solid #C3D5E8; border-left:5px solid var(--steel);
+  border-radius:8px; padding:12px; margin:8px 0;
+}
+.thesis .q{font-size:1.1em; font-weight:700; color:var(--navy); line-height:1.45; margin:0 0 6px;}
+.thesis p{color:#31435A;}
+
+/* ===== grid ===== */
+.grid{display:grid; grid-template-columns:1fr; gap:8px;}
+body.view-pc .grid2{grid-template-columns:1fr 1fr;}
+@media (min-width:768px){ body:not(.view-mobile) .grid2{grid-template-columns:1fr 1fr;} }
+
+.box{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px;}
+.box.risk{border-top:3px solid #B0651A;}
+.box.asset{border-top:3px solid var(--steel);}
+ul{margin:0; padding-left:17px;}
+li{margin:0 0 4px;}
+li:last-child{margin-bottom:0;}
+
+/* ===== table ===== */
+.tw{overflow-x:auto; -webkit-overflow-scrolling:touch;}
+table{width:100%; border-collapse:collapse; font-size:0.9em; min-width:430px;}
+th,td{border:1px solid var(--line); padding:6px 8px; text-align:left; vertical-align:top;}
+th{background:var(--pastel); color:var(--navy); font-weight:700; white-space:nowrap;}
+td.stage{font-weight:700; color:var(--steel); white-space:nowrap;}
+
+/* ===== action list ===== */
+.act{display:flex; gap:10px; padding:9px 0; border-bottom:1px dashed var(--line);}
+.act:last-child{border-bottom:0; padding-bottom:0;}
+.act:first-child{padding-top:0;}
+.num{
+  flex:0 0 22px; height:22px; border-radius:50%; background:var(--navy); color:#FFFFFF;
+  font-size:0.78em; font-weight:700; display:flex; align-items:center; justify-content:center; margin-top:2px;
+}
+.act-b{flex:1;}
+.tag{
+  display:inline-block; font-size:0.74em; font-weight:500; color:var(--steel);
+  background:var(--pastel); border-radius:3px; padding:1px 6px; margin-left:5px; vertical-align:1px;
+}
+
+/* ===== avoid ===== */
+.avoid{background:var(--signalbg); border:1px solid #E7D3B0; border-radius:8px; padding:12px; margin:8px 0;}
+.avoid h2{border-left-color:#B0651A; color:var(--signal);}
+.avoid li{color:#6E4A16;}
+.avoid li b{color:var(--signal);}
+
+/* ===== kpi ===== */
+.kpi{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+body.view-pc .kpi{grid-template-columns:repeat(4,1fr);}
+@media (min-width:768px){ body:not(.view-mobile) .kpi{grid-template-columns:repeat(4,1fr);} }
+.kpi div{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px;}
+.kpi .n{font-size:1.3em; font-weight:900; color:var(--steel); line-height:1.2;}
+.kpi .l{font-size:0.83em; color:var(--sub); margin-top:2px;}
+
+/* ===== footer ===== */
+footer{
+  display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px;
+  border-top:1px solid var(--line); margin-top:12px; padding-top:8px;
+  font-size:0.82em; color:var(--sub);
+}
+footer .ver{font-weight:700; color:var(--navy);}
+</style>
+</head>
+<body class="view-mobile">
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-title">피지컬 AI 사업전략<span>인시스 AI혁신 연구개발실</span></div>
+    <div class="switch" role="group" aria-label="화면 보기 전환">
+      <button type="button" id="btnM" class="on" onclick="setView('mobile')">모바일</button>
+      <button type="button" id="btnP" onclick="setView('pc')">PC</button>
+    </div>
+  </div>
+</nav>
+
+<div id="wrap">
+
+  <div class="cover">
+    <div class="kind">경영전략 검토 보고</div>
+    <h1>피지컬 AI 시대,<br>인시스는 무엇을 파는 회사가 되는가</h1>
+    <p class="lead">인력 도급에서 로봇 운영 도급으로 — 2026~2030 전환 로드맵</p>
+    <div class="meta">
+      <div>작성일 <b>2026-09-08</b></div>
+      <div>담당 <b>AI혁신 연구개발실</b></div>
+      <div>작성자 <b>ys.kim@in-sys.co.kr</b></div>
+    </div>
+  </div>
+
+  <div class="thesis">
+    <p class="q">"사람을 파는 회사"에서 "사람과 로봇의 작업을 파는 회사"로 이동한다.</p>
+    <p>이동의 무기는 로봇 기술이 아니라 인시스가 이미 가진 <strong>현장 접근권과 작업 데이터</strong>다. 로봇 제조사는 공장 안에 들어가지 못하고, 인시스는 이미 계열사 현장에 상주해 있다.</p>
+  </div>
+
+  <section>
+    <h2>1. 진단</h2>
+    <div class="grid grid2">
+      <div class="box risk">
+        <h3>정면으로 침식되는 것</h3>
+        <ul>
+          <li>검사·이송·포장·단순조립 — 인시스가 인력을 공급해 온 공정이 가장 먼저 자동화 대상이 된다.</li>
+          <li>즉 <strong>위협의 크기 = 현재 아웃소싱 매출 구조 그 자체</strong>이며, 대응 여부가 아니라 대응 속도의 문제다.</li>
+          <li>단가 경쟁만으로 방어하면 인건비 상승·노무 리스크에 그대로 노출된다.</li>
+        </ul>
+      </div>
+      <div class="box asset">
+        <h3>인시스만 가진 자산</h3>
+        <ul>
+          <li>7개 계열사 다수 현장에 대한 상시 접근권 — 피지컬 AI에서 가장 비싼 자원은 알고리즘이 아니라 실제 작업 데이터다.</li>
+          <li>PCB 비전검사·데이터 수집 파이프라인 등 자체 진행 중인 실증 과제.</li>
+          <li>Firebase 기반 사내 웹앱·관리 인프라 — 로봇 도입 시 MES·모니터링 레이어로 직결된다.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. 3단계 전환 로드맵</h2>
+    <div class="card">
+      <div class="tw">
+        <table>
+          <thead>
+            <tr><th>단계</th><th>기간</th><th>포지션</th><th>수익모델</th><th>판정 기준</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="stage">1단계<br>내재화</td>
+              <td>~2027</td>
+              <td>자사 공정 자동화 실증</td>
+              <td>내부 원가절감</td>
+              <td>자체 제작 검사 셀 1기 양산 라인 투입</td>
+            </tr>
+            <tr>
+              <td class="stage">2단계<br>외판</td>
+              <td>2027~2029</td>
+              <td>자동화 셀 설계·제작·구축(SI)</td>
+              <td>설비 납품 + 유지보수</td>
+              <td>계열사 외 고객사 수주 3건</td>
+            </tr>
+            <tr>
+              <td class="stage">3단계<br>운영</td>
+              <td>2029~</td>
+              <td>로봇 운영 아웃소싱(RaaS)</td>
+              <td>대당 월 과금 / 생산량 과금</td>
+              <td>로봇 운영 도급 계약 매출 비중 15%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted" style="margin-top:6px;">3단계가 실질 목표다. 인력 도급 계약을 <strong>로봇＋감독인력 통합 도급</strong>으로 갈아끼우면 기존 영업망과 계약구조를 그대로 쓰면서 단가는 오르고 인건비 리스크는 내려간다.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>3. 지금 착수할 5개 과제</h2>
+    <div class="card">
+      <div class="act">
+        <div class="num">1</div>
+        <div class="act-b">
+          <h3>PCB 비전검사 자체 제작을 전략 1호 과제로 격상<span class="tag">즉시</span></h3>
+          <p>검사기 한 대가 아니라 "인시스가 자동화 셀을 직접 설계·제작할 수 있다"는 최초 레퍼런스다. 성공하면 동일 구조를 타 고객사로 복제한다.</p>
+        </div>
+      </div>
+      <div class="act">
+        <div class="num">2</div>
+        <div class="act-b">
+          <h3>데이터 수집을 연구가 아닌 자산 축적으로 재정의<span class="tag">3개월</span></h3>
+          <p>촉각 데이터·세그멘테이션·픽앤플레이스 연구의 목표를 <strong>계열사 공정 5종의 작업 데이터셋 축적</strong>으로 전환한다. 3년 뒤 이 데이터셋이 회사의 가장 비싼 자산이 된다.</p>
+        </div>
+      </div>
+      <div class="act">
+        <div class="num">3</div>
+        <div class="act-b">
+          <h3>공정 대체 순서 지도 작성<span class="tag">2개월</span></h3>
+          <p>계열사 전 공정을 자동화 난이도·인건비·불량손실 3축으로 점수화해 "언제 무엇이 로봇으로 넘어가는가"를 문서화한다. 이 지도가 없으면 투자도 인력계획도 근거가 없다.</p>
+        </div>
+      </div>
+      <div class="act">
+        <div class="num">4</div>
+        <div class="act-b">
+          <h3>인력을 줄이지 말고 등급을 올린다<span class="tag">연내 설계</span></h3>
+          <p>작업자를 로봇 오퍼레이터·데이터 라벨러·셀 관리자로 재교육한다. 아웃소싱 회사가 고급 로봇운영 인력을 공급하면 인당 단가가 올라가고, 노무 리스크 관리 측면에서도 이 서사가 필요하다.</p>
+        </div>
+      </div>
+      <div class="act">
+        <div class="num">5</div>
+        <div class="act-b">
+          <h3>연구개발실을 원가부서에서 수익부서로 재정의<span class="tag">연내</span></h3>
+          <p>이미 구축한 사내 웹앱·데이터 인프라를 외부 판매 가능한 제품 형태로 정리한다. 로봇 하드웨어보다 운영 소프트웨어에서 반복 매출이 나온다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="avoid">
+    <h2>4. 하지 않을 것</h2>
+    <ul>
+      <li><b>범용 휴머노이드 추종</b> — 2030년 이전 제조현장 투자수익이 나오지 않는다.</li>
+      <li><b>대기업 로봇 SI와 정면 경쟁</b> — 특화 공정·소형 셀로 전장을 좁힌다.</li>
+      <li><b>솔루션 업체 통째 의존</b> — 내재화 없이는 3단계 진입이 불가능하다. 현재의 자체 제작 전환 판단은 유효하다.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>5. 2027년 판정 지표</h2>
+    <div class="kpi">
+      <div><div class="n">1기</div><div class="l">자체 제작 자동화 셀 양산 투입</div></div>
+      <div><div class="n">5종</div><div class="l">공정 작업 데이터셋 확보</div></div>
+      <div><div class="n">10명</div><div class="l">로봇 운영 인력 전환 교육</div></div>
+      <div><div class="n">3건</div><div class="l">외부 고객사 자동화 상담</div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div>인시스 AI혁신 연구개발실 · 2026</div>
+    <div class="ver">strategy.html v1.0</div>
+  </footer>
+
+</div>
+
+<script>
+/* strategy.html — version constant */
+var APP_VERSION = 'v1.0';
+
+function setView(mode){
+  var b = document.body;
+  var m = document.getElementById('btnM');
+  var p = document.getElementById('btnP');
+  if(mode === 'pc'){
+    b.classList.remove('view-mobile');
+    b.classList.add('view-pc');
+    p.classList.add('on');
+    m.classList.remove('on');
+  }else{
+    b.classList.remove('view-pc');
+    b.classList.add('view-mobile');
+    m.classList.add('on');
+    p.classList.remove('on');
+  }
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
