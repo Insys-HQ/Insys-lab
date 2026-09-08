@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v11.4 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v11.5 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v11.4</span>
+    <span class="vb">v11.5</span>
   </div>
 </div>
 </div>
@@ -207,19 +207,19 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v11.4 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v11.5 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v11.4
+// 트레이 세척·탈수·건조 시뮬레이터 v11.5
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='11.4';
+const VER='11.5';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
 const S={
   // 트레이 규격 (세워서 투입)
-  trayW:430,trayD:330,trayT:150,pocketCount:6,qty:500,dlv:3,
+  trayW:430,trayD:330,trayT:150,pocketCount:20,qty:500,dlv:3,
   nozzleLayout:'cross',  // vertical(수직)/cross(교차각도)/horizontal(수평)
   // 세척 (2CH 고정)
   wZones:3,wHole:2.5,wTemp:70,
@@ -229,7 +229,7 @@ const S={
   wTiltAngle:15, wOverlap:45, wTiltAlt:true,          // ★v9.0 발주 검토 강건최적
   wDistAuto:true, pumpMode:'auto', stgPumpLpm:[0,0,0], stgPressAct:[280,200,120],
   // 단계별 독립 설정 [1차, 2차, 3차헹굼]
-  stgPress:[150,108,120], stgCol:[6,6,4], stgRow:[4,4,2], stgType:['wash','wash','rinse'],
+  stgPress:[200,144,120], stgCol:[6,6,4], stgRow:[4,4,2], stgType:['wash','wash','rinse'],
 stgLen:[1200,1000,650],   // ★v9.6 발주 검토 확정 — 저수조 회전율·깊이 여유 확보  // 단별 조 길이 (세척·세척·헹굼)
   stgLenAuto:true,  // ★v7.0 조길이 자동: 세로줄 노즐수×줄간격 연동
   // ★v11.1 세척조 구조 여유 (설계 관례값 — 제작사 협의로 확정)
@@ -248,7 +248,8 @@ stgLen:[1200,1000,650],   // ★v9.6 발주 검토 확정 — 저수조 회전�
   // 저수조 폭 고정(세척부 폭 기준), 용량은 길이·깊이로 흡수
   stgTankFixW:800, tankFrameGap:100,   // ★v8.4 저수조 편측 프레임 여유(mm) — 조 길이보다 반드시 작게
   // ★v8.5 구조 제약: 세척조↔저수조 사이 필터 설치 공간, 캐스케이드 오버플로우 단차, 헹굼조 최소 깊이
-  filterGap:200, overflowStep:50, rinseMinDepth:600,
+  filterGap:150, overflowStep:50, rinseMinDepth:400,
+  headerSpace:250, frameBottom:200, tankMaxDepth:600,   // ★v11.5 높이 구성요소 (기성품 1,600mm급 기준)
   // 배수조: 'single'(공통1) or 'perstage'(단별)
   drainMode:'single',
   drainCount:1,drainHead:8,
@@ -258,9 +259,9 @@ stgLen:[1200,1000,650],   // ★v9.6 발주 검토 확정 — 저수조 회전�
   // 탈수
   knifePass:6,knifeAng:60,knifeVel:90,knifePress:14,knifeSlot:1.0,knifeGap:30,knifeLen:600,blowerPerN:1,
   // 건조
-  dryTemp:65,dryAirVol:80,dryRecirc:75,heaterCount:1,
+  dryTemp:60,dryAirVol:90,dryRecirc:75,heaterCount:1,
   // ★v9.2 트레이 열변형 방지 — 건조기 내부 허용 상한온도(하드 제약)
-  trayMaxTemp:70,
+  trayMaxTemp:65,
   // ★v9.4 온수 라디에이터 배관·밸브 / 습도 기반 댐퍼 제어
   // ★v10.3 탈수 회수수 순환: 탈수조 하부 회수조 → (무동력 유하) 헹굼조 → 캐스케이드 → 1단 → 필터 → 급수펌프
   dewatRecovery:true, recovBufferMin:5, recovHeadDrop:50,
@@ -273,7 +274,7 @@ stgLen:[1200,1000,650],   // ★v9.6 발주 검토 확정 — 저수조 회전�
   // ★v9.3 건조 가열 방식: 전기히터 단독 / 히터+온수라디에이터 하이브리드
   dryHeatMode:'electric', dryRadRatio:60, dryLenAuto:true,   // ★v9.0 발주 검토 강건최적
   // ★v8.9 건조기 구성: 최소 길이, 팬 1대 담당 길이, 순환 덕트 풍속
-  dryMinLen:3500, dryFanCover:1000, dryDuctVel:12, dryTarget:95, fanPhase:3,
+  dryMinLen:3500, dryFanCover:1000, dryDuctVel:12, dryTarget:98, fanPhase:3,
   dewatTarget:95,   // ★v9.1 탈수 목표(%) — 절감 분석 기준
   // 온수/유틸
   boilerType:'gas',boilerTankL:750,boilerIns:true,inletTemp:15,convKW:1.5,
@@ -476,11 +477,11 @@ function tankUnderBath(volL, bathLenMm, widthMm, maxWidthMm, fill, frameGapMm, m
   L = Math.max(100, L);
   let W = widthMm, D = volL*1e6/(W*L*fill);
   // ★v9.0 폭 확대는 설비 폭 한도까지만 — 초과 오버슈트 방지 (저수조가 설비보다 넓어지는 결함)
-  while(D>900 && W<maxWidthMm){ W = Math.min(maxWidthMm, W+50); D = volL*1e6/(W*L*fill); }
+  while(D>(S.tankMaxDepth||600) && W<maxWidthMm){ W = Math.min(maxWidthMm, W+50); D = volL*1e6/(W*L*fill); }
   W = Math.min(W, maxWidthMm);
-  const over = D>900;
+  const over = D>(S.tankMaxDepth||600);
   const minD = minDepthMm||300;                            // ★v8.5 헹굼조는 저수량 확보 위해 600↑
-  D = Math.min(900, Math.max(minD, Math.round(D/10)*10));
+  D = Math.min(S.tankMaxDepth||600, Math.max(minD, Math.round(D/10)*10));
   const realVol = Math.round(W*L*D*fill/1e6);              // 클램프 후 실제 유효용량
   return {W:W, L:L, D:D, realVol:realVol, over:over, minD:minD};
 }
@@ -1036,7 +1037,7 @@ function bindSlider(id){
   rg.addEventListener('change',()=>{el.value=rg.value;el.classList.add('s-user');onChange(id);});
 }
 function syncState(){
-  ['dryMinLen','dryFanCover','dryDuctVel','dryTarget','dewatTarget','trayMaxTemp','dryRadRatio','bagMicron','bagDPclean','bagDPchange','susMesh','knifeCoreX','radDT','radPipeLen','recovBufferMin','recovHeadDrop','rhSetLow','rhSetHigh','trayW','trayD','trayT','pocketCount','qty','dlv','wHole','wSprayAngle','wTiltAngle','wOverlap','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
+  ['headerSpace','frameBottom','tankMaxDepth','dryMinLen','dryFanCover','dryDuctVel','dryTarget','dewatTarget','trayMaxTemp','dryRadRatio','bagMicron','bagDPclean','bagDPchange','susMesh','knifeCoreX','radDT','radPipeLen','recovBufferMin','recovHeadDrop','rhSetLow','rhSetHigh','trayW','trayD','trayT','pocketCount','qty','dlv','wHole','wSprayAngle','wTiltAngle','wOverlap','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
   if(!S.wDistAuto){const nd=gi('wNozzleDist'); if(nd&&nd.value!=='')S.wNozzleDist=+nd.value;}
   const bt=gi('boilerType');if(bt)S.boilerType=bt.value;
   const wi=gi('wTankIns');if(wi)S.wTankIns=wi.checked;
@@ -1195,7 +1196,7 @@ function calcAll(){
     if(S.stgLenAuto){
       const needTank = tankOptimal(flow, S.stgTurnover[i]||3);
       const maxW = S.trayD*CH + 400 - 120;
-      const needLenTank = Math.ceil((needTank*1e6/(maxW*900*0.75) + (S.tankFrameGap||100)*2)/100)*100;
+      const needLenTank = Math.ceil((needTank*1e6/(maxW*(S.tankMaxDepth||600)*0.75) + (S.tankFrameGap||100)*2)/100)*100;
       if(needLenTank > S.stgLen[i]) S.stgLen[i] = needLenTank;
     }
     stgDetail.push({idx:i, press, pressSet, pressDrop, nPerFace, nozTotal, nH, nL, col:nH, row:nL, pumpReq, pumpRated, flow, pkw, isRinse, water});
@@ -1226,8 +1227,8 @@ function calcAll(){
       dimW = dm.W; dimD = dm.L; dimH = dm.D;
       tankL_i = dm.realVol;                       // 조 길이에 맞춘 실제 유효용량
       tankLenOver = dm.over || (tankL_i < need*0.95);
-      if(dm.D>=900) depthMax=true;   // ★v9.6 깊이 상한 도달 — 증설 여유 없음
-      if(tankLenOver) tankReqLen = Math.ceil((need*1e6/(dm.W*900*0.75) + S.tankFrameGap*2)/50)*50;  // 필요 조 길이(프레임 포함)
+      if(dm.D>=(S.tankMaxDepth||600)) depthMax=true;   // ★v9.6 깊이 상한 도달 — 증설 여유 없음
+      if(tankLenOver) tankReqLen = Math.ceil((need*1e6/(dm.W*(S.tankMaxDepth||600)*0.75) + S.tankFrameGap*2)/50)*50;  // 필요 조 길이(프레임 포함)
     } else if(S.stgTankMode==='volume'){
       const need = S.stgTank[i]||optTank;
       const dm = tankUnderBath(need, bathLen, fixW, maxTankW, 0.75, S.tankFrameGap, minDep);
@@ -1664,7 +1665,10 @@ function calcAll(){
   // 높이 = 트레이높이 + 상부(노즐헤더400) + 하부(저수조깊이+프레임)
   const tankMaxDepth = Math.max.apply(null, stgTanks.filter(function(t){return t.active;}).map(function(t){return t.dimH||600;}).concat([600]));
   // ★v8.5 높이 = 트레이높이 + 상부헤더400 + 필터공간(세척조↔저수조) + 캐스케이드 최심 바닥 + 프레임300
-  const equipHeight = S.trayW + 400 + (S.filterGap||200) + tankBottomMax + 300;
+  // ★v11.5 높이 구성요소를 입력화 — 기존 고정값(헤더400·프레임300)은 근거 없이 과대
+  //   높이 = 트레이 높이 + 상부 헤더공간 + 필터공간 + 캐스케이드 최심 조 바닥 + 하부 프레임
+  const equipHeight = S.trayW + S.headerSpace + (S.filterGap||150) + tankBottomMax + S.frameBottom;
+  const heightBreak = {tray:S.trayW, header:S.headerSpace, filter:(S.filterGap||150), tank:tankBottomMax, frame:S.frameBottom, total:equipHeight};
   // 모듈별 치수
   const modules = [
     {nm:'입구', L:S.inLen, W:equipWidth, H:equipHeight, note:'투입부'},
@@ -1730,7 +1734,7 @@ function calcAll(){
   const elecTotal = elecBase + convMotorKW + siroFanKW;
   const elecReal = elecRealBase + convLoadKW + siroFanKW*0.85;
 
-  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,filterFactor,fScore,heaterPerUnit,heaterOK,heaterFactor,convLoadKW,nClipPairs,trayOnLine,loadKg,convMotorKW,tankBottomMax,cascadeOK,topStage,nozPitch,angImpact,coverRatioH,washLenBreak,maxEffCombos,washEffMax,slantD,tiltF,ovF,altF,effCovH,dryLenBySpeed,dryLenGovern,dryFanN,airPerFan,heatPerFan,siroModel,siroShort,siroTotalKW,recircQ,dryDuctDia,ductPerSide,siroFanKW,tempOver,bagFlowLpm,bagN,bagSize,bagInitDP,skimmerN,susMeshUm,recoverLph,recovTankL,recovW,recovLen,recovDepth,recovTopRise,gravityOK,rinseMakeupLph,rinseIdx,tankBufferMin,needTankL,tankOK,tankAmple,peakFactor,tankTurnMin,tankTurnOK,heatUpMin,boilerLossKW,radDesignKW,radLPM,radPipe,radPipeID,radVel,radFricPerM,radFricTotal,radCv,radValveDP,radAuthority,evapKgH,rhRaw,rhAfter,damperExh,recircEff,rhCtrlOn,rhState,dryLenByEff,lenBoost,effGapR,radRatio,dryRadKW,dryElecKW,radLoadKW,boilerRatedTotal,airNeed,airUse,ductStatic,ductRunM,fanByLen,fanByAir,dryNeedDwell,rinseF,rinseNeedLph,recircF,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
+  R={washFlow,qPerCh,washPumpTotal,convTotalLen,gapTotal,equipDim,speedMmin,speedMs,capa1ch,capa2ch,feedIntervalSec,monthlyCapa,targetMet,targetOver,needHours,workHoursPerDay,freeHoursPerDay,freeManHourMonth,laborCostMonth,capaEnough,traysPerMin,dwellWash,dwellDewat,dwellDry,needWash,needDewat,needDry,optWashLen,optDewatLen,optDryLen,washOK,dewatOK,dryOK,washWaterTotal,stgDetail,tankL,washHeaterEach,washHeaterTotal,stgTanks,actStages,drainCount,drainFlow,drainKW,airFlow,blowKW,residual,dryKW,boilerHeatKW,boilerLossKW,boilerTotalKW,elecTotal,elecReal,gasLoad,washEff,dewatEff,dryEff,recommend,nozzleInfo,layoutEff,dwellFactor,pocketPen,distFactor,nPerFace,filterFactor,fScore,heaterPerUnit,heaterOK,heaterFactor,convLoadKW,nClipPairs,trayOnLine,loadKg,convMotorKW,tankBottomMax,cascadeOK,topStage,nozPitch,angImpact,coverRatioH,washLenBreak,heightBreak,maxEffCombos,washEffMax,slantD,tiltF,ovF,altF,effCovH,dryLenBySpeed,dryLenGovern,dryFanN,airPerFan,heatPerFan,siroModel,siroShort,siroTotalKW,recircQ,dryDuctDia,ductPerSide,siroFanKW,tempOver,bagFlowLpm,bagN,bagSize,bagInitDP,skimmerN,susMeshUm,recoverLph,recovTankL,recovW,recovLen,recovDepth,recovTopRise,gravityOK,rinseMakeupLph,rinseIdx,tankBufferMin,needTankL,tankOK,tankAmple,peakFactor,tankTurnMin,tankTurnOK,heatUpMin,boilerLossKW,radDesignKW,radLPM,radPipe,radPipeID,radVel,radFricPerM,radFricTotal,radCv,radValveDP,radAuthority,evapKgH,rhRaw,rhAfter,damperExh,recircEff,rhCtrlOn,rhState,dryLenByEff,lenBoost,effGapR,radRatio,dryRadKW,dryElecKW,radLoadKW,boilerRatedTotal,airNeed,airUse,ductStatic,ductRunM,fanByLen,fanByAir,dryNeedDwell,rinseF,rinseNeedLph,recircF,washHeatElec,elecHeater,supplyFresh,supplyMode:S.supplyMode,boilerRunKW,boilerRatedKW,cascadeRatio,directRatio,knifeTotal,knifeLen,flow1,blowerSel,mainDuctSpec,mainDuctID,branchDuctSpec,branchDuctID,vImpact,gapOpt,gapOK,attackEff,slantDist,impactKPa,knifeVelReal};
 }
 
 // ── 좌측 렌더 ──
