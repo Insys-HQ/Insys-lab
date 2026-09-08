@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v11.2 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v11.3 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v11.2</span>
+    <span class="vb">v11.3</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v11.2 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v11.3 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v11.2
+// 트레이 세척·탈수·건조 시뮬레이터 v11.3
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='11.2';
+const VER='11.3';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -233,7 +233,6 @@ const S={
 stgLen:[1200,1000,650],   // ★v9.6 발주 검토 확정 — 저수조 회전율·깊이 여유 확보  // 단별 조 길이 (세척·세척·헹굼)
   stgLenAuto:true,  // ★v7.0 조길이 자동: 세로줄 노즐수×줄간격 연동
   // ★v11.1 세척조 구조 여유 (설계 관례값 — 제작사 협의로 확정)
-  washEndClear:200,   // 조 전후 물막이(입·출구)
   // ★v7.1 최적화 목표 효율 (%)
   optTgtWash:95, optTgtDewat:95, optTgtDry:95, optResult:null,
   wTankL:1500,wTankW:800,wTankD:600,wTankIns:true,
@@ -1035,7 +1034,7 @@ function bindSlider(id){
   rg.addEventListener('change',()=>{el.value=rg.value;el.classList.add('s-user');onChange(id);});
 }
 function syncState(){
-  ['washEndClear','dryMinLen','dryFanCover','dryDuctVel','dryTarget','dewatTarget','trayMaxTemp','dryRadRatio','bagMicron','bagDPclean','bagDPchange','susMesh','knifeCoreX','radDT','radPipeLen','recovBufferMin','recovHeadDrop','rhSetLow','rhSetHigh','trayW','trayD','trayT','pocketCount','qty','dlv','wHole','wSprayAngle','wTiltAngle','wOverlap','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
+  ['dryMinLen','dryFanCover','dryDuctVel','dryTarget','dewatTarget','trayMaxTemp','dryRadRatio','bagMicron','bagDPclean','bagDPchange','susMesh','knifeCoreX','radDT','radPipeLen','recovBufferMin','recovHeadDrop','rhSetLow','rhSetHigh','trayW','trayD','trayT','pocketCount','qty','dlv','wHole','wSprayAngle','wTiltAngle','wOverlap','wPress','wCol','wRow','wTemp','wTankL','wTankW','wTankD','drainCount','drainHead','knifePass','knifeAng','knifeVel','knifePress','knifeSlot','knifeGap','knifeLen','blowerPerN','dryTemp','dryAirVol','dryRecirc','heaterCount','boilerTankL','inletTemp','rinseWater','rinseTemp','aux1stWater','tempSensor','convKW','hours','days','rate','gasRate','targetMonth','workers','wage','clipPitch','trayWeight','washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch'].forEach(k=>{const e=gi(k);if(e&&e.value!=='')S[k]=+e.value;});
   if(!S.wDistAuto){const nd=gi('wNozzleDist'); if(nd&&nd.value!=='')S.wNozzleDist=+nd.value;}
   const bt=gi('boilerType');if(bt)S.boilerType=bt.value;
   const wi=gi('wTankIns');if(wi)S.wTankIns=wi.checked;
@@ -1271,7 +1270,7 @@ function calcAll(){
   // ★v11.2 단간 격벽 가산 폐지 — 칸막이는 각 단 조 길이 안에서 제작하므로 별도 가산하지 않는다
   const stageGap = 0;
   const activeCount = actStages.length;
-  const washEndClear = S.washEndClear;   // 조 전후 물막이(입·출구)
+  const washEndClear = 0;   // ★v11.3 전후 여유 가산 폐지 — 세척조 길이 = 각 단 조 길이 합
   S.washDryLen = Math.round(sumStageLen + stageGap*Math.max(0,activeCount-1) + washEndClear);
   const washLenBreak = { sum:sumStageLen, gap:stageGap, nGap:Math.max(0,activeCount-1), end:washEndClear,
                          parts:actStages.map(function(i){return S.stgLen[i]||1000;}), total:S.washDryLen };
@@ -1823,14 +1822,10 @@ function renderLeft(){
     stgHtml+='</div>';
     stgHtml = optHtml + stgHtml;
     // ★v10.4 세척조 길이 검산식 — 표시값을 손으로 따라 계산할 수 있어야 한다
-    stgHtml += '<div class="g2" style="margin-top:6px;">'+fld('washEndClear','조 전후 물막이','mm',S.washEndClear)+'<div></div></div>'
-      +'<div class="chbox" style="background:#eef6fb;border-color:#cde3f0;color:#0b5a80;">'
-      +'📐 <b>세척조 길이 검산</b> = 조 길이 합 + 전후 물막이<br>'
-      +'<b>'+R.washLenBreak.parts.join(' + ')+' = '+R.washLenBreak.sum+'</b>'
-      +' + 전후 '+R.washLenBreak.end
-      +' = <b>세척조 '+R.washLenBreak.total+'mm</b><br>'
-      +'<span style="font-size:13px;">· 단간 칸막이는 각 단 조 길이 안에서 제작 — 별도 가산 없음<br>'
-      +'· <b>전후 물막이 '+S.washEndClear+'mm</b> — 입·출구에서 세척수가 컨베이어 밖으로 튀지 않도록 하는 립/에어커튼 공간 (불필요하면 0 입력)</span></div>';
+    stgHtml += '<div class="chbox" style="background:#eef6fb;border-color:#cde3f0;color:#0b5a80;">'
+      +'📐 <b>세척조 길이 = 각 단 조 길이 합</b><br>'
+      +'<b>'+R.washLenBreak.parts.join(' + ')+' = '+R.washLenBreak.total+'mm</b><br>'
+      +'<span style="font-size:13px;">단간 칸막이·입출구 물막이는 각 단 조 길이 안에서 제작 — 별도 가산 없음</span></div>';
 
     var coverMmOverlap = R.nozzleInfo.coverW - R.nozPitch;   // 인접 노즐 중첩량(mm)
         h='<div class="card"><div class="ch"><span class="ci">💧</span><span class="cl">세척부 설계 (단계별 독립)</span><span class="cq">실시간 연동</span></div><div class="cb">'
