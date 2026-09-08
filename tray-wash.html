@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v11.3 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v11.4 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v11.3</span>
+    <span class="vb">v11.4</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v11.3 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v11.4 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v11.3
+// 트레이 세척·탈수·건조 시뮬레이터 v11.4
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='11.3';
+const VER='11.4';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -266,7 +266,9 @@ stgLen:[1200,1000,650],   // ★v9.6 발주 검토 확정 — 저수조 회전�
   dewatRecovery:true, recovBufferMin:5, recovHeadDrop:50,
   radDT:15, radPipeLen:20, rhCtrl:true, rhSetLow:65, rhSetHigh:70,
   // ★v10.3 세척수 순환·여과 계통 (백필터 / 오일스키머 / SUS망 / 차압 관리)
-  bagMicron:25, bagDPclean:1.0, bagDPchange:1.5, oilSkimmer:true, susMesh:60, dewatReturn:true,
+  // ★v11.4 트레이 세척기는 오물량이 적어 백필터 미적용(기본) — 오일 스키머 + SUS망으로 처리
+  //   박스 세척기처럼 오물량이 많은 설비에서는 bagFilter를 켜서 백필터를 추가한다
+  bagFilter:false, bagMicron:25, bagDPclean:1.0, bagDPchange:1.5, oilSkimmer:true, susMesh:60, dewatReturn:true,
   knifeCoreX:20,   // ★v10.9 에어나이프 제트 코어 배수(×슬롯폭) — 제작사 실측 곡선으로 교체 권장
   // ★v9.3 건조 가열 방식: 전기히터 단독 / 히터+온수라디에이터 하이브리드
   dryHeatMode:'electric', dryRadRatio:60, dryLenAuto:true,   // ★v9.0 발주 검토 강건최적
@@ -1058,6 +1060,7 @@ function syncState(){
   const dla=gi('dryLenAuto');if(dla)S.dryLenAuto=dla.checked;
   const rc2=gi('rhCtrl');if(rc2)S.rhCtrl=rc2.checked;
   const osk=gi('oilSkimmer');if(osk)S.oilSkimmer=osk.checked;
+  const bgf=gi('bagFilter');if(bgf)S.bagFilter=bgf.checked;
   const dwr=gi('dewatReturn');if(dwr)S.dewatReturn=dwr.checked;
   const dr2=gi('dewatRecovery');if(dr2)S.dewatRecovery=dr2.checked;   // ★v9.1 select 값은 문자열 → 숫자 변환
   for(let i=0;i<3;i++){const pl=gi('stgPumpLpm'+i); if(pl&&pl.value!=='')S.stgPumpLpm[i]=+pl.value;}
@@ -1994,22 +1997,35 @@ function renderLeft(){
       +'<label style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#0d7fa8;margin-top:5px;"><input type="checkbox" id="pumpStrainer" '+(S.pumpStrainer?'checked':'')+'> ③ 펌프 흡입 스트레이너</label>'
       +'<label style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:#0d7fa8;margin-top:5px;"><input type="checkbox" id="oilSkimmer" '+(S.oilSkimmer?'checked':'')+'> ④ 오일 스키머(방청유 부상 회수)</label>'
       +'</div>'
-      +'<div class="g3">'+fld('bagMicron','백필터 여과도','µm',S.bagMicron)+fld('susMesh','SUS망 메시','mesh',S.susMesh)+fld('bagDPclean','청소 차압','bar',S.bagDPclean)+'</div>'
+      +'<div class="g2">'+fld('susMesh','SUS망 메시','mesh',S.susMesh)+'<div class="fl"><label>백필터</label><label style="display:flex;align-items:center;gap:6px;font-size:14px;margin-top:4px;"><input type="checkbox" id="bagFilter" '+(S.bagFilter?'checked':'')+'> 적용(오물량 많은 설비용)</label></div></div>'
+      +(S.bagFilter?('<div class="g2">'+fld('bagMicron','백필터 여과도','µm',S.bagMicron)+fld('bagDPclean','청소 차압','bar',S.bagDPclean)+'</div>'):'')
       +'<div class="chbox" style="background:#eef6fb;border-color:#cde3f0;color:#0b5a80;">'
       +'💧 <b>세척수 순환 계통 (무동력 캐스케이드)</b><br>'
       +'① 탈수부 낙수 → 하부 <b>회수조</b> 저장 ('+R.recovTankL+'L, '+R.recovW+'×'+R.recovLen+'×D'+R.recovDepth+')<br>'
       +'② 회수조 → <b>헹굼조로 무동력 자연 유하</b> (상단 낙차 +'+S.recovHeadDrop+'mm) '+(R.gravityOK?'✅ 펌프 불필요':'⚠️ 낙차 부족 — 이송펌프 필요')+'<br>'
       +'③ 헹굼조 → 2차 → 1차 <b>오버플로우</b> (단차 '+S.overflowStep+'mm씩 하강)<br>'
-      +'④ 최종 1차 저수조 → <b>SUS망 + 백필터</b> → 급수펌프 재순환<br>'
+      +'④ 최종 1차 저수조 → <b>SUS망'+(S.bagFilter?' + 백필터':'')+'</b> → 급수펌프 재순환<br>'
       +'· 회수량 <b>'+R.recoverLph.toFixed(1)+'L/h</b> → 헹굼 청수 보충이 '+R.rinseNeedLph.toFixed(0)+' → <b>'+R.rinseMakeupLph.toFixed(0)+'L/h</b>로 감소</div>'
+      +(S.bagFilter
+        ? ('<div class="chbox" style="background:#f1f8e9;border-color:#c5e1a5;color:#33691e;">'
+          +'🧺 <b>고효율 백필터 (급수펌프 전단)</b><br>'
+          +'· 순환 유량 '+R.bagFlowLpm.toFixed(0)+'LPM → 하우징 <b>'+R.bagN+'기</b> · 백 규격 <b>'+R.bagSize+'</b> · 여과도 <b>'+S.bagMicron+'µm</b><br>'
+          +'· <b>차압 게이지 필수</b> — 초기 '+R.bagInitDP.toFixed(2)+'bar · <b>'+S.bagDPclean.toFixed(1)+'bar 청소</b> / '+S.bagDPchange.toFixed(1)+'bar 교체<br>'
+          +'· 하우징은 <b>퀵오픈 클램프식</b> — 무공구 개방, 백 교체 5분 이내</div>')
+        : ('<div class="chbox" style="background:#fff8f0;border-color:#ffd9a8;color:#8a5a00;">'
+          +'🧺 <b>백필터 미적용 — 트레이 세척 기준</b><br>'
+          +'· 트레이는 오물량이 적고 <b>방청유가 주 오염</b>이므로 백필터 대신 <b>오일 스키머 + SUS망</b>으로 처리<br>'
+          +'· 노즐 오리피스 '+S.wHole+'mm 대비 SUS망 '+S.susMesh+'메시(개구 '+R.susMeshUm+'µm)면 막힘 방지에 충분<br>'
+          +'· 소모품·교체 인력이 들지 않아 무인 운전에 유리<br>'
+          +'· ⚠️ 유화된 방청유는 스키머로 회수되지 않으므로 <b>순환수 정기 배수·교체 주기</b>를 별도로 관리할 것<br>'
+          +'· 박스 세척기처럼 오물량이 많은 설비는 위 체크박스로 백필터를 추가</div>'))
       +'<div class="chbox" style="background:#f1f8e9;border-color:#c5e1a5;color:#33691e;">'
-      +'🧺 <b>고효율 백필터 (급수펌프 전단)</b><br>'
-      +'· 순환 유량 '+R.bagFlowLpm.toFixed(0)+'LPM → 하우징 <b>'+R.bagN+'기</b> · 백 규격 <b>'+R.bagSize+'</b> · 여과도 <b>'+S.bagMicron+'µm</b><br>'
-      +'· <b>차압 게이지 필수</b> (입·출구 각 1개 또는 차압계 1식) — 초기 '+R.bagInitDP.toFixed(2)+'bar<br>'
-      +'· 관리 기준: <b>'+S.bagDPclean.toFixed(1)+'bar 도달 시 백 청소</b> / '+S.bagDPchange.toFixed(1)+'bar 도달 시 교체<br>'
-      +'· 하우징은 <b>퀵오픈 클램프식</b> — 무공구 개방, 백 교체 5분 이내<br>'
-      +'· 1차 SUS망 <b>'+S.susMesh+'메시(개구 약 '+R.susMeshUm+'µm)</b>로 조대 오물 선제거 → 백필터 수명 연장'
-      +(S.oilSkimmer?('<br>· 오일 스키머 <b>'+R.skimmerN+'대</b> (사용 단별 1대) — 수면 부상 방청유 연속 회수, 회수유 드럼 별도'):'<br>· ⚠️ 오일 스키머 미적용 — 방청유가 순환수에 유화되면 백필터 조기 폐색')
+      +'🛢️ <b>오일 스키머 — 주 여과 수단</b><br>'
+      +(S.oilSkimmer
+        ? ('· 벨트식 <b>'+R.skimmerN+'대</b> (사용 단별 1대) — 수면 부상 방청유 + 부유 이물 연속 회수<br>'
+          +'· 회수유 드럼 별도 설치 · 벨트 폭은 저수조 폭('+(R.stgTanks.filter(function(t){return t.active;})[0]||{dimW:800}).dimW+'mm)에 맞춰 선정<br>'
+          +'· 1차 SUS망 <b>'+S.susMesh+'메시(개구 약 '+R.susMeshUm+'µm)</b>로 조대 오물 침전·차단')
+        : '· ⚠️ <b>오일 스키머 미적용</b> — 방청유가 순환수에 축적되어 세척력이 지속 저하됨. 트레이 세척에서는 필수')
       +'</div>'
 
       // ══ ⑧ 생산·인력 (하단) ══
@@ -2425,7 +2441,7 @@ function renderLeft(){
       const needRerender =
         el.id==='boilerType'||el.id==='containerType'||el.id==='supplyMode'||el.id==='aux1st'
         ||el.id==='meshFilter'||el.id==='sludgeFilter'||el.id==='pumpStrainer'
-        ||el.id==='drainMode'||el.id==='stgTankMode'||el.id==='dlv'||el.id==='wAutoArray'||el.id==='wDistAuto'||el.id==='pumpMode'||el.id==='wTiltAlt'||el.id==='wTiltAngle'||el.id==='wOverlap'||el.id==='dewatTarget'||el.id==='dryTarget'||el.id==='fanPhase'||el.id==='dryHeatMode'||el.id==='dryRadRatio'||el.id==='rhCtrl'||el.id==='dewatRecovery'||el.id==='recovBufferMin'||el.id==='recovHeadDrop'||el.id==='radDT'||el.id==='radPipeLen'||el.id==='tankFrameGap'||el.id==='filterGap'||el.id==='rinseMinDepth'||el.id==='stgTankFixW'||el.id==='dryLenAuto'||el.id==='dryTemp'||el.id==='trayMaxTemp'||el.id==='rate'||el.id==='nozzleLayout'||el.id==='pocketCount'||el.id==='wSprayAngle'||el.id==='rinseWater'
+        ||el.id==='drainMode'||el.id==='stgTankMode'||el.id==='dlv'||el.id==='wAutoArray'||el.id==='wDistAuto'||el.id==='pumpMode'||el.id==='wTiltAlt'||el.id==='wTiltAngle'||el.id==='wOverlap'||el.id==='dewatTarget'||el.id==='dryTarget'||el.id==='fanPhase'||el.id==='dryHeatMode'||el.id==='dryRadRatio'||el.id==='rhCtrl'||el.id==='bagFilter'||el.id==='oilSkimmer'||el.id==='susMesh'||el.id==='dewatRecovery'||el.id==='recovBufferMin'||el.id==='recovHeadDrop'||el.id==='radDT'||el.id==='radPipeLen'||el.id==='tankFrameGap'||el.id==='filterGap'||el.id==='rinseMinDepth'||el.id==='stgTankFixW'||el.id==='dryLenAuto'||el.id==='dryTemp'||el.id==='trayMaxTemp'||el.id==='rate'||el.id==='nozzleLayout'||el.id==='pocketCount'||el.id==='wSprayAngle'||el.id==='rinseWater'
         ||(el.id&&el.id.startsWith('stgType'))
         ||['washDryLen','dewatLen','dryLen','inLen','outLen','moduleGap','trayPitch','qty','tempSensor','rinseTemp','rinseWater','hours','days','targetMonth','workers','wage','trayW','trayD','trayT','wHole','wSprayAngle','wNozzleDist'].indexOf(el.id)>=0||(el.id&&el.id.startsWith('directValve'))
         ||(el.id&&el.id.startsWith('stg'));
