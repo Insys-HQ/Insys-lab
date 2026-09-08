@@ -1219,7 +1219,8 @@ function calcAll(){
     // ★v8.3 저수조 길이 = 해당 단 조 길이 (하부 수납) — 초과 불가
     const bathLen = S.stgLen[i]||1000;
     const maxTankW = S.trayD*CH + 400 - 120;   // ★v9.6 설비 폭 − 양측 프레임 60mm씩 (제작 간섭 방지)
-    const minDep = (S.stgType[i]==='rinse') ? (S.rinseMinDepth||600) : 300;  // ★v8.5 헹굼조 최소 깊이
+    // ★v11.5 헹굼 최소깊이는 탱크 깊이 상한을 넘을 수 없음 (설비 높이 제약과 충돌 방지)
+    const minDep = Math.min(S.tankMaxDepth||600, (S.stgType[i]==='rinse') ? (S.rinseMinDepth||400) : 300);
     let tankLenOver=false, tankReqLen=0, depthMax=false;
     if(S.stgTankMode==='auto'){
       const need = optTank;
