@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>트레이 세척·탈수·건조 시뮬레이터 v10.7 | 인시스 AI혁신 연구개발실</title>
+<title>트레이 세척·탈수·건조 시뮬레이터 v10.8 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -164,7 +164,7 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="btnLoad" style="background:#2962ff;">📂 불러오기</button>
     <button class="on" id="bPC">PC</button>
     <button id="bMB">모바일</button>
-    <span class="vb">v10.7</span>
+    <span class="vb">v10.8</span>
   </div>
 </div>
 </div>
@@ -207,13 +207,13 @@ footer{text-align:center;font-size:13px;color:#7a90a4;padding:14px;}
     <button id="closeLoad" style="background:#eceff1;color:#455a64;border:none;border-radius:8px;padding:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">닫기</button>
   </div>
 </div>
-<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v10.7 · 2026</footer>
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 시뮬레이터 v10.8 · 2026</footer>
 <script>
 // ═══════════════════════════════════════════════
-// 트레이 세척·탈수·건조 시뮬레이터 v10.7
+// 트레이 세척·탈수·건조 시뮬레이터 v10.8
 // 좌우 2CH 세워서 투입 (외벽+격벽 각 채널 독립 노즐)
 // ═══════════════════════════════════════════════
-const VER='10.7';
+const VER='10.8';
 const gi=id=>document.getElementById(id);
 const gv=id=>{const e=gi(id);return e?e.value:'';};
 
@@ -1927,7 +1927,7 @@ function renderLeft(){
       +'<div class="g2">'+sel('stgTankMode','저수조 입력',[['auto','자동 최적(회전율)'],['volume','용량 입력→치수'],['dim','치수 입력→용량']],S.stgTankMode)+fld('stgTankFixW','저수조 폭(고정)','mm',S.stgTankFixW)+'</div>'
       +'<div class="g2" style="margin-top:6px;">'+fld('tankFrameGap','프레임 여유(편측)','mm',S.tankFrameGap)+'<div class="fl"><label>저수조 길이 산정</label><input type="text" value="조 길이 − '+(S.tankFrameGap*2)+'mm" readonly style="background:#eef4fa;border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:14px;font-weight:700;color:#0b5a80;font-family:inherit;"></div></div>'
       +'<div class="g2" style="margin-top:6px;">'+fld('filterGap','필터 설치 공간','mm',S.filterGap)+fld('rinseMinDepth','헹굼조 최소깊이','mm',S.rinseMinDepth)+'</div>'
-      +'<table class="tbl" style="margin-top:6px;"><thead><tr><th>단</th><th>유량</th><th>회전</th><th>조→저수조<br>길이(mm)</th><th>상단레벨<br>오버플로우</th><th>용량(L)</th><th>폭×길이×깊이(mm)</th></tr></thead><tbody>'
+      +'<table class="tbl" style="margin-top:6px;"><thead><tr><th>단</th><th>유량</th><th>회전</th><th>조 길이 /<br>저수조 길이</th><th>상단레벨<br>오버플로우</th><th>용량(L)</th><th>폭×길이×깊이(mm)</th></tr></thead><tbody>'
       +R.stgTanks.map(function(t){
           var nm=['1차','2차','3차헹굼'][t.idx];
           if(!t.active) return '<tr style="opacity:.4;"><td>'+nm+'</td><td colspan="6" style="color:#999;">미사용 (저수조·펌프 불필요)</td></tr>';
@@ -1946,13 +1946,13 @@ function renderLeft(){
           var overMark = (t.tankLenOver ? ' <span style="color:#c62828;font-weight:700;font-size:13px;">⚠️용량부족 · 조길이 '+t.tankReqLen+'mm 필요</span>' : '')
             + (t.depthMax ? ' <span style="color:#e65100;font-weight:700;font-size:13px;">⚠️깊이 상한 900mm — 증설 여유 없음</span>' : '');
           var lenOK = t.dimD < t.bathLen;
-          var lenCell = '<span style="font-size:13px;font-weight:700;color:'+(lenOK?'#1b5e20':'#c62828')+';">'+t.bathLen+'<span style="font-weight:400;color:#5a7088;">→'+t.dimD+'</span>'+(lenOK?' ✅':' ❌')+'</span>';
+          var lenCell = '<span style="font-size:13px;line-height:1.4;">조 <b>'+t.bathLen+'</b><br><span style="color:'+(lenOK?'#1b5e20':'#c62828')+';">저수조 <b>'+t.dimD+'</b></span> <span style="color:#5a7088;">(−'+(t.bathLen-t.dimD)+' 프레임)</span>'+(lenOK?' ✅':' ❌')+'</span>';
           var lvlCell = '<span style="font-size:13px;font-weight:700;color:#0d47a1;">-'+t.topDrop+'mm</span><br><span style="font-size:13px;color:#5a7088;">'+(t.overflowTo===null?'최하류·배수':'→'+(t.overflowTo+1)+'단')+'</span>';
           var turnMark = t.actTurnover<1.5?'⚠️짧음':t.actTurnover>4?'⚠️과대':'✅';
           return '<tr><td style="font-weight:700;">'+nm+'</td><td>'+(t.flow?t.flow.toFixed(0):'—')+'LPM</td><td style="font-size:13px;">'+t.actTurnover.toFixed(1)+'분'+turnMark+'</td><td>'+lenCell+'</td><td>'+lvlCell+'</td><td>'+volCell+'</td><td>'+dimCell+overMark+'</td></tr>';
         }).join('')
       +'</tbody></table>'
-      +'<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">💧 저수조 '+R.actStages.length+'개 · 총 <b>'+R.tankL+'L</b> <br>★ <b>저수조 길이 = 조 길이 − 프레임 여유(양측 '+(S.tankFrameGap*2)+'mm)</b> — 프레임 구조상 조보다 반드시 짧게. 폭 고정 · 용량은 <b>깊이</b>로 흡수<br>★ 세척조 하단 ↔ 저수조 상단 <b>'+S.filterGap+'mm</b> 확보 — 철망 필터·슬러지 필터 설치 공간<br>★ 캐스케이드: <b>'+(R.topStage+1)+'단(헹굼) 상단 최고</b>, 단차 '+S.overflowStep+'mm씩 낮아져 자연 유하 '+(R.cascadeOK?'✅':'❌ 역류위험')+' · 헹굼조 최소 깊이 <b>'+S.rinseMinDepth+'mm</b><br>★ 설비 높이 = 트레이 '+S.trayW+' + 헤더400 + 필터 '+S.filterGap+' + 조바닥 '+R.tankBottomMax+' + 프레임300 = <b>'+R.equipDim.equipHeight+'mm</b></div>'
+      +'<div class="chbox" style="background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;">💧 저수조 '+R.actStages.length+'개 · 총 <b>'+R.tankL+'L</b> <br>★ <b>저수조 길이 = 조 길이 − 프레임 여유(양측 '+(S.tankFrameGap*2)+'mm)</b> — 조 아래에 들어가는 저수조의 제작 치수(조 길이를 줄이라는 뜻이 아님). 프레임 구조상 조보다 반드시 짧게. 폭 고정 · 용량은 <b>깊이</b>로 흡수<br>★ 세척조 하단 ↔ 저수조 상단 <b>'+S.filterGap+'mm</b> 확보 — 철망 필터·슬러지 필터 설치 공간<br>★ 캐스케이드: <b>'+(R.topStage+1)+'단(헹굼) 상단 최고</b>, 단차 '+S.overflowStep+'mm씩 낮아져 자연 유하 '+(R.cascadeOK?'✅':'❌ 역류위험')+' · 헹굼조 최소 깊이 <b>'+S.rinseMinDepth+'mm</b><br>★ 설비 높이 = 트레이 '+S.trayW+' + 헤더400 + 필터 '+S.filterGap+' + 조바닥 '+R.tankBottomMax+' + 프레임300 = <b>'+R.equipDim.equipHeight+'mm</b></div>'
 
       // ══ ⑥ 배수 · 단열 ══
       +'<div class="st">⑤ 배수 · 단열</div>'
