@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>트레이 세척·탈수·건조 통합설비 제작 사양서 v1.0 | 인시스 AI혁신 연구개발실</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0d2137;--teal:#0d7fa8;--steel:#3a6b8a;--ink:#1c2b3a;
+  --bg:#eef2f6;--card:#fff;--line:#dde5ee;
+  --good:#1b5e20;--warn:#e65100;--bad:#b71c1c;--hi:#0d47a1;
+}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6;}
+@media(min-width:768px){body{font-size:16px;}}
+.hdr{background:linear-gradient(120deg,#0d2137 0%,#0d7fa8 100%);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.22);}
+.nav-inner{max-width:1100px;margin:0 auto;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.hdr-t{font-size:17px;font-weight:900;letter-spacing:-.3px;}
+.hdr-s{font-size:13px;opacity:.86;font-weight:400;}
+.hdr-r{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.hdr-r button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.32);color:#fff;padding:5px 11px;border-radius:7px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;}
+.hdr-r button.on{background:#fff;color:var(--navy);}
+.vb{background:rgba(255,255,255,.24);padding:4px 10px;border-radius:7px;font-size:13px;font-weight:700;}
+.wrap{max-width:1100px;margin:0 auto;padding:10px 14px;}
+.wrap.mobile{max-width:430px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden;}
+.ch{background:#f4f8fb;border-bottom:1px solid var(--line);padding:8px 12px;display:flex;align-items:center;gap:7px;}
+.cn{background:var(--navy);color:#fff;width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex:none;}
+.cl{font-size:15px;font-weight:800;color:var(--navy);}
+.cb{padding:10px 12px;}
+h3{font-size:14px;font-weight:800;color:var(--teal);margin:10px 0 5px;padding-left:7px;border-left:3px solid var(--teal);}
+h3:first-child{margin-top:0;}
+p{margin:5px 0;}
+table{width:100%;border-collapse:collapse;margin:5px 0 8px;font-size:13px;}
+@media(min-width:768px){table{font-size:15px;}}
+th{background:#e8eff5;color:var(--navy);font-weight:800;padding:6px 8px;border:1px solid var(--line);text-align:center;}
+td{padding:6px 8px;border:1px solid var(--line);text-align:center;}
+td.l{text-align:left;}
+td.k{background:#f7fafc;font-weight:700;text-align:left;color:var(--navy);}
+td.v{font-weight:800;color:var(--hi);}
+.note{background:#eef6fb;border:1px solid #cde3f0;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:13px;color:#0b5a80;line-height:1.6;}
+.warn{background:#fff8f0;border:1px solid #ffd9a8;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:13px;color:#8a5a00;line-height:1.6;}
+.good{background:#eef7ef;border:1px solid #c3e0c6;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:13px;color:var(--good);line-height:1.6;}
+ul{margin:5px 0 5px 17px;}
+li{margin:2px 0;}
+b{font-weight:800;}
+.tag{display:inline-block;background:#e8eff5;color:var(--navy);border-radius:5px;padding:1px 7px;font-size:13px;font-weight:700;margin-right:4px;}
+footer{text-align:center;color:#6b8098;font-size:13px;padding:12px 0 18px;}
+.toc{display:flex;flex-wrap:wrap;gap:5px;}
+.toc a{background:#f4f8fb;border:1px solid var(--line);border-radius:6px;padding:4px 9px;font-size:13px;color:var(--navy);text-decoration:none;font-weight:700;}
+</style>
+</head>
+<body>
+<div class="hdr"><div class="nav-inner">
+  <div><div class="hdr-t">트레이 세척·탈수·건조 통합설비 제작 사양서</div>
+  <div class="hdr-s">인시스 AI혁신 연구개발실 · 인텍코리아 안산공장</div></div>
+  <div class="hdr-r"><span class="vb">v1.0</span>
+    <button id="bm" class="on" onclick="setView('mobile')">모바일</button>
+    <button id="bp" onclick="setView('pc')">PC</button></div>
+</div></div>
+
+<div class="wrap mobile" id="wrap">
+
+<div class="card"><div class="ch"><span class="cn">0</span><span class="cl">문서 정보</span></div><div class="cb">
+<table>
+<tr><td class="k">문서번호</td><td class="l">INSYS-TW-SPEC-2026-01</td></tr>
+<tr><td class="k">버전 / 작성일</td><td class="l">v1.0 / 2026-09-08</td></tr>
+<tr><td class="k">작성</td><td class="l">인시스 AI혁신 연구개발실 (ys.kim@in-sys.co.kr)</td></tr>
+<tr><td class="k">설치 장소</td><td class="l">인텍코리아 안산공장</td></tr>
+<tr><td class="k">대상 설비</td><td class="l">플라스틱 트레이 세척·탈수·건조 통합설비 1식</td></tr>
+</table>
+<div class="toc">
+<a href="#s1">1 개요</a><a href="#s2">2 치수</a><a href="#s3">3 세척부</a><a href="#s4">4 순환·여과</a>
+<a href="#s5">5 탈수부</a><a href="#s6">6 건조부</a><a href="#s7">7 유틸리티</a><a href="#s8">8 컨베이어</a>
+<a href="#s9">9 전기·제어</a><a href="#s10">10 성능·검수</a><a href="#s11">11 제작조건</a><a href="#s12">12 협의사항</a>
+</div>
+</div></div>
+
+<div class="card" id="s1"><div class="ch"><span class="cn">1</span><span class="cl">설비 개요</span></div><div class="cb">
+<h3>1.1 목적</h3>
+<p>플라스틱 트레이의 세척·탈수·건조를 연속 자동화 처리하는 관통식(In-line) 통합설비. 2채널 동시 처리 방식.</p>
+
+<h3>1.2 처리 대상</h3>
+<table>
+<tr><td class="k">트레이 치수</td><td class="v">430 × 330 × 150 mm</td><td class="l">포켓 6개</td></tr>
+<tr><td class="k">트레이 중량</td><td class="v">50 g</td><td class="l">공차 ±10%</td></tr>
+<tr><td class="k">주 오염원</td><td class="v">방청유</td><td class="l">오물량은 적음 (박스 대비)</td></tr>
+<tr><td class="k">설계 오염도</td><td class="v">3등급 (중간)</td><td class="l">성능 보증 기준 조건</td></tr>
+</table>
+
+<h3>1.3 생산 능력</h3>
+<table>
+<tr><td class="k">처리 능력</td><td class="v">1,000 매/h</td><td class="l">2채널 합계 (채널당 500매/h)</td></tr>
+<tr><td class="k">컨베이어 속도</td><td class="v">3.33 m/min</td><td class="l">인버터 가변</td></tr>
+<tr><td class="k">트레이 피치</td><td class="v">400 mm</td><td class="l">2채널 동시 투입</td></tr>
+<tr><td class="k">월 생산량</td><td class="v">176,000 매</td><td class="l">8h × 22일 기준</td></tr>
+<tr><td class="k">투입 인원</td><td class="v">2 명</td><td class="l">투입 1 / 배출 1</td></tr>
+</table>
+</div></div>
+
+<div class="card" id="s2"><div class="ch"><span class="cn">2</span><span class="cl">설비 전체 치수</span></div><div class="cb">
+<h3>2.1 외형</h3>
+<table>
+<tr><th>구분</th><th>치수</th><th>산출 근거</th></tr>
+<tr><td class="k">전장</td><td class="v">10,600 mm</td><td class="l">모듈합 9,600 + 모듈 간격 500×2</td></tr>
+<tr><td class="k">폭</td><td class="v">1,060 mm</td><td class="l">트레이깊이 330×2CH + 격벽 100 + 프레임 300</td></tr>
+<tr><td class="k">높이</td><td class="v">2,170 mm</td><td class="l">트레이 430 + 상부헤더 400 + 필터공간 200 + 조바닥 840 + 프레임 300</td></tr>
+</table>
+<div class="good">40ft 컨테이너 적재 가능 (내부 12,032 × 2,352 × 2,393 mm 기준, 길이 여유 1,432 mm)</div>
+
+<h3>2.2 모듈 구성</h3>
+<table>
+<tr><th>모듈</th><th>길이</th><th>산출 근거</th></tr>
+<tr><td class="k">입구</td><td class="v">500</td><td class="l">투입부</td></tr>
+<tr><td class="k">세척조</td><td class="v">2,900</td><td class="l">조 1,100 + 1,100 + 700 (각 단 조 길이 합)</td></tr>
+<tr><td class="k">탈수조</td><td class="v">2,200</td><td class="l">나이프 6패스 × 300 + 전후 400</td></tr>
+<tr><td class="k">건조기</td><td class="v">3,500</td><td class="l">시로코팬 배치 최소 길이</td></tr>
+<tr><td class="k">출구</td><td class="v">500</td><td class="l">배출부</td></tr>
+</table>
+<div class="note">단간 칸막이·입출구 물막이는 각 단 조 길이 안에서 제작하며 별도 가산하지 않는다.<br>
+<b>모듈 분할 제작</b> — 각 모듈은 상부 독립 분리 구조로 제작하여 반입·설치가 가능해야 한다.</div>
+</div></div>
+
+<div class="card" id="s3"><div class="ch"><span class="cn">3</span><span class="cl">세척부</span></div><div class="cb">
+<h3>3.1 구성 — 3단 (세척 2단 + 헹굼 1단)</h3>
+<p>단당 1회 통과 제거율에는 상한(약 93%)이 있어 단수를 줄이면 압력·노즐로 보상할 수 없다. 오염도 3등급·65°C 조건에서 압력 4.0 bar·노즐 충분·체류 충분을 가정한 도달 가능 최대 효율은 아래와 같다.</p>
+<table>
+<tr><th>구성</th><th>도달가능 최대 효율</th><th>목표 95%</th></tr>
+<tr><td class="k">1단만</td><td class="v">82.3 %</td><td style="color:var(--bad);font-weight:800;">불가</td></tr>
+<tr><td class="k">1·3단 (2단 생략)</td><td class="v">95.6 %</td><td style="color:var(--warn);font-weight:800;">여유 0.6%p — 실질 불가</td></tr>
+<tr><td class="k">1·2·3단</td><td class="v">97.4 %</td><td style="color:var(--good);font-weight:800;">충족</td></tr>
+</table>
+<div class="note">1·3단은 4.0 bar에서 겨우 목표에 걸치므로 실제 오염 변동을 감안하면 <b>3단이 필수</b>다.</div>
+
+<h3>3.2 단별 사양</h3>
+<table>
+<tr><th>구분</th><th>1차 세척</th><th>2차 세척</th><th>3차 헹굼</th></tr>
+<tr><td class="k">조 길이</td><td class="v">1,100 mm</td><td class="v">1,100 mm</td><td class="v">700 mm</td></tr>
+<tr><td class="k">분사 압력</td><td class="v">1.50 bar</td><td class="v">1.08 bar</td><td class="v">1.20 bar</td></tr>
+<tr><td class="k">노즐 배열</td><td>높이 4 × 길이 4줄<br>= 16/면</td><td>높이 4 × 길이 4줄<br>= 16/면</td><td>높이 4 × 길이 2줄<br>= 8/면</td></tr>
+<tr><td class="k">노즐 총수</td><td class="v">64 개</td><td class="v">64 개</td><td class="v">32 개</td><td></td></tr>
+<tr><td class="k">유량</td><td class="v">233 LPM</td><td class="v">198 LPM</td><td class="v">104 LPM</td></tr>
+<tr><td class="k">펌프 동력</td><td class="v">0.78 kW</td><td class="v">0.47 kW</td><td class="v">0.28 kW</td></tr>
+<tr><td class="k">펌프 정격유량</td><td>240 LPM</td><td>200 LPM</td><td>110 LPM</td></tr>
+</table>
+<p style="font-size:13px;color:#5a7088;">※ 노즐 총수 = 면당 개수 × 2면(외벽+격벽) × 2CH</p>
+
+<h3>3.3 노즐 사양</h3>
+<table>
+<tr><td class="k">노즐 형식</td><td class="v">플랫팬(부채꼴)</td><td class="k">오리피스</td><td class="v">2.5 mm</td></tr>
+<tr><td class="k">분사각</td><td class="v">60 °</td><td class="k">트레이면 이격</td><td class="v">120 mm</td></tr>
+<tr><td class="k">노즐 간격</td><td class="v">114 mm</td><td class="k">겹침률</td><td class="v">15 %</td></tr>
+<tr><td class="k">팬 경사각</td><td class="v">15 °</td><td class="k">경사 방향</td><td class="v">노즐마다 좌·우 교대(V자)</td></tr>
+<tr><td class="k">배치</td><td class="v">교차(cross)</td><td class="k">세척수 온도</td><td class="v">65 °C</td></tr>
+</table>
+<div class="warn"><b>필수 조건</b>
+<ul>
+<li>트레이면 충돌은 <b>직각 유지</b>. 헤더 배관은 수직 설치하고 <b>개별 노즐의 팬 방향만</b> 기울인다.</li>
+<li>높이방향 노즐은 <b>4개/열 이상</b>. 미만이면 트레이 높이 430mm를 덮지 못해 미세척 밴드가 발생한다.</li>
+<li>노즐 홀더는 <b>팬 방향 15~30° 회전 조정이 가능한 형식</b>으로 한다.</li>
+<li>각 단 급수 배관에 <b>압력조절 밸브</b>를 설치한다.</li>
+<li>펌프는 <b>3.5 bar까지 출력 가능한 여유 사양</b>으로 선정한다(시운전 중 압력 조정 대비).</li>
+</ul></div>
+
+<h3>3.4 저수조</h3>
+<table>
+<tr><th>구분</th><th>1차</th><th>2차</th><th>3차 헹굼</th></tr>
+<tr><td class="k">치수 (폭×길이×깊이)</td><td class="v">800×900×740</td><td class="v">800×900×650</td><td class="v">800×500×670</td></tr>
+<tr><td class="k">유효 용량</td><td class="v">400 L</td><td class="v">351 L</td><td class="v">201 L</td></tr>
+<tr><td class="k">회전 시간</td><td>1.7 분</td><td>1.8 분</td><td>1.9 분</td></tr>
+<tr><td class="k">상단 레벨</td><td>−100 mm</td><td>−50 mm</td><td>±0 mm (최상단)</td></tr>
+<tr><td class="k">조 바닥 깊이</td><td>−840 mm</td><td>−700 mm</td><td>−670 mm</td></tr>
+</table>
+<div class="warn"><b>구조 조건</b>
+<ul>
+<li>저수조 길이는 해당 조 길이보다 <b>편측 100mm씩 짧게</b> 제작 (프레임 간섭 방지).</li>
+<li>저수조 폭은 설비 폭에서 <b>양측 60mm씩 공제</b>한다.</li>
+<li>세척조 하단과 저수조 상단 사이 <b>200mm 공간 확보</b> (필터 설치용).</li>
+<li>헹굼조 최소 깊이 <b>600mm 이상</b>.</li>
+<li>캐스케이드 오버플로우: <b>3차(최상단) → 2차 → 1차</b> 순으로 단차 50mm씩 낮춰 자연 유하되게 한다.</li>
+<li>각 저수조 최하단에 <b>전량 배수 드레인 밸브</b>를 설치한다.</li>
+</ul></div>
+</div></div>
+
+<div class="card" id="s4"><div class="ch"><span class="cn">4</span><span class="cl">세척수 순환·여과 계통</span></div><div class="cb">
+<h3>4.1 순환 흐름 — 무동력 캐스케이드</h3>
+<table>
+<tr><td class="k">①</td><td class="l"><b>탈수부 낙수</b> → 하부 회수조 저장 (80 L, 800 × 1,700 × D250)</td></tr>
+<tr><td class="k">②</td><td class="l">회수조 → <b>헹굼조로 자연 유하</b> — 회수조 상단을 헹굼조보다 <b>50mm 높게</b> 설치하여 이송 펌프 불필요</td></tr>
+<tr><td class="k">③</td><td class="l">헹굼조 → 2차 → 1차 <b>오버플로우</b> (단차 50mm)</td></tr>
+<tr><td class="k">④</td><td class="l">최종 1차 저수조 → <b>SUS망</b> → 급수 펌프 재순환</td></tr>
+</table>
+<div class="good">회수량 16.4 L/h가 헹굼 청수를 대체하여 청수 소요가 150 → 134 L/h로 감소한다.</div>
+
+<h3>4.2 여과 사양</h3>
+<p>트레이는 오물량이 적고 <b>방청유가 주 오염원</b>이므로 백필터를 적용하지 않는다.</p>
+<table>
+<tr><td class="k">오일 스키머</td><td class="v">벨트식 3대</td><td class="l">사용 단별 1대, 수면 부상 방청유 및 부유 이물 연속 회수</td></tr>
+<tr><td class="k">회수유 처리</td><td class="v">드럼 별도</td><td class="l">벨트 폭은 저수조 폭 800mm에 맞춰 선정</td></tr>
+<tr><td class="k">SUS망 필터</td><td class="v">60 메시</td><td class="l">개구 약 250µm, 각 조 하단 — 조대 오물 침전·차단</td></tr>
+<tr><td class="k">펌프 스트레이너</td><td class="v">전 펌프</td><td class="l">흡입측 설치</td></tr>
+<tr><td class="k">백필터</td><td class="v" style="color:var(--warn);">미적용</td><td class="l">4.3 참조</td></tr>
+</table>
+<div class="note"><b>백필터 미적용 근거</b> — 노즐 오리피스가 2.5mm이므로 SUS망 60메시(250µm)면 막힘 방지에 충분하다. 백필터는 소모품 교체와 인력이 필요해 무인 운전에 불리하며, 유화된 방청유가 유입되면 오히려 조기 폐색된다.</div>
+
+<h3>4.3 순환수 관리 (운전 조건)</h3>
+<div class="warn">유화된 방청유는 오일 스키머로 회수되지 않고 순환수에 축적된다. 따라서 <b>순환수 정기 배수·교체 주기를 운전 기준으로 정한다.</b>
+<ul>
+<li>시운전 시 순환수 오염도(탁도 또는 유분 농도)를 주기적으로 측정해 교체 주기를 확정한다.</li>
+<li>박스 세척기 등 오물량이 많은 설비를 추가할 경우 동일 계통에 백필터(하우징 2기, #2 백, 25µm, 차압 게이지 관리)를 증설할 수 있도록 <b>배관에 분기·바이패스를 예비</b>한다.</li>
+</ul></div>
+</div></div>
+
+<div class="card" id="s5"><div class="ch"><span class="cn">5</span><span class="cl">탈수부</span></div><div class="cb">
+<h3>5.1 사양</h3>
+<table>
+<tr><td class="k">방식</td><td class="v">에어나이프</td><td class="k">통과 횟수</td><td class="v">6 패스</td></tr>
+<tr><td class="k">입사각</td><td class="v">60 °</td><td class="k">슬롯 폭</td><td class="v">1.0 mm</td></tr>
+<tr><td class="k">트레이면 이격</td><td class="v">30 mm</td><td class="k">나이프 정압</td><td class="v">14 kPa</td></tr>
+<tr><td class="k">토출 속도</td><td class="v">92 m/s</td><td class="k">충돌 풍속</td><td class="v">75 m/s</td></tr>
+<tr><td class="k">블로워</td><td class="v">0.75 kW × 24대</td><td class="k">합계</td><td class="v">18.0 kW</td></tr>
+<tr><td class="k">토출구</td><td class="v">25A 직결</td><td class="k">잔수</td><td class="v">0.42 L/h</td></tr>
+</table>
+
+<h3>5.2 이격거리 — 가장 민감한 변수</h3>
+<p>슬롯 제트의 풍속은 코어 구간(슬롯폭 × 약 20 = 20mm) 이후 거리의 제곱근에 비례해 감쇠한다. 물막 제거 임계 동압(3 kPa, 약 71 m/s)을 확보할 수 있는 거리는 정압에 따라 다르다.</p>
+<table>
+<tr><th>정압</th><th>토출 풍속</th><th>임계 확보 거리</th><th>허용 이격</th></tr>
+<tr><td class="k">14 kPa</td><td>92 m/s</td><td class="v">30 mm</td><td>30~40 mm</td></tr>
+<tr><td class="k">20 kPa</td><td>110 m/s</td><td class="v">44 mm</td><td>30~40 mm</td></tr>
+<tr><td class="k">26 kPa</td><td>125 m/s</td><td class="v">57 mm</td><td>30~55 mm</td></tr>
+<tr><td class="k">30 kPa</td><td>134 m/s</td><td class="v">65 mm</td><td>30~65 mm</td></tr>
+</table>
+<div class="warn">14 kPa 설계에서 이격이 30 → 40mm로 벌어지면 탈수효율이 95 → 72%로 급락한다.
+<ul>
+<li>에어나이프는 <b>LM 리니어가이드 + 눈금 핸들</b>에 장착해 <b>20~150mm 범위 조정</b>이 가능해야 한다.</li>
+<li>트레이 요동·기종 편차로 30mm 유지가 어려우면 <b>정압을 20 kPa 이상으로 올려 허용 이격을 넓히는 것</b>을 시운전에서 결정한다.</li>
+<li>30 kPa 초과 정압은 링블로어 라인업 한계를 넘으므로 2단 직렬 또는 터보블로어가 필요하다.</li>
+</ul>
+<b>제트 감쇠 계수는 설계 근사값이다.</b> 제작사 에어나이프의 거리별 실측 풍속 곡선을 입수해 이격을 확정한다.</div>
+
+<h3>5.3 블로워 배분 (선택)</h3>
+<table>
+<tr><th>배분</th><th>블로워 규격</th><th>총 전력</th><th>배관</th></tr>
+<tr><td class="k">나이프 1개당 1대 (채택)</td><td class="v">0.75 kW × 24대</td><td class="v">18.0 kW</td><td>25A 직결, Y분기 불필요</td></tr>
+<tr><td class="k">나이프 2개당 1대</td><td>2.2 kW × 12대</td><td>26.4 kW</td><td>40A → Y분기 32A×2</td></tr>
+<tr><td class="k">나이프 4개당 1대</td><td>5.5 kW × 6대</td><td>33.0 kW</td><td>50A → Y분기 40A×4</td></tr>
+</table>
+<div class="note">소형기 다수 구성이 전력·배관 모두 유리하다. 다만 관리 대상이 24대로 늘어나므로 유지보수 부담과 소음 합산을 제작사와 협의해 최종 결정한다. 2개당 1대(12대, 26.4 kW)가 관리 측면의 대안이다.</div>
+
+<div class="warn"><b>필수 조건</b>
+<ul>
+<li>에어나이프는 측면 양쪽에 <b>사선 배치</b>하여 위에서 아래로 쓸어내리는 구조로 한다.</li>
+<li>낙수는 전량 하부 회수조로 유도되어야 한다.</li>
+</ul></div>
+</div></div>
+
+<div class="card" id="s6"><div class="ch"><span class="cn">6</span><span class="cl">건조부</span></div><div class="cb">
+<h3>6.1 건조 조건</h3>
+<table>
+<tr><td class="k">건조기 길이</td><td class="v">3,500 mm</td><td class="k">체류 시간</td><td class="v">63 초</td></tr>
+<tr><td class="k">내부 온도</td><td class="v">50 °C</td><td class="k">트레이 허용 상한</td><td class="v" style="color:var(--bad);">70 °C</td></tr>
+<tr><td class="k">열풍 풍량</td><td class="v">90 m³/min</td><td class="k">순환 재사용률</td><td class="v">80 %</td></tr>
+</table>
+<div class="warn"><b>온도 상한 준수 필수</b> — 트레이 열변형은 되돌릴 수 없다. 건조실 온도가 허용 상한을 넘지 않도록 설계·제어한다. 온도를 못 올리는 만큼 풍량·체류로 건조력을 확보하는 구성이다.</div>
+
+<h3>6.2 송풍·순환</h3>
+<table>
+<tr><td class="k">시로코팬</td><td class="v">TFB-F19DT × 4대</td><td class="l">상부 배치, 1,000mm 간격</td></tr>
+<tr><td class="k">팬 사양</td><td class="v">0.3 마력 / 삼상</td><td class="l">1,500 m³/h · 31 mmAq · 190 W · 흡토출 Ø200 · 11 kg</td></tr>
+<tr><td class="k">팬 총 소비전력</td><td class="v">0.76 kW</td><td class="l">190W × 4대</td></tr>
+<tr><td class="k">측면 순환덕트</td><td class="v">원형 Ø275</td><td class="l">좌·우 2계통, 계통당 분기 2개</td></tr>
+<tr><td class="k">덕트 필요 정압</td><td class="v">21 mmAq</td><td class="l">기종 31 mmAq 대비 여유</td></tr>
+<tr><td class="k">가열</td><td class="v">전기 덕트히터 11.1 kW</td><td class="l">시로코팬은 송풍 전용(히터 미내장)</td></tr>
+</table>
+<div class="note">삼상 기종을 채택한다. 동일 0.3마력에서 단상 260W 대비 삼상 190W로 <b>27% 절전</b>이며, 연속 운전 설비에 적합하다.</div>
+
+<h3>6.3 온·습도 연동 배기 댐퍼 제어</h3>
+<table>
+<tr><th>내부 상대습도</th><th>≤65%</th><th>70%</th><th>75%</th><th>80%</th><th>≥85%</th></tr>
+<tr><td class="k">배기 댐퍼 개방률</td><td class="v">20%</td><td>26%</td><td>33%</td><td>39%</td><td class="v">45%</td></tr>
+</table>
+<p>저온 건조 특성상 내부 포화를 방지하기 위한 비례 제어를 적용한다. RH가 낮으면 순환을 극대화해 열을 회수하고, 높아지면 배기를 비례 개방한다.</p>
+</div></div>
+
+<div class="card" id="s7"><div class="ch"><span class="cn">7</span><span class="cl">온수 공급 설비</span></div><div class="cb">
+<table>
+<tr><td class="k">열원</td><td class="v">가스 보일러</td><td class="k">운전 부하</td><td class="v">35.6 kW</td></tr>
+<tr><td class="k">정격 용량</td><td class="v">49.7 kW</td><td class="k">저탕 탱크</td><td class="v">750 L</td></tr>
+<tr><td class="k">축열 버퍼</td><td class="v">11.8 분</td><td class="k">초기 승온</td><td class="v">약 34 분</td></tr>
+<tr><td class="k">탱크 대기손실</td><td class="v">0.10 kW</td><td class="k">총 저수량</td><td class="v">952 L</td></tr>
+</table>
+<div class="note"><b>탱크 용량 근거</b> — 750L은 필요 축열량(550L) 이상이면서 표준 규격 중 최소다. 500L로 낮추면 피크 대응을 위해 보일러 정격이 87.8 kW로 올라간다. 2,000L까지 키우면 보일러를 더 줄일 수 있으나 승온 시간이 79분으로 늘어난다.<br>
+<b>하이브리드 옵션</b> — 건조 가열을 온수 코일로 전환하면 전기요금이 줄고 가스요금이 늘어난다. 순 절감은 분담률 60%에서 월 약 4.2만원이며, 보일러 정격 증설·배관·3-way 밸브(25A, Cv 6.3)·순환펌프 초기투자와 비교해 판단한다.</div>
+</div></div>
+
+<div class="card" id="s8"><div class="ch"><span class="cn">8</span><span class="cl">컨베이어</span></div><div class="cb">
+<table>
+<tr><td class="k">형식</td><td class="v">체인 컨베이어 2채널</td><td class="k">트레이 피치</td><td class="v">400 mm</td></tr>
+<tr><td class="k">클립 간격</td><td class="v">500 mm</td><td class="k">속도</td><td class="v">3.33 m/min (인버터)</td></tr>
+<tr><td class="k">계산 부하</td><td class="v">0.28 kW</td><td class="k">모터 용량</td><td class="v">0.75 kW 기어드모터</td></tr>
+<tr><td class="k">라인상 트레이</td><td class="v">56 매</td><td class="k">총 하중</td><td class="v">106 kg</td></tr>
+</table>
+<p>가이드봉은 중간·상단에 설치하여 트레이 이탈과 요동을 방지한다. 트레이 요동은 에어나이프 이격 유지에 직접 영향을 주므로 중요하다.</p>
+</div></div>
+
+<div class="card" id="s9"><div class="ch"><span class="cn">9</span><span class="cl">전기 · 제어</span></div><div class="cb">
+<h3>9.1 전력</h3>
+<table>
+<tr><th>구분</th><th>용량</th><th>비고</th></tr>
+<tr><td class="k">세척 펌프</td><td class="v">1.53 kW</td><td class="l">0.78 + 0.47 + 0.28</td></tr>
+<tr><td class="k">에어나이프 블로워</td><td class="v">18.0 kW</td><td class="l">0.75 kW × 24대</td></tr>
+<tr><td class="k">건조 히터</td><td class="v">11.1 kW</td><td class="l">전기 덕트히터</td></tr>
+<tr><td class="k">시로코팬</td><td class="v">0.76 kW</td><td class="l">190 W × 4대</td></tr>
+<tr><td class="k">컨베이어 모터</td><td class="v">0.75 kW</td><td class="l">인버터</td></tr>
+<tr><td class="k">배수·기타</td><td class="v">잔여</td><td class="l">-</td></tr>
+<tr style="background:#e8f5e9;"><td class="k">총 정격</td><td class="v" style="font-size:16px;">42.3 kW</td><td class="l">실운전 32.2 kW</td></tr>
+</table>
+<p>전원: 삼상 380V 60Hz</p>
+
+<h3>9.2 PLC 입출력</h3>
+<table>
+<tr><td class="k">AI-1</td><td class="l">건조실 온·습도 복합센서 (4~20mA, 입구측·출구측 2점)</td></tr>
+<tr><td class="k">AO-1</td><td class="l">배기 댐퍼 액추에이터 (0~10V 비례)</td></tr>
+<tr><td class="k">AO-2</td><td class="l">순환 댐퍼 액추에이터 (0~10V, 배기와 역동작)</td></tr>
+<tr><td class="k">AO-3</td><td class="l">전기히터 SSR 출력 (위상제어)</td></tr>
+<tr><td class="k">DI</td><td class="l"><b>과열 인터록</b> — 건조실 75°C 초과 시 히터 강제 차단</td></tr>
+<tr><td class="k">DO</td><td class="l">시로코팬 4대 운전 출력 (팬 정지 시 가열 인터록)</td></tr>
+</table>
+
+<h3>9.3 안전·보호</h3>
+<ul>
+<li><b>건조실 과열 인터록</b> — 트레이 열변형 방지. 비용 대비 효과가 크므로 반드시 포함</li>
+<li>팬 정지 시 히터 차단 인터록</li>
+<li>각 펌프 공회전 방지 (저수위 센서)</li>
+<li>비상정지 — 각 모듈 1개소 이상</li>
+</ul>
+</div></div>
+
+<div class="card" id="s10"><div class="ch"><span class="cn">10</span><span class="cl">성능 기준 및 검수 조건</span></div><div class="cb">
+<h3>10.1 설계 성능 (오염도 3등급 기준)</h3>
+<table>
+<tr><th>공정</th><th>목표</th><th>설계값</th></tr>
+<tr><td class="k">세척</td><td>95% 이상</td><td class="v">95.1 %</td></tr>
+<tr><td class="k">탈수</td><td>95% 이상</td><td class="v">97.2 %</td></tr>
+<tr><td class="k">건조</td><td>95% 이상</td><td class="v">96.8 %</td></tr>
+</table>
+
+<h3>10.2 체류 시간 여유</h3>
+<table>
+<tr><th>공정</th><th>확보 체류</th><th>필요 체류</th><th>판정</th></tr>
+<tr><td class="k">세척</td><td class="v">52 초</td><td>42 초</td><td style="color:var(--good);font-weight:800;">충족</td></tr>
+<tr><td class="k">탈수</td><td class="v">40 초</td><td>7 초</td><td style="color:var(--good);font-weight:800;">충족</td></tr>
+<tr><td class="k">건조</td><td class="v">63 초</td><td>11 초</td><td style="color:var(--good);font-weight:800;">충족</td></tr>
+</table>
+
+<h3>10.3 검수 조건 (계약 반영 필수)</h3>
+<div class="warn"><b>본 사양서의 성능 수치는 설계 계산값이며 실물 검증 결과가 아니다.</b> 아래 조건을 계약에 반영한다.
+<ul>
+<li><b>샘플 트레이 실물 테스트를 검수 조건으로 한다.</b> 실제 오염이 묻은 트레이로 세척·탈수·건조 결과를 확인하고, 그 결과를 성능 판정의 근거로 삼는다.</li>
+<li><b>시운전 중 조정 가능 항목을 확보한다</b> — 노즐 팬 각도 15~30°, 각 단 분사 압력, 에어나이프 이격 20~150mm, 컨베이어 속도</li>
+<li><b>적용 오염도 조건</b> — 본 사양의 성능은 오염도 3등급 기준이다. 실제 오염이 이를 초과하면(오염도 5 기준 최대 92.2%) 세척조 연장 또는 4단 구성이 필요하다.</li>
+</ul></div>
+
+<h3>10.4 제작사 확인 필요 항목</h3>
+<p>아래는 당사 산출값이므로 제작사 카탈로그·실측으로 대조하고 차이가 있으면 근거를 제시한다.</p>
+<table>
+<tr><td class="k">1</td><td class="l">블로워 0.75 kW × 24대 사양 및 대수 (나이프 1개당 1대 직결 방식)</td></tr>
+<tr><td class="k">2</td><td class="l"><b>에어나이프 거리별 풍속 곡선</b> — 이격 확정의 근거</td></tr>
+<tr><td class="k">3</td><td class="l">시로코팬 TFB-F19DT 풍량·정압</td></tr>
+<tr><td class="k">4</td><td class="l">세척 압력 1.5 bar의 실제 오염 제거 가능 여부</td></tr>
+</table>
+</div></div>
+
+<div class="card" id="s11"><div class="ch"><span class="cn">11</span><span class="cl">제작 일반 조건</span></div><div class="cb">
+<table>
+<tr><td class="k">조 재질</td><td class="l">STS304 이상 (세척액 접촉부 전체)</td></tr>
+<tr><td class="k">프레임</td><td class="l">SS400 + 방청 도장, 또는 STS</td></tr>
+<tr><td class="k">배관</td><td class="l">STS 또는 강관, 온수부 보온 25mm 이상</td></tr>
+<tr><td class="k">모듈 분할</td><td class="l">입구 / 세척 / 탈수 / 건조 / 출구 상부 독립 분리</td></tr>
+<tr><td class="k">반입 조건</td><td class="l">설비 높이 2,170mm · 전장 10,600mm — 반입구·천장고·설치 길이 사전 확인</td></tr>
+<tr><td class="k">도면 제출</td><td class="l">제작 착수 전 조립도·배관도·전기 결선도·PLC I/O 리스트 제출</td></tr>
+<tr><td class="k">보증</td><td class="l">인수 후 12개월</td></tr>
+</table>
+</div></div>
+
+<div class="card" id="s12"><div class="ch"><span class="cn">12</span><span class="cl">발주 전 협의·확정 사항</span></div><div class="cb">
+<div class="warn">아래 항목은 당사에서 확정하지 못한 정보로, 값이 달라지면 사양이 변경된다.
+<table style="margin-top:6px;">
+<tr><th>항목</th><th>현재 가정</th><th>영향</th></tr>
+<tr><td class="k">트레이 재질</td><td>허용온도 70°C</td><td class="l">PP 계열이면 60°C 이하로 낮춰야 함 → 풍량·건조기 길이 증가</td></tr>
+<tr><td class="k">방청유 종류</td><td>비유화형 가정</td><td class="l">유화형이면 스키머로 회수 불가 → 유수분리조 또는 배수 주기 단축</td></tr>
+<tr><td class="k">세제 사용 여부</td><td>미사용(온수 세척)</td><td class="l">유화형 세제 사용 시 방청유가 물에 섞여 순환수 오염 가속</td></tr>
+<tr><td class="k">목표 처리량</td><td>1,000 매/h</td><td class="l">700 매/h면 설비 축소·전력 절감 가능</td></tr>
+<tr><td class="k">설치 공간</td><td>전장 10.6m 확보</td><td class="l">부족 시 모듈 배치 변경 또는 처리량 조정</td></tr>
+<tr><td class="k">수전 여유</td><td>42.3 kW 수용</td><td class="l">부족 시 블로워 배분 변경(24대→12대는 전력 증가)</td></tr>
+<tr><td class="k">박스 세척기 연계</td><td>독립 운전</td><td class="l">유틸리티 공용 시 보일러·배수 계통 재산정</td></tr>
+</table>
+</div>
+</div></div>
+
+<footer>인시스 AI혁신 연구개발실 · 트레이 세척·탈수·건조 통합설비 제작 사양서 v1.0 · 2026<br>
+본 사양서는 설계 기준서이며, 최종 사양은 제작사 검토 및 실물 테스트 결과에 따라 조정될 수 있다.</footer>
+</div>
+
+<script>
+function setView(v){
+  var w=document.getElementById('wrap');
+  document.getElementById('bm').classList.toggle('on', v==='mobile');
+  document.getElementById('bp').classList.toggle('on', v==='pc');
+  if(v==='mobile') w.classList.add('mobile'); else w.classList.remove('mobile');
+}
+</script>
+</body>
+</html>
