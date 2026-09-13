@@ -177,7 +177,30 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">3</span>작물 구성 <span class="tag blue">블루베리</span><span class="tag fig">무화과</span></h2>
+    <h2><span class="num">3</span>육묘 전략 — 자가 삽목</h2>
+    <label class="chk-row">
+      <input type="checkbox" id="chkSelfProp" checked>
+      2·3차 식재분은 모수(母樹)에서 자가 삽목 육묘
+    </label>
+    <div class="assump-grid" style="margin-top:8px;">
+      <div class="assump-item">
+        <label>육묘장 조성비 (1회성)</label>
+        <div class="in-row"><input type="number" id="inNurseryCost" value="3000" step="500"><span class="unit">천원</span></div>
+      </div>
+      <div class="assump-item">
+        <label>블루베리 자가육묘 단가</label>
+        <div class="in-row"><input type="number" id="inBlueSelfProp" value="1.5" step="0.5"><span class="unit">천원/주</span></div>
+      </div>
+      <div class="assump-item">
+        <label>무화과 자가육묘 단가</label>
+        <div class="in-row"><input type="number" id="inFigSelfProp" value="1.0" step="0.5"><span class="unit">천원/주</span></div>
+      </div>
+    </div>
+    <div class="hint">1차분은 모수 확보를 위해 정상 묘목가로 구입(블루베리 9,000원/주·무화과 15,000원/주)합니다. 2차분부터 삽목 육묘로 대체 시 위 단가(상토·인건비 수준)가 적용됩니다. 실제로는 발근·순화에 1~2년(블루베리)~수개월(무화과)의 준비기간이 필요해 후속 차수 식재 시점을 그만큼 앞당겨 육묘를 시작해야 합니다(연차 표는 이 리드타임을 반영하지 않은 단순화 모델입니다).</div>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">4</span>작물 구성 <span class="tag blue">블루베리</span><span class="tag fig">무화과</span></h2>
     <div class="mix-row">
       <input type="range" id="inMix" min="0" max="100" value="70">
     </div>
@@ -186,7 +209,7 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">4</span>블루베리 판매·수익 가정 <span class="tag blue">여름 성수기 수확</span></h2>
+    <h2><span class="num">5</span>블루베리 판매·수익 가정 <span class="tag blue">여름 성수기 수확</span></h2>
     <div class="assump-grid">
       <div class="assump-item">
         <label>성수기 판매단가</label>
@@ -220,7 +243,7 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">5</span>무화과 판매·수익 가정 <span class="tag fig">8~10월 가을 수확</span></h2>
+    <h2><span class="num">6</span>무화과 판매·수익 가정 <span class="tag fig">8~10월 가을 수확</span></h2>
     <div class="assump-grid">
       <div class="assump-item">
         <label>판매단가</label>
@@ -243,7 +266,7 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">6</span>연차별 투자 계획</h2>
+    <h2><span class="num">7</span>연차별 투자 계획</h2>
     <div class="tbl-scroll">
     <table id="phaseTable">
       <thead>
@@ -255,16 +278,17 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">7</span>총 투자비 요약</h2>
-    <div class="sum-row"><span>블루베리 조성비</span><span id="sumBlueCapex">-</span></div>
-    <div class="sum-row"><span>무화과 조성비</span><span id="sumFigCapex">-</span></div>
+    <h2><span class="num">8</span>총 투자비 요약</h2>
+    <div class="sum-row"><span>블루베리 조성비(묘목비 포함)</span><span id="sumBlueCapex">-</span></div>
+    <div class="sum-row"><span>무화과 조성비(묘목비 포함)</span><span id="sumFigCapex">-</span></div>
     <div class="sum-row"><span>공통 고정시설 (관수 컨트롤러·전기인입)</span><span id="sumFixedCommon">-</span></div>
     <div class="sum-row" id="rowMgmt"><span>관리동</span><span id="sumMgmt">-</span></div>
+    <div class="sum-row" id="rowNursery"><span>육묘장 조성비(자가 삽목)</span><span id="sumNursery">-</span></div>
     <div class="sum-row total"><span>총 조성 투자비</span><span id="sumTotal">-</span></div>
   </section>
 
   <section class="card">
-    <h2><span class="num">8</span>연차별 손익 시뮬레이션</h2>
+    <h2><span class="num">9</span>연차별 손익 시뮬레이션</h2>
     <div class="tbl-scroll">
     <table id="pnlTable">
       <thead>
@@ -277,7 +301,7 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">9</span>핵심 요약</h2>
+    <h2><span class="num">10</span>핵심 요약</h2>
     <div class="kpi-grid">
       <div class="kpi"><div class="lbl">총 조성 투자비</div><div class="val" id="kpiCapex">-</div></div>
       <div class="kpi"><div class="lbl">성목기 연간 영업이익</div><div class="val" id="kpiNetMature">-</div></div>
@@ -289,7 +313,7 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">10</span>누적 현금흐름 추이</h2>
+    <h2><span class="num">11</span>누적 현금흐름 추이</h2>
     <div id="chartWrap"></div>
     <div class="hint">선: 누적 현금흐름 · 점선: 손익분기(0원) 기준선 · 초록 점: 손익분기 시점</div>
   </section>
@@ -309,16 +333,18 @@
 <footer>
   <div class="foot-inner">
     <span>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr</span>
-    <span id="verTag">v3.0</span>
+    <span id="verTag">v4.0</span>
   </div>
 </footer>
 
 <script>
 // ===== 조성 단가 (단위: 천원) =====
-var BLUE_UNIT = { pot: 4.9, media: 12.4, seedling: 9.0, mat: 5.0, irrigVar: 4.538, labor: 2.0 };
-var FIG_UNIT  = { pot: 4.9, media: 13.4, seedling: 15.0, mat: 8.0, irrigVar: 4.538, labor: 2.0 };
-var BLUE_CAPEX_PER_POT = BLUE_UNIT.pot+BLUE_UNIT.media+BLUE_UNIT.seedling+BLUE_UNIT.mat+BLUE_UNIT.irrigVar+BLUE_UNIT.labor;
-var FIG_CAPEX_PER_POT  = FIG_UNIT.pot+FIG_UNIT.media+FIG_UNIT.seedling+FIG_UNIT.mat+FIG_UNIT.irrigVar+FIG_UNIT.labor;
+var BLUE_UNIT = { pot: 4.9, media: 12.4, mat: 5.0, irrigVar: 4.538, labor: 2.0 };
+var FIG_UNIT  = { pot: 4.9, media: 13.4, mat: 8.0, irrigVar: 4.538, labor: 2.0 };
+var BLUE_BASE_PER_POT = BLUE_UNIT.pot+BLUE_UNIT.media+BLUE_UNIT.mat+BLUE_UNIT.irrigVar+BLUE_UNIT.labor; // 묘목비 제외
+var FIG_BASE_PER_POT  = FIG_UNIT.pot+FIG_UNIT.media+FIG_UNIT.mat+FIG_UNIT.irrigVar+FIG_UNIT.labor;       // 묘목비 제외
+var BLUE_SEEDLING_FULL = 9.0;  // 정상 구입가 (천원/주)
+var FIG_SEEDLING_FULL  = 15.0;
 
 var AREA_PER_POT = { blueberry: 5, fig: 8 };
 var TOTAL_AREA = 6510; // ㎡ (과수 감나무 지역 제외 대상)
@@ -343,6 +369,7 @@ function rampFig(ys){
 
 var state = {
   phases: 1, mgmt: true, cropMix: 70,
+  selfProp: true, nurseryCost: 3000, blueSelfPropCost: 1.5, figSelfPropCost: 1.0,
   bluePeak: 15000, blueYield: 4, offPeakOn: true, offPeakRatio: 30, offPeakPrice: 50000,
   blueCostRatio: 0.45, blueFixedMaint: 1.0,
   figPrice: 10000, figYield: 3, figCostRatio: 0.40, figFixedMaint: 1.5
@@ -393,11 +420,21 @@ function figRevPerPot(){
   return state.figYield * state.figPrice / 1000;
 }
 
+function seedlingCost(cropSeedlingFull, cropSelfPropCost, phaseIdx){
+  // 1차(idx 0)는 모수 확보를 위해 항상 정상가로 구입. 2차 이후는 자가 삽목 옵션에 따라 결정.
+  if (phaseIdx === 0) return cropSeedlingFull;
+  return state.selfProp ? cropSelfPropCost : cropSeedlingFull;
+}
+
 function capexByPhase(phases){
   var byYear = {};
   phases.forEach(function(ph, idx){
-    var cost = ph.bluePots * BLUE_CAPEX_PER_POT + ph.figPots * FIG_CAPEX_PER_POT;
-    if (idx === 0) cost += FIXED_COMMON + (state.mgmt ? MGMT_COST : 0);
+    var blueSeed = seedlingCost(BLUE_SEEDLING_FULL, state.blueSelfPropCost, idx);
+    var figSeed = seedlingCost(FIG_SEEDLING_FULL, state.figSelfPropCost, idx);
+    var cost = ph.bluePots * (BLUE_BASE_PER_POT + blueSeed) + ph.figPots * (FIG_BASE_PER_POT + figSeed);
+    if (idx === 0){
+      cost += FIXED_COMMON + (state.mgmt ? MGMT_COST : 0) + (state.selfProp ? state.nurseryCost : 0);
+    }
     byYear[ph.plantYear] = (byYear[ph.plantYear] || 0) + cost;
   });
   return byYear;
@@ -511,15 +548,22 @@ function render(){
     ctbody.appendChild(tr);
   });
 
-  // 7. 총 투자비 요약
-  var blueCapexTotal = totals.bluePots * BLUE_CAPEX_PER_POT;
-  var figCapexTotal = totals.figPots * FIG_CAPEX_PER_POT;
+  // 8. 총 투자비 요약
+  var blueCapexTotal = 0, figCapexTotal = 0;
+  phases.forEach(function(ph, idx){
+    var blueSeed = seedlingCost(BLUE_SEEDLING_FULL, state.blueSelfPropCost, idx);
+    var figSeed = seedlingCost(FIG_SEEDLING_FULL, state.figSelfPropCost, idx);
+    blueCapexTotal += ph.bluePots * (BLUE_BASE_PER_POT + blueSeed);
+    figCapexTotal += ph.figPots * (FIG_BASE_PER_POT + figSeed);
+  });
   var totalMgmt = state.mgmt ? MGMT_COST : 0;
-  var grandCapex = blueCapexTotal + figCapexTotal + FIXED_COMMON + totalMgmt;
+  var totalNursery = state.selfProp ? state.nurseryCost : 0;
+  var grandCapex = blueCapexTotal + figCapexTotal + FIXED_COMMON + totalMgmt + totalNursery;
   document.getElementById('sumBlueCapex').textContent = fmt(blueCapexTotal) + '천원';
   document.getElementById('sumFigCapex').textContent = fmt(figCapexTotal) + '천원';
   document.getElementById('sumFixedCommon').textContent = fmt(FIXED_COMMON) + '천원';
   document.getElementById('sumMgmt').textContent = fmt(totalMgmt) + '천원';
+  document.getElementById('sumNursery').textContent = fmt(totalNursery) + '천원';
   document.getElementById('sumTotal').textContent = fmt(grandCapex) + '천원';
 
   // 8. 손익 시뮬레이션
@@ -563,6 +607,10 @@ document.querySelectorAll('.menu-btn').forEach(function(btn){
 });
 
 document.getElementById('chkMgmt').addEventListener('change', function(e){ state.mgmt = e.target.checked; render(); });
+document.getElementById('chkSelfProp').addEventListener('change', function(e){ state.selfProp = e.target.checked; render(); });
+document.getElementById('inNurseryCost').addEventListener('input', function(e){ var v=parseFloat(e.target.value); if(!isNaN(v)){ state.nurseryCost = v; render(); } });
+document.getElementById('inBlueSelfProp').addEventListener('input', function(e){ var v=parseFloat(e.target.value); if(!isNaN(v)){ state.blueSelfPropCost = v; render(); } });
+document.getElementById('inFigSelfProp').addEventListener('input', function(e){ var v=parseFloat(e.target.value); if(!isNaN(v)){ state.figSelfPropCost = v; render(); } });
 document.getElementById('inMix').addEventListener('input', function(e){ state.cropMix = parseInt(e.target.value, 10); render(); });
 document.getElementById('chkOffPeak').addEventListener('change', function(e){ state.offPeakOn = e.target.checked; render(); });
 
