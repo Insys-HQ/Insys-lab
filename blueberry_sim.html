@@ -86,6 +86,15 @@
   .chk-row input{width:16px;height:16px;accent-color:var(--accent);}
   .hint{font-size:11px;color:var(--text-mid);margin-top:6px;}
 
+  .startup-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);}
+  .startup-row:last-child{border-bottom:none;}
+  .startup-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);flex-shrink:0;}
+  .startup-row label{flex:1;font-size:12.5px;color:var(--text);}
+  .startup-row .in-row{width:100px;flex-shrink:0;display:flex;align-items:center;border:1px solid var(--border);border-radius:7px;overflow:hidden;background:#fafbfd;}
+  .startup-row .in-row input{width:100%;border:none;background:transparent;padding:6px 4px;font-family:inherit;font-size:12.5px;color:var(--text);text-align:right;}
+  .startup-row .in-row input:focus{outline:none;background:#fff;}
+  .startup-row .unit{padding:0 6px;font-size:10.5px;color:var(--text-mid);white-space:nowrap;}
+
   .mix-row{display:flex;align-items:center;gap:10px;}
   .mix-row input[type=range]{flex:1;accent-color:var(--accent);}
   .mix-labels{display:flex;justify-content:space-between;font-size:12px;margin-top:4px;}
@@ -169,7 +178,21 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">2</span>시설 옵션</h2>
+    <h2><span class="num">2</span>기초 조성 비용 — 창업 준비 항목</h2>
+    <div id="startupItemsContainer"></div>
+    <div class="sum-row total" style="margin-top:6px;"><span>기초 조성 비용 소계</span><span id="startupTotalLbl">-</span></div>
+    <div class="hint" style="margin-top:10px;">아래는 연간 반복되는 비용입니다.</div>
+    <div class="assump-grid" style="margin-top:6px;">
+      <div class="assump-item">
+        <label>농작물재해보험료(전체 성목 기준, 연간)</label>
+        <div class="in-row"><input type="number" id="inInsurance" value="1500" step="100"><span class="unit">천원/년</span></div>
+      </div>
+    </div>
+    <div class="hint">정지작업·보강토·펜스 물량은 실제 지적측량·경사도 실측 후 확정해야 하는 개산 견적입니다. 손익분기까지 필요한 최대 자금소요(⑪ 핵심 요약)를 창업 초기 예비운영자금 규모의 참고치로 활용하세요.</div>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">3</span>시설 옵션</h2>
     <label class="chk-row">
       <input type="checkbox" id="chkMgmt" checked>
       관리동 신축 포함 (20,000천원)
@@ -177,7 +200,7 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">3</span>육묘 전략 — 자가 삽목</h2>
+    <h2><span class="num">4</span>육묘 전략 — 자가 삽목</h2>
     <label class="chk-row">
       <input type="checkbox" id="chkSelfProp" checked>
       2·3차 식재분은 모수(母樹)에서 자가 삽목 육묘
@@ -200,7 +223,7 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">4</span>작물 구성 <span class="tag blue">블루베리</span><span class="tag fig">무화과</span></h2>
+    <h2><span class="num">5</span>작물 구성 <span class="tag blue">블루베리</span><span class="tag fig">무화과</span></h2>
     <div class="mix-row">
       <input type="range" id="inMix" min="0" max="100" value="70">
     </div>
@@ -209,7 +232,7 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">5</span>블루베리 판매·수익 가정 <span class="tag blue">여름 성수기 수확</span></h2>
+    <h2><span class="num">6</span>블루베리 판매·수익 가정 <span class="tag blue">여름 성수기 수확</span></h2>
     <div class="assump-grid">
       <div class="assump-item">
         <label>성수기 판매단가</label>
@@ -243,7 +266,7 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">6</span>무화과 판매·수익 가정 <span class="tag fig">8~10월 가을 수확</span></h2>
+    <h2><span class="num">7</span>무화과 판매·수익 가정 <span class="tag fig">8~10월 가을 수확</span></h2>
     <div class="assump-grid">
       <div class="assump-item">
         <label>판매단가</label>
@@ -266,7 +289,7 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">7</span>연차별 투자 계획</h2>
+    <h2><span class="num">8</span>연차별 투자 계획</h2>
     <div class="tbl-scroll">
     <table id="phaseTable">
       <thead>
@@ -278,9 +301,10 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">8</span>총 투자비 요약</h2>
+    <h2><span class="num">9</span>총 투자비 요약</h2>
     <div class="sum-row"><span>블루베리 조성비(묘목비 포함)</span><span id="sumBlueCapex">-</span></div>
     <div class="sum-row"><span>무화과 조성비(묘목비 포함)</span><span id="sumFigCapex">-</span></div>
+    <div class="sum-row"><span>기초 조성 비용(창업 준비 항목)</span><span id="sumStartup">-</span></div>
     <div class="sum-row"><span>공통 고정시설 (관수 컨트롤러·전기인입)</span><span id="sumFixedCommon">-</span></div>
     <div class="sum-row" id="rowMgmt"><span>관리동</span><span id="sumMgmt">-</span></div>
     <div class="sum-row" id="rowNursery"><span>육묘장 조성비(자가 삽목)</span><span id="sumNursery">-</span></div>
@@ -288,7 +312,7 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">9</span>연차별 손익 시뮬레이션</h2>
+    <h2><span class="num">10</span>연차별 손익 시뮬레이션</h2>
     <div class="tbl-scroll">
     <table id="pnlTable">
       <thead>
@@ -301,7 +325,7 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">10</span>핵심 요약</h2>
+    <h2><span class="num">11</span>핵심 요약</h2>
     <div class="kpi-grid">
       <div class="kpi"><div class="lbl">총 조성 투자비</div><div class="val" id="kpiCapex">-</div></div>
       <div class="kpi"><div class="lbl">성목기 연간 영업이익</div><div class="val" id="kpiNetMature">-</div></div>
@@ -313,7 +337,7 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">11</span>누적 현금흐름 추이</h2>
+    <h2><span class="num">12</span>누적 현금흐름 추이</h2>
     <div id="chartWrap"></div>
     <div class="hint">선: 누적 현금흐름 · 점선: 손익분기(0원) 기준선 · 초록 점: 손익분기 시점</div>
   </section>
@@ -333,7 +357,7 @@
 <footer>
   <div class="foot-inner">
     <span>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr</span>
-    <span id="verTag">v4.0</span>
+    <span id="verTag">v5.0</span>
   </div>
 </footer>
 
@@ -367,13 +391,57 @@ function rampFig(ys){
   return 1.0;
 }
 
+var STARTUP_ITEMS = [
+  { key: 'grading',    label: '부지 정지작업(중장비, 평탄화)',              def: 15000 },
+  { key: 'retainWall', label: '보강토 옹벽 시공',                          def: 8000 },
+  { key: 'well',       label: '관정개발(농업용수 확보)',                    def: 5000 },
+  { key: 'fence',      label: '야생동물 방지 펜스(둘레)',                   def: 6500 },
+  { key: 'equipment',  label: '농기계·소형장비(예초기·동력분무기·손수레 등)', def: 4000 },
+  { key: 'truck',      label: '소형 화물차(중고 1톤)',                      def: 10000 },
+  { key: 'permit',     label: '인허가·경영체등록·설계비',                   def: 1500 },
+  { key: 'branding',   label: '브랜딩·포장재·온라인몰 초기구축',            def: 3000 },
+  { key: 'safety',     label: '안전장비 및 기타 잡비',                      def: 1000 }
+];
+
 var state = {
   phases: 1, mgmt: true, cropMix: 70,
   selfProp: true, nurseryCost: 3000, blueSelfPropCost: 1.5, figSelfPropCost: 1.0,
   bluePeak: 15000, blueYield: 4, offPeakOn: true, offPeakRatio: 30, offPeakPrice: 50000,
   blueCostRatio: 0.45, blueFixedMaint: 1.0,
-  figPrice: 10000, figYield: 3, figCostRatio: 0.40, figFixedMaint: 1.5
+  figPrice: 10000, figYield: 3, figCostRatio: 0.40, figFixedMaint: 1.5,
+  startup: {}, insuranceAnnual: 1500
 };
+STARTUP_ITEMS.forEach(function(item){ state.startup[item.key] = { on: true, val: item.def }; });
+
+function startupTotal(){
+  var sum = 0;
+  STARTUP_ITEMS.forEach(function(item){
+    var s = state.startup[item.key];
+    if (s.on) sum += s.val;
+  });
+  return sum;
+}
+
+function buildStartupUI(){
+  var container = document.getElementById('startupItemsContainer');
+  container.innerHTML = '';
+  STARTUP_ITEMS.forEach(function(item){
+    var row = document.createElement('div');
+    row.className = 'startup-row';
+    row.innerHTML =
+      '<input type="checkbox" id="su_' + item.key + '_chk" checked>' +
+      '<label for="su_' + item.key + '_chk">' + item.label + '</label>' +
+      '<div class="in-row"><input type="number" id="su_' + item.key + '_val" value="' + item.def + '" step="500"><span class="unit">천원</span></div>';
+    container.appendChild(row);
+    document.getElementById('su_' + item.key + '_chk').addEventListener('change', function(e){
+      state.startup[item.key].on = e.target.checked; render();
+    });
+    document.getElementById('su_' + item.key + '_val').addEventListener('input', function(e){
+      var v = parseFloat(e.target.value);
+      if (!isNaN(v)){ state.startup[item.key].val = v; render(); }
+    });
+  });
+}
 
 function fmt(n){ return Math.round(n).toLocaleString('ko-KR'); }
 function fmtSigned(n){ var r = Math.round(n); return (r >= 0 ? '+' : '') + r.toLocaleString('ko-KR'); }
@@ -433,7 +501,7 @@ function capexByPhase(phases){
     var figSeed = seedlingCost(FIG_SEEDLING_FULL, state.figSelfPropCost, idx);
     var cost = ph.bluePots * (BLUE_BASE_PER_POT + blueSeed) + ph.figPots * (FIG_BASE_PER_POT + figSeed);
     if (idx === 0){
-      cost += FIXED_COMMON + (state.mgmt ? MGMT_COST : 0) + (state.selfProp ? state.nurseryCost : 0);
+      cost += FIXED_COMMON + (state.mgmt ? MGMT_COST : 0) + (state.selfProp ? state.nurseryCost : 0) + startupTotal();
     }
     byYear[ph.plantYear] = (byYear[ph.plantYear] || 0) + cost;
   });
@@ -446,12 +514,15 @@ function pnlSimulate(phases){
   var fVarCostPerPot = fRev * state.figCostRatio;
   var capexByYear = capexByPhase(phases);
   var maxYear = state.phases + 9;
+  var totals0 = cropTotals();
+  var totalPotsAll = (totals0.bluePots + totals0.figPots) || 1;
+  var insurancePerPot = state.insuranceAnnual / totalPotsAll;
 
   var rows = [];
   var cumulative = 0, breakevenYear = null, wasNegative = false;
 
   for (var y = 1; y <= maxYear; y++){
-    var blueRevenue = 0, blueCost = 0, figRevenue = 0, figCost = 0;
+    var blueRevenue = 0, blueCost = 0, figRevenue = 0, figCost = 0, plantedPots = 0;
     phases.forEach(function(ph){
       if (y >= ph.plantYear){
         var ys = y - ph.plantYear + 1;
@@ -460,10 +531,12 @@ function pnlSimulate(phases){
         blueCost += ph.bluePots * bf * bVarCostPerPot + ph.bluePots * state.blueFixedMaint;
         figRevenue += ph.figPots * ff * fRev;
         figCost += ph.figPots * ff * fVarCostPerPot + ph.figPots * state.figFixedMaint;
+        plantedPots += ph.bluePots + ph.figPots;
       }
     });
     var revenue = blueRevenue + figRevenue;
-    var opCost = blueCost + figCost;
+    var insuranceCost = plantedPots * insurancePerPot;
+    var opCost = blueCost + figCost + insuranceCost;
     var opProfit = revenue - opCost;
     var capex = capexByYear[y] || 0;
     var netFlow = opProfit - capex;
@@ -479,7 +552,7 @@ function pnlSimulate(phases){
   var matureFigRevenue = totals.figPots * fRev;
   var matureBlueCost = totals.bluePots * (bVarCostPerPot + state.blueFixedMaint);
   var matureFigCost = totals.figPots * (fVarCostPerPot + state.figFixedMaint);
-  var matureNet = (matureBlueRevenue + matureFigRevenue) - (matureBlueCost + matureFigCost);
+  var matureNet = (matureBlueRevenue + matureFigRevenue) - (matureBlueCost + matureFigCost) - state.insuranceAnnual;
   var peakFund = Math.min.apply(null, rows.map(function(r){ return r.cumulative; }).concat([0]));
 
   return {
@@ -529,6 +602,7 @@ function render(){
 
   document.getElementById('mixBlueLbl').textContent = '블루베리 ' + state.cropMix + '%';
   document.getElementById('mixFigLbl').textContent = '무화과 ' + (100 - state.cropMix) + '%';
+  document.getElementById('startupTotalLbl').textContent = fmt(startupTotal()) + '천원';
 
   // 6. 연차별 투자 계획
   var byYear = capexByPhase(phases);
@@ -558,9 +632,11 @@ function render(){
   });
   var totalMgmt = state.mgmt ? MGMT_COST : 0;
   var totalNursery = state.selfProp ? state.nurseryCost : 0;
-  var grandCapex = blueCapexTotal + figCapexTotal + FIXED_COMMON + totalMgmt + totalNursery;
+  var totalStartup = startupTotal();
+  var grandCapex = blueCapexTotal + figCapexTotal + FIXED_COMMON + totalMgmt + totalNursery + totalStartup;
   document.getElementById('sumBlueCapex').textContent = fmt(blueCapexTotal) + '천원';
   document.getElementById('sumFigCapex').textContent = fmt(figCapexTotal) + '천원';
+  document.getElementById('sumStartup').textContent = fmt(totalStartup) + '천원';
   document.getElementById('sumFixedCommon').textContent = fmt(FIXED_COMMON) + '천원';
   document.getElementById('sumMgmt').textContent = fmt(totalMgmt) + '천원';
   document.getElementById('sumNursery').textContent = fmt(totalNursery) + '천원';
@@ -611,6 +687,7 @@ document.getElementById('chkSelfProp').addEventListener('change', function(e){ s
 document.getElementById('inNurseryCost').addEventListener('input', function(e){ var v=parseFloat(e.target.value); if(!isNaN(v)){ state.nurseryCost = v; render(); } });
 document.getElementById('inBlueSelfProp').addEventListener('input', function(e){ var v=parseFloat(e.target.value); if(!isNaN(v)){ state.blueSelfPropCost = v; render(); } });
 document.getElementById('inFigSelfProp').addEventListener('input', function(e){ var v=parseFloat(e.target.value); if(!isNaN(v)){ state.figSelfPropCost = v; render(); } });
+document.getElementById('inInsurance').addEventListener('input', function(e){ var v=parseFloat(e.target.value); if(!isNaN(v)){ state.insuranceAnnual = v; render(); } });
 document.getElementById('inMix').addEventListener('input', function(e){ state.cropMix = parseInt(e.target.value, 10); render(); });
 document.getElementById('chkOffPeak').addEventListener('change', function(e){ state.offPeakOn = e.target.checked; render(); });
 
@@ -644,6 +721,7 @@ document.getElementById('btnPC').addEventListener('click', function(){
   document.getElementById('btnMobile').classList.remove('active');
 });
 
+buildStartupUI();
 render();
 </script>
 </body>
