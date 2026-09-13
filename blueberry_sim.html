@@ -357,7 +357,7 @@
 <footer>
   <div class="foot-inner">
     <span>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr</span>
-    <span id="verTag">v5.0</span>
+    <span id="verTag">v5.1</span>
   </div>
 </footer>
 
@@ -392,15 +392,15 @@ function rampFig(ys){
 }
 
 var STARTUP_ITEMS = [
-  { key: 'grading',    label: '부지 정지작업(중장비, 평탄화)',              def: 15000 },
-  { key: 'retainWall', label: '보강토 옹벽 시공',                          def: 8000 },
-  { key: 'well',       label: '관정개발(농업용수 확보)',                    def: 5000 },
-  { key: 'fence',      label: '야생동물 방지 펜스(둘레)',                   def: 6500 },
-  { key: 'equipment',  label: '농기계·소형장비(예초기·동력분무기·손수레 등)', def: 4000 },
-  { key: 'truck',      label: '소형 화물차(중고 1톤)',                      def: 10000 },
-  { key: 'permit',     label: '인허가·경영체등록·설계비',                   def: 1500 },
-  { key: 'branding',   label: '브랜딩·포장재·온라인몰 초기구축',            def: 3000 },
-  { key: 'safety',     label: '안전장비 및 기타 잡비',                      def: 1000 }
+  { key: 'grading',    label: '부지 정지작업(중장비, 평탄화)',              def: 15000, onDefault: true },
+  { key: 'retainWall', label: '보강토 옹벽 시공',                          def: 8000,  onDefault: true },
+  { key: 'well',       label: '관정개발(농업용수 확보)',                    def: 5000,  onDefault: true },
+  { key: 'fence',      label: '야생동물 방지 펜스(둘레)',                   def: 6500,  onDefault: true },
+  { key: 'equipment',  label: '농기계·소형장비(예초기·동력분무기·손수레 등) — 농업회사법인 기보유',  def: 4000,  onDefault: false },
+  { key: 'truck',      label: '소형 화물차(중고 1톤) — 농업회사법인 기보유', def: 10000, onDefault: false },
+  { key: 'permit',     label: '인허가·경영체등록·설계비',                   def: 1500,  onDefault: true },
+  { key: 'branding',   label: '브랜딩·포장재·온라인몰 초기구축',            def: 3000,  onDefault: true },
+  { key: 'safety',     label: '안전장비 및 기타 잡비',                      def: 1000,  onDefault: true }
 ];
 
 var state = {
@@ -411,7 +411,7 @@ var state = {
   figPrice: 10000, figYield: 3, figCostRatio: 0.40, figFixedMaint: 1.5,
   startup: {}, insuranceAnnual: 1500
 };
-STARTUP_ITEMS.forEach(function(item){ state.startup[item.key] = { on: true, val: item.def }; });
+STARTUP_ITEMS.forEach(function(item){ state.startup[item.key] = { on: item.onDefault, val: item.def }; });
 
 function startupTotal(){
   var sum = 0;
@@ -429,7 +429,7 @@ function buildStartupUI(){
     var row = document.createElement('div');
     row.className = 'startup-row';
     row.innerHTML =
-      '<input type="checkbox" id="su_' + item.key + '_chk" checked>' +
+      '<input type="checkbox" id="su_' + item.key + '_chk"' + (item.onDefault ? ' checked' : '') + '>' +
       '<label for="su_' + item.key + '_chk">' + item.label + '</label>' +
       '<div class="in-row"><input type="number" id="su_' + item.key + '_val" value="' + item.def + '" step="500"><span class="unit">천원</span></div>';
     container.appendChild(row);
