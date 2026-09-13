@@ -6,7 +6,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>김해 금곡리 블루베리 화분재배 투자·손익 시뮬레이터</title>
+<title>김해 금곡리 블루베리·무화과 화분재배 투자·손익 시뮬레이터</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -21,6 +21,8 @@
     --border:#e2e6ee;
     --accent:#2f6fed;
     --accent-bg:#eaf1fe;
+    --fig:#8a4b9e;
+    --fig-bg:#f3e9f7;
     --good:#1e7a4c;
     --good-bg:#e8f6ee;
     --warn:#9a5a12;
@@ -41,7 +43,7 @@
     display:flex;align-items:center;justify-content:space-between;gap:8px;
   }
   #mainWrap.mobile .nav-inner{max-width:420px;}
-  .brand{font-weight:700;font-size:15px;display:flex;align-items:center;gap:6px;}
+  .brand{font-weight:700;font-size:14px;display:flex;align-items:center;gap:6px;}
   .brand small{font-weight:400;font-size:11px;color:#c7d0e6;display:block;}
   .view-toggle{display:flex;background:rgba(255,255,255,.12);border-radius:8px;padding:2px;}
   .view-toggle button{
@@ -66,6 +68,9 @@
     width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;
     font-size:11px;margin-right:6px;
   }
+  .tag{display:inline-block;font-size:10.5px;padding:2px 7px;border-radius:5px;font-weight:700;margin-left:4px;}
+  .tag.blue{background:var(--accent-bg);color:var(--accent);}
+  .tag.fig{background:var(--fig-bg);color:var(--fig);}
 
   .menu-btns{display:flex;gap:8px;}
   .menu-btn{
@@ -81,6 +86,12 @@
   .chk-row input{width:16px;height:16px;accent-color:var(--accent);}
   .hint{font-size:11px;color:var(--text-mid);margin-top:6px;}
 
+  .mix-row{display:flex;align-items:center;gap:10px;}
+  .mix-row input[type=range]{flex:1;accent-color:var(--accent);}
+  .mix-labels{display:flex;justify-content:space-between;font-size:12px;margin-top:4px;}
+  .mix-labels .b{color:var(--accent);font-weight:700;}
+  .mix-labels .f{color:var(--fig);font-weight:700;}
+
   .assump-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
   .assump-item label{display:block;font-size:11.5px;color:var(--text-mid);margin-bottom:3px;}
   .assump-item .in-row{display:flex;align-items:center;border:1px solid var(--border);border-radius:7px;overflow:hidden;background:#fafbfd;}
@@ -90,6 +101,7 @@
   }
   .assump-item .unit{padding:0 8px;font-size:11.5px;color:var(--text-mid);white-space:nowrap;}
   .assump-item input:focus{outline:none;background:#fff;}
+  .assump-item.full{grid-column:1 / -1;}
 
   table{width:100%;border-collapse:collapse;font-size:12px;}
   .tbl-scroll{overflow-x:auto;}
@@ -121,6 +133,10 @@
   .kpi .val{font-size:15px;font-weight:700;color:var(--navy-2);}
   .kpi.hi{background:var(--good-bg);border-color:#cdeadb;}
   .kpi.hi .val{color:var(--good);}
+  .kpi.blue{border-color:#cddcfb;}
+  .kpi.blue .val{color:var(--accent);}
+  .kpi.fig{border-color:#e5cdee;}
+  .kpi.fig .val{color:var(--fig);}
 
   svg{width:100%;height:auto;display:block;}
 
@@ -133,7 +149,7 @@
 
 <header>
   <div class="nav-inner">
-    <div class="brand">🫐 블루베리 화분재배 투자·손익 시뮬레이터<small>김해 금곡리 부지 · 단위 천원</small></div>
+    <div class="brand">🫐🟣 블루베리·무화과 화분재배 시뮬레이터<small>김해 금곡리 부지 · 단위 천원</small></div>
     <div class="view-toggle">
       <button id="btnMobile" class="active">모바일</button>
       <button id="btnPC">PC</button>
@@ -158,38 +174,80 @@
       <input type="checkbox" id="chkMgmt" checked>
       관리동 신축 포함 (20,000천원)
     </label>
-    <div class="hint">체크 해제 시 기존 건물 활용 등으로 가정, 총 투자비에서 제외됩니다.</div>
   </section>
 
   <section class="card">
-    <h2><span class="num">3</span>판매·수익 가정 (조정 가능)</h2>
+    <h2><span class="num">3</span>작물 구성 <span class="tag blue">블루베리</span><span class="tag fig">무화과</span></h2>
+    <div class="mix-row">
+      <input type="range" id="inMix" min="0" max="100" value="70">
+    </div>
+    <div class="mix-labels"><span class="b" id="mixBlueLbl">블루베리 70%</span><span class="f" id="mixFigLbl">무화과 30%</span></div>
+    <div class="hint">대상면적 6,510㎡를 두 작물로 배분합니다. 블루베리 5㎡/화분, 무화과 8㎡/화분 기준으로 화분 수가 계산됩니다.</div>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">4</span>블루베리 판매·수익 가정 <span class="tag blue">여름 성수기 수확</span></h2>
     <div class="assump-grid">
       <div class="assump-item">
-        <label>판매단가</label>
-        <div class="in-row"><input type="number" id="inPrice" value="15000" step="500"><span class="unit">원/kg</span></div>
+        <label>성수기 판매단가</label>
+        <div class="in-row"><input type="number" id="inBluePeak" value="15000" step="500"><span class="unit">원/kg</span></div>
       </div>
       <div class="assump-item">
         <label>화분당 성목 수확량</label>
-        <div class="in-row"><input type="number" id="inYield" value="4" step="0.5"><span class="unit">kg/화분</span></div>
+        <div class="in-row"><input type="number" id="inBlueYield" value="4" step="0.5"><span class="unit">kg/화분</span></div>
+      </div>
+      <div class="assump-item full">
+        <label class="chk-row" style="margin-bottom:6px;"><input type="checkbox" id="chkOffPeak" checked> 저온저장 활용 · 비수기(겨울) 판매 반영</label>
+      </div>
+      <div class="assump-item">
+        <label>비수기 판매 비중</label>
+        <div class="in-row"><input type="number" id="inOffPeakRatio" value="30" step="5"><span class="unit">%</span></div>
+      </div>
+      <div class="assump-item">
+        <label>비수기 판매단가</label>
+        <div class="in-row"><input type="number" id="inOffPeakPrice" value="50000" step="1000"><span class="unit">원/kg</span></div>
       </div>
       <div class="assump-item">
         <label>운영비 비율(인건비 등)</label>
-        <div class="in-row"><input type="number" id="inCostRatio" value="45" step="5"><span class="unit">% of 매출</span></div>
+        <div class="in-row"><input type="number" id="inBlueCostRatio" value="45" step="5"><span class="unit">% of 매출</span></div>
       </div>
       <div class="assump-item">
         <label>화분당 연간 기본관리비</label>
-        <div class="in-row"><input type="number" id="inFixedMaint" value="1.0" step="0.5"><span class="unit">천원</span></div>
+        <div class="in-row"><input type="number" id="inBlueFixedMaint" value="1.0" step="0.5"><span class="unit">천원</span></div>
       </div>
     </div>
-    <div class="hint">생산 진행률: 1~2년차 0% → 3년차 20% → 4년차 40% → 5년차 60% → 6년차 80% → 7년차 이후 100%(성목). 값을 바꾸면 아래 결과가 즉시 재계산됩니다.</div>
+    <div class="hint">가락시장 실측(2026년): 성수기(6~8월) 특급 약 3.3만~5.5만원/kg, 비수기(1~2월) 특급 약 11만~14만원/kg. 비수기 판매단가는 냉동품 특성상 신선 특급보다 보수적으로 가정했습니다. 생산률: 3년차 20%→4년차 40%→5년차 60%→6년차 80%→7년차 이후 100%.</div>
   </section>
 
   <section class="card">
-    <h2><span class="num">4</span>연차별 투자 계획</h2>
+    <h2><span class="num">5</span>무화과 판매·수익 가정 <span class="tag fig">8~10월 가을 수확</span></h2>
+    <div class="assump-grid">
+      <div class="assump-item">
+        <label>판매단가</label>
+        <div class="in-row"><input type="number" id="inFigPrice" value="10000" step="500"><span class="unit">원/kg</span></div>
+      </div>
+      <div class="assump-item">
+        <label>화분당 성목 수확량</label>
+        <div class="in-row"><input type="number" id="inFigYield" value="3" step="0.5"><span class="unit">kg/화분</span></div>
+      </div>
+      <div class="assump-item">
+        <label>운영비 비율(인건비 등)</label>
+        <div class="in-row"><input type="number" id="inFigCostRatio" value="40" step="5"><span class="unit">% of 매출</span></div>
+      </div>
+      <div class="assump-item">
+        <label>화분당 연간 기본관리비</label>
+        <div class="in-row"><input type="number" id="inFigFixedMaint" value="1.5" step="0.5"><span class="unit">천원</span></div>
+      </div>
+    </div>
+    <div class="hint">무화과는 저장성이 낮아 당일 직거래 위주 유통을 가정해 블루베리보다 보수적인 단가를 기본값으로 뒀습니다. 생산률: 2년차 20%→3년차 40%→4년차 70%→5년차 이후 100%(블루베리보다 조기 성목).</div>
+  </section>
+
+  <section class="card">
+    <h2><span class="num">6</span>연차별 투자 계획</h2>
     <div class="tbl-scroll">
     <table id="phaseTable">
       <thead>
-        <tr><th>연차</th><th>화분 수</th><th>면적</th><th>해당연도 투자</th><th>누계 투자</th></tr>
+        <tr><th>연차</th><th>블루베리</th><th>무화과</th><th>해당연도 투자</th><th>누계 투자</th></tr>
       </thead>
       <tbody></tbody>
     </table>
@@ -197,52 +255,53 @@
   </section>
 
   <section class="card">
-    <h2><span class="num">5</span>총 투자비 요약</h2>
-    <div class="sum-row"><span>재배 관련 비용 (화분·배양토·묘목·제초매트·관수확장·인건비)</span><span id="sumVariable">-</span></div>
+    <h2><span class="num">7</span>총 투자비 요약</h2>
+    <div class="sum-row"><span>블루베리 조성비</span><span id="sumBlueCapex">-</span></div>
+    <div class="sum-row"><span>무화과 조성비</span><span id="sumFigCapex">-</span></div>
     <div class="sum-row"><span>공통 고정시설 (관수 컨트롤러·전기인입)</span><span id="sumFixedCommon">-</span></div>
     <div class="sum-row" id="rowMgmt"><span>관리동</span><span id="sumMgmt">-</span></div>
     <div class="sum-row total"><span>총 조성 투자비</span><span id="sumTotal">-</span></div>
   </section>
 
   <section class="card">
-    <h2><span class="num">6</span>연차별 손익 시뮬레이션</h2>
+    <h2><span class="num">8</span>연차별 손익 시뮬레이션</h2>
     <div class="tbl-scroll">
     <table id="pnlTable">
       <thead>
-        <tr><th>연차</th><th>생산률</th><th>매출액</th><th>운영비</th><th>영업이익</th><th>당해 투자</th><th>연간 순현금흐름</th><th>누적 현금흐름</th></tr>
+        <tr><th>연차</th><th>블루베리 매출</th><th>무화과 매출</th><th>운영비</th><th>영업이익</th><th>당해 투자</th><th>연간 순현금흐름</th><th>누적 현금흐름</th></tr>
       </thead>
       <tbody></tbody>
     </table>
     </div>
-    <div class="hint">누적 현금흐름이 처음으로 0 이상이 되는 연차(초록색 강조)가 손익분기 시점입니다. 화분마다 식재 시점이 달라 생산률은 전체 화분의 가중평균입니다.</div>
+    <div class="hint">누적 현금흐름이 처음으로 0 이상이 되는 연차(초록색 강조)가 손익분기 시점입니다.</div>
   </section>
 
   <section class="card">
-    <h2><span class="num">7</span>핵심 요약</h2>
+    <h2><span class="num">9</span>핵심 요약</h2>
     <div class="kpi-grid">
       <div class="kpi"><div class="lbl">총 조성 투자비</div><div class="val" id="kpiCapex">-</div></div>
-      <div class="kpi"><div class="lbl">성목기 연간 매출액</div><div class="val" id="kpiRevMature">-</div></div>
-      <div class="kpi"><div class="lbl">성목기 연간 운영비</div><div class="val" id="kpiCostMature">-</div></div>
       <div class="kpi"><div class="lbl">성목기 연간 영업이익</div><div class="val" id="kpiNetMature">-</div></div>
+      <div class="kpi blue"><div class="lbl">블루베리 성목기 매출</div><div class="val" id="kpiRevBlue">-</div></div>
+      <div class="kpi fig"><div class="lbl">무화과 성목기 매출</div><div class="val" id="kpiRevFig">-</div></div>
       <div class="kpi hi"><div class="lbl">손익분기 도달 시점</div><div class="val" id="kpiBreakeven">-</div></div>
       <div class="kpi hi"><div class="lbl">손익분기까지 최대 자금소요</div><div class="val" id="kpiPeakFund">-</div></div>
     </div>
   </section>
 
   <section class="card">
-    <h2><span class="num">8</span>누적 현금흐름 추이</h2>
+    <h2><span class="num">10</span>누적 현금흐름 추이</h2>
     <div id="chartWrap"></div>
-    <div class="hint">막대: 연간 투자(위쪽 음영은 투자, 붉은 선 아래는 적자 구간) · 선: 누적 현금흐름 · 점선: 손익분기(0원) 기준선</div>
+    <div class="hint">선: 누적 현금흐름 · 점선: 손익분기(0원) 기준선 · 초록 점: 손익분기 시점</div>
   </section>
 
   <section class="card note">
     <h2>참고 · 저온저장고 (별도 트랙, 위 합계 미포함)</h2>
-    <p>농업회사법인 명의로 「산지 저온시설 지원사업」 신청 시 사업비 최대 70% 국고보조 가능. 총사업비 60,000천원 가정 시 국고보조 42,000천원 / 자부담 18,000천원.</p>
+    <p>농업회사법인 명의로 「산지 저온시설 지원사업」 신청 시 사업비 최대 70% 국고보조 가능. 총사업비 60,000천원 가정 시 국고보조 42,000천원 / 자부담 18,000천원. 이 저온저장고가 블루베리 비수기 판매 전략의 전제입니다.</p>
   </section>
 
   <section class="card warnnote">
     <h2>가정치 안내</h2>
-    <p>판매단가·수확량·운영비 비율은 조정 가능한 가정치이며, 실제 시세(가락시장 등)·인건비·기상 여건에 따라 달라질 수 있습니다. 손익분기 시점은 참고용 추정치입니다.</p>
+    <p>판매단가·수확량·운영비 비율은 조정 가능한 가정치이며, 실제 시세·인건비·기상 여건에 따라 달라질 수 있습니다. 무화과는 국가 소득통계(51개 품목) 미포함 품목으로 지역조사 참고치를 바탕으로 한 추정입니다. 손익분기 시점은 참고용입니다.</p>
   </section>
 
 </div>
@@ -250,132 +309,147 @@
 <footer>
   <div class="foot-inner">
     <span>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr</span>
-    <span id="verTag">v2.0</span>
+    <span id="verTag">v3.0</span>
   </div>
 </footer>
 
 <script>
-// ===== 조성 단가표 (단위: 천원) =====
-var UNIT = {
-  pot: 4.9,        // 화분(130L 특대형) 개당
-  media: 12.4,     // 배양토 개당(100L 상당)
-  seedling: 9.0,   // 묘목 주당
-  mat: 5.0,        // 제초매트 개당(5㎡ x 1천원/㎡)
-  irrigVar: 4.538, // 관수배관 확장분 개당
-  labor: 2.0       // 정식 인건비 개당
-};
-var PER_POT_CAPEX = UNIT.pot + UNIT.media + UNIT.seedling + UNIT.mat + UNIT.irrigVar + UNIT.labor;
+// ===== 조성 단가 (단위: 천원) =====
+var BLUE_UNIT = { pot: 4.9, media: 12.4, seedling: 9.0, mat: 5.0, irrigVar: 4.538, labor: 2.0 };
+var FIG_UNIT  = { pot: 4.9, media: 13.4, seedling: 15.0, mat: 8.0, irrigVar: 4.538, labor: 2.0 };
+var BLUE_CAPEX_PER_POT = BLUE_UNIT.pot+BLUE_UNIT.media+BLUE_UNIT.seedling+BLUE_UNIT.mat+BLUE_UNIT.irrigVar+BLUE_UNIT.labor;
+var FIG_CAPEX_PER_POT  = FIG_UNIT.pot+FIG_UNIT.media+FIG_UNIT.seedling+FIG_UNIT.mat+FIG_UNIT.irrigVar+FIG_UNIT.labor;
 
-var TOTAL_POTS = 1300;   // 과수(감나무) 지역 제외 후 식재 대상
-var TOTAL_AREA = 6510;   // ㎡
-var FIXED_COMMON = 3000 + 8000; // 관수 컨트롤러·펌프실(3,000) + 전기인입(8,000)
-var MGMT_COST = 20000;   // 관리동
+var AREA_PER_POT = { blueberry: 5, fig: 8 };
+var TOTAL_AREA = 6510; // ㎡ (과수 감나무 지역 제외 대상)
+var FIXED_COMMON = 3000 + 8000; // 관수 컨트롤러·펌프실 + 전기인입
+var MGMT_COST = 20000;
 
-// 생산 진행률 스케줄 (식재 후 경과연차 기준)
-function rampFraction(yearsSincePlant){
-  if (yearsSincePlant <= 2) return 0;
-  if (yearsSincePlant === 3) return 0.2;
-  if (yearsSincePlant === 4) return 0.4;
-  if (yearsSincePlant === 5) return 0.6;
-  if (yearsSincePlant === 6) return 0.8;
+function rampBlueberry(ys){
+  if (ys <= 2) return 0;
+  if (ys === 3) return 0.2;
+  if (ys === 4) return 0.4;
+  if (ys === 5) return 0.6;
+  if (ys === 6) return 0.8;
+  return 1.0;
+}
+function rampFig(ys){
+  if (ys <= 1) return 0;
+  if (ys === 2) return 0.2;
+  if (ys === 3) return 0.4;
+  if (ys === 4) return 0.7;
   return 1.0;
 }
 
-var state = { phases: 1, mgmt: true, price: 15000, yieldPerPot: 4, costRatio: 0.45, fixedMaint: 1.0 };
+var state = {
+  phases: 1, mgmt: true, cropMix: 70,
+  bluePeak: 15000, blueYield: 4, offPeakOn: true, offPeakRatio: 30, offPeakPrice: 50000,
+  blueCostRatio: 0.45, blueFixedMaint: 1.0,
+  figPrice: 10000, figYield: 3, figCostRatio: 0.40, figFixedMaint: 1.5
+};
 
-function fmt(n){
-  return Math.round(n).toLocaleString('ko-KR');
+function fmt(n){ return Math.round(n).toLocaleString('ko-KR'); }
+function fmtSigned(n){ var r = Math.round(n); return (r >= 0 ? '+' : '') + r.toLocaleString('ko-KR'); }
+
+function cropTotals(){
+  var blueArea = TOTAL_AREA * state.cropMix / 100;
+  var figArea = TOTAL_AREA - blueArea;
+  return {
+    bluePots: Math.round(blueArea / AREA_PER_POT.blueberry),
+    figPots: Math.round(figArea / AREA_PER_POT.fig),
+    blueArea: Math.round(blueArea),
+    figArea: Math.round(figArea)
+  };
 }
-function fmtSigned(n){
-  var r = Math.round(n);
-  return (r >= 0 ? '+' : '') + r.toLocaleString('ko-KR');
+
+function splitPhases(totalPots, n){
+  var base = Math.floor(totalPots / n);
+  var rem = totalPots - base * n;
+  var arr = [];
+  for (var i = 0; i < n; i++){ arr.push(base + (i < rem ? 1 : 0)); }
+  return arr;
 }
 
 function phaseSchedule(){
-  var n = state.phases;
-  var base = Math.floor(TOTAL_POTS / n);
-  var remainder = TOTAL_POTS - base * n;
+  var totals = cropTotals();
+  var blueArr = splitPhases(totals.bluePots, state.phases);
+  var figArr = splitPhases(totals.figPots, state.phases);
   var phases = [];
-  for (var i = 0; i < n; i++){
-    var pots = base + (i < remainder ? 1 : 0);
-    var area = Math.round(pots * TOTAL_AREA / TOTAL_POTS);
-    phases.push({ plantYear: i + 1, pots: pots, area: area });
+  for (var i = 0; i < state.phases; i++){
+    phases.push({ plantYear: i + 1, bluePots: blueArr[i], figPots: figArr[i] });
   }
   return phases;
 }
 
-function capexRows(phases){
-  var rows = [];
-  var cumulative = 0;
+function blueRevPerPot(){
+  var effPrice = state.bluePeak;
+  if (state.offPeakOn){
+    var r = state.offPeakRatio / 100;
+    effPrice = state.bluePeak * (1 - r) + state.offPeakPrice * r;
+  }
+  return state.blueYield * effPrice / 1000; // 천원/화분/년 (성목 기준)
+}
+function figRevPerPot(){
+  return state.figYield * state.figPrice / 1000;
+}
+
+function capexByPhase(phases){
+  var byYear = {};
   phases.forEach(function(ph, idx){
-    var variable = ph.pots * PER_POT_CAPEX;
-    var yearCost = variable;
-    if (idx === 0){
-      yearCost += FIXED_COMMON + (state.mgmt ? MGMT_COST : 0);
-    }
-    cumulative += yearCost;
-    rows.push({ year: ph.plantYear, pots: ph.pots, area: ph.area, yearCost: yearCost, cumulative: cumulative });
+    var cost = ph.bluePots * BLUE_CAPEX_PER_POT + ph.figPots * FIG_CAPEX_PER_POT;
+    if (idx === 0) cost += FIXED_COMMON + (state.mgmt ? MGMT_COST : 0);
+    byYear[ph.plantYear] = (byYear[ph.plantYear] || 0) + cost;
   });
-  return rows;
+  return byYear;
 }
 
 function pnlSimulate(phases){
-  var revMaturePerPot = state.yieldPerPot * state.price / 1000; // 천원/화분/년
-  var costVarMaturePerPot = revMaturePerPot * state.costRatio;   // 천원/화분/년 (매출 비례 운영비)
-  var fixedMaintPerPot = state.fixedMaint;                       // 천원/화분/년 (고정 기본관리비)
-
-  var maxYear = state.phases + 9; // 마지막 단계 성목 도달 후 여유 연차까지 시뮬레이션
-  var capexByYear = {};
-  phases.forEach(function(ph, idx){
-    var variable = ph.pots * PER_POT_CAPEX;
-    var yearCost = variable + (idx === 0 ? (FIXED_COMMON + (state.mgmt ? MGMT_COST : 0)) : 0);
-    capexByYear[ph.plantYear] = (capexByYear[ph.plantYear] || 0) + yearCost;
-  });
+  var bRev = blueRevPerPot(), fRev = figRevPerPot();
+  var bVarCostPerPot = bRev * state.blueCostRatio;
+  var fVarCostPerPot = fRev * state.figCostRatio;
+  var capexByYear = capexByPhase(phases);
+  var maxYear = state.phases + 9;
 
   var rows = [];
-  var cumulative = 0;
-  var breakevenYear = null;
-  var wasNegative = false;
+  var cumulative = 0, breakevenYear = null, wasNegative = false;
 
   for (var y = 1; y <= maxYear; y++){
-    var revenue = 0, varCost = 0, fixedCost = 0, plantedPots = 0;
+    var blueRevenue = 0, blueCost = 0, figRevenue = 0, figCost = 0;
     phases.forEach(function(ph){
       if (y >= ph.plantYear){
         var ys = y - ph.plantYear + 1;
-        var frac = rampFraction(ys);
-        revenue += ph.pots * frac * revMaturePerPot;
-        varCost += ph.pots * frac * costVarMaturePerPot;
-        fixedCost += ph.pots * fixedMaintPerPot;
-        plantedPots += ph.pots;
+        var bf = rampBlueberry(ys), ff = rampFig(ys);
+        blueRevenue += ph.bluePots * bf * bRev;
+        blueCost += ph.bluePots * bf * bVarCostPerPot + ph.bluePots * state.blueFixedMaint;
+        figRevenue += ph.figPots * ff * fRev;
+        figCost += ph.figPots * ff * fVarCostPerPot + ph.figPots * state.figFixedMaint;
       }
     });
-    var opCost = varCost + fixedCost;
+    var revenue = blueRevenue + figRevenue;
+    var opCost = blueCost + figCost;
     var opProfit = revenue - opCost;
     var capex = capexByYear[y] || 0;
     var netFlow = opProfit - capex;
     cumulative += netFlow;
-
     if (cumulative < 0) wasNegative = true;
-    if (breakevenYear === null && wasNegative && cumulative >= 0){
-      breakevenYear = y;
-    }
+    if (breakevenYear === null && wasNegative && cumulative >= 0) breakevenYear = y;
 
-    var prodRate = plantedPots > 0 ? (revenue / (plantedPots * revMaturePerPot || 1)) : 0;
-
-    rows.push({
-      year: y, prodRate: prodRate, revenue: revenue, opCost: opCost,
-      opProfit: opProfit, capex: capex, netFlow: netFlow, cumulative: cumulative
-    });
+    rows.push({ year: y, blueRevenue: blueRevenue, figRevenue: figRevenue, opCost: opCost, opProfit: opProfit, capex: capex, netFlow: netFlow, cumulative: cumulative });
   }
 
-  // 성목기(전체 100% 가동) 기준값
-  var matureRevenue = TOTAL_POTS * revMaturePerPot;
-  var matureCost = TOTAL_POTS * (costVarMaturePerPot + fixedMaintPerPot);
-  var matureNet = matureRevenue - matureCost;
-
+  var totals = cropTotals();
+  var matureBlueRevenue = totals.bluePots * bRev;
+  var matureFigRevenue = totals.figPots * fRev;
+  var matureBlueCost = totals.bluePots * (bVarCostPerPot + state.blueFixedMaint);
+  var matureFigCost = totals.figPots * (fVarCostPerPot + state.figFixedMaint);
+  var matureNet = (matureBlueRevenue + matureFigRevenue) - (matureBlueCost + matureFigCost);
   var peakFund = Math.min.apply(null, rows.map(function(r){ return r.cumulative; }).concat([0]));
 
-  return { rows: rows, breakevenYear: breakevenYear, matureRevenue: matureRevenue, matureCost: matureCost, matureNet: matureNet, peakFund: peakFund };
+  return {
+    rows: rows, breakevenYear: breakevenYear,
+    matureBlueRevenue: matureBlueRevenue, matureFigRevenue: matureFigRevenue, matureNet: matureNet,
+    peakFund: peakFund
+  };
 }
 
 function renderChart(rows, breakevenYear){
@@ -385,34 +459,27 @@ function renderChart(rows, breakevenYear){
   var minV = Math.min.apply(null, cums.concat([0]));
   var maxV = Math.max.apply(null, cums.concat([0]));
   var range = (maxV - minV) || 1;
-
   function xOf(i){ return padL + (i / (years.length - 1)) * (w - padL - padR); }
   function yOf(v){ return padT + (1 - (v - minV) / range) * (h - padT - padB); }
-
   var zeroY = yOf(0);
   var pathPts = cums.map(function(v, i){ return xOf(i) + ',' + yOf(v); }).join(' ');
 
   var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
-  // 0원 기준선
   svg += '<line x1="' + padL + '" y1="' + zeroY + '" x2="' + (w - padR) + '" y2="' + zeroY + '" stroke="#c7cede" stroke-dasharray="4,3" stroke-width="1"/>';
   svg += '<text x="' + (padL - 6) + '" y="' + (zeroY + 4) + '" font-size="10" fill="#5b6577" text-anchor="end">0</text>';
-  // y축 최소/최대 라벨
   svg += '<text x="' + (padL - 6) + '" y="' + (padT + 8) + '" font-size="10" fill="#5b6577" text-anchor="end">' + fmt(maxV) + '</text>';
   svg += '<text x="' + (padL - 6) + '" y="' + (h - padB) + '" font-size="10" fill="#5b6577" text-anchor="end">' + fmt(minV) + '</text>';
-  // x축 연차 라벨(짝수 연차만 표기해 혼잡 방지)
   years.forEach(function(yr, i){
-    if (yr % 2 === 1 || yr === years[years.length-1]){
+    if (yr % 2 === 1 || yr === years[years.length - 1]){
       svg += '<text x="' + xOf(i) + '" y="' + (h - 6) + '" font-size="10" fill="#5b6577" text-anchor="middle">' + yr + '년</text>';
     }
   });
-  // 누적 현금흐름 선
   svg += '<polyline points="' + pathPts + '" fill="none" stroke="#2f6fed" stroke-width="2.2"/>';
-  // 점: 손익분기
   if (breakevenYear){
-    var beIdx = years.indexOf(breakevenYear);
-    if (beIdx >= 0){
-      svg += '<circle cx="' + xOf(beIdx) + '" cy="' + yOf(cums[beIdx]) + '" r="4.5" fill="#1e7a4c"/>';
-      svg += '<text x="' + xOf(beIdx) + '" y="' + (yOf(cums[beIdx]) - 8) + '" font-size="10" fill="#1e7a4c" text-anchor="middle" font-weight="700">손익분기 ' + breakevenYear + '년차</text>';
+    var idx = years.indexOf(breakevenYear);
+    if (idx >= 0){
+      svg += '<circle cx="' + xOf(idx) + '" cy="' + yOf(cums[idx]) + '" r="4.5" fill="#1e7a4c"/>';
+      svg += '<text x="' + xOf(idx) + '" y="' + (yOf(cums[idx]) - 8) + '" font-size="10" fill="#1e7a4c" text-anchor="middle" font-weight="700">손익분기 ' + breakevenYear + '년차</text>';
     }
   }
   svg += '</svg>';
@@ -420,33 +487,42 @@ function renderChart(rows, breakevenYear){
 }
 
 function render(){
+  var totals = cropTotals();
   var phases = phaseSchedule();
 
-  // 4. 연차별 투자 계획 표
-  var crows = capexRows(phases);
+  document.getElementById('mixBlueLbl').textContent = '블루베리 ' + state.cropMix + '%';
+  document.getElementById('mixFigLbl').textContent = '무화과 ' + (100 - state.cropMix) + '%';
+
+  // 6. 연차별 투자 계획
+  var byYear = capexByPhase(phases);
   var ctbody = document.querySelector('#phaseTable tbody');
   ctbody.innerHTML = '';
-  crows.forEach(function(r){
+  var cumCapex = 0;
+  phases.forEach(function(ph){
+    var yearCost = byYear[ph.plantYear] || 0;
+    cumCapex += yearCost;
     var tr = document.createElement('tr');
     tr.innerHTML =
-      '<td>' + r.year + '년차</td>' +
-      '<td>' + r.pots.toLocaleString('ko-KR') + '개</td>' +
-      '<td>' + r.area.toLocaleString('ko-KR') + '㎡</td>' +
-      '<td>' + fmt(r.yearCost) + '천원</td>' +
-      '<td>' + fmt(r.cumulative) + '천원</td>';
+      '<td>' + ph.plantYear + '년차</td>' +
+      '<td>' + ph.bluePots.toLocaleString('ko-KR') + '개</td>' +
+      '<td>' + ph.figPots.toLocaleString('ko-KR') + '개</td>' +
+      '<td>' + fmt(yearCost) + '천원</td>' +
+      '<td>' + fmt(cumCapex) + '천원</td>';
     ctbody.appendChild(tr);
   });
 
-  // 5. 총 투자비 요약
-  var totalVariable = crows.reduce(function(s, r){ return s + (r.pots * PER_POT_CAPEX); }, 0);
+  // 7. 총 투자비 요약
+  var blueCapexTotal = totals.bluePots * BLUE_CAPEX_PER_POT;
+  var figCapexTotal = totals.figPots * FIG_CAPEX_PER_POT;
   var totalMgmt = state.mgmt ? MGMT_COST : 0;
-  var grandCapex = totalVariable + FIXED_COMMON + totalMgmt;
-  document.getElementById('sumVariable').textContent = fmt(totalVariable) + '천원';
+  var grandCapex = blueCapexTotal + figCapexTotal + FIXED_COMMON + totalMgmt;
+  document.getElementById('sumBlueCapex').textContent = fmt(blueCapexTotal) + '천원';
+  document.getElementById('sumFigCapex').textContent = fmt(figCapexTotal) + '천원';
   document.getElementById('sumFixedCommon').textContent = fmt(FIXED_COMMON) + '천원';
   document.getElementById('sumMgmt').textContent = fmt(totalMgmt) + '천원';
   document.getElementById('sumTotal').textContent = fmt(grandCapex) + '천원';
 
-  // 6. 손익 시뮬레이션
+  // 8. 손익 시뮬레이션
   var sim = pnlSimulate(phases);
   var ptbody = document.querySelector('#pnlTable tbody');
   ptbody.innerHTML = '';
@@ -455,8 +531,8 @@ function render(){
     if (r.year === sim.breakevenYear) tr.className = 'milestone';
     tr.innerHTML =
       '<td>' + r.year + '년차</td>' +
-      '<td>' + Math.round(r.prodRate * 100) + '%</td>' +
-      '<td>' + fmt(r.revenue) + '</td>' +
+      '<td>' + fmt(r.blueRevenue) + '</td>' +
+      '<td>' + fmt(r.figRevenue) + '</td>' +
       '<td>' + fmt(r.opCost) + '</td>' +
       '<td>' + fmt(r.opProfit) + '</td>' +
       '<td>' + fmt(r.capex) + '</td>' +
@@ -465,15 +541,15 @@ function render(){
     ptbody.appendChild(tr);
   });
 
-  // 7. 핵심 요약
+  // 9. 핵심 요약
   document.getElementById('kpiCapex').textContent = fmt(grandCapex) + '천원';
-  document.getElementById('kpiRevMature').textContent = fmt(sim.matureRevenue) + '천원';
-  document.getElementById('kpiCostMature').textContent = fmt(sim.matureCost) + '천원';
   document.getElementById('kpiNetMature').textContent = fmt(sim.matureNet) + '천원';
-  document.getElementById('kpiBreakeven').textContent = sim.breakevenYear ? (sim.breakevenYear + '년차') : '시뮬레이션 기간 내 미도달';
+  document.getElementById('kpiRevBlue').textContent = fmt(sim.matureBlueRevenue) + '천원';
+  document.getElementById('kpiRevFig').textContent = fmt(sim.matureFigRevenue) + '천원';
+  document.getElementById('kpiBreakeven').textContent = sim.breakevenYear ? (sim.breakevenYear + '년차') : '기간 내 미도달';
   document.getElementById('kpiPeakFund').textContent = fmt(Math.abs(sim.peakFund)) + '천원';
 
-  // 8. 차트
+  // 10. 차트
   renderChart(sim.rows, sim.breakevenYear);
 }
 
@@ -486,19 +562,25 @@ document.querySelectorAll('.menu-btn').forEach(function(btn){
   });
 });
 
-document.getElementById('chkMgmt').addEventListener('change', function(e){
-  state.mgmt = e.target.checked;
-  render();
-});
+document.getElementById('chkMgmt').addEventListener('change', function(e){ state.mgmt = e.target.checked; render(); });
+document.getElementById('inMix').addEventListener('input', function(e){ state.cropMix = parseInt(e.target.value, 10); render(); });
+document.getElementById('chkOffPeak').addEventListener('change', function(e){ state.offPeakOn = e.target.checked; render(); });
 
-['inPrice','inYield','inCostRatio','inFixedMaint'].forEach(function(id){
+var fieldMap = {
+  inBluePeak: 'bluePeak', inBlueYield: 'blueYield',
+  inOffPeakRatio: 'offPeakRatio', inOffPeakPrice: 'offPeakPrice',
+  inBlueCostRatio: '__blueCostRatio', inBlueFixedMaint: 'blueFixedMaint',
+  inFigPrice: 'figPrice', inFigYield: 'figYield',
+  inFigCostRatio: '__figCostRatio', inFigFixedMaint: 'figFixedMaint'
+};
+Object.keys(fieldMap).forEach(function(id){
   document.getElementById(id).addEventListener('input', function(e){
     var v = parseFloat(e.target.value);
     if (isNaN(v)) return;
-    if (id === 'inPrice') state.price = v;
-    if (id === 'inYield') state.yieldPerPot = v;
-    if (id === 'inCostRatio') state.costRatio = v / 100;
-    if (id === 'inFixedMaint') state.fixedMaint = v;
+    var key = fieldMap[id];
+    if (key === '__blueCostRatio') state.blueCostRatio = v / 100;
+    else if (key === '__figCostRatio') state.figCostRatio = v / 100;
+    else state[key] = v;
     render();
   });
 });
