@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>김해 금곡리 블루베리 화분재배 투자 시뮬레이터</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#17264a;
+    --navy-2:#24345f;
+    --text:#25324a;
+    --text-mid:#5b6577;
+    --bg:#f3f5f8;
+    --card:#ffffff;
+    --border:#e2e6ee;
+    --accent:#2f6fed;
+    --accent-bg:#eaf1fe;
+    --good:#1e7a4c;
+    --good-bg:#e8f6ee;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Noto Sans KR',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    font-size:14px;
+    line-height:1.5;
+  }
+  header{background:var(--navy);color:#fff;}
+  .nav-inner{
+    max-width:1100px;margin:0 auto;padding:10px 16px;
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+  }
+  #mainWrap.mobile .nav-inner{max-width:420px;}
+  .brand{font-weight:700;font-size:15px;display:flex;align-items:center;gap:6px;}
+  .brand small{font-weight:400;font-size:11px;color:#c7d0e6;display:block;}
+  .view-toggle{display:flex;background:rgba(255,255,255,.12);border-radius:8px;padding:2px;}
+  .view-toggle button{
+    border:none;background:transparent;color:#dfe4f0;font-family:inherit;
+    font-size:12px;padding:6px 10px;border-radius:6px;cursor:pointer;
+  }
+  .view-toggle button.active{background:#fff;color:var(--navy);font-weight:700;}
+
+  #mainWrap{max-width:1100px;margin:0 auto;padding:0 16px;}
+  #mainWrap.mobile{max-width:420px;}
+
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:10px;
+    padding:12px 14px;margin-top:8px;
+  }
+  .card h2{
+    font-size:13px;color:var(--text-mid);margin:0 0 8px 0;
+    font-weight:700;letter-spacing:.02em;
+  }
+
+  .menu-btns{display:flex;gap:8px;}
+  .menu-btn{
+    flex:1;border:1px solid var(--border);background:#fafbfd;color:var(--text);
+    border-radius:8px;padding:10px 4px;cursor:pointer;font-family:inherit;
+    font-size:13px;text-align:center;line-height:1.4;
+  }
+  .menu-btn span{display:block;font-size:11px;color:var(--text-mid);margin-top:2px;}
+  .menu-btn.active{border-color:var(--accent);background:var(--accent-bg);color:var(--accent);font-weight:700;}
+  .menu-btn.active span{color:var(--accent);}
+
+  .chk-row{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;}
+  .chk-row input{width:16px;height:16px;accent-color:var(--accent);}
+  .hint{font-size:11px;color:var(--text-mid);margin-top:6px;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  thead th{
+    background:var(--accent-bg);color:var(--navy-2);font-weight:700;
+    text-align:right;padding:6px 6px;border-bottom:1px solid var(--border);
+  }
+  thead th:first-child{text-align:left;}
+  tbody td{padding:7px 6px;text-align:right;border-bottom:1px solid var(--border);}
+  tbody td:first-child{text-align:left;color:var(--text-mid);}
+  tbody tr:last-child td{font-weight:700;color:var(--navy-2);}
+
+  .sum-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;}
+  .sum-row.total{
+    border-top:1px solid var(--border);margin-top:4px;padding-top:8px;
+    font-size:15px;font-weight:700;color:var(--navy-2);
+  }
+  .sum-row span:last-child{font-variant-numeric:tabular-nums;}
+
+  .note{background:var(--good-bg);border-color:#cdeadb;}
+  .note p{margin:0;font-size:12.5px;color:#22543d;}
+
+  footer{margin-top:10px;padding:14px 16px 24px;text-align:center;}
+  .foot-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;font-size:11px;color:var(--text-mid);}
+  #mainWrap.mobile ~ footer .foot-inner{max-width:420px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav-inner">
+    <div class="brand">🫐 블루베리 화분재배 시뮬레이터<small>김해 금곡리 부지 · 단위 천원</small></div>
+    <div class="view-toggle">
+      <button id="btnMobile" class="active">모바일</button>
+      <button id="btnPC">PC</button>
+    </div>
+  </div>
+</header>
+
+<div id="mainWrap" class="mobile">
+
+  <section class="card">
+    <h2>1. 식재 방식 선택</h2>
+    <div class="menu-btns">
+      <button class="menu-btn active" data-phases="1">일괄 식재<span>1회 · 1년차</span></button>
+      <button class="menu-btn" data-phases="2">2년 분할<span>2회 · 1~2년차</span></button>
+      <button class="menu-btn" data-phases="3">3년 분할<span>3회 · 1~3년차</span></button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>2. 옵션</h2>
+    <label class="chk-row">
+      <input type="checkbox" id="chkMgmt" checked>
+      관리동 신축 포함 (20,000천원)
+    </label>
+    <div class="hint">체크 해제 시 기존 건물 활용 등으로 가정, 총 투자비에서 제외됩니다.</div>
+  </section>
+
+  <section class="card">
+    <h2>3. 연차별 투자 계획</h2>
+    <table id="phaseTable">
+      <thead>
+        <tr><th>연차</th><th>화분 수</th><th>면적</th><th>해당연도 투자</th><th>누계</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>4. 총 투자비 요약</h2>
+    <div class="sum-row"><span>재배 관련 비용 (화분·배양토·묘목·제초매트·관수확장·인건비)</span><span id="sumVariable">-</span></div>
+    <div class="sum-row"><span>공통 고정시설 (관수 컨트롤러·전기인입)</span><span id="sumFixedCommon">-</span></div>
+    <div class="sum-row" id="rowMgmt"><span>관리동</span><span id="sumMgmt">-</span></div>
+    <div class="sum-row total"><span>총 투자비 (자체 부담)</span><span id="sumTotal">-</span></div>
+  </section>
+
+  <section class="card note">
+    <h2>참고 · 저온저장고 (별도 트랙, 위 합계 미포함)</h2>
+    <p>농업회사법인 명의로 「산지 저온시설 지원사업」 신청 시 사업비 최대 70% 국고보조 가능. 총사업비 60,000천원 가정 시 국고보조 42,000천원 / 자부담 18,000천원.</p>
+  </section>
+
+</div>
+
+<footer>
+  <div class="foot-inner">
+    <span>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr</span>
+    <span id="verTag">v1.0</span>
+  </div>
+</footer>
+
+<script>
+// ===== 단가표 (단위: 천원) =====
+var UNIT = {
+  pot: 4.9,        // 화분(130L 특대형) 개당
+  media: 12.4,     // 배양토 개당(100L 상당)
+  seedling: 9.0,   // 묘목 주당
+  mat: 5.0,        // 제초매트 개당(5㎡ x 1천원/㎡)
+  irrigVar: 4.538, // 관수배관 확장분 개당
+  labor: 2.0       // 정식 인건비 개당
+};
+var PER_POT = UNIT.pot + UNIT.media + UNIT.seedling + UNIT.mat + UNIT.irrigVar + UNIT.labor;
+
+var TOTAL_POTS = 1300;   // 과수(감나무) 지역 제외 후 식재 대상
+var TOTAL_AREA = 6510;   // ㎡
+var FIXED_COMMON = 3000 + 8000; // 관수 컨트롤러·펌프실(3,000) + 전기인입(8,000)
+var MGMT_COST = 20000;   // 관리동
+
+var state = { phases: 1, mgmt: true };
+
+function fmt(n){
+  return Math.round(n).toLocaleString('ko-KR');
+}
+
+function calcRows(){
+  var n = state.phases;
+  var base = Math.floor(TOTAL_POTS / n);
+  var remainder = TOTAL_POTS - base * n;
+  var rows = [];
+  var cumulative = 0;
+  for (var i = 0; i < n; i++){
+    var pots = base + (i < remainder ? 1 : 0);
+    var area = Math.round(pots * TOTAL_AREA / TOTAL_POTS);
+    var variable = pots * PER_POT;
+    var yearCost = variable;
+    if (i === 0){
+      yearCost += FIXED_COMMON + (state.mgmt ? MGMT_COST : 0);
+    }
+    cumulative += yearCost;
+    rows.push({
+      year: i + 1, pots: pots, area: area,
+      variable: variable, yearCost: yearCost, cumulative: cumulative
+    });
+  }
+  return rows;
+}
+
+function render(){
+  var rows = calcRows();
+  var tbody = document.querySelector('#phaseTable tbody');
+  tbody.innerHTML = '';
+  rows.forEach(function(r){
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td>' + r.year + '년차</td>' +
+      '<td>' + r.pots.toLocaleString('ko-KR') + '개</td>' +
+      '<td>' + r.area.toLocaleString('ko-KR') + '㎡</td>' +
+      '<td>' + fmt(r.yearCost) + '천원</td>' +
+      '<td>' + fmt(r.cumulative) + '천원</td>';
+    tbody.appendChild(tr);
+  });
+
+  var totalVariable = rows.reduce(function(s, r){ return s + r.variable; }, 0);
+  var totalMgmt = state.mgmt ? MGMT_COST : 0;
+  var grandTotal = totalVariable + FIXED_COMMON + totalMgmt;
+
+  document.getElementById('sumVariable').textContent = fmt(totalVariable) + '천원';
+  document.getElementById('sumFixedCommon').textContent = fmt(FIXED_COMMON) + '천원';
+  document.getElementById('sumMgmt').textContent = fmt(totalMgmt) + '천원';
+  document.getElementById('sumTotal').textContent = fmt(grandTotal) + '천원';
+  document.getElementById('rowMgmt').style.opacity = state.mgmt ? '1' : '.45';
+}
+
+document.querySelectorAll('.menu-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.menu-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    state.phases = parseInt(btn.getAttribute('data-phases'), 10);
+    render();
+  });
+});
+
+document.getElementById('chkMgmt').addEventListener('change', function(e){
+  state.mgmt = e.target.checked;
+  render();
+});
+
+document.getElementById('btnMobile').addEventListener('click', function(){
+  document.getElementById('mainWrap').classList.add('mobile');
+  document.getElementById('btnMobile').classList.add('active');
+  document.getElementById('btnPC').classList.remove('active');
+});
+document.getElementById('btnPC').addEventListener('click', function(){
+  document.getElementById('mainWrap').classList.remove('mobile');
+  document.getElementById('btnPC').classList.add('active');
+  document.getElementById('btnMobile').classList.remove('active');
+});
+
+render();
+</script>
+</body>
+</html>
