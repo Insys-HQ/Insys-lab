@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>세척·탈수·건조 설비 요구 사양서 v1.3 | 인시스 AI혁신 연구개발실</title>
+<title>세척·탈수·건조 설비 요구 사양서 v1.4 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -63,7 +63,7 @@ footer{text-align:center;color:#6b8098;font-size:12px;padding:12px 0 18px;}
 <body>
 <div class="hdr"><div class="nav-inner">
   <div><div class="hdr-t" id="hdrT">세척·탈수·건조 설비 요구 사양서</div><div class="hdr-s" id="hdrS">인시스 AI혁신 연구개발실 · 인텍코리아 안산공장</div></div>
-  <div class="hdr-r"><span class="vb">v1.3</span>
+  <div class="hdr-r"><span class="vb">v1.4</span>
     <select id="docSel" onchange="render()"><option value="tray">트레이 / Tray / 托盘(料盘)</option><option value="box">박스 / Box / 周转箱</option></select>
     <button id="lko" class="on" onclick="setLang('ko')">한국어</button><button id="len" onclick="setLang('en')">English</button><button id="lzh" onclick="setLang('zh')">中文</button>
     <button id="bp" class="on" onclick="setView('pc')">PC</button><button id="bm" onclick="setView('mobile')">모바일</button></div>
@@ -283,7 +283,7 @@ function render(){
   const D=DOCS[curDoc()];
   gi('hdrT').textContent=L(D.name); gi('hdrS').textContent=L(UI.org);
   gi('btnPdf').textContent=L(UI.pdf); gi('btnSave').textContent=L(UI.save); gi('btnLoad').textContent=L(UI.load); gi('btnMail').textContent=L(UI.mail);
-  document.title=L(D.name)+' v1.3';
+  document.title=L(D.name)+' v1.4';
   let h='';
   h+=card(0,SECT.s0,'<table><colgroup><col style="width:16%"><col></colgroup>'
     +'<tr><td class="k">'+L(SECT.docno)+'</td><td>'+D.no+'</td></tr>'
@@ -293,7 +293,7 @@ function render(){
     +'<tr><td class="k">'+L(SECT.nature)+'</td><td>'+L(SECT.natureV)+'</td></tr>'
     +'<tr><td class="k">'+L(SECT.rel)+'</td><td>'+L(D.rel)+'</td></tr></table>');
   // 1
-  let b='<table><colgroup><col style="width:14%"><col style="width:30%"><col></colgroup><tr><th>'+L(UI.item)+'</th><th>'+L(UI.req)+'</th><th>'+L(UI.note)+'</th></tr>';
+  let b='<table><colgroup><col style="width:11%"><col style="width:23%"><col></colgroup><tr><th>'+L(UI.item)+'</th><th>'+L(UI.req)+'</th><th>'+L(UI.note)+'</th></tr>';
   D.target.forEach(r=>{b+='<tr><td class="k">'+L(r[0])+'</td><td class="v">'+L(r[1])+'</td><td>'+L(r[2])+'</td></tr>';});
   b+='</table>'+qbox('target');
   const cg = D.sizeHead.length===5 ? '<colgroup><col style="width:8%"><col style="width:19%"><col style="width:10%"><col style="width:10%"><col></colgroup>'
@@ -303,7 +303,7 @@ function render(){
   b+='</table><div class="note">'+L(D.sizeNote)+'</div>'+qbox('size');
   h+=card(1,SECT.s1,b);
   // 2
-  b='<table><colgroup><col style="width:14%"><col style="width:30%"><col></colgroup><tr><th>'+L(UI.proc)+'</th><th>'+L(UI.qty)+'</th><th>'+L(UI.crit)+'</th></tr>';
+  b='<table><colgroup><col style="width:11%"><col style="width:26%"><col></colgroup><tr><th>'+L(UI.proc)+'</th><th>'+L(UI.qty)+'</th><th>'+L(UI.crit)+'</th></tr>';
   D.cap.forEach(r=>{b+='<tr><td class="k">'+L(r[0])+'</td><td class="v">'+L(r[1])+'</td><td>'+L(r[2])+'</td></tr>';});
   b+='</table>'+qbox('cap');
   h+=card(2,SECT.s2,b);
