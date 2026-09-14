@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>세척·탈수·건조 설비 요구 사양서 v2.0 | 인시스 AI혁신 연구개발실</title>
+<title>세척·탈수·건조 설비 요구 사양서 v2.1 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -21,6 +21,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 .hdr-r button.on{background:#fff;color:var(--navy);}
 .hdr-r select option{color:var(--navy);}
 .ptitle{display:none;}
+.ask{background:#fff8f0;border:1.5px solid #ffcc80;border-radius:8px;padding:8px 12px;margin:0 0 8px;font-size:13px;font-weight:800;color:#8a5a00;text-align:center;}
 .vb{background:rgba(255,255,255,.24);padding:4px 10px;border-radius:7px;font-size:12px;font-weight:700;}
 .wrap{max-width:1100px;margin:0 auto;padding:10px 14px;}
 .wrap.mobile{max-width:430px;}
@@ -76,13 +77,14 @@ footer{text-align:center;color:#6b8098;font-size:12px;padding:12px 0 18px;}
   .note,.warn{padding:4px 7px;margin:3px 0;font-size:10.5px;break-inside:avoid;page-break-inside:avoid;}
   ul{margin:2px 0 2px 14px;}li{margin:0;}
   footer{padding:4px 0;font-size:10px;}
+  .ask{padding:5px 10px;margin:0 0 6px;font-size:11px;}
 }
 </style>
 </head>
 <body>
 <div class="hdr"><div class="nav-inner">
   <div><div class="hdr-t" id="hdrT">세척·탈수·건조 설비 요구 사양서</div><div class="hdr-s" id="hdrS">인시스 AI혁신 연구개발실 · 인텍코리아 안산공장</div></div>
-  <div class="hdr-r"><span class="vb">v2.0</span>
+  <div class="hdr-r"><span class="vb">v2.1</span>
     <select id="docSel" onchange="render()"><option value="tray">트레이 / Tray / 托盘(料盘)</option><option value="box">박스 / Box / 周转箱</option></select>
     <button id="lko" class="on" onclick="setLang('ko')">한국어</button><button id="len" onclick="setLang('en')">English</button><button id="lzh" onclick="setLang('zh')">中文</button>
     <button id="bp" class="on" onclick="setView('pc')">PC</button><button id="bm" onclick="setView('mobile')">모바일</button></div>
@@ -127,7 +129,8 @@ const UI={
   fail:T('저장 실패 — Firebase 규칙 확인 필요','Save failed — check Firebase rules','保存失败 — 请检查Firebase规则'),
   mailSubj:T('[요구 사양서 질문]','[Spec questions]','[规格书问题]'),
   mailHint:T('메일 앱이 열립니다. 질문 내용이 본문에 담기며, PDF는 "PDF 출력"으로 저장 후 첨부해 주세요.','Your mail app opens with the questions in the body. Attach the PDF saved via "Print PDF".','将打开邮件客户端，问题内容已填入正文。请用"输出PDF"保存后附加PDF。'),
-  noq:T('입력된 질문이 없습니다','No questions entered','未输入问题')
+  noq:T('입력된 질문이 없습니다','No questions entered','未输入问题'),
+  ask:T('본 사양서 내용에 따라 최적 설계를 검토하신 후 회신 및 가견적을 요청합니다.','Please review the optimum design based on this specification and reply with your proposal and a budgetary quotation.','请根据本规格书内容进行最优设计评审后回复，并提供预算报价。')
 };
 
 // ── 공통 섹션 (트레이·박스 공용) ──
@@ -310,8 +313,9 @@ function render(){
   gi('hdrT').textContent=L(D.name); gi('hdrS').textContent=L(UI.org);
   gi('ptitle').innerHTML='<b>'+L(D.name)+'</b><span>'+L(UI.org)+' · '+D.no+' · '+D.ver+'</span>';
   gi('btnPdf').textContent=L(UI.pdf); gi('btnSave').textContent=L(UI.save); gi('btnLoad').textContent=L(UI.load); gi('btnMail').textContent=L(UI.mail);
-  document.title=L(D.name)+' v2.0';
+  document.title=L(D.name)+' v2.1';
   let h='';
+  h+='<div class="ask">'+L(UI.ask)+'</div>';
   h+=card(0,SECT.s0,'<table><colgroup><col style="width:16%"><col></colgroup>'
     +'<tr><td class="k">'+L(SECT.docno)+'</td><td>'+D.no+'</td></tr>'
     +'<tr><td class="k">'+L(SECT.ver)+'</td><td>'+D.ver+'</td></tr>'
