@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>세척·탈수·건조 설비 요구 사양서 v1.0 | 인시스 AI혁신 연구개발실</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--navy:#0d2137;--teal:#0d7fa8;--ink:#1c2b3a;--bg:#eef2f6;--line:#dde5ee;--hi:#0d47a1;--warn:#8a5a00;--good:#1b5e20;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6;}
+@media(min-width:768px){body{font-size:16px;}}
+.hdr{background:linear-gradient(120deg,#0d2137 0%,#0d7fa8 100%);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.22);}
+.nav-inner{max-width:1100px;margin:0 auto;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.hdr-t{font-size:17px;font-weight:900;}
+.hdr-s{font-size:13px;opacity:.86;}
+.hdr-r{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.hdr-r button,.hdr-r select{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.32);color:#fff;padding:5px 10px;border-radius:7px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;}
+.hdr-r button.on{background:#fff;color:var(--navy);}
+.hdr-r select option{color:var(--navy);}
+.vb{background:rgba(255,255,255,.24);padding:4px 10px;border-radius:7px;font-size:13px;font-weight:700;}
+.wrap{max-width:1100px;margin:0 auto;padding:10px 14px;}
+.wrap.mobile{max-width:430px;}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden;}
+.ch{background:#f4f8fb;border-bottom:1px solid var(--line);padding:8px 12px;display:flex;align-items:center;gap:7px;}
+.cn{background:var(--navy);color:#fff;width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex:none;}
+.cl{font-size:15px;font-weight:800;color:var(--navy);}
+.cb{padding:10px 12px;}
+h3{font-size:14px;font-weight:800;color:var(--teal);margin:10px 0 5px;padding-left:7px;border-left:3px solid var(--teal);}
+table{width:100%;border-collapse:collapse;margin:5px 0 8px;font-size:13px;}
+@media(min-width:768px){table{font-size:15px;}}
+th{background:#e8eff5;color:var(--navy);font-weight:800;padding:6px 8px;border:1px solid var(--line);text-align:center;}
+td{padding:6px 8px;border:1px solid var(--line);text-align:left;vertical-align:top;}
+td.k{background:#f7fafc;font-weight:700;color:var(--navy);width:22%;}
+td.v{font-weight:800;color:var(--hi);}
+td.c{text-align:center;}
+.note{background:#eef6fb;border:1px solid #cde3f0;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:13px;color:#0b5a80;line-height:1.6;}
+.warn{background:#fff8f0;border:1px solid #ffd9a8;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:13px;color:var(--warn);line-height:1.6;}
+ul{margin:4px 0 4px 17px;}li{margin:2px 0;}
+.q{margin:4px 0 8px;display:flex;gap:6px;align-items:flex-start;}
+.q textarea{flex:1;min-height:38px;border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:13px;font-family:inherit;resize:vertical;background:#fffdf5;}
+.q textarea:focus{outline:none;border-color:var(--teal);}
+.q .qt{font-size:13px;color:#7a90a4;flex:none;padding-top:8px;width:60px;}
+.qc{font-size:13px;color:#7a90a4;margin:-4px 0 6px 66px;}
+.bar{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;}
+.bar button{background:var(--teal);color:#fff;border:0;border-radius:7px;padding:8px 13px;font-size:13px;font-weight:800;font-family:inherit;cursor:pointer;}
+.bar button.g{background:#5a7088;}
+.bar button.r{background:#b71c1c;}
+#status{font-size:13px;color:#5a7088;margin:4px 0;}
+footer{text-align:center;color:#6b8098;font-size:13px;padding:12px 0 18px;}
+@media print{
+  .hdr,.bar,.q,.qc,#status,.noprint{display:none!important;}
+  body{background:#fff;font-size:12px;}
+  .wrap{max-width:100%;padding:0;}
+  .card{break-inside:avoid;border:1px solid #bbb;margin-bottom:6px;}
+  table{font-size:12px;}
+  @page{margin:12mm;}
+}
+</style>
+</head>
+<body>
+<div class="hdr"><div class="nav-inner">
+  <div><div class="hdr-t" id="hdrT">세척·탈수·건조 설비 요구 사양서</div><div class="hdr-s" id="hdrS">인시스 AI혁신 연구개발실 · 인텍코리아 안산공장</div></div>
+  <div class="hdr-r"><span class="vb">v1.0</span>
+    <select id="docSel" onchange="render()"><option value="tray">트레이 / Tray / 托盘(料盘)</option><option value="box">박스 / Box / 周转箱</option></select>
+    <button id="lko" class="on" onclick="setLang('ko')">한국어</button><button id="len" onclick="setLang('en')">English</button><button id="lzh" onclick="setLang('zh')">中文</button>
+    <button id="bp" class="on" onclick="setView('pc')">PC</button><button id="bm" onclick="setView('mobile')">모바일</button></div>
+</div></div>
+
+<div class="wrap" id="wrap">
+<div class="bar noprint">
+  <button onclick="window.print()" id="btnPdf">📄 PDF 출력</button>
+  <button class="g" onclick="saveQ()" id="btnSave">💾 질문 저장</button>
+  <button class="g" onclick="loadQ()" id="btnLoad">🔄 저장된 질문 불러오기</button>
+  <button class="r" onclick="sendMail()" id="btnMail">✉️ 이메일 보내기</button>
+</div>
+<div id="status"></div>
+<div id="doc"></div>
+<footer id="foot"></footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// 3개 언어 병기 구조: T(ko, en, zh) — 항목마다 세 언어를 나란히 두어 역번역 검토가 가능
+// ══════════════════════════════════════════════════════════════
+const T=(ko,en,zh)=>({ko,en,zh});
+let LANG='ko';
+const L=t=>typeof t==='string'?t:(t[LANG]||t.ko);
+
+const UI={
+  title:T('세척·탈수·건조 설비 요구 사양서','Washing · Dewatering · Drying Equipment Requirement Specification','清洗·脱水·烘干设备需求规格书'),
+  org:T('인시스 AI혁신 연구개발실 · 인텍코리아 안산공장','INSYS AI Innovation R&D Office · Intec Korea Ansan Plant','INSYS AI创新研发室 · Intec Korea 安山工厂'),
+  pdf:T('📄 PDF 출력','📄 Print PDF','📄 输出PDF'), save:T('💾 질문 저장','💾 Save questions','💾 保存问题'),
+  load:T('🔄 저장된 질문 불러오기','🔄 Load saved questions','🔄 读取已保存问题'), mail:T('✉️ 이메일 보내기','✉️ Send by e-mail','✉️ 发送邮件'),
+  q:T('질문','Question','问题'), qph:T('이 항목에 대한 질문·의견을 입력하세요','Enter your question or comment on this item','请输入对此项的问题或意见'),
+  item:T('항목','Item','项目'), req:T('요구 조건','Requirement','要求条件'), note:T('비고','Remarks','备注'),
+  proc:T('공정','Process','工序'), qty:T('요구량','Required capacity','要求量'), crit:T('판정 기준','Acceptance criteria','判定标准'),
+  content:T('내용','Description','内容'), grade:T('구분','Class','分类'), size:T('규격 W×D×H (mm)','Size W×D×H (mm)','规格 W×D×H (mm)'),
+  feat:T('특징','Feature','特点'), pocket:T('포켓 수','Pockets','格数'), pdepth:T('포켓 깊이','Pocket depth','格深'),
+  max:T('최대','Max','最大'), min:T('최소','Min','最小'),
+  foot:T('본 사양서는 발주 요구 사양이며 세부 설계는 제작사 제안에 따른다. 세부 설계값은 당사 설계 기준을 참고자료로 별도 제공하며, 최종 설계는 제작사 책임으로 한다.',
+         'This document states procurement requirements; detailed design follows the manufacturer\'s proposal. Our design reference values are provided separately; final design is the manufacturer\'s responsibility.',
+         '本规格书为采购需求规格，详细设计以制造商方案为准。我方设计基准值另行提供作为参考，最终设计由制造商负责。'),
+  saved:T('저장 완료','Saved','已保存'), loaded:T('불러오기 완료','Loaded','已读取'), none:T('저장된 질문이 없습니다','No saved questions','没有已保存的问题'),
+  fail:T('저장 실패 — Firebase 규칙 확인 필요','Save failed — check Firebase rules','保存失败 — 请检查Firebase规则'),
+  mailSubj:T('[요구 사양서 질문]','[Spec questions]','[规格书问题]'),
+  mailHint:T('메일 앱이 열립니다. 질문 내용이 본문에 담기며, PDF는 "PDF 출력"으로 저장 후 첨부해 주세요.','Your mail app opens with the questions in the body. Attach the PDF saved via "Print PDF".','将打开邮件客户端，问题内容已填入正文。请用"输出PDF"保存后附加PDF。'),
+  noq:T('입력된 질문이 없습니다','No questions entered','未输入问题')
+};
+
+// ── 공통 섹션 (트레이·박스 공용) ──
+const ENERGY=[
+  T('세척수는 헹굼조 → 세척조 캐스케이드(오버플로우)로 재사용하고, 탈수부 낙수는 회수하여 헹굼조로 되돌린다.',
+    'Reuse wash water by cascade overflow (rinse tank → wash tanks); collect drip water from the dewatering zone and return it to the rinse tank.',
+    '清洗水采用漂洗槽→清洗槽的溢流串级回用，脱水段滴落水回收后返回漂洗槽。'),
+  T('세척조 급수는 소모량 보충(레벨 제어)으로 하고, 조 온도 유지는 열교환 방식으로 한다. 온수를 직접 투입해 오버플로우로 버리는 방식은 불가.',
+    'Make-up water is level-controlled (replace only what is consumed); tank temperature is maintained by heat exchange. Feeding hot water directly and discarding it through overflow is not acceptable.',
+    '清洗槽补水采用液位控制（仅补充消耗量），槽温通过热交换维持。不允许直接注入热水再经溢流排掉的方式。'),
+  T('세척수 가열은 설비 내장 전기히터가 아니라 별도 가스 보일러의 온수로 공급한다(전기료 절감의 핵심). 보일러는 다른 세척기와 공용하며, 설비별 독립 제어밸브와 정유량 밸브로 상호 간섭을 방지한다. 설비에는 온수 유입·환수 접속구와 조 내 열교환 코일(또는 온수 직공급 레벨 제어)을 갖춘다.',
+    'Wash water is heated by hot water from a separate gas boiler, not by built-in electric heaters (key to reducing electricity cost). The boiler is shared with the other washer; each machine has its own control valve and constant-flow valve to avoid interference. The machine shall have hot-water supply/return connections and in-tank heat-exchange coils (or level-controlled direct hot-water feed).',
+    '清洗水加热采用独立燃气锅炉热水供应，而非设备内置电加热器（节省电费的关键）。锅炉与另一台清洗机共用，各设备设独立控制阀和定流量阀以避免相互干扰。设备需配备热水进/回水接口及槽内热交换盘管（或液位控制的热水直供）。'),
+  T('건조는 저온(60°C 이하)·대풍량 방식으로 하고, 열풍은 순환 재사용한다. 배기는 습도에 따라 비례 제어한다.',
+    'Drying uses low temperature (≤60°C) with high airflow; hot air is recirculated. Exhaust is proportionally controlled by humidity.',
+    '烘干采用低温（≤60°C）大风量方式，热风循环回用，排气按湿度比例控制。'),
+  T('에어나이프 블로워·시로코팬은 삼상 기종을 우선하고, 소형 다수 배치로 전력이 낮은 구성을 제안한다.',
+    'Prefer three-phase air-knife blowers and sirocco fans; propose a low-power configuration using multiple small units.',
+    '气刀风机与多翼风机优先选用三相机型，建议采用多台小型机组的低功耗配置。')
+];
+const SEP=T('구조 분리 (중요)','Structural separation (important)','结构分离（重要）');
+const SEPv=T('세척조·탈수조·건조로는 컨베이어로 연결되되, 탈수조와 건조로의 상부 구조물은 세척조와 분리하여 세척조 내부의 습기·비산수가 탈수·건조 구간으로 전이되지 않는 구조로 한다. 구간 경계에 커튼·격벽·배기 등 습기 차단 수단을 둔다.',
+  'Wash, dewatering and drying zones are linked by the conveyor, but the upper enclosures of the dewatering and drying zones must be separated from the wash zone so that moisture and spray from the wash zone do not migrate into them. Provide curtains, partitions or exhaust at the boundaries.',
+  '清洗槽、脱水段、烘干炉由输送机连接，但脱水段与烘干炉的上部结构须与清洗槽分离，防止清洗槽内的湿气与飞溅水进入脱水、烘干区。区段交界处设置帘幕、隔板或排气等隔湿措施。');
+const CLIP=T('컨베이어 유지 방식 (중요)','Conveyor holding method (important)','输送机夹持方式（重要）');
+const ADJ=T('세척 조건 조정','Wash condition adjustment','清洗条件调整');
+const ADJv=T('노즐 각도·분사 압력·컨베이어 속도는 시운전 중 조정 가능해야 함. 펌프는 4.0 bar까지 여유',
+  'Nozzle angle, spray pressure and conveyor speed shall be adjustable during commissioning. Pumps rated up to 4.0 bar.',
+  '喷嘴角度、喷射压力、输送速度须可在试运行中调整。泵额定压力预留至4.0 bar。');
+const DRY=T('건조 방식','Drying method','烘干方式');
+const DRYv=T('상부 시로코팬 + 측면 원형 순환덕트. 건조실 내부온도 65°C 초과 시 히터 차단 인터록 필수',
+  'Top-mounted sirocco fans + side round recirculation ducts. Interlock to cut the heater if dryer temperature exceeds 65°C is mandatory.',
+  '顶部多翼风机+侧面圆形循环风管。烘干室温度超过65°C时切断加热器的联锁为必须。');
+const TANK=T('저수조','Water tanks','水槽');
+const TANKv=T('세척조 하부 배치. 각 조 최하단 전량 배수 드레인. 헹굼조가 최상단, 하류로 단차를 두어 자연 유하',
+  'Located under the wash zone. Full-drain valve at the bottom of each tank. Rinse tank highest; stepped levels downstream for gravity overflow.',
+  '设于清洗槽下方。各槽最底部设全量排放阀。漂洗槽最高，向下游逐级降低以自然溢流。');
+const DIM=T('설비 치수','Equipment dimensions','设备尺寸');
+const DIMv=T('길이·폭·높이는 제작사 규격을 기준으로 협의하여 확정한다.','Length, width and height are to be agreed based on the manufacturer\'s standard.','长、宽、高以制造商标准为基础协商确定。');
+const MOD=T('모듈 분할','Modular split','模块分割');
+const MODv=T('입구 / 세척 / 탈수 / 건조 / 출구 분리 제작·현장 조립','Inlet / wash / dewatering / drying / outlet built as separate modules, assembled on site.','入口/清洗/脱水/烘干/出口分模块制作、现场组装。');
+const MAT=T('재질','Material','材质'); const MATv=T('세척액 접촉부 STS304 이상','STS304 or better for all wetted parts.','接液部件STS304以上。');
+const PWR=T('전원','Power supply','电源'); const PWRv=T('삼상 380V 60Hz (수전 여유 있음)','3-phase 380V 60Hz (sufficient supply capacity available)','三相380V 60Hz（供电容量充足）');
+const SUB=[
+  T('세척·탈수·건조 성능 보증치와 그 근거 (유사 실적 포함)','Guaranteed wash / dewatering / drying performance and its basis (including similar references)','清洗、脱水、烘干性能保证值及其依据（含类似业绩）'),
+  T('에어나이프 거리별 풍속 곡선, 블로워·팬 기종 사양','Air-knife velocity-vs-distance curve; blower and fan model specifications','气刀距离-风速曲线，风机机型规格'),
+  T('전력·가스·용수 소비량 산출표 (시간당)','Hourly consumption table for electricity, gas and water','每小时电、气、水消耗量计算表'),
+  T('조립도·배관도·전기 결선도·PLC I/O 리스트 (착수 전)','Assembly drawing, piping diagram, wiring diagram, PLC I/O list (before start)','装配图、管路图、电气接线图、PLC I/O清单（开工前）'),
+  T('샘플 실물 세척 테스트 일정 — 검수 조건으로 계약에 반영','Schedule for sample washing test — to be included in the contract as an acceptance condition','实物样品清洗测试计划 — 作为验收条件写入合同')
+];
+
+// ── 문서별 콘텐츠 ──
+const DOCS={
+tray:{
+  no:'INSYS-TW-REQ-2026-01', ver:'v1.8 / 2026-09-14',
+  name:T('트레이 세척·탈수·건조 설비 요구 사양서','Tray Washing · Dewatering · Drying Equipment — Requirement Specification','托盘(料盘)清洗·脱水·烘干设备需求规格书'),
+  rel:T('박스 세척기(별도 사양서)와 별개의 독립 설비. 온수 보일러는 공용','Independent machine, separate from the box washer (separate spec). Hot-water boiler shared.','与周转箱清洗机（另有规格书）相互独立。热水锅炉共用。'),
+  target:[
+    [T('트레이 종류','Tray type','托盘种类'),T('플라스틱 사출 포켓 트레이 2종','Injection-moulded plastic pocket trays, 2 sizes','注塑塑料格式托盘2种'),T('포켓 약 20개. 두 규격 모두 처리 가능해야 함','About 20 pockets. Both sizes must be handled.','约20格。两种规格均须可处理。')],
+    [T('트레이 재질','Tray material','托盘材质'),T('플라스틱 (PP 계열)','Plastic (PP family)','塑料（PP系）'),T('열변형 방지: 건조 내부온도 60~65°C 이하 유지','To prevent heat deformation, keep dryer temperature at or below 60–65°C.','防止热变形：烘干内部温度保持在60~65°C以下')],
+    [T('투입 방식','Feeding orientation','投入方式'),T('트레이를 세워서(수직·경사) 투입','Trays are fed standing (vertical / inclined)','托盘立放（垂直/倾斜）投入'),T('세척수 배수와 노즐 분사에 유리. 눕혀서 통과하는 구조 불가','Better drainage and spray access. Flat (lying) pass-through is not acceptable.','有利于排水与喷射。不允许平放通过的结构。')],
+    [T('주 오염원','Main contaminant','主要污染物'),T('방청유 (비유화형) + 소량 이물','Rust-preventive oil (non-emulsifying) + small debris','防锈油（非乳化型）+少量异物'),T('오물량 적음. 기존 세척기는 스키머 필터로 운용 중','Low soil load. Existing washer runs with skimmer filtration.','污物量少。现有清洗机以撇油器过滤运行。')]
+  ],
+  sizeTitle:T('트레이 규격 (2종 모두 처리 가능해야 함)','Tray sizes (both must be handled)','托盘规格（两种均须可处理）'),
+  sizeHead:[UI.grade,UI.size,UI.pocket,UI.pdepth,UI.feat],
+  sizes:[
+    [UI.max,'430 × 330 × 150',T('약 20개','~20','约20格'),T('약 45 mm','~45 mm','约45 mm'),T('대형 · 중량 약 50 g · 설비 통과 폭·높이 및 노즐 배열 기준 규격. 포켓 깊이 45mm로 측면 분사 필요','Large · ~50 g · reference size for pass-through width/height and nozzle layout. 45 mm pocket depth requires side spray.','大型·重约50 g·作为设备通过宽高及喷嘴布置的基准规格。格深45mm需侧向喷射')],
+    [UI.min,'320 × 210 × 50',T('약 20개','~20','约20格'),'—',T('소형 · 가이드·클립 조정 하한 기준','Small · lower limit for guide / clip adjustment','小型·导轨、夹具调整下限基准')]
+  ],
+  sizeNote:T('두 규격을 교체 없이 처리하거나, 규격 전환 시 조정 시간이 5분 이내여야 한다. 노즐 이격·에어나이프 높이·가이드 폭이 소형 트레이에도 대응되도록 조정 범위를 확보한다.',
+    'Both sizes shall be handled without changeover, or changeover shall take no more than 5 minutes. Nozzle stand-off, air-knife height and guide width shall have adjustment range to suit the small tray.',
+    '两种规格须免换型处理，或换型调整时间不超过5分钟。喷嘴间距、气刀高度、导轨宽度的调整范围须覆盖小型托盘。'),
+  cap:[
+    [T('세척 (시간당)','Washing (per hour)','清洗（每小时）'),T('1,000 매/h (채널당 500 × 2채널)','1,000 trays/h (500 per channel × 2 channels)','1,000个/小时（每通道500×2通道）'),T('방청유·이물 제거. 포켓 내부 포함. 샘플 실물 테스트로 검수','Removal of rust-preventive oil and debris, including inside pockets. Verified by sample test.','去除防锈油及异物，含格内。以实物样品测试验收。')],
+    [T('세척 (일 8시간)','Washing (per 8-h day)','清洗（每日8小时）'),T('8,000 매/일','8,000 trays/day','8,000个/日'),T('8시간 연속 운전 기준','Based on 8 h continuous operation','按8小时连续运行')],
+    [T('탈수','Dewatering','脱水'),T('95% 이상','95% or more','95%以上'),T('배출 트레이에 물방울 흘러내림 없음','No dripping water on discharged trays','出料托盘无滴水')],
+    [T('건조','Drying','烘干'),T('컨베이어 통과 시간 내 98% 이상','98% or more within the conveyor pass time','在输送通过时间内达98%以上'),T('배출 시 표면 건조 완료, 별도 후건조 없음','Surface dry at discharge; no separate post-drying','出料时表面干燥完成，无需另行后烘干')],
+    [T('운전 인원','Operators','操作人员'),T('2인 (투입 1 · 배출 1)','2 persons (1 loading · 1 unloading)','2人（投入1·出料1）'),T('투입·배출 자동화는 제작사 제안 가능','Automated loading/unloading may be proposed by the manufacturer','投入、出料自动化可由制造商提案')]
+  ],
+  filt:T('세척수 여과는 오일 스키머 + SUS망을 기본으로 한다. 백필터 등 추가 여과 장치의 필요 여부와 사양은 제작사가 오염 조건을 검토하여 제안한다.',
+    'Basic filtration is an oil skimmer + stainless mesh. Whether additional filtration (e.g. bag filter) is needed, and its specification, is to be proposed by the manufacturer after reviewing the soil conditions.',
+    '清洗水过滤以撇油器+不锈钢滤网为基本。是否需要袋式过滤器等附加过滤装置及其规格，由制造商根据污染条件评估后提案。'),
+  ref:[
+    [T('채널 구성','Channel configuration','通道配置'),T('2채널 동시 처리. 채널 간 격벽으로 분사 간섭 방지','2 channels processed simultaneously. Partition between channels to prevent spray interference.','2通道同时处理。通道间设隔板防止喷射干扰。')],
+    [SEP,SEPv],
+    [CLIP,T('체인 컨베이어에 트레이를 클립 형태로 2개소 이상 꽂아 고정하는 구조로 한다. 세척·탈수 분사에 의해 트레이가 흔들리거나 이탈하지 않아야 하며, 대형·소형 규격 모두 동일 클립으로 대응한다.',
+      'Trays are held on the chain conveyor by clips at two or more points. Trays must not wobble or come off under wash/dewatering spray; the same clips must suit both large and small trays.',
+      '托盘以夹具形式在链式输送机上至少2处插固。清洗、脱水喷射时托盘不得晃动或脱落，大小两种规格用同一夹具对应。')],
+    [T('세척 방식','Washing method','清洗方式'),T('3단 구성(세척 2 + 헹굼 1) 권장. 분사노즐은 트레이 높이를 전부 덮도록 배열하고, 분사노즐 방향은 진행방향 기준 약 15° 기울여 인접 분사 간섭 회피',
+      '3-stage configuration (2 wash + 1 rinse) recommended. Spray nozzles shall cover the full tray height; nozzle direction tilted about 15° from the travel direction to avoid interference between adjacent sprays.',
+      '建议3段构成（清洗2+漂洗1）。喷嘴布置须覆盖托盘全高，喷嘴方向相对行进方向倾斜约15°以避免相邻喷射干扰。')],
+    [ADJ,ADJv],
+    [T('탈수 방식','Dewatering method','脱水方式'),T('에어나이프. 트레이 양 측면에 사선 배치하여 위에서 아래로 물을 쓸어내림. 각 면당 4회 통과(4패스) 구성. 링블로어 1대에 에어나이프 2개를 연결(Y분기). 나이프–트레이 이격은 20~150mm 범위에서 조정 가능한 슬라이드 구조',
+      'Air knives on both tray faces, set diagonally to sweep water downward. 4 passes per face. One ring blower feeds two air knives (Y-branch). Knife-to-tray stand-off adjustable 20–150 mm on a slide.',
+      '气刀。托盘两侧斜向布置，自上而下刮除水分。每面4次通过（4道）。1台环形风机连接2把气刀（Y分支）。气刀与托盘间距在20~150mm范围内可滑动调整。')],
+    [DRY,DRYv],[TANK,TANKv],[DIM,DIMv],
+    [T('기종 대응','Size changeover','规格对应'),T('대형(430×330×150)·소형(320×210×50) 트레이 공용. 노즐 이격·나이프 높이·가이드 폭 조정 구조','Common for large (430×330×150) and small (320×210×50) trays. Adjustable nozzle stand-off, knife height and guide width.','大型（430×330×150）与小型（320×210×50）托盘共用。喷嘴间距、气刀高度、导轨宽度可调。')],
+    [MOD,MODv],[MAT,MATv],[PWR,PWRv]
+  ],
+  sub:[SUB[0],T('포켓 20개 트레이의 포켓 내부 세척 대응 방안','Approach for cleaning inside the pockets of the 20-pocket tray','20格托盘格内清洗的应对方案'),SUB[1],SUB[2],SUB[3],SUB[4]]
+},
+box:{
+  no:'INSYS-BW-REQ-2026-01', ver:'v1.2 / 2026-09-14',
+  name:T('박스 세척·탈수·건조 설비 요구 사양서','Box Washing · Dewatering · Drying Equipment — Requirement Specification','周转箱清洗·脱水·烘干设备需求规格书'),
+  rel:T('트레이 세척기(별도 사양서)와 별개의 독립 설비. 온수 보일러는 공용','Independent machine, separate from the tray washer (separate spec). Hot-water boiler shared.','与托盘清洗机（另有规格书）相互独立。热水锅炉共用。'),
+  target:[
+    [T('박스 종류','Box type','周转箱种类'),T('플라스틱 사출 박스 5종','Injection-moulded plastic boxes, 5 sizes','注塑塑料周转箱5种'),T('가장자리에 사출 포켓(리브·홈)이 있어 물이 고이는 구조','Moulded pockets (ribs/grooves) along the rim trap water.','边缘有注塑格（筋/槽），易积水。')],
+    [T('박스 재질','Box material','周转箱材质'),T('플라스틱 (PP 계열)','Plastic (PP family)','塑料（PP系）'),T('열변형 방지: 건조 내부온도 60~65°C 이하 유지','To prevent heat deformation, keep dryer temperature at or below 60–65°C.','防止热变形：烘干内部温度保持在60~65°C以下')],
+    [T('투입 방식','Feeding orientation','投入方式'),T('박스를 세워서(수직·경사) 투입','Boxes are fed standing (vertical / inclined)','周转箱立放（垂直/倾斜）投入'),T('가장자리 사출 포켓에 고인 물은 뒤집지 않으면 제거되지 않음 → 세운 상태로 통과시켜 자연 배수. 눕혀서 통과하는 구조 불가','Water trapped in the rim pockets cannot be removed unless the box is inverted → pass boxes standing so they drain by gravity. Flat pass-through is not acceptable.','边缘格内积水若不翻转无法排除→立放通过使其自然排水。不允许平放通过。')],
+    [T('주 오염원','Main contaminant','主要污染物'),T('방청유 + 분진·이물','Rust-preventive oil + dust/debris','防锈油+粉尘、异物'),T('트레이보다 오물량 많음','Higher soil load than trays','污物量比托盘多')]
+  ],
+  sizeTitle:T('박스 규격 (5종 모두 처리 가능해야 함)','Box sizes (all 5 must be handled)','周转箱规格（5种均须可处理）'),
+  sizeHead:[UI.grade,UI.size,UI.note,UI.feat],
+  sizes:[
+    [UI.max,'720 × 480 × 200',T('가장 큼','Largest','最大'),T('설비 통과 폭·높이 기준 규격','Reference size for pass-through width/height','设备通过宽高基准规格')],
+    ['','575 × 368 × 310',T('가장 깊음','Deepest','最深'),T('깊이 310mm — 내부 바닥까지 분사 도달 필요','310 mm deep — spray must reach the inner bottom','深310mm — 喷射须到达内底')],
+    ['','480 × 380 × 150','',''],['','480 × 380 × 110','',''],
+    [UI.min,'450 × 280 × 125',T('가장 작음','Smallest','最小'),T('가이드·클립 조정 하한 기준','Lower limit for guide / clip adjustment','导轨、夹具调整下限基准')]
+  ],
+  sizeNote:T('5종을 교체 없이 처리하거나, 규격 전환 시 조정 시간이 5분 이내여야 한다. 노즐 이격·에어나이프 위치·가이드 폭이 최대~최소 규격에 모두 대응되도록 조정 범위를 확보한다.',
+    'All 5 sizes shall be handled without changeover, or changeover shall take no more than 5 minutes. Nozzle stand-off, air-knife position and guide width shall have adjustment range covering the largest to smallest box.',
+    '5种规格须免换型处理，或换型调整时间不超过5分钟。喷嘴间距、气刀位置、导轨宽度的调整范围须覆盖最大至最小规格。'),
+  cap:[
+    [T('세척 (시간당)','Washing (per hour)','清洗（每小时）'),T('600~700 개/h (채널당 300~350 × 2채널)','600–700 boxes/h (300–350 per channel × 2 channels)','600~700个/小时（每通道300~350×2通道）'),T('방청유·분진·이물 제거. 가장자리 포켓·내부 바닥 포함. 샘플 실물 테스트로 검수','Removal of rust-preventive oil, dust and debris, including rim pockets and inner bottom. Verified by sample test.','去除防锈油、粉尘及异物，含边缘格与内底。以实物样品测试验收。')],
+    [T('세척 (일 8시간)','Washing (per 8-h day)','清洗（每日8小时）'),T('4,800~5,600 개/일','4,800–5,600 boxes/day','4,800~5,600个/日'),T('8시간 연속 운전 기준','Based on 8 h continuous operation','按8小时连续运行')],
+    [T('탈수','Dewatering','脱水'),T('95% 이상 · 4면 탈수','95% or more · 4-side dewatering','95%以上·四面脱水'),T('트레이는 양면이지만 박스는 상·하·좌·우 4면 모두 탈수. 배출 박스에 물방울 흘러내림 없음','Trays need two faces, but boxes need all four sides (top, bottom, left, right). No dripping water on discharged boxes.','托盘为两面，周转箱须上下左右四面脱水。出料周转箱无滴水。')],
+    [T('건조','Drying','烘干'),T('컨베이어 통과 시간 내 98% 이상','98% or more within the conveyor pass time','在输送通过时间内达98%以上'),T('배출 시 표면·포켓 건조 완료, 별도 후건조 없음','Surface and pockets dry at discharge; no separate post-drying','出料时表面与格内干燥完成，无需另行后烘干')],
+    [T('운전 인원','Operators','操作人员'),T('2인 (투입 1 · 배출 1)','2 persons (1 loading · 1 unloading)','2人（投入1·出料1）'),T('투입·배출 자동화는 제작사 제안 가능','Automated loading/unloading may be proposed by the manufacturer','投入、出料自动化可由制造商提案')]
+  ],
+  filt:T('세척수 여과는 오일 스키머 + SUS망을 기본으로 한다. 박스는 오물량이 많으므로 백필터 등 추가 여과(차압 게이지로 청소 시점 관리)를 권장하며, 사양은 제작사가 오염 조건을 검토하여 제안한다.',
+    'Basic filtration is an oil skimmer + stainless mesh. Because boxes carry more soil, additional filtration such as a bag filter (cleaning timed by differential-pressure gauge) is recommended; the manufacturer proposes the specification after reviewing soil conditions.',
+    '清洗水过滤以撇油器+不锈钢滤网为基本。周转箱污物量大，建议增设袋式过滤器等附加过滤（以压差表管理清洗时机），规格由制造商根据污染条件评估后提案。'),
+  ref:[
+    [T('채널 구성','Channel configuration','通道配置'),T('2채널 동시 처리. 채널당 300~350개/h. 최대 박스 720mm 기준 통과 폭 확보. 채널 간 격벽으로 분사 간섭 방지','2 channels processed simultaneously, 300–350 boxes/h each. Pass-through width based on the 720 mm box. Partition between channels to prevent spray interference.','2通道同时处理，每通道300~350个/小时。按最大720mm周转箱确保通过宽度。通道间设隔板防止喷射干扰。')],
+    [SEP,SEPv],
+    [CLIP,T('체인 컨베이어에 박스를 클립 형태로 2개소 이상 꽂아 세운 상태로 고정하는 구조로 한다. 세척·탈수 분사에 의해 박스가 흔들리거나 이탈하지 않아야 하며, 5종 규격 모두 동일 클립으로 대응한다.',
+      'Boxes are held standing on the chain conveyor by clips at two or more points. Boxes must not wobble or come off under wash/dewatering spray; the same clips must suit all 5 sizes.',
+      '周转箱以夹具形式在链式输送机上至少2处插固并保持立放。清洗、脱水喷射时不得晃动或脱落，5种规格用同一夹具对应。')],
+    [T('세척 방식','Washing method','清洗方式'),T('3단 구성(세척 2 + 헹굼 1) 권장. 박스는 상·하·좌·우 4면 분사. 분사노즐은 박스 높이를 전부 덮도록 배열하고, 분사노즐 방향은 진행방향 기준 약 15° 기울여 인접 분사 간섭 회피. 깊이 310mm 박스의 내부 바닥까지 분사가 도달해야 함',
+      '3-stage configuration (2 wash + 1 rinse) recommended. Boxes are sprayed on all four sides. Nozzles shall cover the full box height; nozzle direction tilted about 15° from the travel direction to avoid interference. Spray must reach the inner bottom of the 310 mm-deep box.',
+      '建议3段构成（清洗2+漂洗1）。周转箱上下左右四面喷射。喷嘴布置须覆盖周转箱全高，喷嘴方向相对行进方向倾斜约15°以避免干扰。喷射须到达深310mm周转箱的内底。')],
+    [ADJ,ADJv],
+    [T('탈수 방식','Dewatering method','脱水方式'),T('에어나이프 상·하·좌·우 4면 배치. 측면은 사선 배치하여 위에서 아래로 물을 쓸어내림. 각 면당 4회 통과(4패스) 구성. 링블로어 1대에 에어나이프 2개를 연결(Y분기). 나이프–박스 이격은 20~150mm 범위에서 조정 가능한 슬라이드 구조',
+      'Air knives on all four sides. Side knives set diagonally to sweep water downward. 4 passes per side. One ring blower feeds two air knives (Y-branch). Knife-to-box stand-off adjustable 20–150 mm on a slide.',
+      '气刀上下左右四面布置。侧面斜向布置自上而下刮除水分。每面4次通过（4道）。1台环形风机连接2把气刀（Y分支）。气刀与周转箱间距在20~150mm范围内可滑动调整。')],
+    [DRY,DRYv],[TANK,TANKv],[DIM,DIMv],
+    [T('기종 대응','Size changeover','规格对应'),T('5종 박스(최대 720×480×200 ~ 최소 450×280×125) 공용. 노즐 이격·나이프 위치·가이드 폭 조정 구조','Common for all 5 boxes (max 720×480×200 to min 450×280×125). Adjustable nozzle stand-off, knife position and guide width.','5种周转箱（最大720×480×200~最小450×280×125）共用。喷嘴间距、气刀位置、导轨宽度可调。')],
+    [MOD,MODv],[MAT,MATv],[PWR,PWRv]
+  ],
+  sub:[SUB[0],T('가장자리 포켓·깊은 박스(310mm) 내부 세척 및 4면 탈수 대응 방안','Approach for cleaning rim pockets and the inside of the deep (310 mm) box, and for 4-side dewatering','边缘格与深周转箱（310mm）内部清洗及四面脱水的应对方案'),SUB[1],SUB[2],SUB[3],SUB[4]]
+}};
+
+// ══════════════ 렌더 ══════════════
+const SECT={
+  s0:T('문서 정보','Document information','文件信息'), s1:T('세척 대상','Items to be washed','清洗对象'),
+  s2:T('처리 요구량','Required capacity','处理要求量'), s3:T('에너지 절약 요구','Energy-saving requirements','节能要求'),
+  s4:T('제작 참고 사항','Notes for manufacturing','制作参考事项'), s5:T('제작사 제출 요청 자료','Documents requested from the manufacturer','要求制造商提交的资料'),
+  docno:T('문서번호','Document No.','文件编号'), ver:T('버전 / 작성일','Version / date','版本/日期'), auth:T('작성','Prepared by','编制'),
+  site:T('설치 장소','Installation site','安装地点'), nature:T('문서 성격','Document type','文件性质'), rel:T('관련 설비','Related equipment','相关设备'),
+  natureV:T('발주 요구 사양 — 세부 설계는 제작사 제안에 따름','Procurement requirement — detailed design per manufacturer\'s proposal','采购需求规格 — 详细设计以制造商方案为准'),
+  siteV:T('인텍코리아 안산공장','Intec Korea Ansan Plant','Intec Korea 安山工厂'),
+  authV:T('인시스 AI혁신 연구개발실 (ys.kim@in-sys.co.kr)','INSYS AI Innovation R&D Office (ys.kim@in-sys.co.kr)','INSYS AI创新研发室 (ys.kim@in-sys.co.kr)')
+};
+let Q={};   // 질문 저장 {docKey.itemId: text}
+const gi=id=>document.getElementById(id);
+function qbox(id){
+  const key=curDoc()+'.'+id;
+  return '<div class="q"><span class="qt">'+L(UI.q)+'</span><textarea data-q="'+key+'" placeholder="'+L(UI.qph)+'" onchange="Q[this.dataset.q]=this.value">'+(Q[key]||'').replace(/</g,'&lt;')+'</textarea></div>';
+}
+function curDoc(){return gi('docSel').value;}
+function card(n,title,body){return '<div class="card"><div class="ch"><span class="cn">'+n+'</span><span class="cl">'+L(title)+'</span></div><div class="cb">'+body+'</div></div>';}
+function render(){
+  const D=DOCS[curDoc()];
+  gi('hdrT').textContent=L(D.name); gi('hdrS').textContent=L(UI.org);
+  gi('btnPdf').textContent=L(UI.pdf); gi('btnSave').textContent=L(UI.save); gi('btnLoad').textContent=L(UI.load); gi('btnMail').textContent=L(UI.mail);
+  document.title=L(D.name)+' v1.0';
+  let h='';
+  h+=card(0,SECT.s0,'<table>'
+    +'<tr><td class="k">'+L(SECT.docno)+'</td><td>'+D.no+'</td></tr>'
+    +'<tr><td class="k">'+L(SECT.ver)+'</td><td>'+D.ver+'</td></tr>'
+    +'<tr><td class="k">'+L(SECT.auth)+'</td><td>'+L(SECT.authV)+'</td></tr>'
+    +'<tr><td class="k">'+L(SECT.site)+'</td><td>'+L(SECT.siteV)+'</td></tr>'
+    +'<tr><td class="k">'+L(SECT.nature)+'</td><td>'+L(SECT.natureV)+'</td></tr>'
+    +'<tr><td class="k">'+L(SECT.rel)+'</td><td>'+L(D.rel)+'</td></tr></table>');
+  // 1
+  let b='<table><tr><th>'+L(UI.item)+'</th><th>'+L(UI.req)+'</th><th>'+L(UI.note)+'</th></tr>';
+  D.target.forEach(r=>{b+='<tr><td class="k">'+L(r[0])+'</td><td class="v">'+L(r[1])+'</td><td>'+L(r[2])+'</td></tr>';});
+  b+='</table>'+qbox('target');
+  b+='<h3>'+L(D.sizeTitle)+'</h3><table><tr>'+D.sizeHead.map(x=>'<th>'+L(x)+'</th>').join('')+'</tr>';
+  D.sizes.forEach(r=>{b+='<tr>'+r.map((x,i)=>'<td class="'+(i===0?'k c':(i===1?'v c':''))+'">'+L(x)+'</td>').join('')+'</tr>';});
+  b+='</table><div class="note">'+L(D.sizeNote)+'</div>'+qbox('size');
+  h+=card(1,SECT.s1,b);
+  // 2
+  b='<table><tr><th>'+L(UI.proc)+'</th><th>'+L(UI.qty)+'</th><th>'+L(UI.crit)+'</th></tr>';
+  D.cap.forEach(r=>{b+='<tr><td class="k">'+L(r[0])+'</td><td class="v">'+L(r[1])+'</td><td>'+L(r[2])+'</td></tr>';});
+  b+='</table>'+qbox('cap');
+  h+=card(2,SECT.s2,b);
+  // 3
+  b='<div class="note"><ul>'+ENERGY.map(x=>'<li>'+L(x)+'</li>').join('')+'<li>'+L(D.filt)+'</li></ul></div>'+qbox('energy');
+  h+=card(3,SECT.s3,b);
+  // 4
+  b='<table><tr><th>'+L(UI.item)+'</th><th>'+L(UI.content)+'</th></tr>';
+  D.ref.forEach((r,i)=>{b+='<tr><td class="k">'+L(r[0])+'</td><td>'+L(r[1])+'</td></tr><tr><td colspan="2" style="padding:0 6px;border-top:0;">'+qbox('ref'+i)+'</td></tr>';});
+  b+='</table>';
+  h+=card(4,SECT.s4,b);
+  // 5
+  b='<div class="warn"><ul>'+D.sub.map(x=>'<li>'+L(x)+'</li>').join('')+'</ul></div>'+qbox('submit');
+  h+=card(5,SECT.s5,b);
+  gi('doc').innerHTML=h;
+  gi('foot').textContent=L(UI.foot);
+}
+function setLang(l){LANG=l;['ko','en','zh'].forEach(k=>gi('l'+k).classList.toggle('on',k===l));document.documentElement.lang=l==='zh'?'zh-CN':l;render();}
+function setView(v){gi('wrap').classList.toggle('mobile',v==='mobile');gi('bp').classList.toggle('on',v==='pc');gi('bm').classList.toggle('on',v==='mobile');}
+
+// ══════════════ Firebase(REST) 질문 저장 ══════════════
+const FB='https://firestore.googleapis.com/v1/projects/insys-work/databases/(default)/documents/spec_questions';
+const KEY='AIzaSyC4DWFGGJjJmVlqnfmZaVDdKJWCXK0Yr_g';
+function docId(){return curDoc()+'_'+LANG;}
+function collectQ(){document.querySelectorAll('textarea[data-q]').forEach(t=>{Q[t.dataset.q]=t.value;});}
+async function saveQ(){
+  collectQ();
+  const fields={};Object.keys(Q).forEach(k=>{if(Q[k]&&Q[k].trim())fields[k]={stringValue:Q[k]};});
+  fields._updated={stringValue:new Date().toISOString()}; fields._doc={stringValue:curDoc()}; fields._lang={stringValue:LANG};
+  try{
+    const r=await fetch(FB+'/'+docId()+'?key='+KEY,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields})});
+    if(!r.ok) throw new Error(r.status);
+    gi('status').textContent='✅ '+L(UI.saved)+' ('+new Date().toLocaleString()+')';
+  }catch(e){gi('status').textContent='⚠️ '+L(UI.fail)+' ('+e.message+')';}
+}
+async function loadQ(){
+  try{
+    const r=await fetch(FB+'/'+docId()+'?key='+KEY);
+    if(r.status===404){gi('status').textContent=L(UI.none);return;}
+    const j=await r.json(); const f=j.fields||{};
+    Object.keys(f).forEach(k=>{if(k[0]!=='_')Q[k]=f[k].stringValue||'';});
+    render(); gi('status').textContent='✅ '+L(UI.loaded)+' ('+(f._updated?f._updated.stringValue:'')+')';
+  }catch(e){gi('status').textContent='⚠️ '+e.message;}
+}
+function sendMail(){
+  collectQ();
+  const D=DOCS[curDoc()];
+  const lines=Object.keys(Q).filter(k=>Q[k]&&Q[k].trim()&&k.startsWith(curDoc()+'.')).map(k=>'['+k.split('.')[1]+'] '+Q[k]);
+  const body=L(D.name)+' ('+D.no+') — '+LANG.toUpperCase()+'\n\n'+(lines.length?lines.join('\n\n'):L(UI.noq))+'\n\n— '+new Date().toLocaleString();
+  gi('status').textContent=L(UI.mailHint);
+  location.href='mailto:ys.kim@in-sys.co.kr?subject='+encodeURIComponent(L(UI.mailSubj)+' '+L(D.name))+'&body='+encodeURIComponent(body);
+}
+render();
+</script>
+</body>
+</html>
