@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>세척·탈수·건조 설비 요구 사양서 v1.7 | 인시스 AI혁신 연구개발실</title>
+<title>세척·탈수·건조 설비 요구 사양서 v1.8 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -24,12 +24,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 .vb{background:rgba(255,255,255,.24);padding:4px 10px;border-radius:7px;font-size:12px;font-weight:700;}
 .wrap{max-width:1100px;margin:0 auto;padding:10px 14px;}
 .wrap.mobile{max-width:430px;}
-.card{background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden;}
-.ch{background:#f4f8fb;border-bottom:1px solid var(--line);padding:8px 12px;display:flex;align-items:center;gap:7px;}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;overflow:hidden;}
+.ch{background:#f4f8fb;border-bottom:1px solid var(--line);padding:5px 10px;display:flex;align-items:center;gap:7px;}
 .cn{background:var(--navy);color:#fff;width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex:none;}
 .cl{font-size:12px;font-weight:800;color:var(--navy);}
-.cb{padding:10px 12px;}
-h3{font-size:12px;font-weight:800;color:var(--teal);margin:10px 0 5px;padding-left:7px;border-left:3px solid var(--teal);}
+.cb{padding:6px 10px;}
+h3{font-size:12px;font-weight:800;color:var(--teal);margin:6px 0 3px;padding-left:7px;border-left:3px solid var(--teal);}
 table{width:100%;border-collapse:collapse;margin:4px 0 6px;font-size:12px;}
 th{background:#e8eff5;color:var(--navy);font-weight:800;padding:4px 7px;border:1px solid var(--line);text-align:center;}
 td{padding:4px 7px;border:1px solid var(--line);text-align:left;vertical-align:top;}
@@ -37,11 +37,11 @@ td.k{background:#f7fafc;font-weight:700;color:var(--navy);white-space:nowrap;}
 td.n{white-space:nowrap;}
 td.v{font-weight:800;color:var(--hi);}
 td.c{text-align:center;}
-.note{background:#eef6fb;border:1px solid #cde3f0;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:12px;color:#0b5a80;line-height:1.6;}
-.warn{background:#fff8f0;border:1px solid #ffd9a8;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:12px;color:var(--warn);line-height:1.6;}
+.note{background:#eef6fb;border:1px solid #cde3f0;border-radius:8px;padding:5px 8px;margin:4px 0;font-size:12px;color:#0b5a80;line-height:1.6;}
+.warn{background:#fff8f0;border:1px solid #ffd9a8;border-radius:8px;padding:5px 8px;margin:4px 0;font-size:12px;color:var(--warn);line-height:1.6;}
 ul{margin:4px 0 4px 17px;}li{margin:2px 0;}
-.q{margin:4px 0 8px;display:flex;gap:6px;align-items:flex-start;}
-.q textarea{flex:1;min-height:38px;border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:12px;font-family:inherit;resize:vertical;background:#fffdf5;}
+.q{margin:2px 0 5px;display:flex;gap:6px;align-items:flex-start;}
+.q textarea{flex:1;min-height:30px;border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:12px;font-family:inherit;resize:vertical;background:#fffdf5;}
 .q textarea:focus{outline:none;border-color:var(--teal);}
 .q .qt{font-size:12px;color:#7a90a4;flex:none;padding-top:8px;width:60px;}
 .qc{font-size:12px;color:#7a90a4;margin:-4px 0 6px 66px;}
@@ -75,7 +75,7 @@ footer{text-align:center;color:#6b8098;font-size:12px;padding:12px 0 18px;}
 <body>
 <div class="hdr"><div class="nav-inner">
   <div><div class="hdr-t" id="hdrT">세척·탈수·건조 설비 요구 사양서</div><div class="hdr-s" id="hdrS">인시스 AI혁신 연구개발실 · 인텍코리아 안산공장</div></div>
-  <div class="hdr-r"><span class="vb">v1.7</span>
+  <div class="hdr-r"><span class="vb">v1.8</span>
     <select id="docSel" onchange="render()"><option value="tray">트레이 / Tray / 托盘(料盘)</option><option value="box">박스 / Box / 周转箱</option></select>
     <button id="lko" class="on" onclick="setLang('ko')">한국어</button><button id="len" onclick="setLang('en')">English</button><button id="lzh" onclick="setLang('zh')">中文</button>
     <button id="bp" class="on" onclick="setView('pc')">PC</button><button id="bm" onclick="setView('mobile')">모바일</button></div>
@@ -147,11 +147,11 @@ const ENERGY=[
     'Prefer three-phase air-knife blowers and sirocco fans; propose a low-power configuration using multiple small units.',
     '气刀风机与多翼风机优先选用三相机型，建议采用多台小型机组的低功耗配置。')
 ];
-const SEP=T('구조 분리 (중요)','Structural separation (important)','结构分离（重要）');
+const SEP=T('구조 분리','Structural separation','结构分离');
 const SEPv=T('세척조·탈수조·건조로는 컨베이어로 연결되되, 탈수조와 건조로의 상부 구조물은 세척조와 분리하여 세척조 내부의 습기·비산수가 탈수·건조 구간으로 전이되지 않는 구조로 한다. 구간 경계에 커튼·격벽·배기 등 습기 차단 수단을 둔다.',
   'Wash, dewatering and drying zones are linked by the conveyor, but the upper enclosures of the dewatering and drying zones must be separated from the wash zone so that moisture and spray from the wash zone do not migrate into them. Provide curtains, partitions or exhaust at the boundaries.',
   '清洗槽、脱水段、烘干炉由输送机连接，但脱水段与烘干炉的上部结构须与清洗槽分离，防止清洗槽内的湿气与飞溅水进入脱水、烘干区。区段交界处设置帘幕、隔板或排气等隔湿措施。');
-const CLIP=T('컨베이어 유지 방식 (중요)','Conveyor holding method (important)','输送机夹持方式（重要）');
+const CLIP=T('컨베이어 유지 방식','Conveyor holding method','输送机夹持方式');
 const ADJ=T('세척 조건 조정','Wash condition adjustment','清洗条件调整');
 const ADJv=T('노즐 각도·분사 압력·컨베이어 속도는 시운전 중 조정 가능해야 함. 펌프는 4.0 bar까지 여유',
   'Nozzle angle, spray pressure and conveyor speed shall be adjustable during commissioning. Pumps rated up to 4.0 bar.',
@@ -303,7 +303,7 @@ function render(){
   gi('hdrT').textContent=L(D.name); gi('hdrS').textContent=L(UI.org);
   gi('ptitle').innerHTML='<b>'+L(D.name)+'</b><span>'+L(UI.org)+' · '+D.no+' · '+D.ver+'</span>';
   gi('btnPdf').textContent=L(UI.pdf); gi('btnSave').textContent=L(UI.save); gi('btnLoad').textContent=L(UI.load); gi('btnMail').textContent=L(UI.mail);
-  document.title=L(D.name)+' v1.7';
+  document.title=L(D.name)+' v1.8';
   let h='';
   h+=card(0,SECT.s0,'<table><colgroup><col style="width:16%"><col></colgroup>'
     +'<tr><td class="k">'+L(SECT.docno)+'</td><td>'+D.no+'</td></tr>'
