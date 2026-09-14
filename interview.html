@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>면접질의서 - 인시스 AI혁신 연구개발실</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1A2B4A; --navy2:#26406e; --sky:#3B7DDB; --line:#e2e6ec;
+    --bg:#f4f6f9; --card:#ffffff; --text:#26313f; --muted:#6b7684;
+    --danger:#c0392b;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);
+       font-size:14px;line-height:1.5;}
+  @media (min-width:768px){ body{font-size:16px;} }
+
+  /* ===== 로그인 화면 ===== */
+  #loginView{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;}
+  .loginBox{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px 24px;
+            width:100%;max-width:360px;box-shadow:0 4px 16px rgba(0,0,0,.06);}
+  .loginBox h1{font-size:1.1em;margin:0 0 4px;color:var(--navy);}
+  .loginBox p.sub{margin:0 0 18px;color:var(--muted);font-size:.85em;}
+  .loginBox input{width:100%;padding:11px 12px;margin-bottom:10px;border:1px solid var(--line);
+                   border-radius:8px;font-size:1em;font-family:inherit;}
+  .loginBox button{width:100%;padding:11px;border:none;border-radius:8px;background:var(--navy);
+                    color:#fff;font-weight:700;font-size:1em;cursor:pointer;font-family:inherit;}
+  .loginBox button:disabled{opacity:.6;}
+  #loginErr{color:var(--danger);font-size:.85em;margin-top:8px;min-height:1.2em;}
+
+  /* ===== 공통 레이아웃 ===== */
+  #appView{display:none;}
+  header.nav{background:var(--navy);width:100%;}
+  .nav-inner{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;
+             justify-content:space-between;gap:8px;}
+  .nav-inner .brand{color:#fff;font-weight:700;font-size:.95em;}
+  .nav-inner .actions{display:flex;gap:6px;}
+  .nav-inner button{padding:7px 12px;border-radius:7px;border:1px solid rgba(255,255,255,.35);
+                     background:transparent;color:#fff;font-size:.8em;cursor:pointer;font-family:inherit;}
+  .nav-inner button.primary{background:#fff;color:var(--navy);border-color:#fff;font-weight:700;}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:12px 16px 60px;}
+
+  .banner{background:#fdecec;border:1px solid #f3b9b3;color:var(--danger);font-weight:700;
+          text-align:center;padding:8px;border-radius:8px;margin-bottom:10px;font-size:.85em;}
+
+  .viewToggle{display:flex;gap:6px;margin-bottom:10px;}
+  .viewToggle button{flex:1;padding:8px;border-radius:8px;border:1px solid var(--line);
+                      background:#fff;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;font-size:.85em;}
+  .viewToggle button.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+        padding:12px 14px;margin-bottom:10px;}
+  .card h2{font-size:1em;color:var(--navy);margin:0 0 8px;padding-bottom:6px;border-bottom:2px solid var(--sky);}
+
+  .metaGrid{display:grid;grid-template-columns:1fr;gap:8px;}
+  @media (min-width:768px){ .metaGrid{grid-template-columns:1fr 1fr;} }
+  .field label{display:block;font-size:.8em;color:var(--muted);margin-bottom:3px;}
+  .field input, .field textarea{width:100%;padding:8px 10px;border:1px solid var(--line);
+        border-radius:7px;font-family:inherit;font-size:.95em;color:var(--text);}
+
+  table.qa{width:100%;border-collapse:collapse;}
+  table.qa th, table.qa td{border:1px solid var(--line);padding:8px;text-align:left;vertical-align:top;font-size:.92em;}
+  table.qa th{background:#eef2f8;color:var(--navy2);width:40px;text-align:center;}
+  table.qa td.purpose{color:var(--muted);font-size:.85em;width:26%;}
+
+  .scoreRow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;
+             border-bottom:1px solid var(--line);}
+  .scoreRow:last-child{border-bottom:none;}
+  .scoreRow .name{font-size:.92em;}
+  .scoreRow .pt{color:var(--muted);font-size:.78em;}
+  .scoreRow input[type=number]{width:64px;padding:6px;border:1px solid var(--line);border-radius:6px;
+        text-align:center;font-family:inherit;}
+  .totalRow{display:flex;justify-content:space-between;font-weight:700;color:var(--navy);
+            padding-top:8px;margin-top:4px;border-top:2px solid var(--navy);}
+
+  #saveBar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);
+           padding:10px 16px;display:flex;gap:8px;justify-content:flex-end;}
+  #saveBar button{padding:10px 16px;border-radius:8px;border:none;font-weight:700;cursor:pointer;font-family:inherit;font-size:.9em;}
+  #saveBar .save{background:var(--navy);color:#fff;}
+  #saveBar .print{background:#fff;border:1px solid var(--navy);color:var(--navy);}
+  #saveStatus{font-size:.8em;color:var(--muted);align-self:center;margin-right:auto;}
+
+  .verFoot{text-align:right;color:var(--muted);font-size:.75em;padding:6px 16px 20px;}
+
+  @media print{
+    header.nav, .viewToggle, #saveBar, .banner{display:none !important;}
+    body{background:#fff;font-size:11pt;}
+    .card{border:1px solid #999;break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 로그인 화면 ===== -->
+<div id="loginView">
+  <div class="loginBox">
+    <h1>면접질의서</h1>
+    <p class="sub">인시스 AI혁신 연구개발실 · 대외비</p>
+    <input type="email" id="loginEmail" placeholder="이메일" autocomplete="username">
+    <input type="password" id="loginPw" placeholder="비밀번호" autocomplete="current-password">
+    <button id="loginBtn" onclick="doLogin()">로그인</button>
+    <div id="loginErr"></div>
+  </div>
+</div>
+
+<!-- ===== 앱 화면 ===== -->
+<div id="appView">
+  <header class="nav">
+    <div class="nav-inner">
+      <span class="brand">면접질의서 · 인시스 AI혁신 연구개발실</span>
+      <div class="actions">
+        <button onclick="doLogout()">로그아웃</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="banner">대외비 — 인사담당자 외 열람 금지</div>
+
+    <div class="viewToggle">
+      <button id="tabMobile" class="active" onclick="setDevice('mobile')">모바일 화면</button>
+      <button id="tabPc" onclick="setDevice('pc')">PC 화면</button>
+    </div>
+
+    <div class="card">
+      <h2>기본 정보</h2>
+      <div class="metaGrid">
+        <div class="field"><label>지원자</label><input id="fName" placeholder="지원자 성명 입력"></div>
+        <div class="field"><label>지원분야</label><input id="fRole" value="연구원 (AI혁신 연구개발실)"></div>
+        <div class="field"><label>학력</label><input id="fEdu" placeholder="예: 인제대학교 컴퓨터공학과"></div>
+        <div class="field"><label>경력</label><input id="fCareer" placeholder="예: ETRI 인턴 (데이터마이닝)"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>1. 경력·이력 사실 확인</h2>
+      <table class="qa">
+        <tr><th>1-1</th><td>이력서 상 ETRI 인턴 기간(2023.01~2023.03 / 2022.07)이 서로 다르게 기재되어 있습니다. 정확한 재직 기간과 업무 내용을 설명해 주세요.</td></tr>
+        <tr><th>1-2</th><td>ETRI에서 담당한 Clotho 데이터셋 전처리 작업의 구체적 절차와, 본인이 직접 수행한 부분과 지도받은 부분을 구분해서 설명해 주세요.</td></tr>
+        <tr><th>1-3</th><td>텍스트마이닝·딥러닝 동향 조사 결과물 중 실제 업무에 반영된 사례가 있다면 소개해 주세요.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>2. 프로젝트 기술 검증</h2>
+      <table class="qa">
+        <tr><th>2-1</th><td>학과 챗봇 프로젝트에서 CNN 기반 의도 분류와 KR-SBERT 유사도 검색을 함께 쓴 이유와 역할 분담을 설명해 주세요.</td></tr>
+        <tr><th>2-2</th><td>약 400만 문장 규모 데이터 전처리 중 겪은 가장 큰 문제와 해결 방법은 무엇이었나요?</td></tr>
+        <tr><th>2-3</th><td>음성 대화형 AI(Whisper→Llama 3.1→TTS)에서 응답 지연 문제를 어떻게 진단했고, 어느 구간에서 병목이 발생했나요?</td></tr>
+        <tr><th>2-4</th><td>학습 진행도 저장 구조를 설계한 방식과 데이터 유실 방지책은 무엇인가요?</td></tr>
+        <tr><th>2-5</th><td>Speech Emotion Recognition에서 CNN+LSTM 조합을 선택한 근거는 무엇인가요?</td></tr>
+        <tr><th>2-6</th><td>포트폴리오 프로젝트 중 실제 배포·서비스 운영까지 이어진 것이 있나요? 있다면 사용자 지표를 알려주세요.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>3. 직무 적합성</h2>
+      <table class="qa">
+        <tr><th>3-1</th><td>제조업 도메인(비전검사, 설비 자동화 등) 데이터를 다뤄본 경험이 있나요? 없다면 어떻게 빠르게 학습할 계획인가요?</td></tr>
+        <tr><th>3-2</th><td>여러 부서와 협업하며 요구사항이 계속 바뀌는 환경에서 일해본 경험이 있나요?</td></tr>
+        <tr><th>3-3</th><td>연구개발전담부서 특성상 문서화 작업 비중이 높습니다. 관련 경험이나 의향은 어떤가요?</td></tr>
+        <tr><th>3-4</th><td>창원 근무 전제 통근/이주 계획을 확인 부탁드립니다.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>4. 인성·조직 적합성</h2>
+      <table class="qa">
+        <tr><th>4-1</th><td>팀 프로젝트에서 부팀장을 맡으셨는데, 의견 충돌 시 어떻게 조율하셨나요?</td></tr>
+        <tr><th>4-2</th><td>ETRI 인턴 계약만료 이후 공백기 동안 무엇을 하셨나요?</td></tr>
+        <tr><th>4-3</th><td>최소 희망 처우 수준이 있다면 알려주세요.</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>5. 평가표</h2>
+      <div class="scoreRow"><span class="name">기술 역량 (AI/데이터)<br><span class="pt">배점 30</span></span><input type="number" class="scoreInput" data-max="30" min="0" max="30" value="0"></div>
+      <div class="scoreRow"><span class="name">실무 적용력·문제해결<br><span class="pt">배점 25</span></span><input type="number" class="scoreInput" data-max="25" min="0" max="25" value="0"></div>
+      <div class="scoreRow"><span class="name">직무 적합성(제조 도메인 적응)<br><span class="pt">배점 20</span></span><input type="number" class="scoreInput" data-max="20" min="0" max="20" value="0"></div>
+      <div class="scoreRow"><span class="name">협업·커뮤니케이션<br><span class="pt">배점 15</span></span><input type="number" class="scoreInput" data-max="15" min="0" max="15" value="0"></div>
+      <div class="scoreRow"><span class="name">조직 적합성<br><span class="pt">배점 10</span></span><input type="number" class="scoreInput" data-max="10" min="0" max="10" value="0"></div>
+      <div class="totalRow"><span>합계</span><span id="totalScore">0 / 100</span></div>
+      <div class="field" style="margin-top:10px;">
+        <label>종합 의견</label>
+        <textarea id="fComment" rows="4" placeholder="종합 의견을 입력하세요"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div id="saveBar">
+    <span id="saveStatus"></span>
+    <button class="print" onclick="window.print()">출력</button>
+    <button class="save" onclick="saveData()">저장</button>
+  </div>
+  <div class="verFoot">interview.html v1.0</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",
+  authDomain: "insys-work.firebaseapp.com",
+  projectId: "insys-work",
+  storageBucket: "insys-work.firebasestorage.app",
+  messagingSenderId: "225275784859",
+  appId: "1:225275784859:web:bd12815c6dc47c0c49e03e"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const DOC_ID = "20260914_jhj_researcher"; // 이 지원자 건 전용 문서 ID
+const DOC_REF = doc(db, "interview_records", DOC_ID);
+
+window.doLogin = async function(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pw = document.getElementById('loginPw').value;
+  const errEl = document.getElementById('loginErr');
+  const btn = document.getElementById('loginBtn');
+  errEl.textContent = "";
+  if(!email || !pw){ errEl.textContent = "이메일과 비밀번호를 입력하세요."; return; }
+  btn.disabled = true; btn.textContent = "로그인 중...";
+  try{
+    await signInWithEmailAndPassword(auth, email, pw);
+  }catch(e){
+    errEl.textContent = "로그인 실패: 이메일 또는 비밀번호를 확인하세요.";
+  }finally{
+    btn.disabled = false; btn.textContent = "로그인";
+  }
+};
+
+window.doLogout = async function(){
+  await signOut(auth);
+};
+
+onAuthStateChanged(auth, async (user)=>{
+  if(user){
+    document.getElementById('loginView').style.display = 'none';
+    document.getElementById('appView').style.display = 'block';
+    await loadData();
+  }else{
+    document.getElementById('loginView').style.display = 'flex';
+    document.getElementById('appView').style.display = 'none';
+  }
+});
+
+async function loadData(){
+  try{
+    const snap = await getDoc(DOC_REF);
+    if(snap.exists()){
+      const d = snap.data();
+      document.getElementById('fName').value = d.name || "";
+      document.getElementById('fRole').value = d.role || "연구원 (AI혁신 연구개발실)";
+      document.getElementById('fEdu').value = d.edu || "";
+      document.getElementById('fCareer').value = d.career || "";
+      document.getElementById('fComment').value = d.comment || "";
+      const inputs = document.querySelectorAll('.scoreInput');
+      (d.scores || []).forEach((v,i)=>{ if(inputs[i]) inputs[i].value = v; });
+    }
+    updateTotal();
+  }catch(e){
+    document.getElementById('saveStatus').textContent = "불러오기 오류: " + e.message;
+  }
+}
+
+function updateTotal(){
+  const inputs = document.querySelectorAll('.scoreInput');
+  let total = 0;
+  inputs.forEach(inp=>{
+    let v = Number(inp.value) || 0;
+    const max = Number(inp.dataset.max);
+    if(v > max) v = max;
+    if(v < 0) v = 0;
+    inp.value = v;
+    total += v;
+  });
+  document.getElementById('totalScore').textContent = total + " / 100";
+}
+document.addEventListener('input', (e)=>{
+  if(e.target.classList.contains('scoreInput')) updateTotal();
+});
+
+window.saveData = async function(){
+  const statusEl = document.getElementById('saveStatus');
+  statusEl.textContent = "저장 중...";
+  const scores = Array.from(document.querySelectorAll('.scoreInput')).map(i=>Number(i.value)||0);
+  const payload = {
+    name: document.getElementById('fName').value,
+    role: document.getElementById('fRole').value,
+    edu: document.getElementById('fEdu').value,
+    career: document.getElementById('fCareer').value,
+    comment: document.getElementById('fComment').value,
+    scores: scores,
+    updatedAt: serverTimestamp()
+  };
+  try{
+    await setDoc(DOC_REF, payload, { merge: true });
+    statusEl.textContent = "저장 완료 (" + new Date().toLocaleTimeString('ko-KR') + ")";
+  }catch(e){
+    statusEl.textContent = "저장 실패: " + e.message;
+  }
+};
+
+window.setDevice = function(mode){
+  document.getElementById('tabMobile').classList.toggle('active', mode==='mobile');
+  document.getElementById('tabPc').classList.toggle('active', mode==='pc');
+  document.querySelector('.wrap').style.maxWidth = (mode==='pc') ? '1100px' : '480px';
+  document.querySelector('.wrap').style.margin = (mode==='pc') ? '0 auto' : '0 auto';
+};
+setDevice('mobile');
+</script>
+</body>
+</html>
