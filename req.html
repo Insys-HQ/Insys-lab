@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>세척·탈수·건조 설비 요구 사양서 v3.1 | 인시스 AI혁신 연구개발실</title>
+<title>세척·탈수·건조 설비 요구 사양서 v3.2 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -99,7 +99,7 @@ footer{text-align:center;color:#6b8098;font-size:12px;padding:12px 0 18px;}
 <body>
 <div class="hdr"><div class="nav-inner">
   <div><div class="hdr-t" id="hdrT">세척·탈수·건조 설비 요구 사양서</div><div class="hdr-s" id="hdrS">인시스 AI혁신 연구개발실 · 인텍코리아 안산공장</div></div>
-  <div class="hdr-r"><span class="vb">v3.1</span>
+  <div class="hdr-r"><span class="vb">v3.2</span>
     <select id="docSel" onchange="render()"><option value="tray">트레이 / Tray / 托盘(料盘)</option><option value="box">박스 / Box / 周转箱</option></select>
     <button id="lko" class="on" onclick="setLang('ko')">한국어</button><button id="len" onclick="setLang('en')">English</button><button id="lzh" onclick="setLang('zh')">中文</button>
     <button id="bp" class="on" onclick="setView('pc')">PC</button><button id="bm" onclick="setView('mobile')">모바일</button></div>
@@ -327,17 +327,26 @@ const VCOLS={
   E:[{k:'item',l:T('항목','Item','项目'),t:'text',w:30},{k:'kw',l:T('전기 kW','Electric kW','电力 kW'),t:'num',w:14,e:'kw'},{k:'water',l:T('용수 L/h','Water L/h','用水 L/h'),t:'num',w:14,e:'water'},{k:'gas',l:T('가스 Nm³/h','Gas Nm³/h','燃气 Nm³/h'),t:'num',w:14,e:'gas'},{k:'note',l:T('비고','Remarks','备注'),t:'text',w:26}]
 };
 // 기본 행 (문서별 초기 구성 — 제작사가 수정·추가·삭제)
+// 기본 행 라벨은 3개 언어 객체 — 제작사가 수정하면 문자열로 바뀜
+const Z1=T('1차 세척','1st wash','1次清洗'), Z2=T('2차 세척','2nd wash','2次清洗'), Z3=T('3차 헹굼','3rd rinse','3次漂洗');
+const Z1b=T('1차 세척 (상·하·좌·우)','1st wash (top·bottom·left·right)','1次清洗（上·下·左·右）'), Z2b=T('2차 세척 (상·하·좌·우)','2nd wash (top·bottom·left·right)','2次清洗（上·下·左·右）');
+const RB=T('링블로어','Ring blower','环形风机'), AK2=T('에어나이프 (좌·우)','Air knives (left·right)','气刀（左·右）'), AK4=T('에어나이프 (상·하·좌·우)','Air knives (top·bottom·left·right)','气刀（上·下·左·右）');
+const SF=T('시로코팬','Sirocco fan','多翼风机'), RAD=T('온수 라디에이터','Hot-water radiator','热水散热器'), AUXH=T('보조 전기히터','Auxiliary electric heater','辅助电加热器');
+const CV=T('체인 컨베이어','Chain conveyor','链式输送机'), TKH=T('저수조 보조 전기히터','Tank auxiliary electric heater','水槽辅助电加热器');
+const CTL=T('제어반·조명 등','Control panel, lighting, etc.','控制柜·照明等'), FW=T('청수 보충','Make-up fresh water','补充清水'), GAS=T('보일러 가스 (설비 배분분)','Boiler gas (share for this machine)','锅炉燃气（本设备分摊）');
+const FLT=T('백필터·스키머 등 여과','Bag filter, skimmer, etc.','袋式过滤器·撇油器等');
 const VDEF={
-  tray:{A:[{zone:'1차 세척'},{zone:'2차 세척'},{zone:'3차 헹굼'}],B:[{item:'링블로어'},{item:'에어나이프 (좌·우)'}],C:[{item:'시로코팬'},{item:'온수 라디에이터'},{item:'보조 전기히터'}],D:[{item:'체인 컨베이어'}],E:[{item:'저수조 보조 전기히터'},{item:'제어반·조명 등'},{item:'청수 보충'},{item:'보일러 가스 (설비 배분분)'}]},
-  box:{A:[{zone:'1차 세척 (상·하·좌·우)'},{zone:'2차 세척 (상·하·좌·우)'},{zone:'3차 헹굼'}],B:[{item:'링블로어'},{item:'에어나이프 (상·하·좌·우)'}],C:[{item:'시로코팬'},{item:'온수 라디에이터'},{item:'보조 전기히터'}],D:[{item:'체인 컨베이어'}],E:[{item:'저수조 보조 전기히터'},{item:'백필터·스키머 등 여과'},{item:'제어반·조명 등'},{item:'청수 보충'},{item:'보일러 가스 (설비 배분분)'}]}
+  tray:{A:[{zone:Z1},{zone:Z2},{zone:Z3}],B:[{item:RB},{item:AK2}],C:[{item:SF},{item:RAD},{item:AUXH}],D:[{item:CV}],E:[{item:TKH},{item:CTL},{item:FW},{item:GAS}]},
+  box:{A:[{zone:Z1b},{zone:Z2b},{zone:Z3}],B:[{item:RB},{item:AK4}],C:[{item:SF},{item:RAD},{item:AUXH}],D:[{item:CV}],E:[{item:TKH},{item:FLT},{item:CTL},{item:FW},{item:GAS}]}
 };
+const VS=v=>(v&&typeof v==='object')?L(v):String(v||'');   // 셀 값 표시 (언어 객체면 현재 언어)
 let V={};   // {doc:{name:'',A:[],B:[],C:[],D:[],E:[]}}
 function vdata(){const d=curDoc(); if(!V[d]) V[d]={name:'',A:JSON.parse(JSON.stringify(VDEF[d].A)),B:JSON.parse(JSON.stringify(VDEF[d].B)),C:JSON.parse(JSON.stringify(VDEF[d].C)),D:JSON.parse(JSON.stringify(VDEF[d].D)),E:JSON.parse(JSON.stringify(VDEF[d].E))}; return V[d];}
 function vtable(sec){
   const cols=VCOLS[sec], rows=vdata()[sec];
   let h='<table class="vt"><colgroup>'+cols.map(x=>'<col style="width:'+x.w+'%">').join('')+'<col class="act" style="width:5%"></colgroup><thead><tr>'+cols.map(x=>'<th>'+L(x.l)+'</th>').join('')+'<th class="act">'+L(UI.act)+'</th></tr></thead><tbody>';
   rows.forEach((r,i)=>{
-    h+='<tr>'+cols.map(x=>'<td><input type="'+(x.t==='num'?'number':'text')+'"'+(x.t==='num'?' step="any"':'')+' value="'+String(r[x.k]||'').replace(/"/g,'&quot;')+'" oninput="vset(\''+sec+'\','+i+',\''+x.k+'\',this.value)"></td>').join('')
+    h+='<tr>'+cols.map(x=>'<td><input type="'+(x.t==='num'?'number':'text')+'"'+(x.t==='num'?' step="any"':'')+' value="'+VS(r[x.k]).replace(/"/g,'&quot;')+'" oninput="vset(\''+sec+'\','+i+',\''+x.k+'\',this.value)"></td>').join('')
       +'<td class="act c"><button class="del" onclick="vdel(\''+sec+'\','+i+')">'+L(UI.del)+'</button></td></tr>';
   });
   h+='</tbody></table><button class="vadd" onclick="vaddRow(\''+sec+'\')">'+L(UI.add)+'</button>';
@@ -438,7 +447,7 @@ function render(){
   gi('hdrT').textContent=L(D.name); gi('hdrS').textContent=L(UI.org);
   gi('ptitle').innerHTML='<b>'+L(D.name)+'</b><span>'+L(UI.org)+' · '+D.no+' · '+D.ver+'</span>';
   gi('btnPdf').textContent=L(UI.pdf); gi('btnSave').textContent=L(UI.save); gi('btnLoad').textContent=L(UI.load); gi('btnMail').textContent=L(UI.mail);
-  document.title=L(D.name)+' v3.1';
+  document.title=L(D.name)+' v3.2';
   let h='';
   h+='<div class="ask">'+L(UI.ask)+'</div>';
   h+=card(0,SECT.s0,'<table><colgroup><col style="width:16%"><col></colgroup>'
