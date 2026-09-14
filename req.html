@@ -6,16 +6,15 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>세척·탈수·건조 설비 요구 사양서 v1.0 | 인시스 AI혁신 연구개발실</title>
+<title>세척·탈수·건조 설비 요구 사양서 v1.1 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{--navy:#0d2137;--teal:#0d7fa8;--ink:#1c2b3a;--bg:#eef2f6;--line:#dde5ee;--hi:#0d47a1;--warn:#8a5a00;--good:#1b5e20;}
-body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6;}
-@media(min-width:768px){body{font-size:16px;}}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55;}
 .hdr{background:linear-gradient(120deg,#0d2137 0%,#0d7fa8 100%);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.22);}
 .nav-inner{max-width:1100px;margin:0 auto;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
-.hdr-t{font-size:17px;font-weight:900;}
+.hdr-t{font-size:16px;font-weight:900;}
 .hdr-s{font-size:13px;opacity:.86;}
 .hdr-r{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
 .hdr-r button,.hdr-r select{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.32);color:#fff;padding:5px 10px;border-radius:7px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;}
@@ -27,11 +26,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink)
 .card{background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden;}
 .ch{background:#f4f8fb;border-bottom:1px solid var(--line);padding:8px 12px;display:flex;align-items:center;gap:7px;}
 .cn{background:var(--navy);color:#fff;width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex:none;}
-.cl{font-size:15px;font-weight:800;color:var(--navy);}
+.cl{font-size:14px;font-weight:800;color:var(--navy);}
 .cb{padding:10px 12px;}
-h3{font-size:14px;font-weight:800;color:var(--teal);margin:10px 0 5px;padding-left:7px;border-left:3px solid var(--teal);}
+h3{font-size:13px;font-weight:800;color:var(--teal);margin:10px 0 5px;padding-left:7px;border-left:3px solid var(--teal);}
 table{width:100%;border-collapse:collapse;margin:5px 0 8px;font-size:13px;}
-@media(min-width:768px){table{font-size:15px;}}
 th{background:#e8eff5;color:var(--navy);font-weight:800;padding:6px 8px;border:1px solid var(--line);text-align:center;}
 td{padding:6px 8px;border:1px solid var(--line);text-align:left;vertical-align:top;}
 td.k{background:#f7fafc;font-weight:700;color:var(--navy);width:22%;}
@@ -64,7 +62,7 @@ footer{text-align:center;color:#6b8098;font-size:13px;padding:12px 0 18px;}
 <body>
 <div class="hdr"><div class="nav-inner">
   <div><div class="hdr-t" id="hdrT">세척·탈수·건조 설비 요구 사양서</div><div class="hdr-s" id="hdrS">인시스 AI혁신 연구개발실 · 인텍코리아 안산공장</div></div>
-  <div class="hdr-r"><span class="vb">v1.0</span>
+  <div class="hdr-r"><span class="vb">v1.1</span>
     <select id="docSel" onchange="render()"><option value="tray">트레이 / Tray / 托盘(料盘)</option><option value="box">박스 / Box / 周转箱</option></select>
     <button id="lko" class="on" onclick="setLang('ko')">한국어</button><button id="len" onclick="setLang('en')">English</button><button id="lzh" onclick="setLang('zh')">中文</button>
     <button id="bp" class="on" onclick="setView('pc')">PC</button><button id="bm" onclick="setView('mobile')">모바일</button></div>
@@ -284,7 +282,7 @@ function render(){
   const D=DOCS[curDoc()];
   gi('hdrT').textContent=L(D.name); gi('hdrS').textContent=L(UI.org);
   gi('btnPdf').textContent=L(UI.pdf); gi('btnSave').textContent=L(UI.save); gi('btnLoad').textContent=L(UI.load); gi('btnMail').textContent=L(UI.mail);
-  document.title=L(D.name)+' v1.0';
+  document.title=L(D.name)+' v1.1';
   let h='';
   h+=card(0,SECT.s0,'<table>'
     +'<tr><td class="k">'+L(SECT.docno)+'</td><td>'+D.no+'</td></tr>'
