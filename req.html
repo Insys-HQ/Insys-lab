@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>세척·탈수·건조 설비 요구 사양서 v1.4 | 인시스 AI혁신 연구개발실</title>
+<title>세척·탈수·건조 설비 요구 사양서 v1.5 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -63,7 +63,7 @@ footer{text-align:center;color:#6b8098;font-size:12px;padding:12px 0 18px;}
 <body>
 <div class="hdr"><div class="nav-inner">
   <div><div class="hdr-t" id="hdrT">세척·탈수·건조 설비 요구 사양서</div><div class="hdr-s" id="hdrS">인시스 AI혁신 연구개발실 · 인텍코리아 안산공장</div></div>
-  <div class="hdr-r"><span class="vb">v1.4</span>
+  <div class="hdr-r"><span class="vb">v1.5</span>
     <select id="docSel" onchange="render()"><option value="tray">트레이 / Tray / 托盘(料盘)</option><option value="box">박스 / Box / 周转箱</option></select>
     <button id="lko" class="on" onclick="setLang('ko')">한국어</button><button id="len" onclick="setLang('en')">English</button><button id="lzh" onclick="setLang('zh')">中文</button>
     <button id="bp" class="on" onclick="setView('pc')">PC</button><button id="bm" onclick="setView('mobile')">모바일</button></div>
@@ -162,12 +162,12 @@ const SUB=[
 // ── 문서별 콘텐츠 ──
 const DOCS={
 tray:{
-  no:'INSYS-TW-REQ-2026-01', ver:'v1.8 / 2026-09-14',
+  no:'INSYS-TW-REQ-2026-01', ver:'v1.9 / 2026-09-14',
   name:T('트레이 세척·탈수·건조 설비 요구 사양서','Tray Washing · Dewatering · Drying Equipment — Requirement Specification','托盘(料盘)清洗·脱水·烘干设备需求规格书'),
   rel:T('박스 세척기(별도 사양서)와 별개의 독립 설비. 온수 보일러는 공용','Independent machine, separate from the box washer (separate spec). Hot-water boiler shared.','与周转箱清洗机（另有规格书）相互独立。热水锅炉共用。'),
   target:[
     [T('트레이 종류','Tray type','托盘种类'),T('플라스틱 사출 포켓 트레이 2종','Injection-moulded plastic pocket trays, 2 sizes','注塑塑料格式托盘2种'),T('포켓 약 20개. 두 규격 모두 처리 가능해야 함','About 20 pockets. Both sizes must be handled.','约20格。两种规格均须可处理。')],
-    [T('트레이 재질','Tray material','托盘材质'),T('플라스틱 (PP 계열)','Plastic (PP family)','塑料（PP系）'),T('열변형 방지: 건조 내부온도 60~65°C 이하 유지','To prevent heat deformation, keep dryer temperature at or below 60–65°C.','防止热变形：烘干内部温度保持在60~65°C以下')],
+    [T('트레이 재질','Tray material','托盘材质'),T('플라스틱 (PP · ABS · PET)','Plastic (PP · ABS · PET)','塑料（PP · ABS · PET）'),T('3종 혼용. 열변형 방지: 건조 내부온도 60~65°C 이하 유지','Three materials in mixed use. To prevent heat deformation, keep dryer temperature at or below 60–65°C.','三种材质混用。防止热变形：烘干内部温度保持在60~65°C以下')],
     [T('투입 방식','Feeding orientation','投入方式'),T('트레이를 세워서(수직·경사) 투입','Trays are fed standing (vertical / inclined)','托盘立放（垂直/倾斜）投入'),T('세척수 배수와 노즐 분사에 유리. 눕혀서 통과하는 구조 불가','Better drainage and spray access. Flat (lying) pass-through is not acceptable.','有利于排水与喷射。不允许平放通过的结构。')],
     [T('주 오염원','Main contaminant','主要污染物'),T('방청유 (비유화형) + 소량 이물','Rust-preventive oil (non-emulsifying) + small debris','防锈油（非乳化型）+少量异物'),T('오물량 적음. 기존 세척기는 스키머 필터로 운용 중','Low soil load. Existing washer runs with skimmer filtration.','污物量少。现有清洗机以撇油器过滤运行。')]
   ],
@@ -210,12 +210,12 @@ tray:{
   sub:[SUB[0],T('포켓 20개 트레이의 포켓 내부 세척 대응 방안','Approach for cleaning inside the pockets of the 20-pocket tray','20格托盘格内清洗的应对方案'),SUB[1],SUB[2],SUB[3],SUB[4]]
 },
 box:{
-  no:'INSYS-BW-REQ-2026-01', ver:'v1.2 / 2026-09-14',
+  no:'INSYS-BW-REQ-2026-01', ver:'v1.3 / 2026-09-14',
   name:T('박스 세척·탈수·건조 설비 요구 사양서','Box Washing · Dewatering · Drying Equipment — Requirement Specification','周转箱清洗·脱水·烘干设备需求规格书'),
   rel:T('트레이 세척기(별도 사양서)와 별개의 독립 설비. 온수 보일러는 공용','Independent machine, separate from the tray washer (separate spec). Hot-water boiler shared.','与托盘清洗机（另有规格书）相互独立。热水锅炉共用。'),
   target:[
     [T('박스 종류','Box type','周转箱种类'),T('플라스틱 사출 박스 5종','Injection-moulded plastic boxes, 5 sizes','注塑塑料周转箱5种'),T('가장자리에 사출 포켓(리브·홈)이 있어 물이 고이는 구조','Moulded pockets (ribs/grooves) along the rim trap water.','边缘有注塑格（筋/槽），易积水。')],
-    [T('박스 재질','Box material','周转箱材质'),T('플라스틱 (PP 계열)','Plastic (PP family)','塑料（PP系）'),T('열변형 방지: 건조 내부온도 60~65°C 이하 유지','To prevent heat deformation, keep dryer temperature at or below 60–65°C.','防止热变形：烘干内部温度保持在60~65°C以下')],
+    [T('박스 재질','Box material','周转箱材质'),T('플라스틱 (PP · PE)','Plastic (PP · PE)','塑料（PP · PE）'),T('2종 혼용. 열변형 방지: 건조 내부온도 60~65°C 이하 유지','Two materials in mixed use. To prevent heat deformation, keep dryer temperature at or below 60–65°C.','两种材质混用。防止热变形：烘干内部温度保持在60~65°C以下')],
     [T('투입 방식','Feeding orientation','投入方式'),T('박스를 세워서(수직·경사) 투입','Boxes are fed standing (vertical / inclined)','周转箱立放（垂直/倾斜）投入'),T('가장자리 사출 포켓에 고인 물은 뒤집지 않으면 제거되지 않음 → 세운 상태로 통과시켜 자연 배수. 눕혀서 통과하는 구조 불가','Water trapped in the rim pockets cannot be removed unless the box is inverted → pass boxes standing so they drain by gravity. Flat pass-through is not acceptable.','边缘格内积水若不翻转无法排除→立放通过使其自然排水。不允许平放通过。')],
     [T('주 오염원','Main contaminant','主要污染物'),T('방청유 + 분진·이물','Rust-preventive oil + dust/debris','防锈油+粉尘、异物'),T('트레이보다 오물량 많음','Higher soil load than trays','污物量比托盘多')]
   ],
@@ -283,7 +283,7 @@ function render(){
   const D=DOCS[curDoc()];
   gi('hdrT').textContent=L(D.name); gi('hdrS').textContent=L(UI.org);
   gi('btnPdf').textContent=L(UI.pdf); gi('btnSave').textContent=L(UI.save); gi('btnLoad').textContent=L(UI.load); gi('btnMail').textContent=L(UI.mail);
-  document.title=L(D.name)+' v1.4';
+  document.title=L(D.name)+' v1.5';
   let h='';
   h+=card(0,SECT.s0,'<table><colgroup><col style="width:16%"><col></colgroup>'
     +'<tr><td class="k">'+L(SECT.docno)+'</td><td>'+D.no+'</td></tr>'
