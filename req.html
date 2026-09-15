@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>세척·탈수·건조 설비 요구 사양서 v3.3 | 인시스 AI혁신 연구개발실</title>
+<title>세척·탈수·건조 설비 요구 사양서 v3.4 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -99,7 +99,7 @@ footer{text-align:center;color:#6b8098;font-size:12px;padding:12px 0 18px;}
 <body>
 <div class="hdr"><div class="nav-inner">
   <div><div class="hdr-t" id="hdrT">세척·탈수·건조 설비 요구 사양서</div><div class="hdr-s" id="hdrS">인시스 AI혁신 연구개발실 · 인텍코리아 안산공장</div></div>
-  <div class="hdr-r"><span class="vb">v3.3</span>
+  <div class="hdr-r"><span class="vb">v3.4</span>
     <select id="docSel" onchange="render()"><option value="tray">트레이 / Tray / 托盘(料盘)</option><option value="box">박스 / Box / 周转箱</option></select>
     <button id="lko" class="on" onclick="setLang('ko')">한국어</button><button id="len" onclick="setLang('en')">English</button><button id="lzh" onclick="setLang('zh')">中文</button>
     <button id="bp" class="on" onclick="setView('pc')">PC</button><button id="bm" onclick="setView('mobile')">모바일</button></div>
@@ -186,18 +186,18 @@ const ENERGY=[
     '气刀风机与多翼风机优先选用三相机型，建议采用多台小型机组的低功耗配置。')
 ];
 const SEP=T('구조 분리','Structural separation','结构分离');
-const SEPv=T('세척조·탈수조·건조로는 컨베이어로 연결되되, 탈수조와 건조로의 상부 구조물은 세척조와 분리하여 세척조 내부의 습기·비산수가 탈수·건조 구간으로 전이되지 않는 구조로 한다. 구간 경계에 커튼·격벽·배기 등 습기 차단 수단을 둔다.',
-  'Wash, dewatering and drying zones are linked by the conveyor, but the upper enclosures of the dewatering and drying zones must be separated from the wash zone so that moisture and spray from the wash zone do not migrate into them. Provide curtains, partitions or exhaust at the boundaries.',
-  '清洗槽、脱水段、烘干炉由输送机连接，但脱水段与烘干炉的上部结构须与清洗槽分离，防止清洗槽内的湿气与飞溅水进入脱水、烘干区。区段交界处设置帘幕、隔板或排气等隔湿措施。');
+const SEPv=T('세척조·탈수조·건조로는 컨베이어로 연결되되, 각 구간(세척→탈수, 탈수→건조) 경계에는 에어커튼을 설치하여 세척구간의 다량의 습기가 탈수·건조 구간으로 넘어가지 않도록 한다. 탈수조와 건조로의 상부 구조물은 세척조와 분리하고, 구간 경계에 격벽·배기 등 추가 차단 수단을 둔다.',
+  'Wash, dewatering and drying zones are linked by the conveyor, but an air curtain is installed at each zone boundary (wash→dewatering, dewatering→drying) so that the large amount of moisture from the wash zone does not carry over into the dewatering and drying zones. The upper enclosures of the dewatering and drying zones are separated from the wash zone, with partitions and exhaust as additional barriers at the boundaries.',
+  '清洗槽、脱水段、烘干炉由输送机连接，但在各区段交界处（清洗→脱水、脱水→烘干）设置风幕，防止清洗区段大量湿气进入脱水、烘干区。脱水段与烘干炉的上部结构须与清洗槽分离，交界处另设隔板、排气等隔断措施。');
 const CLIP=T('컨베이어 유지 방식','Conveyor holding method','输送机夹持方式');
 const ADJ=T('세척 조건 조정','Wash condition adjustment','清洗条件调整');
 const ADJv=T('노즐 각도·분사 압력·컨베이어 속도는 시운전 중 조정 가능해야 함. 펌프는 4.0 bar까지 여유',
   'Nozzle angle, spray pressure and conveyor speed shall be adjustable during commissioning. Pumps rated up to 4.0 bar.',
   '喷嘴角度、喷射压力、输送速度须可在试运行中调整。泵额定压力预留至4.0 bar。');
 const DRY=T('건조 방식','Drying method','烘干方式');
-const DRYv=T('상부 시로코팬 + 측면 원형 순환덕트. 건조실 내부온도 65°C 초과 시 히터 차단 인터록 필수',
-  'Top-mounted sirocco fans + side round recirculation ducts. Interlock to cut the heater if dryer temperature exceeds 65°C is mandatory.',
-  '顶部多翼风机+侧面圆形循环风管。烘干室温度超过65°C时切断加热器的联锁为必须。');
+const DRYv=T('상부 시로코팬 + 측면 원형 순환덕트. 건조로 내부는 진입부(가열 구간)와 출구부(냉풍 냉각 구간)로 구분하고, 두 구간 사이에 격벽을 두어 온도 전이를 최소화한다. 건조실 내부온도 65°C 초과 시 히터 차단 인터록 필수',
+  'Top-mounted sirocco fans + side round recirculation ducts. The dryer interior is divided into an entry section (heated) and an exit section (cooled with cold air), with a partition between them to minimize heat transfer. Interlock to cut the heater if dryer temperature exceeds 65°C is mandatory.',
+  '顶部多翼风机+侧面圆形循环风管。烘干炉内部分为进口段（加热区）与出口段（冷风冷却区），两区间设隔板以减少温度传递。烘干室温度超过65°C时切断加热器的联锁为必须。');
 const TANK=T('저수조','Water tanks','水槽');
 const TANKv=T('세척조 하부 배치. 각 조 최하단 전량 배수 드레인. 헹굼조가 최상단, 하류로 단차를 두어 자연 유하',
   'Located under the wash zone. Full-drain valve at the bottom of each tank. Rinse tank highest; stepped levels downstream for gravity overflow.',
@@ -210,6 +210,7 @@ const MAT=T('재질','Material','材质'); const MATv=T('세척액 접촉부 STS
 const PWR=T('전원','Power supply','电源'); const PWRv=T('삼상 380V 60Hz (수전 여유 있음)','3-phase 380V 60Hz (sufficient supply capacity available)','三相380V 60Hz（供电容量充足）');
 const SUB=[
   T('세척·탈수·건조 성능 보증치와 그 근거 (유사 실적 포함)','Guaranteed wash / dewatering / drying performance and its basis (including similar references)','清洗、脱水、烘干性能保证值及其依据（含类似业绩）'),
+  T('에어커튼 사양 (설치 위치·풍량) 및 건조로 가열·냉각 구간 격벽 설계안','Air-curtain specification (locations, airflow) and the partition design between the dryer\'s heating and cooling sections','风幕规格（安装位置·风量）及烘干炉加热区与冷却区隔板设计方案'),
   T('에어나이프 거리별 풍속 곡선, 블로워·팬 기종 사양','Air-knife velocity-vs-distance curve; blower and fan model specifications','气刀距离-风速曲线，风机机型规格'),
   T('전력·가스·용수 소비량 산출표 (시간당)','Hourly consumption table for electricity, gas and water','每小时电、气、水消耗量计算表'),
   T('조립도·배관도·전기 결선도·PLC I/O 리스트 (착수 전)','Assembly drawing, piping diagram, wiring diagram, PLC I/O list (before start)','装配图、管路图、电气接线图、PLC I/O清单（开工前）'),
@@ -219,7 +220,7 @@ const SUB=[
 // ── 문서별 콘텐츠 ──
 const DOCS={
 tray:{
-  no:'INSYS-TW-REQ-2026-01', ver:'v3.0 / 2026-09-15',
+  no:'INSYS-TW-REQ-2026-01', ver:'v3.1 / 2026-09-15',
   name:T('트레이 세척·탈수·건조 설비 요구 사양서 (2단 회전 순환식)','Tray Washing · Dewatering · Drying Equipment — Requirement Specification (2-Tier U-Turn Type)','托盘(料盘)清洗·脱水·烘干设备需求规格书（双层回转循环式）'),
   rel:T('박스 세척기(별도 사양서)와 별개의 독립 설비. 온수 보일러는 공용','Independent machine, separate from the box washer (separate spec). Hot-water boiler shared.','与周转箱清洗机（另有规格书）相互独立。热水锅炉共用。'),
   target:[
@@ -252,9 +253,9 @@ tray:{
     [T('설비 구성','Machine configuration','设备构成'),T('2단(상·하) 적재 단일 라인. 트레이는 투입구에서 상·하 2단으로 동시 투입되어 설비 내부(세척·탈수·건조)를 통과한 뒤, 내부에서 180° 회전(U자형 순환)하여 투입구와 동일한 좌측으로 배출된다. 투입·배출이 같은 위치에서 이루어져 1인 작업이 가능하다.',
       'Single-line, 2-tier (upper/lower) loading. Trays are fed 2 tiers at a time at the infeed, pass through washing, dewatering and drying, then rotate 180° inside the machine (U-turn) and discharge on the same left side as the infeed. Loading and unloading at the same location enable 1-person operation.',
       '单线双层（上下）装载。托盘在投入口以上下2层同时投入，经过清洗、脱水、烘干后，在设备内部180°回转（U形循环），从与投入口相同的左侧出料。投入、出料在同一位置进行，可实现1人作业。')],
-    [SEP,T('세척조·탈수조·건조로는 컨베이어로 연결되되, 탈수조와 건조로의 상부 구조물은 세척조와 분리하여 세척조 내부의 습기·비산수가 탈수·건조 구간으로 전이되지 않는 구조로 한다. 구간 경계에 커튼·격벽·배기 등 습기 차단 수단을 둔다. 진행측·복귀측(U턴 왕복) 구간 모두 동일하게 적용한다.',
-      'Wash, dewatering and drying zones are linked by the conveyor, but the upper enclosures of the dewatering and drying zones must be separated from the wash zone so that moisture and spray from the wash zone do not migrate into them. Provide curtains, partitions or exhaust at the boundaries. This applies equally to both the outbound and return (U-turn) passes.',
-      '清洗槽、脱水段、烘干炉由输送机连接，但脱水段与烘干炉的上部结构须与清洗槽分离，防止清洗槽内的湿气与飞溅水进入脱水、烘干区。区段交界处设置帘幕、隔板或排气等隔湿措施。往返（U形回转）两侧区段均须同样适用。')],
+    [SEP,T('세척조·탈수조·건조로는 컨베이어로 연결되되, 각 구간(세척→탈수, 탈수→건조) 경계에는 에어커튼을 설치하여 세척구간의 다량의 습기가 탈수·건조 구간으로 넘어가지 않도록 한다. 탈수조와 건조로의 상부 구조물은 세척조와 분리하고, 구간 경계에 격벽·배기 등 추가 차단 수단을 둔다. 진행측·복귀측(U턴 왕복) 구간 모두 동일하게 적용한다.',
+      'Wash, dewatering and drying zones are linked by the conveyor, but an air curtain is installed at each zone boundary (wash→dewatering, dewatering→drying) so that the large amount of moisture from the wash zone does not carry over. The upper enclosures of the dewatering and drying zones are separated from the wash zone, with partitions and exhaust as additional barriers. This applies equally to both the outbound and return (U-turn) passes.',
+      '清洗槽、脱水段、烘干炉由输送机连接，但在各区段交界处（清洗→脱水、脱水→烘干）设置风幕，防止清洗区段大量湿气进入脱水、烘干区。脱水段与烘干炉的上部结构须与清洗槽分离，交界处另设隔板、排气等隔断措施。往返（U形回转）两侧区段均须同样适用。')],
     [CLIP,T('체인 컨베이어에 트레이를 클립 형태로 2개소 이상 꽂아 고정하는 구조로 한다. 상·하 2단 적재 및 U자형 회전 구간에서도 세척·탈수 분사에 의해 트레이가 흔들리거나 이탈하지 않아야 하며, 대형·소형 규격 모두 동일 클립으로 대응한다.',
       'Trays are held on the chain conveyor by clips at two or more points. Trays must not wobble or come off under wash/dewatering spray even in the 2-tier loading and U-turn sections; the same clips must suit both large and small trays.',
       '托盘以夹具形式在链式输送机上至少2处插固。上下2层装载及U形回转区段内，清洗、脱水喷射时托盘也不得晃动或脱落，大小两种规格用同一夹具对应。')],
@@ -265,9 +266,9 @@ tray:{
     [T('탈수 방식','Dewatering method','脱水方式'),T('에어나이프. 트레이 양 측면에 사선 배치하여 위에서 아래로 물을 쓸어내림. 2단 적재 높이에 맞춰 에어나이프 및 링블로어 토출부의 상하 방향 길이를 확대한다. 각 면당 4회 통과(4패스) 구성. 나이프–트레이 이격은 20~150mm 범위에서 조정 가능한 슬라이드 구조. 링블로어 대수·연결 방식은 확대된 에어나이프 규격에 맞춰 제작사가 산정한다.',
       'Air knives on both tray faces, set diagonally to sweep water downward. The vertical extent of the air knives and ring-blower outlets is enlarged to match the increased height from 2-tier loading. 4 passes per face. Knife-to-tray stand-off adjustable 20–150 mm on a slide. Ring-blower quantity and connection are to be sized by the manufacturer to match the enlarged air-knife specification.',
       '气刀。托盘两侧斜向布置，自上而下刮除水分。气刀及环形风机出风口的上下方向长度须根据双层装载增加的高度而扩大。每面4次通过（4道）。气刀与托盘间距在20~150mm范围内可滑动调整。环形风机数量及连接方式由制造商根据扩大后的气刀规格核算。')],
-    [DRY,T('상부 시로코팬 + 측면 원형 순환덕트. 2단 적재 높이에 맞춰 건조실 내부 높이를 확대한다. 건조실 내부온도 65°C 초과 시 히터 차단 인터록 필수',
-      'Top-mounted sirocco fans + side round recirculation ducts. The dryer\'s internal height is enlarged to match the 2-tier loading height. Interlock to cut the heater if dryer temperature exceeds 65°C is mandatory.',
-      '顶部多翼风机+侧面圆形循环风管。烘干室内部高度须根据双层装载高度而扩大。烘干室温度超过65°C时切断加热器的联锁为必须。')],
+    [DRY,T('상부 시로코팬 + 측면 원형 순환덕트. 건조로 내부는 진입부(가열 구간)와 출구부(냉풍 냉각 구간)로 구분하고, 두 구간 사이에 격벽을 두어 온도 전이를 최소화한다. 2단 적재 높이에 맞춰 건조실 내부 높이를 확대한다. 건조실 내부온도 65°C 초과 시 히터 차단 인터록 필수',
+      'Top-mounted sirocco fans + side round recirculation ducts. The dryer interior is divided into an entry section (heated) and an exit section (cooled with cold air), with a partition between them to minimize heat transfer. Internal height is enlarged to match the 2-tier loading height. Interlock to cut the heater if dryer temperature exceeds 65°C is mandatory.',
+      '顶部多翼风机+侧面圆形循环风管。烘干炉内部分为进口段（加热区）与出口段（冷风冷却区），两区间设隔板以减少温度传递。内部高度须根据双层装载高度而扩大。烘干室温度超过65°C时切断加热器的联锁为必须。')],
     [TANK,TANKv],
     [DIM,T('길이·폭·높이는 제작사 규격을 기준으로 협의하여 확정한다. 2단 적재·U자형 순환 구조로 높이 및 폭이 기존 단순 통과형 대비 증가할 수 있음.',
       'Length, width and height are to be agreed based on the manufacturer\'s standard. Height and width may increase versus a simple pass-through layout due to the 2-tier, U-turn structure.',
@@ -460,7 +461,7 @@ function render(){
   gi('hdrT').textContent=L(D.name); gi('hdrS').textContent=L(UI.org);
   gi('ptitle').innerHTML='<b>'+L(D.name)+'</b><span>'+L(UI.org)+' · '+D.no+' · '+D.ver+'</span>';
   gi('btnPdf').textContent=L(UI.pdf); gi('btnSave').textContent=L(UI.save); gi('btnLoad').textContent=L(UI.load); gi('btnMail').textContent=L(UI.mail);
-  document.title=L(D.name)+' v3.3';
+  document.title=L(D.name)+' v3.4';
   let h='';
   h+='<div class="ask">'+L(UI.ask)+'</div>';
   h+=card(0,SECT.s0,'<table><colgroup><col style="width:16%"><col></colgroup>'
