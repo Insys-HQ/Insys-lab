@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>세척·탈수·건조 설비 요구 사양서 v3.4 | 인시스 AI혁신 연구개발실</title>
+<title>세척·탈수·건조 설비 요구 사양서 v3.5 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -99,7 +99,7 @@ footer{text-align:center;color:#6b8098;font-size:12px;padding:12px 0 18px;}
 <body>
 <div class="hdr"><div class="nav-inner">
   <div><div class="hdr-t" id="hdrT">세척·탈수·건조 설비 요구 사양서</div><div class="hdr-s" id="hdrS">인시스 AI혁신 연구개발실 · 인텍코리아 안산공장</div></div>
-  <div class="hdr-r"><span class="vb">v3.4</span>
+  <div class="hdr-r"><span class="vb">v3.5</span>
     <select id="docSel" onchange="render()"><option value="tray">트레이 / Tray / 托盘(料盘)</option><option value="box">박스 / Box / 周转箱</option></select>
     <button id="lko" class="on" onclick="setLang('ko')">한국어</button><button id="len" onclick="setLang('en')">English</button><button id="lzh" onclick="setLang('zh')">中文</button>
     <button id="bp" class="on" onclick="setView('pc')">PC</button><button id="bm" onclick="setView('mobile')">모바일</button></div>
@@ -220,25 +220,25 @@ const SUB=[
 // ── 문서별 콘텐츠 ──
 const DOCS={
 tray:{
-  no:'INSYS-TW-REQ-2026-01', ver:'v3.1 / 2026-09-15',
+  no:'INSYS-TW-REQ-2026-01', ver:'v3.2 / 2026-09-15',
   name:T('트레이 세척·탈수·건조 설비 요구 사양서 (2단 회전 순환식)','Tray Washing · Dewatering · Drying Equipment — Requirement Specification (2-Tier U-Turn Type)','托盘(料盘)清洗·脱水·烘干设备需求规格书（双层回转循环式）'),
   rel:T('박스 세척기(별도 사양서)와 별개의 독립 설비. 온수 보일러는 공용','Independent machine, separate from the box washer (separate spec). Hot-water boiler shared.','与周转箱清洗机（另有规格书）相互独立。热水锅炉共用。'),
   target:[
-    [T('트레이 종류','Tray type','托盘种类'),T('플라스틱 사출 포켓 트레이 2종','Injection-moulded plastic pocket trays, 2 sizes','注塑塑料格式托盘2种'),T('포켓 약 20개. 두 규격 모두 처리 가능해야 함','About 20 pockets. Both sizes must be handled.','约20格。两种规格均须可处理。')],
+    [T('트레이 종류','Tray type','托盘种类'),T('플라스틱 사출 포켓 트레이 약 20종','Injection-moulded plastic pocket trays, about 20 varieties','注塑塑料格式托盘约20种'),T('포켓 5~20개 (모델별 상이). 약 20종 모델 모두 처리 가능해야 함','5–20 pockets, varying by model. All ~20 models must be handled.','格数5~20个（因型号而异）。约20种型号均须可处理。')],
     [T('트레이 재질','Tray material','托盘材质'),T('플라스틱 (PP · ABS · PET)','Plastic (PP · ABS · PET)','塑料（PP · ABS · PET）'),T('3종 혼용. 열변형 방지: 세척수 온도·건조 내부온도 모두 60~65°C 이하 유지','Three materials in mixed use. To prevent heat deformation, keep both wash-water and dryer temperature at or below 60–65°C.','三种材质混用。防止热变形：清洗水温与烘干内部温度均保持在60~65°C以下')],
     [T('투입 방식','Feeding orientation','投入方式'),T('트레이를 세워서(수직) 상·하 2단으로 동시 투입','Trays are fed standing (vertical), 2 tiers (upper/lower) simultaneously','托盘立放（垂直）上下2层同时投入'),T('세척수 배수와 노즐 분사에 유리. 눕혀서 통과하는 구조 불가','Better drainage and spray access. Flat (lying) pass-through is not acceptable.','有利于排水与喷射。不允许平放通过的结构。')],
     [T('순환·배출 구조','Return / discharge structure','循环·出料结构'),T('설비 내부에서 180° 회전(U자형 순환)하여 투입구와 동일한 좌측으로 배출','Rotates 180° inside the machine (U-turn) and discharges on the same left side as the infeed','设备内部180°回转（U形循环）后从与投入口相同的左侧出料'),T('투입·배출이 동일 위치에서 이루어져 1인 작업 가능','Loading and unloading occur at the same location, enabling 1-person operation','投入、出料在同一位置进行，可实现1人作业')],
     [T('주 오염원','Main contaminant','主要污染物'),T('방청유 (비유화형) + 소량 이물','Rust-preventive oil (non-emulsifying) + small debris','防锈油（非乳化型）+少量异物'),T('오물량 적음. 기존 세척기는 스키머 필터로 운용 중','Low soil load. Existing washer runs with skimmer filtration.','污物量少。现有清洗机以撇油器过滤运行。')]
   ],
-  sizeTitle:T('트레이 규격 (2종 모두 처리 가능해야 함)','Tray sizes (both must be handled)','托盘规格（两种均须可处理）'),
+  sizeTitle:T('트레이 규격 범위 (약 20종, 최대~최소 범위 내 전 모델 처리 가능해야 함)','Tray size range (about 20 varieties; all models within the max–min range must be handled)','托盘规格范围（约20种，须可处理最大~最小范围内的所有型号）'),
   sizeHead:[UI.grade,UI.size,UI.pocket,UI.pdepth,UI.feat],
   sizes:[
-    [UI.max,'430 × 330 × 150',T('약 20개','~20','约20格'),T('약 45 mm','~45 mm','约45 mm'),T('대형 · 중량 약 50 g · 설비 통과 폭·높이 및 노즐 배열 기준 규격. 포켓 깊이 45mm로 측면 분사 필요','Large · ~50 g · reference size for pass-through width/height and nozzle layout. 45 mm pocket depth requires side spray.','大型·重约50 g·作为设备通过宽高及喷嘴布置的基准规格。格深45mm需侧向喷射')],
-    [UI.min,'320 × 210 × 50',T('약 20개','~20','约20格'),'—',T('소형 · 가이드·클립 조정 하한 기준','Small · lower limit for guide / clip adjustment','小型·导轨、夹具调整下限基准')]
+    [UI.max,'430 × 330 × 150',T('5~20개 (모델별 상이)','5–20 (varies by model)','5~20个（因型号而异）'),T('약 45 mm','~45 mm','约45 mm'),T('최대 규격 · 중량 약 50 g · 설비 통과 폭·높이 및 노즐 배열 기준. 포켓 깊이 45mm로 측면 분사 필요','Largest size · ~50 g · reference for pass-through width/height and nozzle layout. 45 mm pocket depth requires side spray.','最大规格·重约50 g·作为设备通过宽高及喷嘴布置的基准。格深45mm需侧向喷射')],
+    [UI.min,'320 × 210 × 50',T('5~20개 (모델별 상이)','5–20 (varies by model)','5~20个（因型号而异）'),'—',T('최소 규격 · 가이드·클립 조정 하한 기준','Smallest size · lower limit for guide / clip adjustment','最小规格·导轨、夹具调整下限基准')]
   ],
-  sizeNote:T('두 규격을 교체 없이 처리하거나, 규격 전환 시 조정 시간이 5분 이내여야 한다. 노즐 이격·에어나이프 높이·가이드 폭이 소형 트레이에도 대응되도록 조정 범위를 확보한다.',
-    'Both sizes shall be handled without changeover, or changeover shall take no more than 5 minutes. Nozzle stand-off, air-knife height and guide width shall have adjustment range to suit the small tray.',
-    '两种规格须免换型处理，或换型调整时间不超过5分钟。喷嘴间距、气刀高度、导轨宽度的调整范围须覆盖小型托盘。'),
+  sizeNote:T('약 20종의 트레이가 이 최대~최소 범위 내에 분포하며, 설비는 전 모델을 교체 없이 처리하거나 규격 전환 시 조정 시간이 5분 이내여야 한다. 노즐 이격·에어나이프 높이·가이드 폭이 최소 규격에도 대응되도록 조정 범위를 확보한다.',
+    'About 20 tray varieties fall within this max–min range. The machine shall handle all models without changeover, or changeover shall take no more than 5 minutes. Nozzle stand-off, air-knife height and guide width shall have adjustment range to suit the smallest size.',
+    '约20种托盘分布在此最大~最小范围内，设备须免换型处理所有型号，或换型调整时间不超过5分钟。喷嘴间距、气刀高度、导轨宽度的调整范围须覆盖最小规格。'),
   cap:[
     [T('세척 (시간당)','Washing (per hour)','清洗（每小时）'),T('1,000 매/h (상·하 2단 적재, 단일 라인 순환식)','1,000 trays/h (2-tier upper/lower loading, single-line circulation)','1,000个/小时（上下2层装载，单线循环式）'),T('방청유·이물 제거. 포켓 내부 포함. 샘플 실물 테스트로 검수','Removal of rust-preventive oil and debris, including inside pockets. Verified by sample test.','去除防锈油及异物，含格内。以实物样品测试验收。')],
     [T('세척 (일 8시간)','Washing (per 8-h day)','清洗（每日8小时）'),T('8,000 매/일','8,000 trays/day','8,000个/日'),T('8시간 연속 운전 기준','Based on 8 h continuous operation','按8小时连续运行')],
@@ -256,9 +256,9 @@ tray:{
     [SEP,T('세척조·탈수조·건조로는 컨베이어로 연결되되, 각 구간(세척→탈수, 탈수→건조) 경계에는 에어커튼을 설치하여 세척구간의 다량의 습기가 탈수·건조 구간으로 넘어가지 않도록 한다. 탈수조와 건조로의 상부 구조물은 세척조와 분리하고, 구간 경계에 격벽·배기 등 추가 차단 수단을 둔다. 진행측·복귀측(U턴 왕복) 구간 모두 동일하게 적용한다.',
       'Wash, dewatering and drying zones are linked by the conveyor, but an air curtain is installed at each zone boundary (wash→dewatering, dewatering→drying) so that the large amount of moisture from the wash zone does not carry over. The upper enclosures of the dewatering and drying zones are separated from the wash zone, with partitions and exhaust as additional barriers. This applies equally to both the outbound and return (U-turn) passes.',
       '清洗槽、脱水段、烘干炉由输送机连接，但在各区段交界处（清洗→脱水、脱水→烘干）设置风幕，防止清洗区段大量湿气进入脱水、烘干区。脱水段与烘干炉的上部结构须与清洗槽分离，交界处另设隔板、排气等隔断措施。往返（U形回转）两侧区段均须同样适用。')],
-    [CLIP,T('체인 컨베이어에 트레이를 클립 형태로 2개소 이상 꽂아 고정하는 구조로 한다. 상·하 2단 적재 및 U자형 회전 구간에서도 세척·탈수 분사에 의해 트레이가 흔들리거나 이탈하지 않아야 하며, 대형·소형 규격 모두 동일 클립으로 대응한다.',
-      'Trays are held on the chain conveyor by clips at two or more points. Trays must not wobble or come off under wash/dewatering spray even in the 2-tier loading and U-turn sections; the same clips must suit both large and small trays.',
-      '托盘以夹具形式在链式输送机上至少2处插固。上下2层装载及U形回转区段内，清洗、脱水喷射时托盘也不得晃动或脱落，大小两种规格用同一夹具对应。')],
+    [CLIP,T('체인 컨베이어에 트레이를 클립 형태로 2개소 이상 꽂아 고정하는 구조로 한다. 클립은 상·하 2단 적재 시 트레이를 쉽게 넣고 뺄 수 있는 신속 착탈 구조여야 하며, 동시에 세척·탈수·건조 전 구간(U자형 회전 구간 포함)에서 흔들림·이탈이 없어야 한다. 약 20종 트레이 규격(최대 430×330×150~최소 320×210×50) 모두 동일 클립으로 대응한다.',
+      'Trays are held on the chain conveyor by clips at two or more points. The clips shall allow trays to be inserted and removed easily when loading 2 tiers, while also preventing any wobble or dislodging throughout washing, dewatering and drying (including the U-turn section). The same clips must suit all ~20 tray sizes (max 430×330×150 to min 320×210×50).',
+      '托盘以夹具形式在链式输送机上至少2处插固。夹具须为便于上下2层装载时轻松插入、取出的快速装卸结构，同时须保证在清洗、脱水、烘干全程（含U形回转区段）不晃动、不脱落。约20种托盘规格（最大430×330×150~最小320×210×50）均须用同一夹具对应。')],
     [T('세척 방식','Washing method','清洗方式'),T('3단 구성(세척 2 + 헹굼 1) 권장. 분사노즐은 트레이 높이를 전부 덮도록 배열하되, 2단 적재로 늘어난 높이에 맞춰 상단 노즐 수량을 늘려 배열한다. 분사노즐 방향은 진행방향 기준 약 15° 기울여 인접 분사 간섭 회피',
       '3-stage configuration (2 wash + 1 rinse) recommended. Spray nozzles shall cover the full tray height, with more nozzles in the upper rows to match the increased height from 2-tier loading. Nozzle direction tilted about 15° from the travel direction to avoid interference between adjacent sprays.',
       '建议3段构成（清洗2+漂洗1）。喷嘴布置须覆盖托盘全高，并根据双层装载增加的高度在上部增加喷嘴数量。喷嘴方向相对行进方向倾斜约15°以避免相邻喷射干扰。')],
@@ -273,10 +273,11 @@ tray:{
     [DIM,T('길이·폭·높이는 제작사 규격을 기준으로 협의하여 확정한다. 2단 적재·U자형 순환 구조로 높이 및 폭이 기존 단순 통과형 대비 증가할 수 있음.',
       'Length, width and height are to be agreed based on the manufacturer\'s standard. Height and width may increase versus a simple pass-through layout due to the 2-tier, U-turn structure.',
       '长、宽、高以制造商标准为基础协商确定。由于双层装载、U形循环结构，高度及宽度可能比简单直通式更大。')],
-    [T('기종 대응','Size changeover','规格对应'),T('대형(430×330×150)·소형(320×210×50) 트레이 공용. 노즐 이격·나이프 높이·가이드 폭 조정 구조','Common for large (430×330×150) and small (320×210×50) trays. Adjustable nozzle stand-off, knife height and guide width.','大型（430×330×150）与小型（320×210×50）托盘共用。喷嘴间距、气刀高度、导轨宽度可调。')],
+    [T('기종 대응','Size changeover','规格对应'),T('트레이 약 20종(최대 430×330×150 ~ 최소 320×210×50, 포켓 5~20개) 공용. 노즐 이격·나이프 높이·가이드 폭 조정 구조','Common for about 20 tray varieties (max 430×330×150 to min 320×210×50, 5–20 pockets). Adjustable nozzle stand-off, knife height and guide width.','约20种托盘（最大430×330×150~最小320×210×50，格数5~20个）共用。喷嘴间距、气刀高度、导轨宽度可调。')],
     [MOD,MODv],[MAT,MATv],[PWR,PWRv]
   ],
-  sub:[SUB[0],T('포켓 20개 트레이의 포켓 내부 세척 대응 방안','Approach for cleaning inside the pockets of the 20-pocket tray','20格托盘格内清洗的应对方案'),
+  sub:[SUB[0],T('포켓 5~20개, 약 20종 트레이의 포켓 내부 세척 대응 방안','Approach for cleaning inside the pockets of trays with 5–20 pockets across ~20 varieties','格数5~20个、约20种托盘的格内清洗应对方案'),
+    T('2단 적재용 신속 착탈 클립 구조 설계안 (투입·배출 용이성과 처리 중 고정력 양립)','Design for a quick-release clip for 2-tier loading (easy load/unload while holding trays firmly during processing)','双层装载用快速装卸夹具结构设计方案（兼顾装卸便利性与加工中的固定力）'),
     T('U자형 회전부의 트레이 낙하·걸림 방지 메커니즘 설계안','Design for preventing trays from falling or jamming at the U-turn section','U形回转部位防止托盘掉落、卡滞的机构设计方案'),
     SUB[1],SUB[2],SUB[3],SUB[4]]
 },
@@ -461,7 +462,7 @@ function render(){
   gi('hdrT').textContent=L(D.name); gi('hdrS').textContent=L(UI.org);
   gi('ptitle').innerHTML='<b>'+L(D.name)+'</b><span>'+L(UI.org)+' · '+D.no+' · '+D.ver+'</span>';
   gi('btnPdf').textContent=L(UI.pdf); gi('btnSave').textContent=L(UI.save); gi('btnLoad').textContent=L(UI.load); gi('btnMail').textContent=L(UI.mail);
-  document.title=L(D.name)+' v3.4';
+  document.title=L(D.name)+' v3.5';
   let h='';
   h+='<div class="ask">'+L(UI.ask)+'</div>';
   h+=card(0,SECT.s0,'<table><colgroup><col style="width:16%"><col></colgroup>'
