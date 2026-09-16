@@ -107,7 +107,7 @@ footer{text-align:center;color:#6b8098;font-size:12px;padding:12px 0 18px;}
 <body>
 <div class="hdr"><div class="nav-inner">
   <div><div class="hdr-t" id="hdrT">세척·탈수·건조 설비 요구 사양서</div><div class="hdr-s" id="hdrS">인시스 AI혁신 연구개발실 · 인텍코리아 안산공장</div></div>
-  <div class="hdr-r"><span class="vb">v3.8</span>
+  <div class="hdr-r"><span class="vb">v3.9</span>
     <select id="docSel" onchange="render()"><option value="tray">트레이 / Tray / 托盘(料盘)</option><option value="box">박스 / Box / 周转箱</option></select>
     <button id="lko" class="on" onclick="setLang('ko')">한국어</button><button id="len" onclick="setLang('en')">English</button><button id="lzh" onclick="setLang('zh')">中文</button>
     <button id="bp" class="on" onclick="setView('pc')">PC</button><button id="bm" onclick="setView('mobile')">모바일</button></div>
@@ -294,12 +294,12 @@ box:{
   name:T('박스 세척·탈수·건조 설비 요구 사양서','Box Washing · Dewatering · Drying Equipment — Requirement Specification','周转箱清洗·脱水·烘干设备需求规格书'),
   rel:T('트레이 세척기(별도 사양서)와 별개의 독립 설비. 온수 보일러는 공용','Independent machine, separate from the tray washer (separate spec). Hot-water boiler shared.','与托盘清洗机（另有规格书）相互独立。热水锅炉共用。'),
   target:[
-    [T('박스 종류','Box type','周转箱种类'),T('플라스틱 사출 박스 약 20여종','Injection-moulded plastic boxes, about 20 varieties','注塑塑料周转箱约20余种'),T('가장자리에 사출 포켓(리브·홈)이 있어 물이 고이는 구조. 아래 5개 치수는 대표 예시','Moulded pockets (ribs/grooves) along the rim trap water. The 5 sizes below are representative examples.','边缘有注塑格（筋/槽），易积水。下方5种尺寸为代表性示例。')],
+    [T('박스 종류','Box type','周转箱种类'),T('플라스틱 사출 박스 10종 이내','Injection-moulded plastic boxes, up to 10 varieties','注塑塑料周转箱10种以内'),T('가장자리에 사출 포켓(리브·홈)이 있어 물이 고이는 구조. 아래 5개 치수는 대표 예시','Moulded pockets (ribs/grooves) along the rim trap water. The 5 sizes below are representative examples.','边缘有注塑格（筋/槽），易积水。下方5种尺寸为代表性示例。')],
     [T('박스 재질','Box material','周转箱材质'),T('플라스틱 (PP · PE)','Plastic (PP · PE)','塑料（PP · PE）'),T('2종 혼용. 열변형 방지: 세척수 온도·건조 내부온도 모두 60~65°C 이하 유지','Two materials in mixed use. To prevent heat deformation, keep both wash-water and dryer temperature at or below 60–65°C.','两种材质混用。防止热变形：清洗水温与烘干内部温度均保持在60~65°C以下')],
     [T('투입 방식','Feeding orientation','投入方式'),T('박스를 세워서(수직·경사) 투입','Boxes are fed standing (vertical / inclined)','周转箱立放（垂直/倾斜）投入'),T('가장자리 사출 포켓에 고인 물은 뒤집지 않으면 제거되지 않음 → 세운 상태로 통과시켜 자연 배수. 눕혀서 통과하는 구조 불가','Water trapped in the rim pockets cannot be removed unless the box is inverted → pass boxes standing so they drain by gravity. Flat pass-through is not acceptable.','边缘格内积水若不翻转无法排除→立放通过使其自然排水。不允许平放通过。')],
     [T('주 오염원','Main contaminant','主要污染物'),T('방청유 + 분진·이물','Rust-preventive oil + dust/debris','防锈油+粉尘、异物'),T('트레이보다 오물량 많음','Higher soil load than trays','污物量比托盘多')]
   ],
-  sizeTitle:T('박스 규격 범위 (약 20여종 중 대표 치수 5가지 — 최대~최소 범위 내 전 모델 처리 가능해야 함)','Box size range (5 representative sizes among about 20 varieties; all models within the max–min range must be handled)','周转箱规格范围（约20余种中的5种代表尺寸 — 须可处理最大~最小范围内的所有型号）'),
+  sizeTitle:T('박스 규격 범위 (10종 이내 중 대표 치수 5가지 — 최대~최소 범위 내 전 모델 처리 가능해야 함)','Box size range (5 representative sizes among up to 10 varieties; all models within the max–min range must be handled)','周转箱规格范围（10种以内中的5种代表尺寸 — 须可处理最大~最小范围内的所有型号）'),
   sizeHead:[UI.grade,UI.size,UI.note,UI.feat],
   sizes:[
     [UI.max,'720 × 480 × 200',T('가장 큼','Largest','最大'),T('설비 통과 폭·높이 기준 규격','Reference size for pass-through width/height','设备通过宽高基准规格')],
@@ -307,9 +307,9 @@ box:{
     ['','480 × 380 × 150','',''],['','480 × 380 × 110','',''],
     [UI.min,'450 × 280 × 125',T('가장 작음','Smallest','最小'),T('가이드·클립 조정 하한 기준','Lower limit for guide / clip adjustment','导轨、夹具调整下限基准')]
   ],
-  sizeNote:T('약 20여종의 박스가 이 최대~최소 범위 내에 분포하며(위 5가지는 대표 치수 예시), 설비는 전 모델을 교체 없이 처리하거나 규격 전환 시 조정 시간이 5분 이내여야 한다. 노즐 이격·에어나이프 위치·가이드 폭이 최대~최소 규격에 모두 대응되도록 조정 범위를 확보한다.',
-    'About 20 box varieties fall within this max–min range (the 5 above are representative examples). The machine shall handle all models without changeover, or changeover shall take no more than 5 minutes. Nozzle stand-off, air-knife position and guide width shall have adjustment range covering the largest to smallest box.',
-    '约20余种周转箱分布在此最大~最小范围内（以上5种为代表性示例），设备须免换型处理所有型号，或换型调整时间不超过5分钟。喷嘴间距、气刀位置、导轨宽度的调整范围须覆盖最大至最小规格。'),
+  sizeNote:T('박스는 10종 이내로 이 최대~최소 범위 내에 분포하며(위 5가지는 대표 치수 예시), 설비는 전 모델을 교체 없이 처리하거나 규격 전환 시 조정 시간이 5분 이내여야 한다. 노즐 이격·에어나이프 위치·가이드 폭이 최대~최소 규격에 모두 대응되도록 조정 범위를 확보한다.',
+    'The boxes number up to 10 varieties within this max–min range (the 5 above are representative examples). The machine shall handle all models without changeover, or changeover shall take no more than 5 minutes. Nozzle stand-off, air-knife position and guide width shall have adjustment range covering the largest to smallest box.',
+    '周转箱共10种以内，分布在此最大~最小范围内（以上5种为代表性示例），设备须免换型处理所有型号，或换型调整时间不超过5分钟。喷嘴间距、气刀位置、导轨宽度的调整范围须覆盖最大至最小规格。'),
   cap:[
     [T('세척 (시간당)','Washing (per hour)','清洗（每小时）'),T('600~700 개/h (채널당 300~350 × 2채널)','600–700 boxes/h (300–350 per channel × 2 channels)','600~700个/小时（每通道300~350×2通道）'),T('방청유·분진·이물 제거. 가장자리 포켓·내부 바닥 포함. 샘플 실물 테스트로 검수','Removal of rust-preventive oil, dust and debris, including rim pockets and inner bottom. Verified by sample test.','去除防锈油、粉尘及异物，含边缘格与内底。以实物样品测试验收。')],
     [T('세척 (일 8시간)','Washing (per 8-h day)','清洗（每日8小时）'),T('4,800~5,600 개/일','4,800–5,600 boxes/day','4,800~5,600个/日'),T('8시간 연속 운전 기준','Based on 8 h continuous operation','按8小时连续运行')],
@@ -323,9 +323,9 @@ box:{
   ref:[
     [T('채널 구성','Channel configuration','通道配置'),T('2채널 동시 처리. 채널당 300~350개/h. 최대 박스 720mm 기준 통과 폭 확보. 채널 간 격벽으로 분사 간섭 방지','2 channels processed simultaneously, 300–350 boxes/h each. Pass-through width based on the 720 mm box. Partition between channels to prevent spray interference.','2通道同时处理，每通道300~350个/小时。按最大720mm周转箱确保通过宽度。通道间设隔板防止喷射干扰。')],
     [SEP,SEPv],
-    [CLIP,T('체인 컨베이어에 박스를 클립 형태로 2개소 이상 꽂아 세운 상태로 고정하는 구조로 한다. 세척·탈수 분사에 의해 박스가 흔들리거나 이탈하지 않아야 하며, 약 20여종 규격(최대 720×480×200~최소 450×280×125) 모두 동일 클립으로 대응한다.',
-      'Boxes are held standing on the chain conveyor by clips at two or more points. Boxes must not wobble or come off under wash/dewatering spray; the same clips must suit all ~20 varieties (max 720×480×200 to min 450×280×125).',
-      '周转箱以夹具形式在链式输送机上至少2处插固并保持立放。清洗、脱水喷射时不得晃动或脱落，约20余种规格（最大720×480×200~最小450×280×125）均须用同一夹具对应。')],
+    [CLIP,T('체인 컨베이어에 박스를 클립 형태로 2개소 이상 꽂아 세운 상태로 고정하는 구조로 한다. 세척·탈수 분사에 의해 박스가 흔들리거나 이탈하지 않아야 하며, 10종 이내 규격(최대 720×480×200~최소 450×280×125) 모두 동일 클립으로 대응한다.',
+      'Boxes are held standing on the chain conveyor by clips at two or more points. Boxes must not wobble or come off under wash/dewatering spray; the same clips must suit all varieties (up to 10, max 720×480×200 to min 450×280×125).',
+      '周转箱以夹具形式在链式输送机上至少2处插固并保持立放。清洗、脱水喷射时不得晃动或脱落，10种以内规格（最大720×480×200~最小450×280×125）均须用同一夹具对应。')],
     [T('세척 방식','Washing method','清洗方式'),T('3단 구성(세척 2 + 헹굼 1) 권장. 박스는 상·하·좌·우 4면 분사. 분사노즐은 박스 높이를 전부 덮도록 배열하고, 분사노즐 방향은 진행방향 기준 약 15° 기울여 인접 분사 간섭 회피. 깊이 310mm 박스의 내부 바닥까지 분사가 도달해야 함',
       '3-stage configuration (2 wash + 1 rinse) recommended. Boxes are sprayed on all four sides. Nozzles shall cover the full box height; nozzle direction tilted about 15° from the travel direction to avoid interference. Spray must reach the inner bottom of the 310 mm-deep box.',
       '建议3段构成（清洗2+漂洗1）。周转箱上下左右四面喷射。喷嘴布置须覆盖周转箱全高，喷嘴方向相对行进方向倾斜约15°以避免干扰。喷射须到达深310mm周转箱的内底。')],
@@ -334,7 +334,7 @@ box:{
       'Air knives on all four sides. Side knives set diagonally to sweep water downward. 4 passes per side. One ring blower feeds two air knives (Y-branch). Knife-to-box stand-off adjustable 20–150 mm on a slide.',
       '气刀上下左右四面布置。侧面斜向布置自上而下刮除水分。每面4次通过（4道）。1台环形风机连接2把气刀（Y分支）。气刀与周转箱间距在20~150mm范围内可滑动调整。')],
     [DRY,DRYv],[TANK,TANKv],[DIM,DIMv],
-    [T('기종 대응','Size changeover','规格对应'),T('박스 약 20여종(최대 720×480×200 ~ 최소 450×280×125, 대표 치수 5가지 예시) 공용. 노즐 이격·나이프 위치·가이드 폭 조정 구조','Common for about 20 box varieties (max 720×480×200 to min 450×280×125, 5 representative sizes shown). Adjustable nozzle stand-off, knife position and guide width.','约20余种周转箱（最大720×480×200~最小450×280×125，示例5种代表尺寸）共用。喷嘴间距、气刀位置、导轨宽度可调。')],
+    [T('기종 대응','Size changeover','规格对应'),T('박스 10종 이내(최대 720×480×200 ~ 최소 450×280×125, 대표 치수 5가지 예시) 공용. 노즐 이격·나이프 위치·가이드 폭 조정 구조','Common for up to 10 box varieties (max 720×480×200 to min 450×280×125, 5 representative sizes shown). Adjustable nozzle stand-off, knife position and guide width.','周转箱10种以内（最大720×480×200~最小450×280×125，示例5种代表尺寸）共用。喷嘴间距、气刀位置、导轨宽度可调。')],
     [MOD,MODv],[MAT,MATv],[PWR,PWRv]
   ],
   sub:[SUB[0],T('가장자리 포켓·깊은 박스(310mm) 내부 세척 및 4면 탈수 대응 방안','Approach for cleaning rim pockets and the inside of the deep (310 mm) box, and for 4-side dewatering','边缘格与深周转箱（310mm）内部清洗及四面脱水的应对方案'),SUB[1],SUB[2],SUB[3],SUB[4]]
