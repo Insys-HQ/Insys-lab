@@ -107,7 +107,7 @@ footer{text-align:center;color:#6b8098;font-size:12px;padding:12px 0 18px;}
 <body>
 <div class="hdr"><div class="nav-inner">
   <div><div class="hdr-t" id="hdrT">세척·탈수·건조 설비 요구 사양서</div><div class="hdr-s" id="hdrS">인시스 AI혁신 연구개발실 · 인텍코리아 안산공장</div></div>
-  <div class="hdr-r"><span class="vb">v3.7</span>
+  <div class="hdr-r"><span class="vb">v3.8</span>
     <select id="docSel" onchange="render()"><option value="tray">트레이 / Tray / 托盘(料盘)</option><option value="box">박스 / Box / 周转箱</option></select>
     <button id="lko" class="on" onclick="setLang('ko')">한국어</button><button id="len" onclick="setLang('en')">English</button><button id="lzh" onclick="setLang('zh')">中文</button>
     <button id="bp" class="on" onclick="setView('pc')">PC</button><button id="bm" onclick="setView('mobile')">모바일</button></div>
@@ -241,8 +241,8 @@ tray:{
   sizeTitle:T('트레이 규격 범위 (약 20종, 최대~최소 범위 내 전 모델 처리 가능해야 함)','Tray size range (about 20 varieties; all models within the max–min range must be handled)','托盘规格范围（约20种，须可处理最大~最小范围内的所有型号）'),
   sizeHead:[UI.grade,UI.size,UI.pocket,UI.pdepth,UI.feat],
   sizes:[
-    [UI.max,'430 × 330 × 150',T('5~20개 (모델별 상이)','5–20 (varies by model)','5~20个（因型号而异）'),T('약 45 mm','~45 mm','约45 mm'),T('최대 규격 · 중량 약 50 g · 설비 통과 폭·높이 및 노즐 배열 기준. 포켓 깊이 45mm로 측면 분사 필요','Largest size · ~50 g · reference for pass-through width/height and nozzle layout. 45 mm pocket depth requires side spray.','最大规格·重约50 g·作为设备通过宽高及喷嘴布置的基准。格深45mm需侧向喷射')],
-    [UI.min,'320 × 210 × 50',T('5~20개 (모델별 상이)','5–20 (varies by model)','5~20个（因型号而异）'),'—',T('최소 규격 · 가이드·클립 조정 하한 기준','Smallest size · lower limit for guide / clip adjustment','最小规格·导轨、夹具调整下限基准')]
+    [UI.max,'430 × 330 × 150',T('5~20개 (모델별 상이)','5–20 (varies by model)','5~20个（因型号而异）'),T('20~50 mm (모델별 상이)','20–50 mm (varies by model)','20~50 mm（因型号而异）'),T('최대 규격 · 중량 약 50 g · 설비 통과 폭·높이 및 노즐 배열 기준. 깊은 포켓(약 50mm)은 측면 분사가 바닥까지 도달해야 함','Largest size · ~50 g · reference for pass-through width/height and nozzle layout. For the deepest pockets (~50 mm), side spray must reach the bottom.','最大规格·重约50 g·作为设备通过宽高及喷嘴布置的基准。深格（约50mm）需侧向喷射到达底部')],
+    [UI.min,'320 × 210 × 50',T('5~20개 (모델별 상이)','5–20 (varies by model)','5~20个（因型号而异）'),T('20~50 mm (모델별 상이)','20–50 mm (varies by model)','20~50 mm（因型号而异）'),T('최소 규격 · 가이드·클립 조정 하한 기준. 얕은 포켓(약 20mm)도 이 범위에 포함','Smallest size · lower limit for guide / clip adjustment. Shallow pockets (~20 mm) are also within this range.','最小规格·导轨、夹具调整下限基准。浅格（约20mm）亦包含在此范围内')]
   ],
   sizeNote:T('약 20종의 트레이가 이 최대~최소 범위 내에 분포하며, 설비는 전 모델을 교체 없이 처리하거나 규격 전환 시 조정 시간이 5분 이내여야 한다. 노즐 이격·에어나이프 높이·가이드 폭이 최소 규격에도 대응되도록 조정 범위를 확보한다.',
     'About 20 tray varieties fall within this max–min range. The machine shall handle all models without changeover, or changeover shall take no more than 5 minutes. Nozzle stand-off, air-knife height and guide width shall have adjustment range to suit the smallest size.',
