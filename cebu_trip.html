@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>세부 스킨스쿠버 여행계획</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f6f8;
+    --card:#ffffff;
+    --text:#2b3440;
+    --sub:#5b6673;
+    --accent:#1f5fa8;
+    --accent-dark:#154a86;
+    --border:#e1e5ea;
+    --tag-bg:#eaf1fa;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    font-family:'Noto Sans KR',sans-serif;
+    color:var(--text);
+    font-size:14px;
+    line-height:1.55;
+  }
+  .wrap{
+    max-width:1100px;
+    margin:0 auto;
+    padding:0 16px;
+  }
+  header.cover{
+    width:100%;
+    background:linear-gradient(135deg,var(--accent) 0%, var(--accent-dark) 100%);
+    color:#fff;
+    padding-top:12px;
+    padding-bottom:12px;
+  }
+  header.cover .wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:4px;
+  }
+  header.cover h1{
+    font-size:18px;
+    font-weight:700;
+    margin:4px 0 0 0;
+  }
+  header.cover p{
+    font-size:12px;
+    margin:0;
+    color:#dce8f7;
+  }
+
+  /* 상단 컨트롤 영역 (모바일/PC 토글 + 공항 선택) */
+  .controls{
+    margin-top:10px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .toggle-group{
+    display:flex;
+    background:rgba(255,255,255,0.15);
+    border-radius:8px;
+    padding:3px;
+    gap:2px;
+  }
+  .toggle-group button{
+    flex:1;
+    border:none;
+    background:transparent;
+    color:#fff;
+    font-family:inherit;
+    font-size:12px;
+    font-weight:500;
+    padding:6px 8px;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .toggle-group button.active{
+    background:#fff;
+    color:var(--accent-dark);
+    font-weight:700;
+  }
+
+  main{
+    padding-top:12px;
+    padding-bottom:24px;
+  }
+
+  .version-tag{
+    text-align:right;
+    font-size:11px;
+    color:var(--sub);
+    margin-bottom:8px;
+  }
+
+  .airport-note{
+    background:var(--tag-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px 12px;
+    font-size:12.5px;
+    color:var(--accent-dark);
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .airport-note b{font-weight:700;}
+
+  .day-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px 14px;
+    margin-bottom:10px;
+  }
+  .day-card h2{
+    font-size:14.5px;
+    font-weight:700;
+    margin:0 0 6px 0;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .day-badge{
+    display:inline-block;
+    background:var(--accent);
+    color:#fff;
+    font-size:11px;
+    font-weight:700;
+    padding:2px 8px;
+    border-radius:20px;
+  }
+  .day-card ul{
+    margin:0;
+    padding-left:18px;
+  }
+  .day-card li{
+    margin-bottom:4px;
+    font-size:13px;
+    color:var(--text);
+  }
+  .day-card li .time{
+    color:var(--accent-dark);
+    font-weight:700;
+    margin-right:4px;
+  }
+  .flight-block{
+    background:#fbfcfd;
+    border-left:3px solid var(--accent);
+    padding:6px 10px;
+    border-radius:6px;
+    font-size:12.5px;
+    margin-bottom:6px;
+    color:var(--sub);
+  }
+  .flight-block b{color:var(--text);}
+
+  footer{
+    text-align:center;
+    font-size:11px;
+    color:var(--sub);
+    padding:10px 0 16px 0;
+  }
+  footer .ver{
+    font-weight:700;
+    color:var(--accent-dark);
+  }
+
+  /* PC 모드 */
+  body.pc{
+    font-size:16px;
+  }
+  body.pc .day-card li{font-size:14.5px;}
+  body.pc .day-card h2{font-size:17px;}
+  body.pc header.cover h1{font-size:22px;}
+  body.pc .airport-note{font-size:14px;}
+  body.pc .flight-block{font-size:14px;}
+
+  @media (min-width:768px){
+    body{font-size:16px;}
+    .day-card li{font-size:14.5px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="cover">
+  <div class="wrap">
+    <p>인시스 AI혁신 연구개발실</p>
+    <h1>세부 스킨스쿠버 여행계획 (3박4일)</h1>
+    <p>2026.12.4(금) ~ 12.7(월)</p>
+
+    <div class="controls">
+      <div class="toggle-group" id="viewToggle">
+        <button data-view="mobile" class="active">모바일</button>
+        <button data-view="pc">PC</button>
+      </div>
+      <div class="toggle-group" id="airportToggle">
+        <button data-airport="icn" class="active">인천(ICN) 출발</button>
+        <button data-airport="pus">김해(PUS) 출발</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="version-tag">v1.0</div>
+
+  <div class="airport-note" id="airportNote">
+    <span>✈️</span>
+    <span><b id="airportLabel">인천공항(ICN)</b> 출발 기준 일정입니다.</span>
+  </div>
+
+  <!-- Day 1 -->
+  <div class="day-card">
+    <h2><span class="day-badge">Day 1</span> 12/4 (금) — 이동 &amp; 체크인</h2>
+
+    <div class="flight-block" data-flight="icn">
+      <b>출국:</b> 인천(ICN) → 막탄세부(CEB), 오전~낮 출발 직항 (약 4시간 40분)
+    </div>
+    <div class="flight-block" data-flight="pus" style="display:none;">
+      <b>출국:</b> 김해(PUS) → 막탄세부(CEB), 오전 출발 직항 (약 5시간, 항공사별 상이)
+    </div>
+
+    <ul>
+      <li><span class="time">낮</span>막탄세부 공항 도착, 리조트 체크인</li>
+      <li><span class="time">오후</span>리조트 주변 산책, 휴식</li>
+      <li><span class="time">저녁</span>라풀라풀 시장 or 리조트 인근 시푸드 레스토랑</li>
+    </ul>
+  </div>
+
+  <!-- Day 2 -->
+  <div class="day-card">
+    <h2><span class="day-badge">Day 2</span> 12/5 (토) — 막탄 펀다이빙</h2>
+    <ul>
+      <li><span class="time">08:00</span>다이빙샵 픽업</li>
+      <li><span class="time">09:00~12:00</span>막탄 보트 다이빙 2회 (산타로사 / 팅고 포인트)</li>
+      <li><span class="time">12:30</span>점심</li>
+      <li><span class="time">오후</span>리조트 휴식, 수영장</li>
+      <li><span class="time">저녁</span>선셋 비치 바</li>
+    </ul>
+  </div>
+
+  <!-- Day 3 -->
+  <div class="day-card">
+    <h2><span class="day-badge">Day 3</span> 12/6 (일) — 오슬롭 &amp; 카와산</h2>
+    <ul>
+      <li><span class="time">07:00</span>오슬롭 방면 이동 출발</li>
+      <li><span class="time">09:00</span>고래상어 스노클링</li>
+      <li><span class="time">11:00</span>카와산 폭포 트레킹 &amp; 물놀이</li>
+      <li><span class="time">15:00</span>막탄 리조트로 복귀</li>
+      <li><span class="time">저녁</span>마지막 밤 자유일정</li>
+    </ul>
+  </div>
+
+  <!-- Day 4 -->
+  <div class="day-card">
+    <h2><span class="day-badge">Day 4</span> 12/7 (월) — 자유시간 &amp; 귀국</h2>
+    <ul>
+      <li><span class="time">오전</span>자유시간, 체크아웃</li>
+      <li><span class="time">낮</span>막탄공항 이동</li>
+    </ul>
+
+    <div class="flight-block" data-flight="icn">
+      <b>귀국:</b> 막탄세부(CEB) → 인천(ICN), 오후~저녁 출발 직항
+    </div>
+    <div class="flight-block" data-flight="pus" style="display:none;">
+      <b>귀국:</b> 막탄세부(CEB) → 김해(PUS), 오후~저녁 출발 직항 (항공사별 상이)
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  세부 스킨스쿠버 여행계획 · <span class="ver">v1.0</span>
+</footer>
+
+<script>
+  // 모바일 / PC 화면 토글
+  const viewToggle = document.getElementById('viewToggle');
+  viewToggle.addEventListener('click', function(e){
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    viewToggle.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    if(btn.dataset.view === 'pc'){
+      document.body.classList.add('pc');
+    } else {
+      document.body.classList.remove('pc');
+    }
+  });
+
+  // 공항 선택 토글 (인천 / 김해)
+  const airportToggle = document.getElementById('airportToggle');
+  const airportLabel = document.getElementById('airportLabel');
+  airportToggle.addEventListener('click', function(e){
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    airportToggle.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const airport = btn.dataset.airport; // icn or pus
+    document.querySelectorAll('.flight-block').forEach(el=>{
+      el.style.display = (el.dataset.flight === airport) ? 'block' : 'none';
+    });
+    airportLabel.textContent = (airport === 'icn') ? '인천공항(ICN)' : '김해공항(PUS)';
+  });
+</script>
+
+</body>
+</html>
