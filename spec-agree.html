@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<script>
+(function(){ if(location.search.indexOf('v=')===-1){ location.replace(location.pathname + '?v=' + Date.now()); } })();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>트레이·박스 세척기 제작사양 협의서 v1.0 | 인시스 AI혁신 연구개발실</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--navy:#0d2137;--teal:#0d7fa8;--ink:#1c2b3a;--bg:#eef2f6;--line:#dde5ee;--hi:#0d47a1;--warn:#8a5a00;--good:#1b5e20;--bad:#b71c1c;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);font-size:12px;line-height:1.55;}
+.hdr{background:linear-gradient(120deg,#0d2137 0%,#0d7fa8 100%);color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.22);}
+.nav-inner{max-width:1000px;margin:0 auto;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.hdr-t{font-size:14px;font-weight:900;}
+.hdr-s{font-size:12px;opacity:.86;}
+.hdr-r{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.hdr-r button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.32);color:#fff;padding:5px 10px;border-radius:7px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;}
+.hdr-r button.on{background:#fff;color:var(--navy);}
+.vb{background:rgba(255,255,255,.24);padding:4px 9px;border-radius:7px;font-size:12px;font-weight:700;}
+.wrap{max-width:1000px;margin:0 auto;padding:10px 12px;}
+.wrap.mobile{max-width:430px;}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;overflow:hidden;}
+.ch{background:#f4f8fb;border-bottom:1px solid var(--line);padding:5px 10px;display:flex;align-items:center;gap:7px;}
+.cn{background:var(--navy);color:#fff;width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex:none;}
+.cl{font-size:13px;font-weight:800;color:var(--navy);}
+.cb{padding:8px 10px;}
+h3{font-size:12px;font-weight:800;color:var(--teal);margin:6px 0 3px;padding-left:6px;border-left:3px solid var(--teal);}
+p{margin:4px 0;}
+table{width:100%;border-collapse:collapse;margin:4px 0 6px;font-size:12px;}
+th{background:#e8eff5;color:var(--navy);font-weight:800;padding:4px 6px;border:1px solid var(--line);text-align:center;}
+td{padding:4px 6px;border:1px solid var(--line);text-align:left;vertical-align:top;}
+td.k{background:#f7fafc;font-weight:700;color:var(--navy);white-space:nowrap;}
+td.v{font-weight:800;color:var(--hi);}
+td.c{text-align:center;}
+.note{background:#eef6fb;border:1px solid #cde3f0;border-radius:8px;padding:6px 9px;margin:5px 0;font-size:12px;color:#0b5a80;line-height:1.6;}
+.warn{background:#fff8f0;border:1px solid #ffd9a8;border-radius:8px;padding:6px 9px;margin:5px 0;font-size:12px;color:var(--warn);line-height:1.6;}
+.good{background:#eef7ef;border:1px solid #c3e0c6;border-radius:8px;padding:6px 9px;margin:5px 0;font-size:12px;color:var(--good);line-height:1.6;}
+ul{margin:3px 0 3px 15px;}li{margin:1px 0;}
+b{font-weight:800;}
+.q{margin:5px 0 4px;display:flex;gap:6px;align-items:flex-start;}
+.q textarea{flex:1;min-height:44px;border:1.5px solid #c5d5e5;border-radius:6px;padding:5px 8px;font-size:12px;font-family:inherit;resize:vertical;background:#fffdf5;}
+.q textarea:focus{outline:none;border-color:var(--teal);}
+.q .qt{font-size:12px;color:#7a90a4;flex:none;padding-top:8px;width:56px;}
+.bar{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;}
+.bar button{background:var(--teal);color:#fff;border:0;border-radius:7px;padding:8px 13px;font-size:12px;font-weight:800;font-family:inherit;cursor:pointer;}
+.bar button.g{background:#5a7088;}
+.bar button.r{background:#b71c1c;}
+#status{font-size:12px;color:#5a7088;margin:4px 0;}
+.at{width:100%;border-collapse:collapse;font-size:12px;margin:4px 0 6px;}
+.at th{background:#e8eff5;color:var(--navy);font-weight:800;padding:4px 5px;border:1px solid var(--line);text-align:center;white-space:nowrap;}
+.at td{padding:2px 4px;border:1px solid var(--line);}
+.at input,.at select{width:100%;border:1px solid #c5d5e5;border-radius:4px;padding:4px 5px;font-size:12px;font-family:inherit;background:#fffdf5;}
+.at textarea{width:100%;border:1px solid #c5d5e5;border-radius:4px;padding:4px 5px;font-size:12px;font-family:inherit;background:#fffdf5;resize:vertical;min-height:32px;}
+.at input:focus,.at textarea:focus,.at select:focus{outline:none;border-color:var(--teal);}
+.at .del{background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a;border-radius:4px;padding:3px 7px;font-size:11px;cursor:pointer;font-family:inherit;}
+.aadd{background:#e8f5e9;color:#1b5e20;border:1px solid #a5d6a7;border-radius:5px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin:2px 0 6px;}
+footer{text-align:center;color:#6b8098;font-size:12px;padding:12px 0 18px;}
+@media print{
+  .hdr,.bar,.q,#status,.noprint,.at .del,.aadd{display:none!important;}
+  html,body{background:#fff;}
+  body{font-size:10.5px;line-height:1.35;}
+  @page{size:A4;margin:20mm 18mm;}
+  .wrap{max-width:100%;padding:0;}
+  .ptitle{display:block;text-align:center;margin:0 0 8px;}
+  .ptitle b{font-size:16px;color:#0d2137;}
+  .ptitle span{display:block;font-size:11px;color:#0d7fa8;}
+  .card{border:1px solid #bbb;margin-bottom:4px;border-radius:4px;break-inside:auto;}
+  .ch{padding:3px 8px;}.cb{padding:4px 8px;}
+  h3{font-size:10.5px;}
+  table{font-size:10.5px;}
+  tr,td,th{break-inside:avoid;page-break-inside:avoid;}
+  .note,.warn,.good{font-size:10.5px;break-inside:avoid;page-break-inside:avoid;}
+  .at input,.at textarea{border:0;background:transparent;padding:1px 2px;}
+}
+.ptitle{display:none;}
+</style>
+</head>
+<body>
+<div class="hdr"><div class="nav-inner">
+  <div><div class="hdr-t">트레이·박스 세척기 제작사양 협의서</div><div class="hdr-s">인시스 AI혁신 연구개발실 · 인텍코리아 안산공장</div></div>
+  <div class="hdr-r"><span class="vb">v1.0</span>
+    <button id="bp" class="on" onclick="setView('pc')">PC</button><button id="bm" onclick="setView('mobile')">모바일</button></div>
+</div></div>
+
+<div class="wrap" id="wrap">
+<div class="bar noprint">
+  <button onclick="window.print()">📄 PDF 출력</button>
+  <button class="g" onclick="saveAll()">💾 저장</button>
+  <button class="g" onclick="loadAll()">🔄 불러오기</button>
+  <button class="r" onclick="sendMail()">✉️ 이메일 보내기</button>
+</div>
+<div id="status"></div>
+<div class="ptitle"><b>트레이·박스 세척기 제작사양 협의서</b><span>인시스 AI혁신 연구개발실 · INSYS-TB-AGR-2026-01 · v1.0</span></div>
+
+<div class="card"><div class="ch"><span class="cn">0</span><span class="cl">문서 정보</span></div><div class="cb">
+<table>
+<tr><td class="k">문서번호</td><td>INSYS-TB-AGR-2026-01</td></tr>
+<tr><td class="k">버전 / 작성일</td><td>v1.0 / 2026-09-16</td></tr>
+<tr><td class="k">작성</td><td>인시스 AI혁신 연구개발실 (ys.kim@in-sys.co.kr)</td></tr>
+<tr><td class="k">설치 장소</td><td>인텍코리아 안산공장</td></tr>
+<tr><td class="k">문서 성격</td><td>트레이·박스 세척기 제작사양 협의 자료 — 상호 사양·아이디어 협의 진행 중</td></tr>
+<tr><td class="k">관련 문서</td><td>트레이 요구사양서(INSYS-TW-REQ-2026-01) · 박스 요구사양서(INSYS-BW-REQ-2026-01)</td></tr>
+</table>
+</div></div>
+
+<div class="card"><div class="ch"><span class="cn">1</span><span class="cl">적용 범위 구분</span></div><div class="cb">
+<p>트레이 높이(두께) 100mm를 기준으로 두 설비의 처리 대상을 나눈다.</p>
+<table><tr><th>구분</th><th>적용 범위</th><th>비고</th></tr>
+<tr><td class="k">트레이 세척기</td><td class="v">높이(두께) 100mm 이하</td><td>포켓 깊이 20~50mm는 기존과 동일. 높이 100mm 초과 트레이는 본 설비 대상에서 제외</td></tr>
+<tr><td class="k">박스 세척기</td><td class="v">트레이 높이 100mm 초과분 포함</td><td>기존 박스 규격(대표 치수 5가지, 10종 이내)에 100mm 초과 트레이가 추가로 포함됨</td></tr>
+</table>
+<div class="note">100mm 초과 트레이의 정확한 규격·수량을 제작사에 별도 제공하여 박스 세척기 설계에 반영해야 한다.</div>
+<div class="q noprint"><span class="qt">의견</span><textarea data-q="s1" placeholder="이 항목에 대한 의견·답변을 입력하세요"></textarea></div>
+</div></div>
+
+<div class="card"><div class="ch"><span class="cn">2</span><span class="cl">트레이 규격 및 처리 요구량</span></div><div class="cb">
+<table><tr><th>구분</th><th>규격 W×D×H(mm)</th><th>포켓 수</th><th>포켓 깊이</th><th>비고</th></tr>
+<tr><td class="k">최대</td><td class="v">430×330×100 이하</td><td>5~20개(모델별 상이)</td><td>20~50mm(모델별 상이)</td><td>높이 100mm가 처리 상한. 초과 시 박스 세척기로</td></tr>
+<tr><td class="k">최소</td><td class="v">320×210×50</td><td>5~20개(모델별 상이)</td><td>20~50mm(모델별 상이)</td><td>기존과 동일</td></tr>
+</table>
+<table><tr><th>공정</th><th>요구량</th><th>판정 기준</th></tr>
+<tr><td class="k">세척(시간당)</td><td class="v">1,000 매/h (상·하 2단 적재, 단일 라인 순환식)</td><td>방청유·이물 제거. 포켓 내부 포함. 높이 100mm 이하 트레이만 해당</td></tr>
+<tr><td class="k">탈수</td><td class="v">95% 이상</td><td>배출 트레이에 물방울 흘러내림 없음</td></tr>
+<tr><td class="k">건조</td><td class="v">컨베이어 통과 시간 내 98% 이상</td><td>배출 시 표면 건조 완료</td></tr>
+</table>
+<div class="q noprint"><span class="qt">의견</span><textarea data-q="s2" placeholder="이 항목에 대한 의견·답변을 입력하세요"></textarea></div>
+</div></div>
+
+<div class="card"><div class="ch"><span class="cn">3</span><span class="cl">박스 규격 및 처리 요구량</span></div><div class="cb">
+<table><tr><th>구분</th><th>규격 W×D×H(mm)</th><th>비고</th><th>특징</th></tr>
+<tr><td class="k">최대</td><td class="v">720×480×200</td><td>가장 큼</td><td>설비 통과 폭·높이 기준 규격</td></tr>
+<tr><td></td><td class="v">575×368×310</td><td>가장 깊음</td><td>깊이 310mm — 내부 바닥까지 분사 도달 필요</td></tr>
+<tr><td></td><td class="v">480×380×150</td><td></td><td></td></tr>
+<tr><td></td><td class="v">480×380×110</td><td></td><td></td></tr>
+<tr><td class="k">최소</td><td class="v">450×280×125</td><td>가장 작음</td><td>가이드·클립 조정 하한 기준</td></tr>
+</table>
+<div class="note">박스 10종 이내(위 5가지는 대표 치수)가 이 범위 내에 분포하며, 1항의 트레이 높이 100mm 초과분도 본 규격 범위 내에서 함께 처리한다.</div>
+<table><tr><th>공정</th><th>요구량</th><th>판정 기준</th></tr>
+<tr><td class="k">세척(시간당)</td><td class="v">600~700 개/h (채널당 300~350 × 2채널)</td><td>방청유·분진·이물 제거. 가장자리 포켓·내부 바닥 포함</td></tr>
+<tr><td class="k">탈수</td><td class="v">95% 이상 · 4면 탈수</td><td>상·하·좌·우 4면 모두 탈수</td></tr>
+</table>
+<div class="q noprint"><span class="qt">의견</span><textarea data-q="s3" placeholder="이 항목에 대한 의견·답변을 입력하세요"></textarea></div>
+</div></div>
+
+<div class="card"><div class="ch"><span class="cn">4</span><span class="cl">탈수 방식 — 스핀들(원심분리)식 검토 조건</span></div><div class="cb">
+<div class="warn"><b>탈수 방식은 기본적으로 에어나이프를 적용한다.</b>
+<ul>
+<li>스핀들(원심분리)식 탈수 방식을 대안으로 검토할 경우, 최대 규격 박스(720×480×200)는 크기·중량 한계로 스핀들 방식 적용 대상에서 제외한다.</li>
+<li>최대 규격 박스는 스핀들 방식 채택 여부와 무관하게 에어나이프 등 별도 방식으로 처리하는 방안을 제작사가 제안한다.</li>
+<li>스핀들 방식 채택 시 회전 고정 지그, 편심 방지 구조, 사이클 타임을 별도 협의한다.</li>
+</ul></div>
+<div class="q noprint"><span class="qt">의견</span><textarea data-q="s4" placeholder="이 항목에 대한 의견·답변을 입력하세요"></textarea></div>
+</div></div>
+
+<div class="card"><div class="ch"><span class="cn">5</span><span class="cl">저수조 및 여과</span></div><div class="cb">
+<table><tr><th>항목</th><th>적용 조건</th><th>비고</th></tr>
+<tr><td class="k">저수조 용량</td><td class="v">200 L 이하</td><td>트레이·박스 세척기 각 저수조 공통 상한</td></tr>
+<tr><td class="k">교환 주기</td><td class="v">1일 1회 전량 교환</td><td>단시간 순환·소량 저수 구조</td></tr>
+<tr><td class="k">오일 스키머</td><td style="color:var(--bad);font-weight:800;">불필요</td><td>매일 전량 교환하므로 방청유가 장기 축적되지 않음</td></tr>
+<tr><td class="k">백필터</td><td style="color:var(--bad);font-weight:800;">불필요</td><td>미세 여과 장치 없이 일일 교환으로 수질 관리</td></tr>
+<tr><td class="k">철망(SUS) 필터</td><td class="v">설치</td><td>큰 이물질만 걸러내는 용도로 각 조 하단에 설치</td></tr>
+</table>
+<div class="note">저수조를 소형화·일일교환 방식으로 운영하는 대신, 배수·급수 설비의 처리 용량과 소요 시간을 제작사가 산정하여 제안해야 한다.</div>
+<div class="q noprint"><span class="qt">의견</span><textarea data-q="s5" placeholder="이 항목에 대한 의견·답변을 입력하세요"></textarea></div>
+</div></div>
+
+<div class="card"><div class="ch"><span class="cn">6</span><span class="cl">온수 공급 및 보조 가열</span></div><div class="cb">
+<table><tr><th>항목</th><th>내용</th></tr>
+<tr><td class="k">보일러 구성</td><td>가스 보일러 1대로 트레이·박스 세척기에 온수를 공용 공급한다.</td></tr>
+<tr><td class="k">주 열원</td><td>세척수 가열은 보일러 온수를 주 열원으로 한다.</td></tr>
+<tr><td class="k">보조 가열</td><td>저수조 내부 전기 히터봉은 보조 수단이며, 심야 전력(경제형 요금 시간대)을 활용하여 저수조를 예열하는 용도로 사용한다. 정상 운전 중 주 가열원으로 사용하지 않는다.</td></tr>
+<tr><td class="k">제어 요건</td><td>심야 예열 운전 시간대·목표 온도를 PLC로 설정 가능해야 하며, 보일러 가동 시간과 중복되지 않도록 인터록을 둔다.</td></tr>
+</table>
+<div class="q noprint"><span class="qt">의견</span><textarea data-q="s6" placeholder="이 항목에 대한 의견·답변을 입력하세요"></textarea></div>
+</div></div>
+
+<div class="card"><div class="ch"><span class="cn">7</span><span class="cl">에너지 절약 구조 요약</span></div><div class="cb">
+<div class="good"><ul>
+<li>저수조 소형화(200L 이하)로 가열 대상 수량 자체를 최소화한다.</li>
+<li>심야 전력을 활용한 보조 히터봉 예열로 주간 전기요금 부담을 낮춘다.</li>
+<li>가스 보일러 1대를 트레이·박스 세척기가 공용하여 설비 중복 투자를 줄인다.</li>
+<li>건조는 저온(60~65°C 이하)·대풍량 방식으로 하고 열풍을 순환 재사용한다.</li>
+<li>세척·탈수·건조 구간 경계에 에어커튼을 설치해 열·습기 손실을 줄인다.</li>
+</ul></div>
+<div class="q noprint"><span class="qt">의견</span><textarea data-q="s7" placeholder="이 항목에 대한 의견·답변을 입력하세요"></textarea></div>
+</div></div>
+
+<div class="card"><div class="ch"><span class="cn">8</span><span class="cl">제작사 협의·확인 요청 사항</span></div><div class="cb">
+<div class="warn"><ul>
+<li>트레이 높이 100mm 초과분의 정확한 규격·물량 — 박스 세척기 설계 반영을 위해 확정 필요</li>
+<li>스핀들식 탈수 도입 여부, 최대 규격 박스 제외 시 대체 처리 방안(에어나이프 겸용 등)</li>
+<li>저수조 200L·일일 전량교환 기준의 배수 소요 시간, 급수 라인 용량</li>
+<li>심야전력 예열 운전 스케줄 및 보일러 가동시간과의 인터록 로직</li>
+<li>가스보일러 정격 용량 — 트레이·박스 공용 부하 기준 재산정</li>
+<li>철망(SUS) 필터 메시 규격 및 청소 주기</li>
+</ul></div>
+<div class="q noprint"><span class="qt">의견</span><textarea data-q="s8" placeholder="이 항목에 대한 의견·답변을 입력하세요"></textarea></div>
+</div></div>
+
+<div class="card"><div class="ch"><span class="cn">9</span><span class="cl">추가 협의 항목 (자유 추가)</span></div><div class="cb">
+<p style="font-size:12px;color:#5a7088;">위 8개 항목 외에 새로 제기되는 사양·아이디어를 아래에 자유롭게 추가한다. 누구나 행을 추가·삭제할 수 있다.</p>
+<div id="addWrap"></div>
+</div></div>
+
+<footer id="foot">본 문서는 트레이·박스 세척기 제작사양에 대해 상호 협의해가는 자료이다.</footer>
+</div>
+
+<script>
+const gi=id=>document.getElementById(id);
+
+// ── 9장 추가 협의 항목 (동적 행) ──
+var ADD=[{who:'',item:'',content:'',opinion:'',status:''}];
+function addRender(){
+  let h='<table class="at"><colgroup><col style="width:9%"><col style="width:16%"><col style="width:26%"><col style="width:26%"><col style="width:13%"><col style="width:6%"></colgroup>'
+    +'<tr><th>제안자</th><th>항목</th><th>내용</th><th>의견/답변</th><th>상태</th><th>삭제</th></tr>';
+  ADD.forEach((r,i)=>{
+    h+='<tr>'
+      +'<td><input value="'+(r.who||'').replace(/"/g,'&quot;')+'" oninput="ADD['+i+'].who=this.value"></td>'
+      +'<td><input value="'+(r.item||'').replace(/"/g,'&quot;')+'" oninput="ADD['+i+'].item=this.value"></td>'
+      +'<td><textarea oninput="ADD['+i+'].content=this.value">'+(r.content||'')+'</textarea></td>'
+      +'<td><textarea oninput="ADD['+i+'].opinion=this.value">'+(r.opinion||'')+'</textarea></td>'
+      +'<td><select onchange="ADD['+i+'].status=this.value">'
+        +['','협의중','합의','보류'].map(s=>'<option'+(r.status===s?' selected':'')+'>'+s+'</option>').join('')
+      +'</select></td>'
+      +'<td class="c"><button class="del" onclick="addDel('+i+')">삭제</button></td></tr>';
+  });
+  h+='</table>';
+  gi('addWrap').innerHTML=h+'<button class="aadd noprint" onclick="addRow()">+ 행 추가</button>';
+}
+function addRow(){ ADD.push({who:'',item:'',content:'',opinion:'',status:''}); addRender(); }
+function addDel(i){ ADD.splice(i,1); addRender(); }
+addRender();
+
+function setView(v){ gi('wrap').classList.toggle('mobile',v==='mobile'); gi('bp').classList.toggle('on',v==='pc'); gi('bm').classList.toggle('on',v==='mobile'); }
+
+// ── Firebase(REST) 저장/불러오기 ──
+const FB='https://firestore.googleapis.com/v1/projects/insys-work/databases/(default)/documents/spec_agree';
+const KEY='AIzaSyC4DWFGGJjJmVlqnfmZaVDdKJWCXK0Yr_g';
+const DOCID='tb-agree-2026-01';
+function collect(){
+  const opin={};
+  document.querySelectorAll('textarea[data-q]').forEach(t=>{ opin[t.dataset.q]=t.value; });
+  return {opin, add:ADD};
+}
+async function saveAll(){
+  const d=collect();
+  const fields={ opin:{stringValue:JSON.stringify(d.opin)}, add:{stringValue:JSON.stringify(d.add)}, _updated:{stringValue:new Date().toISOString()} };
+  try{
+    const r=await fetch(FB+'/'+DOCID+'?key='+KEY,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields})});
+    if(!r.ok) throw new Error(r.status);
+    gi('status').textContent='✅ 저장 완료 ('+new Date().toLocaleString()+')';
+  }catch(e){ gi('status').textContent='⚠️ 저장 실패 — Firebase 규칙 확인 필요 ('+e.message+')'; }
+}
+async function loadAll(){
+  try{
+    const r=await fetch(FB+'/'+DOCID+'?key='+KEY);
+    if(r.status===404){ gi('status').textContent='저장된 내용이 없습니다'; return; }
+    const j=await r.json(); const f=j.fields||{};
+    const opin=f.opin?JSON.parse(f.opin.stringValue):{};
+    document.querySelectorAll('textarea[data-q]').forEach(t=>{ if(opin[t.dataset.q]!==undefined) t.value=opin[t.dataset.q]; });
+    if(f.add){ ADD=JSON.parse(f.add.stringValue); if(!ADD.length) ADD=[{who:'',item:'',content:'',opinion:'',status:''}]; addRender(); }
+    gi('status').textContent='✅ 불러오기 완료 ('+(f._updated?f._updated.stringValue:'')+')';
+  }catch(e){ gi('status').textContent='⚠️ '+e.message; }
+}
+function sendMail(){
+  const d=collect();
+  const labels={s1:'1.적용범위',s2:'2.트레이규격',s3:'3.박스규격',s4:'4.탈수방식',s5:'5.저수조여과',s6:'6.온수공급',s7:'7.에너지절약',s8:'8.제작사요청'};
+  let body='트레이·박스 세척기 제작사양 협의서 (INSYS-TB-AGR-2026-01)\n\n';
+  Object.keys(labels).forEach(k=>{ if(d.opin[k]&&d.opin[k].trim()) body+='['+labels[k]+'] '+d.opin[k]+'\n\n'; });
+  const addLines=d.add.filter(r=>r.item||r.content||r.opinion).map(r=>'· ['+(r.who||'-')+'/'+(r.status||'-')+'] '+(r.item||'')+' — '+(r.content||'')+(r.opinion?(' / 의견: '+r.opinion):''));
+  if(addLines.length) body+='[9.추가 협의 항목]\n'+addLines.join('\n')+'\n\n';
+  body+='— '+new Date().toLocaleString();
+  gi('status').textContent='메일 앱이 열립니다. PDF는 "PDF 출력"으로 저장 후 첨부해 주세요.';
+  location.href='mailto:ys.kim@in-sys.co.kr?subject='+encodeURIComponent('[제작사양협의서 의견] 트레이·박스 세척기')+'&body='+encodeURIComponent(body);
+}
+</script>
+</body>
+</html>
