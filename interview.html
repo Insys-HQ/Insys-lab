@@ -6,21 +6,19 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>면접질의서 - 인시스 AI혁신 연구개발실</title>
+<title>면접평가서 - 정희준 - 인시스 AI혁신 연구개발실</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --navy:#1A2B4A; --navy2:#26406e; --sky:#3B7DDB; --line:#e2e6ec;
-    --bg:#f4f6f9; --card:#ffffff; --text:#26313f; --muted:#6b7684;
-    --danger:#c0392b;
+    --navy:#1F3864; --navy2:#2E5FA3; --sky:#1565A8; --line:#e2e6ec;
+    --bg:#f4f6f9; --card:#ffffff; --text:#26313f; --muted:#6b7684; --danger:#c0392b;
   }
   *{box-sizing:border-box;}
   body{margin:0;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);
-       font-size:14px;line-height:1.5;}
+       font-size:14px;line-height:1.55;}
   @media (min-width:768px){ body{font-size:16px;} }
 
-  /* ===== 로그인 화면 ===== */
   #loginView{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;}
   .loginBox{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px 24px;
             width:100%;max-width:360px;box-shadow:0 4px 16px rgba(0,0,0,.06);}
@@ -30,22 +28,17 @@
                    border-radius:8px;font-size:1em;font-family:inherit;}
   .loginBox button{width:100%;padding:11px;border:none;border-radius:8px;background:var(--navy);
                     color:#fff;font-weight:700;font-size:1em;cursor:pointer;font-family:inherit;}
-  .loginBox button:disabled{opacity:.6;}
   #loginErr{color:var(--danger);font-size:.85em;margin-top:8px;min-height:1.2em;}
 
-  /* ===== 공통 레이아웃 ===== */
   #appView{display:none;}
   header.nav{background:var(--navy);width:100%;}
   .nav-inner{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;
              justify-content:space-between;gap:8px;}
-  .nav-inner .brand{color:#fff;font-weight:700;font-size:.95em;}
-  .nav-inner .actions{display:flex;gap:6px;}
+  .nav-inner .brand{color:#fff;font-weight:700;font-size:.92em;}
   .nav-inner button{padding:7px 12px;border-radius:7px;border:1px solid rgba(255,255,255,.35);
                      background:transparent;color:#fff;font-size:.8em;cursor:pointer;font-family:inherit;}
-  .nav-inner button.primary{background:#fff;color:var(--navy);border-color:#fff;font-weight:700;}
 
   .wrap{max-width:1100px;margin:0 auto;padding:12px 16px 60px;}
-
   .banner{background:#fdecec;border:1px solid #f3b9b3;color:var(--danger);font-weight:700;
           text-align:center;padding:8px;border-radius:8px;margin-bottom:10px;font-size:.85em;}
 
@@ -54,38 +47,61 @@
                       background:#fff;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;font-size:.85em;}
   .viewToggle button.active{background:var(--navy);color:#fff;border-color:var(--navy);}
 
+  .cover{text-align:center;padding-top:8px;padding-bottom:12px;}
+  .cover .org{color:var(--muted);font-size:.8em;}
+  .cover h1{color:var(--navy);font-size:1.6em;margin:4px 0;letter-spacing:2px;}
+  .cover .sub{color:#888;font-size:.8em;border-bottom:3px solid var(--navy2);display:inline-block;padding-bottom:8px;}
+
   .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
         padding:12px 14px;margin-bottom:10px;}
-  .card h2{font-size:1em;color:var(--navy);margin:0 0 8px;padding-bottom:6px;border-bottom:2px solid var(--sky);}
+  h2.sec{background:var(--navy);color:#fff;font-size:.95em;margin:0 0 10px;padding:8px 10px;border-radius:6px;}
+  h2.sec.sub2{background:transparent;color:var(--navy2);border-bottom:2px solid var(--navy2);border-radius:0;padding:0 0 6px;}
+  .note{color:var(--muted);font-size:.8em;font-style:italic;margin:0 0 10px;}
 
-  .metaGrid{display:grid;grid-template-columns:1fr;gap:8px;}
-  @media (min-width:768px){ .metaGrid{grid-template-columns:1fr 1fr;} }
-  .field label{display:block;font-size:.8em;color:var(--muted);margin-bottom:3px;}
-  .field input, .field textarea{width:100%;padding:8px 10px;border:1px solid var(--line);
-        border-radius:7px;font-family:inherit;font-size:.95em;color:var(--text);}
+  table.meta{width:100%;border-collapse:collapse;margin-bottom:6px;}
+  table.meta th,table.meta td{border:1px solid var(--line);padding:7px 8px;font-size:.88em;text-align:left;}
+  table.meta th{background:#eef2f8;color:var(--navy2);width:26%;white-space:nowrap;}
+  table.meta td input{width:100%;border:none;background:transparent;font-family:inherit;font-size:1em;color:var(--text);}
 
-  table.qa{width:100%;border-collapse:collapse;}
-  table.qa th, table.qa td{border:1px solid var(--line);padding:8px;text-align:left;vertical-align:top;font-size:.92em;}
-  table.qa th{background:#eef2f8;color:var(--navy2);width:40px;text-align:center;}
-  table.qa td.purpose{color:var(--muted);font-size:.85em;width:26%;}
+  .projTable{width:100%;border-collapse:collapse;margin:8px 0;}
+  .projTable th,.projTable td{border:1px solid var(--line);padding:7px 8px;font-size:.85em;vertical-align:top;}
+  .projTable th{background:#eef2f8;color:var(--navy2);}
 
-  .scoreRow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;
+  .welfBox{background:#f0fff4;border:1px solid #cdeed7;border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:.88em;}
+  .welfBox.plan{background:#f0f4ff;border-color:#cdd9f5;}
+  .welfBox div{padding:2px 0;}
+
+  .areaHead{font-weight:700;font-size:.95em;padding:8px 0 6px;border-bottom:2px solid;margin-top:10px;}
+  .qBlock{border:1px solid var(--line);border-radius:8px;margin-bottom:10px;overflow:hidden;}
+  .qTop{display:flex;gap:8px;padding:9px 10px;font-weight:700;font-size:.9em;align-items:flex-start;}
+  .qTop .qno{background:var(--navy2);color:#fff;border-radius:5px;padding:2px 8px;font-size:.8em;flex-shrink:0;}
+  .qBody{padding:0 10px 10px;}
+  .qBody label{display:block;font-size:.78em;color:var(--muted);margin:6px 0 3px;}
+  .qBody textarea{width:100%;border:1px solid var(--line);border-radius:6px;padding:7px 8px;font-family:inherit;font-size:.9em;}
+  .qBody select{padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-family:inherit;font-size:.9em;}
+  .tip{background:#fff8ec;color:#aa6600;font-size:.78em;padding:7px 9px;border-radius:6px;margin-top:6px;}
+  .tip b{color:#aa6600;}
+
+  .scoreRow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;
              border-bottom:1px solid var(--line);}
-  .scoreRow:last-child{border-bottom:none;}
-  .scoreRow .name{font-size:.92em;}
-  .scoreRow .pt{color:var(--muted);font-size:.78em;}
-  .scoreRow input[type=number]{width:64px;padding:6px;border:1px solid var(--line);border-radius:6px;
-        text-align:center;font-family:inherit;}
+  .scoreRow:last-of-type{border-bottom:none;}
+  .scoreRow .name{font-size:.9em;}
+  .scoreRow .pt{color:var(--muted);font-size:.76em;}
+  .scoreRow input[type=number]{width:64px;padding:6px;border:1px solid var(--line);border-radius:6px;text-align:center;font-family:inherit;}
   .totalRow{display:flex;justify-content:space-between;font-weight:700;color:var(--navy);
-            padding-top:8px;margin-top:4px;border-top:2px solid var(--navy);}
+            padding-top:8px;margin-top:4px;border-top:2px solid var(--navy);font-size:.95em;}
+
+  .radioGroup label{display:inline-block;margin-right:10px;font-size:.88em;}
+  .field label{display:block;font-size:.8em;color:var(--muted);margin:6px 0 3px;}
+  .field textarea, .field input{width:100%;padding:8px 10px;border:1px solid var(--line);
+        border-radius:7px;font-family:inherit;font-size:.92em;color:var(--text);}
 
   #saveBar{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);
-           padding:10px 16px;display:flex;gap:8px;justify-content:flex-end;}
+           padding:10px 16px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
   #saveBar button{padding:10px 16px;border-radius:8px;border:none;font-weight:700;cursor:pointer;font-family:inherit;font-size:.9em;}
   #saveBar .save{background:var(--navy);color:#fff;}
   #saveBar .print{background:#fff;border:1px solid var(--navy);color:var(--navy);}
-  #saveStatus{font-size:.8em;color:var(--muted);align-self:center;margin-right:auto;}
-
+  #saveStatus{font-size:.78em;color:var(--muted);align-self:center;margin-right:auto;}
   .verFoot{text-align:right;color:var(--muted);font-size:.75em;padding:6px 16px 20px;}
 
   @media print{
@@ -97,10 +113,9 @@
 </head>
 <body>
 
-<!-- ===== 로그인 화면 ===== -->
 <div id="loginView">
   <div class="loginBox">
-    <h1>면접질의서</h1>
+    <h1>면접평가서</h1>
     <p class="sub">인시스 AI혁신 연구개발실 · 대외비</p>
     <input type="email" id="loginEmail" placeholder="이메일" autocomplete="username">
     <input type="password" id="loginPw" placeholder="비밀번호" autocomplete="current-password">
@@ -109,87 +124,126 @@
   </div>
 </div>
 
-<!-- ===== 앱 화면 ===== -->
 <div id="appView">
   <header class="nav">
     <div class="nav-inner">
-      <span class="brand">면접질의서 · 인시스 AI혁신 연구개발실</span>
-      <div class="actions">
-        <button onclick="doLogout()">로그아웃</button>
-      </div>
+      <span class="brand">면접평가서 · 정희준 · AI혁신 연구개발실</span>
+      <button onclick="doLogout()">로그아웃</button>
     </div>
   </header>
 
   <div class="wrap">
     <div class="banner">대외비 — 인사담당자 외 열람 금지</div>
-
     <div class="viewToggle">
       <button id="tabMobile" class="active" onclick="setDevice('mobile')">모바일 화면</button>
       <button id="tabPc" onclick="setDevice('pc')">PC 화면</button>
     </div>
 
+    <div class="cover">
+      <div class="org">인시스그룹 AI혁신 R&amp;D센터</div>
+      <h1>면 접 평 가 서</h1>
+      <div class="sub">업무 자동화 담당자(연구원) 채용 · 전략기획팀 · 2026년 9월</div>
+    </div>
+
     <div class="card">
-      <h2>기본 정보</h2>
-      <div class="metaGrid">
-        <div class="field"><label>지원자</label><input id="fName" placeholder="지원자 성명 입력"></div>
-        <div class="field"><label>지원분야</label><input id="fRole" value="연구원 (AI혁신 연구개발실)"></div>
-        <div class="field"><label>학력</label><input id="fEdu" placeholder="예: 인제대학교 컴퓨터공학과"></div>
-        <div class="field"><label>경력</label><input id="fCareer" placeholder="예: ETRI 인턴 (데이터마이닝)"></div>
+      <h2 class="sec">기본 정보</h2>
+      <table class="meta">
+        <tr><th>지원자</th><td><b>정희준</b></td><th>서류 등급</th><td>B등급 (AI 프로젝트 경험 有)</td></tr>
+        <tr><th>경력</th><td>신입 (ETRI 인턴 3개월)</td><th>면접 일시</th><td><input id="mDate" type="text" placeholder="0000년 00월 00일(  ) 00:00"></td></tr>
+        <tr><th>면접 장소</th><td><input id="mPlace" type="text" value="한마음타워 7층 전략기획실"></td><th>면접 시간</th><td>약 60분 예정</td></tr>
+        <tr><th>면접위원①(센터장)</th><td><input id="mIntv1" type="text" placeholder="성명"></td><th>면접위원②(경영지원실장)</th><td><input id="mIntv2" type="text" placeholder="성명"></td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2 class="sec">지원자 서류 분석 카드 (면접 전 확인)</h2>
+      <p class="note">※ 면접 전 면접관이 내부적으로 확인하는 지원자 핵심 프로파일입니다.</p>
+      <table class="meta">
+        <tr><th>이름</th><td>정희준</td><th>나이</th><td>28세 (1998년생)</td></tr>
+        <tr><th>학력</th><td>인제대학교(김해) 컴퓨터공학과 졸업</td><th>거주지</th><td>창원 진해구 ✅ (본사 약 28분)</td></tr>
+        <tr><th>경력</th><td>ETRI 인턴 3개월 (계약만료)</td><th>입사희망일</th><td>2026년 09월 09일</td></tr>
+        <tr><th>직전 연봉</th><td>2,600만원 (ETRI 인턴)</td><th>희망연봉</th><td>회사내규에 따름</td></tr>
+        <tr><th>자격증</th><td>ADsP(2026.03) / JLPT N2(2026.08)</td><th>군복무</th><td>해군 병장 만기전역(2018~2020)</td></tr>
+        <tr><th>AI 스킬</th><td colspan="3">Python·PyTorch·CNN·LSTM·NLP·LLM·TTS·음성인식·챗봇 / TypeScript·React Native·Expo·OpenCV·Pandas</td></tr>
+      </table>
+      <table class="projTable" id="projTable"></table>
+    </div>
+
+    <div class="card">
+      <h2 class="sec">면접 진행 안내 (면접관 내부 참고)</h2>
+      <div class="welfBox">
+        ① 아래 질문은 상황·경험 기반으로 구성되어 있으며, 인성 평가임을 지원자가 인식하지 못하도록 자연스럽게 진행합니다.<br>
+        ② 각 질문의 [관찰 포인트]는 면접관 전용이며 지원자에게 공개하지 않습니다.<br>
+        ③ 점수(5~1)는 면접 종료 직후 즉시 기입합니다. (5:매우우수 / 4:우수 / 3:보통 / 2:미흡 / 1:부적합)<br>
+        ④ 진행 순서: Step1 회사·복지 안내(10분) → Step2 공통 질의응답(30분) → Step3 개별 질의응답(15분) → Step4 지원자 질문·마무리(5분)<br>
+        ⑤ 신입에 가까운 지원자이므로 기술 역량보다 학습 태도·근성·성장 잠재력을 집중 관찰합니다.
       </div>
     </div>
 
     <div class="card">
-      <h2>1. 경력·이력 사실 확인</h2>
-      <table class="qa">
-        <tr><th>1-1</th><td>이력서 상 ETRI 인턴 기간(2023.01~2023.03 / 2022.07)이 서로 다르게 기재되어 있습니다. 정확한 재직 기간과 업무 내용을 설명해 주세요.</td></tr>
-        <tr><th>1-2</th><td>ETRI에서 담당한 Clotho 데이터셋 전처리 작업의 구체적 절차와, 본인이 직접 수행한 부분과 지도받은 부분을 구분해서 설명해 주세요.</td></tr>
-        <tr><th>1-3</th><td>텍스트마이닝·딥러닝 동향 조사 결과물 중 실제 업무에 반영된 사례가 있다면 소개해 주세요.</td></tr>
-      </table>
+      <h2 class="sec">Step 1 | 회사 안내 및 복지 설명</h2>
+      <p class="note">※ 아래 내용을 지원자에게 직접 안내하고 반응·질문을 하단에 기재합니다.</p>
+      <h2 class="sec sub2">현재 복지 수준</h2>
+      <div class="welfBox" id="welfCurrent"></div>
+      <h2 class="sec sub2">향후 복지 개선 계획</h2>
+      <div class="welfBox plan" id="welfPlanned"></div>
+      <div class="field"><label>복지 관련 지원자 질문</label><textarea id="fWelfQ" rows="2"></textarea></div>
+      <div class="field"><label>출장 조건 관련 반응</label><textarea id="fWelfTravel" rows="2"></textarea></div>
+      <div class="field"><label>전반적 인상</label>
+        <select id="fWelfImpr">
+          <option value="">선택</option><option>매우 만족 (적극 수용)</option><option>만족 (긍정적)</option>
+          <option>보통 (무반응)</option><option>불만족 신호</option><option>협상 요구</option>
+        </select>
+      </div>
     </div>
 
     <div class="card">
-      <h2>2. 프로젝트 기술 검증</h2>
-      <table class="qa">
-        <tr><th>2-1</th><td>학과 챗봇 프로젝트에서 CNN 기반 의도 분류와 KR-SBERT 유사도 검색을 함께 쓴 이유와 역할 분담을 설명해 주세요.</td></tr>
-        <tr><th>2-2</th><td>약 400만 문장 규모 데이터 전처리 중 겪은 가장 큰 문제와 해결 방법은 무엇이었나요?</td></tr>
-        <tr><th>2-3</th><td>음성 대화형 AI(Whisper→Llama 3.1→TTS)에서 응답 지연 문제를 어떻게 진단했고, 어느 구간에서 병목이 발생했나요?</td></tr>
-        <tr><th>2-4</th><td>학습 진행도 저장 구조를 설계한 방식과 데이터 유실 방지책은 무엇인가요?</td></tr>
-        <tr><th>2-5</th><td>Speech Emotion Recognition에서 CNN+LSTM 조합을 선택한 근거는 무엇인가요?</td></tr>
-        <tr><th>2-6</th><td>포트폴리오 프로젝트 중 실제 배포·서비스 운영까지 이어진 것이 있나요? 있다면 사용자 지표를 알려주세요.</td></tr>
-      </table>
+      <h2 class="sec">Step 2 | 공통 질의응답 (19문항)</h2>
+      <p class="note">※ 질문 후 지원자 응답을 요약 기재하고 점수를 표시합니다.</p>
+      <div id="commonQArea"></div>
     </div>
 
     <div class="card">
-      <h2>3. 직무 적합성</h2>
-      <table class="qa">
-        <tr><th>3-1</th><td>제조업 도메인(비전검사, 설비 자동화 등) 데이터를 다뤄본 경험이 있나요? 없다면 어떻게 빠르게 학습할 계획인가요?</td></tr>
-        <tr><th>3-2</th><td>여러 부서와 협업하며 요구사항이 계속 바뀌는 환경에서 일해본 경험이 있나요?</td></tr>
-        <tr><th>3-3</th><td>연구개발전담부서 특성상 문서화 작업 비중이 높습니다. 관련 경험이나 의향은 어떤가요?</td></tr>
-        <tr><th>3-4</th><td>창원 근무 전제 통근/이주 계획을 확인 부탁드립니다.</td></tr>
-      </table>
+      <h2 class="sec">Step 3 | 개별 질의응답 (정희준 전용 3문항)</h2>
+      <p class="note">※ 포트폴리오·경력 기반 개별 확인 질문. 기술 역량 깊이와 책임감을 집중 확인합니다.</p>
+      <div id="indivQArea"></div>
     </div>
 
     <div class="card">
-      <h2>4. 인성·조직 적합성</h2>
-      <table class="qa">
-        <tr><th>4-1</th><td>팀 프로젝트에서 부팀장을 맡으셨는데, 의견 충돌 시 어떻게 조율하셨나요?</td></tr>
-        <tr><th>4-2</th><td>ETRI 인턴 계약만료 이후 공백기 동안 무엇을 하셨나요?</td></tr>
-        <tr><th>4-3</th><td>최소 희망 처우 수준이 있다면 알려주세요.</td></tr>
-      </table>
+      <h2 class="sec">Step 4 | 지원자 질문 및 마무리</h2>
+      <div class="field"><label>지원자 질문 ①</label><textarea id="fQ1" rows="2"></textarea></div>
+      <div class="field"><label>지원자 질문 ②</label><textarea id="fQ2" rows="2"></textarea></div>
+      <div class="field"><label>지원자 질문 ③</label><textarea id="fQ3" rows="2"></textarea></div>
+      <div class="field"><label>질문 수준 종합 인상</label>
+        <select id="fQImpr">
+          <option value="">선택</option><option>날카롭고 준비된 질문</option><option>적절한 질문</option>
+          <option>형식적 질문</option><option>질문 없음</option><option>부적절한 질문</option>
+        </select>
+      </div>
     </div>
 
     <div class="card">
-      <h2>5. 평가표</h2>
-      <div class="scoreRow"><span class="name">기술 역량 (AI/데이터)<br><span class="pt">배점 30</span></span><input type="number" class="scoreInput" data-max="30" min="0" max="30" value="0"></div>
-      <div class="scoreRow"><span class="name">실무 적용력·문제해결<br><span class="pt">배점 25</span></span><input type="number" class="scoreInput" data-max="25" min="0" max="25" value="0"></div>
-      <div class="scoreRow"><span class="name">직무 적합성(제조 도메인 적응)<br><span class="pt">배점 20</span></span><input type="number" class="scoreInput" data-max="20" min="0" max="20" value="0"></div>
-      <div class="scoreRow"><span class="name">협업·커뮤니케이션<br><span class="pt">배점 15</span></span><input type="number" class="scoreInput" data-max="15" min="0" max="15" value="0"></div>
-      <div class="scoreRow"><span class="name">조직 적합성<br><span class="pt">배점 10</span></span><input type="number" class="scoreInput" data-max="10" min="0" max="10" value="0"></div>
+      <h2 class="sec">영역별 종합 평가 점수 (100점 만점)</h2>
+      <div id="scoreArea"></div>
       <div class="totalRow"><span>합계</span><span id="totalScore">0 / 100</span></div>
-      <div class="field" style="margin-top:10px;">
-        <label>종합 의견</label>
-        <textarea id="fComment" rows="4" placeholder="종합 의견을 입력하세요"></textarea>
+      <p class="note" style="margin-top:6px;">S(85↑) / A(70↑) / B(55↑) / C(54↓)</p>
+    </div>
+
+    <div class="card">
+      <h2 class="sec">최종 판정 (면접위원 합의)</h2>
+      <div class="field"><label>채용 판정</label>
+        <div class="radioGroup" id="finalJudge">
+          <label><input type="radio" name="judge" value="적극 채용 권장"> 적극 채용 권장</label>
+          <label><input type="radio" name="judge" value="채용 추천"> 채용 추천</label>
+          <label><input type="radio" name="judge" value="조건부 추천"> 조건부 추천</label>
+          <label><input type="radio" name="judge" value="보류"> 보류</label>
+          <label><input type="radio" name="judge" value="탈락"> 탈락</label>
+        </div>
       </div>
+      <div class="field"><label>강점 (인상적인 부분)</label><textarea id="fStrength" rows="3"></textarea></div>
+      <div class="field"><label>우려사항 (리스크)</label><textarea id="fConcern" rows="3"></textarea></div>
+      <div class="field"><label>희망연봉 협의 의견</label><textarea id="fSalary" rows="3" placeholder="지원자 희망 / 회사 제시 가능 범위 / 협상 여지 등"></textarea></div>
+      <div class="field"><label>성장 잠재력 종합 의견</label><textarea id="fPotential" rows="3"></textarea></div>
     </div>
   </div>
 
@@ -198,8 +252,147 @@
     <button class="print" onclick="window.print()">출력</button>
     <button class="save" onclick="saveData()">저장</button>
   </div>
-  <div class="verFoot">interview.html v1.0</div>
+  <div class="verFoot">interview.html v2.0</div>
 </div>
+
+<script>
+const WELFARE_CURRENT = [
+  '【급여·수당】 4대보험 완비 / 퇴직금 / 직급별 성과 인센티브 / 명절 상여금(설·추석)',
+  '【근무 환경】 주 40시간(월~금 08:00~17:00) / 연장근무 수당 별도 지급',
+  '【휴가·휴일】 법정 연차(입사 1년 후 15일~최대 25일) / 경조사 휴가 / 생일 반차',
+  '【복리후생】 식대 지원 / 교통비 지원 / 단체상해보험 / 경조사비 지원',
+  '【건강·안전】 연 1회 건강검진(임직원 전체) / 산업안전보건 프로그램',
+  '【출장·이동】 출장비 실비 지급(교통·숙박·식비) / 법인차 배차 지원(출장 시)',
+  '【R&D센터 특이사항】 연구 활동비 별도 지원 / 외부 세미나·교육 참가비 지원',
+];
+const WELFARE_PLANNED = [
+  '▷ 유연근무제 도입 검토 (2026년 하반기~2027년 시범 운영 예정)',
+  '▷ 자기계발비 지원 제도 신설 (도서·강의·자격증 취득 비용 연 한도)',
+  '▷ 직원 복지포인트 제도 도입 (카페테리아 플랜 형태)',
+  '▷ 성과급 체계 개편 (개인·팀 성과 연동 인센티브 구체화)',
+  '▷ AI R&D센터 연구 성과 특별 보상 신설 (특허·논문·사업화 성과 연동)',
+  '▷ 장기근속자 포상제도 강화 (3년·5년·10년 마일스톤 포상)',
+];
+const PROJECTS = [
+  ['① NLP 챗봇 (졸업작품)','Python·CNN·KR-SBERT','의도분류+유사도검색 파이프라인 구축. 400만 문장 데이터 활용. 로그 기반 오답 분석·수정 → 품질 개선'],
+  ['② 음성 대화형 AI (개인)','Whisper·Llama3.1·TTS·VTuber Studio','응답 지연 문제 직접 해결. 음성→LLM→TTS→VTuber 전 흐름 연결. 멀티 모델 통합 경험'],
+  ['③ 한자길 앱 (개인)','React Native·TypeScript·Expo','퀴즈 로직·오답노트·학습 진행도 구현. JSON 예문 4,272개 직접 정리·QA. 앱 배포 준비'],
+  ['④ Speech Emotion Recognition','CNN+LSTM·PyTorch·RAVDESS','음성 특징 추출 → 감정 분류 딥러닝 모델. RAVDESS 데이터셋 활용'],
+];
+const COMMON_QS = [
+  {area:'업무 방식 및 소통', color:'#2E5FA3', qno:1, q:'본인이 강하게 주장했던 의견이 최종적으로 채택되지 않았던 경험이 있으신가요? 그 상황에서 어떻게 대응하셨나요?', tip:'자기 의견 고집 vs 상황 수용 능력. "결국 제 말이 맞았어요"식 반응 주의. 과정과 태도에 집중.'},
+  {area:'업무 방식 및 소통', color:'#2E5FA3', qno:2, q:'계열사나 타 부서 담당자가 기술적으로 재검토가 필요한 방향을 요청해왔을 때 어떤 방식으로 소통하시나요?', tip:'상대를 먼저 이해하려는 자세 vs 일방적 설득. "제가 더 잘 알죠"식 반응 주의.'},
+  {area:'업무 방식 및 소통', color:'#2E5FA3', qno:3, q:'함께 일하기 가장 편했던 동료 유형과 다소 어려웠던 동료 유형을 각각 말씀해 주시겠어요?', tip:'타인 평가 기준에서 본인 성향 드러남. 다른 스타일을 지나치게 비판하면 협력성 부족 신호.'},
+  {area:'출장 및 이동 적응력', color:'#1565A8', qno:4, q:'업무 특성상 창원 본사 외 계열사(이천·공장), 고객사 방문 출장이 월 2~4회 이상 발생할 수 있습니다. 어떻게 생각하시나요?', tip:'출장을 부담·회피로 보는지, 업무의 자연스러운 일부로 받아들이는지. 체력과 이동 적응력 간접 파악.'},
+  {area:'출장 및 이동 적응력', color:'#1565A8', qno:5, q:'장거리 이동이 많은 날에는 컨디션 관리를 어떻게 하시나요? 체력 관리 방법이 있으시면 말씀해 주세요.', tip:'자기관리와 체력 수준. 출장 후 다음날 업무에 어떤 영향이 있는지 자연스럽게 확인.'},
+  {area:'출장 및 이동 적응력', color:'#1565A8', qno:6, q:'고객사나 계열사 담당자를 처음 만나는 자리에서 본인은 주로 어떤 역할을 하시나요?', tip:'첫 만남에서의 사회성·경청 태도. "상대방 니즈를 먼저 파악해요"가 이상적.'},
+  {area:'극복 경험 및 정신력', color:'#AA4400', qno:7, q:'공부나 프로젝트 중 가장 힘들고 막막했던 시기가 언제였나요? 당시 어떻게 버티셨고, 그 경험이 본인에게 어떤 영향을 주었나요?', tip:'어려움의 원인을 외부에 돌리는지, 내부(역량 부족)로 보는지. 극복 과정의 능동성.'},
+  {area:'극복 경험 및 정신력', color:'#AA4400', qno:8, q:'마감이 촉박한 상황에서 예상치 못한 오류가 발생했을 때 가장 먼저 하는 행동은 무엇인가요?', tip:'당황해서 주저앉는지, 빠르게 원인 파악과 우선순위 재설정을 하는지.'},
+  {area:'극복 경험 및 정신력', color:'#AA4400', qno:9, q:'부당하다고 느꼈던 지시나 평가를 받은 적이 있나요? 그때 어떻게 하셨나요?', tip:'즉각 반발·포기 vs 수용 후 소통으로 해결. 감정 조절 능력.'},
+  {area:'생활 습관 및 건강', color:'#1A6B1A', qno:10, q:'평일 퇴근 후와 주말에 주로 어떻게 시간을 보내시나요? 루틴이 있으시면 말씀해 주세요.', tip:'자기관리 루틴 유무. "특별한 건 없어요"가 전부면 자기계발 의지 부족 신호.'},
+  {area:'생활 습관 및 건강', color:'#1A6B1A', qno:11, q:'요즘 꾸준히 하고 계신 운동이나 취미 활동이 있으신가요? 어떻게 시작하게 되셨나요?', tip:'신체 활동 유무와 지속성. 현재 진행형인지 확인.'},
+  {area:'생활 습관 및 건강', color:'#1A6B1A', qno:12, q:'업무나 공부 중 스트레스가 심할 때 본인만의 해소 방법이 있으신가요?', tip:'건강한 해소법 vs 불건강한 방식. 음주 언급 시 빈도·양 자연스럽게 추가 질문.'},
+  {area:'조직 생활 및 사회성', color:'#7B1FA2', qno:13, q:'팀 회식이나 사내 행사에 대해 어떻게 생각하시나요? 학교·인턴 시절 팀 모임 참여는 어떠셨나요?', tip:'회식을 부담으로만 보는지, 관계 형성 기회로 보는지. 회피 성향 파악.'},
+  {area:'조직 생활 및 사회성', color:'#7B1FA2', qno:14, q:'상사나 선배가 업무 외 자리(식사·커피)를 자주 제안하는 편이라면 어떻게 느끼실 것 같으세요?', tip:'관계 형성에 적극적인지, 사생활 침해로 받아들이는지.'},
+  {area:'자기 인식 및 태도', color:'#4A148C', qno:15, q:'본인이 자신 있는 기술 분야가 있으신가요? 그 분야에서 팀원들과 어떻게 협업하시나요?', tip:'자신감과 겸손의 균형. "제가 제일 잘해서 다 맡아요"식이면 독불장군 성향.'},
+  {area:'자기 인식 및 태도', color:'#4A148C', qno:16, q:'본인 단점 중 실제로 학업이나 프로젝트에서 문제가 됐던 경험을 솔직하게 말씀해 주세요.', tip:'"완벽주의"같은 포장된 답변 주의. 구체적 실패 사례와 개선 노력이 있으면 성숙한 자기인식.'},
+  {area:'책임감 및 성실성', color:'#004D80', qno:17, q:'맡은 프로젝트가 예상보다 훨씬 오래 걸리게 됐을 때 어떻게 하셨나요? 구체적인 사례를 말씀해 주세요.', tip:'끝까지 책임지는 성향인지, 중도 포기·전가 성향인지.'},
+  {area:'책임감 및 성실성', color:'#004D80', qno:18, q:'누가 시키지 않아도 본인이 먼저 나서서 했던 학습이나 활동이 있었나요?', tip:'수동적 지시 대기형 vs 능동적 자기주도형.'},
+  {area:'처우 및 근무조건', color:'#B71C1C', qno:19, q:'희망하시는 연봉 수준과 그 기준이 되는 근거를 말씀해 주시겠어요? (직전 연봉 2,600만원 기재 확인) 처우 협의에서 유연성은 어느 정도 있으신가요?', tip:'직전 ETRI 인턴 연봉 2,600만원 대비 기대치. 신입 수준 현실 인식 여부.'},
+];
+const INDIVIDUAL_QS = [
+  {qno:'A', q:'ETRI 인턴 3개월 동안 가장 기억에 남는 업무나 배움이 무엇이었나요? 본인이 실제로 기여한 부분을 구체적으로 말씀해 주세요.', tip:'Clotho 데이터셋 정리·논문 리뷰가 전부인지, 자발적으로 더 한 부분이 있는지 확인.'},
+  {qno:'B', q:'음성 대화형 AI 프로젝트에서 응답 지연 문제를 어떤 방식으로 원인 찾고 해결하셨나요? 해결 전후 차이가 얼마나 됐나요?', tip:'수치가 있는지, LLM 파인튜닝인지 API 호출인지 확인.'},
+  {qno:'C', q:'한자길 앱이 실제로 출시되었나요? 사용자 반응이나 피드백을 받아보셨다면 어떻게 반영하셨나요?', tip:'기획·개발에서 끝나는지, 실제 배포·운영까지 책임지는지 파악.'},
+];
+const SCORE_AREAS = [
+  {area:'업무 방식 및 소통', max:15},
+  {area:'출장 및 이동 적응력', max:10},
+  {area:'극복 경험 및 정신력', max:15},
+  {area:'생활 습관 및 건강', max:15},
+  {area:'조직 생활 및 사회성', max:10},
+  {area:'자기 인식 및 태도', max:15},
+  {area:'책임감 및 성실성', max:10},
+  {area:'처우 및 근무조건', max:10},
+];
+
+function buildStatic(){
+  document.getElementById('welfCurrent').innerHTML = WELFARE_CURRENT.map(t=>'<div>'+t+'</div>').join('');
+  document.getElementById('welfPlanned').innerHTML = WELFARE_PLANNED.map(t=>'<div>'+t+'</div>').join('');
+
+  document.getElementById('projTable').innerHTML =
+    '<tr><th>프로젝트</th><th>기술 스택</th><th>역할 및 특이사항</th></tr>' +
+    PROJECTS.map(p=>'<tr><td>'+p[0]+'</td><td>'+p[1]+'</td><td>'+p[2]+'</td></tr>').join('');
+
+  let lastArea = null;
+  const cq = document.getElementById('commonQArea');
+  COMMON_QS.forEach(q=>{
+    if(q.area !== lastArea){
+      lastArea = q.area;
+      const h = document.createElement('div');
+      h.className = 'areaHead'; h.style.color = q.color; h.style.borderColor = q.color;
+      h.textContent = '▶ ' + q.area;
+      cq.appendChild(h);
+    }
+    cq.appendChild(makeQBlock('c'+q.qno, 'Q'+q.qno, q.q, q.tip, q.color));
+  });
+
+  const iq = document.getElementById('indivQArea');
+  INDIVIDUAL_QS.forEach(q=>{
+    iq.appendChild(makeQBlock('i'+q.qno, 'Q'+q.qno, q.q, q.tip, '#AA3300'));
+  });
+
+  const sa = document.getElementById('scoreArea');
+  SCORE_AREAS.forEach((a,i)=>{
+    const row = document.createElement('div');
+    row.className = 'scoreRow';
+    row.innerHTML = '<span class="name">'+a.area+'<br><span class="pt">배점 '+a.max+'</span></span>' +
+      '<input type="number" class="scoreInput" data-idx="'+i+'" data-max="'+a.max+'" min="0" max="'+a.max+'" value="0">';
+    sa.appendChild(row);
+  });
+}
+
+function makeQBlock(id, qno, qtext, tip, color){
+  const box = document.createElement('div');
+  box.className = 'qBlock';
+  box.innerHTML =
+    '<div class="qTop"><span class="qno" style="background:'+color+'">'+qno+'</span><span>'+qtext+'</span></div>' +
+    '<div class="qBody">' +
+      '<label>응답 요약</label><textarea rows="2" data-role="ans" data-id="'+id+'"></textarea>' +
+      '<label>점수</label><select data-role="score" data-id="'+id+'">' +
+        '<option value="">-</option><option value="5">5 매우우수</option><option value="4">4 우수</option>' +
+        '<option value="3">3 보통</option><option value="2">2 미흡</option><option value="1">1 부적합</option>' +
+      '</select>' +
+      '<div class="tip"><b>관찰 포인트</b> — '+tip+'</div>' +
+    '</div>';
+  return box;
+}
+
+function updateTotal(){
+  const inputs = document.querySelectorAll('.scoreInput');
+  let total = 0;
+  inputs.forEach(inp=>{
+    let v = Number(inp.value) || 0;
+    const max = Number(inp.dataset.max);
+    if(v > max) v = max;
+    if(v < 0) v = 0;
+    inp.value = v;
+    total += v;
+  });
+  document.getElementById('totalScore').textContent = total + ' / 100';
+}
+document.addEventListener('input', (e)=>{
+  if(e.target.classList.contains('scoreInput')) updateTotal();
+});
+
+function setDevice(mode){
+  document.getElementById('tabMobile').classList.toggle('active', mode==='mobile');
+  document.getElementById('tabPc').classList.toggle('active', mode==='pc');
+  document.querySelector('.wrap').style.maxWidth = (mode==='pc') ? '1100px' : '480px';
+}
+buildStatic();
+setDevice('mobile');
+</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -218,12 +411,10 @@ const firebaseConfig = {
   messagingSenderId: "225275784859",
   appId: "1:225275784859:web:bd12815c6dc47c0c49e03e"
 };
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
-const DOC_ID = "20260914_jhj_researcher"; // 이 지원자 건 전용 문서 ID
+const DOC_ID = "20260914_jhj_researcher";
 const DOC_REF = doc(db, "interview_records", DOC_ID);
 
 window.doLogin = async function(){
@@ -234,18 +425,11 @@ window.doLogin = async function(){
   errEl.textContent = "";
   if(!email || !pw){ errEl.textContent = "이메일과 비밀번호를 입력하세요."; return; }
   btn.disabled = true; btn.textContent = "로그인 중...";
-  try{
-    await signInWithEmailAndPassword(auth, email, pw);
-  }catch(e){
-    errEl.textContent = "로그인 실패: 이메일 또는 비밀번호를 확인하세요.";
-  }finally{
-    btn.disabled = false; btn.textContent = "로그인";
-  }
+  try{ await signInWithEmailAndPassword(auth, email, pw); }
+  catch(e){ errEl.textContent = "로그인 실패: 이메일 또는 비밀번호를 확인하세요."; }
+  finally{ btn.disabled = false; btn.textContent = "로그인"; }
 };
-
-window.doLogout = async function(){
-  await signOut(auth);
-};
+window.doLogout = async function(){ await signOut(auth); };
 
 onAuthStateChanged(auth, async (user)=>{
   if(user){
@@ -258,18 +442,35 @@ onAuthStateChanged(auth, async (user)=>{
   }
 });
 
+function textFields(){
+  return ['mDate','mPlace','mIntv1','mIntv2','fWelfQ','fWelfTravel','fWelfImpr','fQ1','fQ2','fQ3','fQImpr',
+          'fStrength','fConcern','fSalary','fPotential'];
+}
+
 async function loadData(){
   try{
     const snap = await getDoc(DOC_REF);
     if(snap.exists()){
       const d = snap.data();
-      document.getElementById('fName').value = d.name || "";
-      document.getElementById('fRole').value = d.role || "연구원 (AI혁신 연구개발실)";
-      document.getElementById('fEdu').value = d.edu || "";
-      document.getElementById('fCareer').value = d.career || "";
-      document.getElementById('fComment').value = d.comment || "";
+      textFields().forEach(id=>{ if(d[id] !== undefined) document.getElementById(id).value = d[id]; });
+      if(d.judge){
+        const r = document.querySelector('input[name="judge"][value="'+d.judge+'"]');
+        if(r) r.checked = true;
+      }
+      if(d.answers){
+        Object.keys(d.answers).forEach(id=>{
+          const el = document.querySelector('[data-role="ans"][data-id="'+id+'"]');
+          if(el) el.value = d.answers[id];
+        });
+      }
+      if(d.qscores){
+        Object.keys(d.qscores).forEach(id=>{
+          const el = document.querySelector('[data-role="score"][data-id="'+id+'"]');
+          if(el) el.value = d.qscores[id];
+        });
+      }
       const inputs = document.querySelectorAll('.scoreInput');
-      (d.scores || []).forEach((v,i)=>{ if(inputs[i]) inputs[i].value = v; });
+      (d.areaScores || []).forEach((v,i)=>{ if(inputs[i]) inputs[i].value = v; });
     }
     updateTotal();
   }catch(e){
@@ -277,36 +478,20 @@ async function loadData(){
   }
 }
 
-function updateTotal(){
-  const inputs = document.querySelectorAll('.scoreInput');
-  let total = 0;
-  inputs.forEach(inp=>{
-    let v = Number(inp.value) || 0;
-    const max = Number(inp.dataset.max);
-    if(v > max) v = max;
-    if(v < 0) v = 0;
-    inp.value = v;
-    total += v;
-  });
-  document.getElementById('totalScore').textContent = total + " / 100";
-}
-document.addEventListener('input', (e)=>{
-  if(e.target.classList.contains('scoreInput')) updateTotal();
-});
-
 window.saveData = async function(){
   const statusEl = document.getElementById('saveStatus');
   statusEl.textContent = "저장 중...";
-  const scores = Array.from(document.querySelectorAll('.scoreInput')).map(i=>Number(i.value)||0);
-  const payload = {
-    name: document.getElementById('fName').value,
-    role: document.getElementById('fRole').value,
-    edu: document.getElementById('fEdu').value,
-    career: document.getElementById('fCareer').value,
-    comment: document.getElementById('fComment').value,
-    scores: scores,
-    updatedAt: serverTimestamp()
-  };
+  const payload = { updatedAt: serverTimestamp() };
+  textFields().forEach(id=>{ payload[id] = document.getElementById(id).value; });
+  const judgeEl = document.querySelector('input[name="judge"]:checked');
+  payload.judge = judgeEl ? judgeEl.value : "";
+  const answers = {};
+  document.querySelectorAll('[data-role="ans"]').forEach(el=>{ answers[el.dataset.id] = el.value; });
+  payload.answers = answers;
+  const qscores = {};
+  document.querySelectorAll('[data-role="score"]').forEach(el=>{ qscores[el.dataset.id] = el.value; });
+  payload.qscores = qscores;
+  payload.areaScores = Array.from(document.querySelectorAll('.scoreInput')).map(i=>Number(i.value)||0);
   try{
     await setDoc(DOC_REF, payload, { merge: true });
     statusEl.textContent = "저장 완료 (" + new Date().toLocaleTimeString('ko-KR') + ")";
@@ -314,14 +499,6 @@ window.saveData = async function(){
     statusEl.textContent = "저장 실패: " + e.message;
   }
 };
-
-window.setDevice = function(mode){
-  document.getElementById('tabMobile').classList.toggle('active', mode==='mobile');
-  document.getElementById('tabPc').classList.toggle('active', mode==='pc');
-  document.querySelector('.wrap').style.maxWidth = (mode==='pc') ? '1100px' : '480px';
-  document.querySelector('.wrap').style.margin = (mode==='pc') ? '0 auto' : '0 auto';
-};
-setDevice('mobile');
 </script>
 </body>
 </html>
