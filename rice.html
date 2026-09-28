@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  
+
   <title>2026 유황품은 이천쌀 주문 안내</title>
 
   <!-- 카카오톡/SNS 링크 공유 시 유황품은 이천쌀 공식 배너 미리보기 -->
@@ -22,25 +22,209 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --ink: #1c2b1a;
+      --ink-soft: #3d4a3a;
+      --green: #2d5a27;
+      --green-dark: #1e3a1b;
+      --red: #b71c1c;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans KR', sans-serif; }
-    body { background-color: #f7f9fa; color: #222; display: flex; justify-content: center; padding: 12px 8px; }
-    .container { width: 100%; max-width: 600px; background: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
-    .banner-img { width: 100%; display: block; border-bottom: 2px solid #b71c1c; }
-    .hero-banner { width: 100%; background: #2d5a27; color: #fff; padding: 18px 20px; text-align: center; }
-    .hero-banner p { font-size: 13px; opacity: 0.9; }
-    .hero-banner h1 { font-size: 20px; font-weight: 800; margin: 4px 0; }
-    .content { padding: 18px 16px; }
-    .section-card { background: #fdfdfd; border: 1px solid #eef0f2; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
-    .section-card h3 { font-size: 15px; font-weight: 700; color: #1e3a1b; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-    .price-list { list-style: none; font-size: 14px; }
-    .price-list li { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #e5e7eb; }
+    html { font-size: 14px; } /* 모바일 기본 14px */
+    body {
+      background-color: #f7f9fa;
+      color: var(--ink);
+      display: flex;
+      justify-content: center;
+      padding: 12px 8px 8px;
+      padding-bottom: 88px; /* 하단 고정 주문바 공간 확보 (모바일) */
+    }
+
+    /* ===== 모바일/PC 보기 전환 탭 ===== */
+    .view-toggle {
+      position: fixed;
+      top: 8px;
+      right: 8px;
+      z-index: 50;
+      display: flex;
+      gap: 4px;
+      background: #ffffff;
+      border: 1px solid #e3e6e8;
+      border-radius: 999px;
+      padding: 3px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .view-toggle button {
+      border: none;
+      background: transparent;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 999px;
+      color: var(--ink-soft);
+      cursor: pointer;
+    }
+    .view-toggle button.active {
+      background: var(--green);
+      color: #ffffff;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 460px;
+      background: #ffffff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .banner-img { width: 100%; display: block; border-bottom: 2px solid var(--red); }
+
+    .hero-banner {
+      width: 100%;
+      background: var(--green);
+      color: #fff;
+      padding: 16px 18px 12px;
+      text-align: center;
+    }
+    .hero-banner p { font-size: 0.9rem; opacity: 0.92; line-height: 1.4; }
+    .hero-banner h1 { font-size: 1.35rem; font-weight: 800; margin: 6px 0; line-height: 1.3; }
+
+    .content { padding: 14px 14px 4px; }
+
+    .section-card {
+      background: #fdfdfd;
+      border: 1px solid #eef0f2;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .section-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--green-dark);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .price-list { list-style: none; font-size: 1rem; }
+    .price-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 2px;
+      border-bottom: 1px dashed #e5e7eb;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 44px; /* 터치 타깃 확보 */
+    }
     .price-list li:last-child { border-bottom: none; }
-    .badge { background: #e8f5e9; color: #2e7d32; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
-    .btn-order { display: block; width: 100%; background: #b71c1c; color: #ffffff; text-align: center; text-decoration: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: 700; margin-top: 14px; box-shadow: 0 4px 10px rgba(183,28,28,0.25); }
-    .footer { text-align: center; font-size: 11px; color: #888; padding: 16px 0 10px; }
+    .badge {
+      background: #e8f5e9;
+      color: #2e7d32;
+      font-size: 0.8rem;
+      padding: 3px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .info-text {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--ink-soft);
+    }
+
+    /* 인라인 CTA (본문 내, PC 보기에서 사용) */
+    .btn-order-inline {
+      display: block;
+      width: 100%;
+      background: var(--red);
+      color: #ffffff;
+      text-align: center;
+      text-decoration: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-top: 12px;
+      box-shadow: 0 4px 10px rgba(183,28,28,0.25);
+      min-height: 48px;
+    }
+
+    /* 모바일 하단 고정 주문바 */
+    .sticky-order {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 40;
+      background: #ffffff;
+      border-top: 1px solid #ececec;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      box-shadow: 0 -4px 14px rgba(0,0,0,0.08);
+    }
+    .sticky-order a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 48px;
+      background: var(--red);
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border-radius: 8px;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #888;
+      padding: 14px 0 10px;
+    }
+
+    /* PC 보기 전용 레이아웃 (토글로 전환 시) */
+    body.view-pc { padding-bottom: 40px; }
+    body.view-pc .sticky-order { display: none; }
+    body.view-pc .btn-order-inline { display: block; }
+    body.view-pc .container {
+      max-width: 900px;
+    }
+    body.view-pc .content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: start;
+      padding: 20px;
+    }
+    body.view-pc .hero-banner { padding: 22px; }
+    body.view-pc .hero-banner h1 { font-size: 1.7rem; }
+    body.view-pc .btn-order-inline { grid-column: 1 / -1; }
+
+    /* 실제 PC 화면 폭에서의 자동 확대 (반응형 폰트) */
+    @media (min-width: 768px) {
+      html { font-size: 16px; }
+      .container { max-width: 640px; }
+      body:not(.view-pc) { padding-bottom: 40px; }
+      body:not(.view-pc) .sticky-order { display: none; }
+    }
+
+    /* 모바일 보기 강제 선택 시, 넓은 화면에서도 카드 폭 고정해 폰 프레임처럼 보기 */
+    body.view-mobile-forced {
+      align-items: flex-start;
+    }
+    body.view-mobile-forced .container { max-width: 420px; }
   </style>
 </head>
-<body>
+<body class="view-mobile-forced">
+
+<div class="view-toggle" role="tablist" aria-label="화면 보기 전환">
+  <button type="button" id="btnMobile" class="active" onclick="setView('mobile')">모바일</button>
+  <button type="button" id="btnPc" onclick="setView('pc')">PC</button>
+</div>
 
 <div class="container">
   <!-- 상단 대표 배너 이미지 -->
@@ -69,21 +253,45 @@
 
     <div class="section-card">
       <h3>제25회 이천쌀문화축제 안내</h3>
-      <p style="font-size: 13px; line-height: 1.6; color: #555;">
+      <p class="info-text">
         • <strong>축제 기간:</strong> 2026. 10. 14.(수) ~ 10. 18.(일)<br>
         • <strong>축제 장소:</strong> 이천시 복하천 수변공원 일원<br>
         • <strong>공식 홈페이지:</strong> http://www.ricefestival.or.kr
       </p>
     </div>
 
-    <!-- 구글 폼 주문서 연결 버튼 -->
-    <a href="https://forms.gle/W2T8J5P5z2Yj5PXE7" class="btn-order">유황품은 이천쌀 주문서 작성하기 ➔</a>
+    <!-- 구글 폼 주문서 연결 버튼 (PC 보기·인라인용) -->
+    <a href="https://forms.gle/W2T8J5P5z2Yj5PXE7" class="btn-order-inline">유황품은 이천쌀 주문서 작성하기 ➔</a>
+  </div>
 
-    <div class="footer">
-      이천바이오팜연구회 • v1.2
-    </div>
+  <div class="footer">
+    이천바이오팜연구회 • v2.0
   </div>
 </div>
+
+<!-- 모바일 하단 고정 주문 버튼 -->
+<div class="sticky-order">
+  <a href="https://forms.gle/W2T8J5P5z2Yj5PXE7">🌾 이천쌀 주문서 작성하기</a>
+</div>
+
+<script>
+  function setView(mode) {
+    var body = document.body;
+    var btnMobile = document.getElementById('btnMobile');
+    var btnPc = document.getElementById('btnPc');
+    if (mode === 'pc') {
+      body.classList.remove('view-mobile-forced');
+      body.classList.add('view-pc');
+      btnPc.classList.add('active');
+      btnMobile.classList.remove('active');
+    } else {
+      body.classList.remove('view-pc');
+      body.classList.add('view-mobile-forced');
+      btnMobile.classList.add('active');
+      btnPc.classList.remove('active');
+    }
+  }
+</script>
 
 </body>
 </html>
