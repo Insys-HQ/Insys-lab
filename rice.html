@@ -40,35 +40,6 @@
       padding-bottom: 88px; /* 하단 고정 주문바 공간 확보 (모바일) */
     }
 
-    /* ===== 모바일/PC 보기 전환 탭 ===== */
-    .view-toggle {
-      position: fixed;
-      top: 8px;
-      right: 8px;
-      z-index: 50;
-      display: flex;
-      gap: 4px;
-      background: #ffffff;
-      border: 1px solid #e3e6e8;
-      border-radius: 999px;
-      padding: 3px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    .view-toggle button {
-      border: none;
-      background: transparent;
-      font-size: 0.85rem;
-      font-weight: 700;
-      padding: 6px 12px;
-      border-radius: 999px;
-      color: var(--ink-soft);
-      cursor: pointer;
-    }
-    .view-toggle button.active {
-      background: var(--green);
-      color: #ffffff;
-    }
-
     .container {
       width: 100%;
       max-width: 460px;
@@ -195,45 +166,13 @@
       padding: 14px 0 10px;
     }
 
-    /* PC 보기 전용 레이아웃 (토글로 전환 시) */
-    body.view-pc { padding-bottom: 40px; }
-    body.view-pc .sticky-order { display: none; }
-    body.view-pc .btn-order-inline { display: block; }
-    body.view-pc .container {
-      max-width: 900px;
-    }
-    body.view-pc .content {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      align-items: start;
-      padding: 20px;
-    }
-    body.view-pc .hero-banner { padding: 22px; }
-    body.view-pc .hero-banner h1 { font-size: 1.7rem; }
-    body.view-pc .btn-order-inline { grid-column: 1 / -1; }
-
-    /* 실제 PC 화면 폭에서의 자동 확대 (반응형 폰트) */
+    /* 넓은 화면에서도 항상 모바일 레이아웃 유지 (PC 전용 레이아웃 없음) */
     @media (min-width: 768px) {
-      html { font-size: 16px; }
-      .container { max-width: 640px; }
-      body:not(.view-pc) { padding-bottom: 40px; }
-      body:not(.view-pc) .sticky-order { display: none; }
+      html { font-size: 16px; } /* 가독성을 위한 폰트 확대만 적용, 레이아웃은 모바일 그대로 */
     }
-
-    /* 모바일 보기 강제 선택 시, 넓은 화면에서도 카드 폭 고정해 폰 프레임처럼 보기 */
-    body.view-mobile-forced {
-      align-items: flex-start;
-    }
-    body.view-mobile-forced .container { max-width: 420px; }
   </style>
 </head>
-<body class="view-mobile-forced">
-
-<div class="view-toggle" role="tablist" aria-label="화면 보기 전환">
-  <button type="button" id="btnMobile" class="active" onclick="setView('mobile')">모바일</button>
-  <button type="button" id="btnPc" onclick="setView('pc')">PC</button>
-</div>
+<body>
 
 <div class="container">
   <!-- 상단 대표 배너 이미지 -->
@@ -271,38 +210,19 @@
       </p>
     </div>
 
-    <!-- 구글 폼 주문서 연결 버튼 (PC 보기·인라인용) -->
+    <!-- 구글 폼 주문서 연결 버튼 (본문 인라인용) -->
     <a href="https://forms.gle/W2T8J5P5z2Yj5PXE7" class="btn-order-inline">유황품은 이천쌀 주문서 작성하기 ➔</a>
   </div>
 
   <div class="footer">
-    이천바이오팜연구회 • v2.1
+    이천바이오팜연구회 • v2.2
   </div>
 </div>
 
-<!-- 모바일 하단 고정 주문 버튼 -->
+<!-- 하단 고정 주문 버튼 -->
 <div class="sticky-order">
   <a href="https://forms.gle/W2T8J5P5z2Yj5PXE7">🌾 이천쌀 주문서 작성하기</a>
 </div>
-
-<script>
-  function setView(mode) {
-    var body = document.body;
-    var btnMobile = document.getElementById('btnMobile');
-    var btnPc = document.getElementById('btnPc');
-    if (mode === 'pc') {
-      body.classList.remove('view-mobile-forced');
-      body.classList.add('view-pc');
-      btnPc.classList.add('active');
-      btnMobile.classList.remove('active');
-    } else {
-      body.classList.remove('view-pc');
-      body.classList.add('view-mobile-forced');
-      btnMobile.classList.add('active');
-      btnPc.classList.remove('active');
-    }
-  }
-</script>
 
 </body>
 </html>
