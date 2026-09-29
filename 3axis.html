@@ -54,8 +54,9 @@
   .hint{font-size:12px;color:var(--text-light);margin-top:6px;}
   svg{width:100%;height:auto;display:block;}
   /* 애니메이션이 한 화면을 넘지 않도록 높이 제한 (스크롤 방지) */
-  #scene{max-height:calc(100vh - 330px);min-height:260px;margin:0 auto;}
-  @media (max-width:900px){ #scene{max-height:calc(100vh - 430px);} }
+  #scene{max-height:calc(100vh - 700px);min-height:160px;margin:0 auto;}
+  @media (max-width:900px){ #scene{max-height:calc(100vh - 725px);} }
+  @media (max-width:600px){ #scene{max-height:calc(100vh - 830px);} }
   .axisbar{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:7px;}
   @media (max-width:600px){.axisbar{grid-template-columns:repeat(3,1fr);}}
   .ax{background:#F2F6FC;border:1px solid #D3E0F0;border-radius:7px;padding:4px 6px;text-align:center;}
@@ -112,7 +113,7 @@
 <body>
 
 <header class="cover"><div class="inner">
-  <span class="hver" id="hVer">v2.8</span>
+  <span class="hver" id="hVer">v2.9</span>
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (Z·Rx·Ry 3축 헤드)</h1>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
@@ -208,7 +209,7 @@
   </section>
 </main>
 
-<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v2.8</span></footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v2.9</span></footer>
 
 <script>
   // ===== 3D 월드 (X:컨베이어, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
@@ -257,7 +258,7 @@
   }
 
   // ===== 다국어 (한국어 / English) =====
-  const VER='v2.8';
+  const VER='v2.9';
   const I18N={
     ko:{
       title:'PCB 비전 검사 시뮬레이터 (3축 헤드)',
