@@ -18,8 +18,21 @@
   *{box-sizing:border-box;}
   body{margin:0;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.45;}
   header.cover{background:linear-gradient(135deg,var(--navy),var(--navy-dark));color:#F4F7FB;padding:9px 16px;}
-  header.cover .inner{max-width:1200px;margin:0 auto;text-align:center;}
-  header.cover h1{font-size:18px;font-weight:900;margin:0;}
+  header.cover .inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:8px;}
+  header.cover h1{font-size:18px;font-weight:900;margin:0;flex:1 1 auto;text-align:center;}
+  .hver{flex:0 0 auto;font-size:11.5px;font-weight:700;letter-spacing:.3px;color:#EAF1FA;
+    background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.32);border-radius:20px;padding:3px 9px;white-space:nowrap;}
+  .langsw{flex:0 0 auto;display:flex;border:1px solid rgba(255,255,255,.34);border-radius:8px;overflow:hidden;}
+  .langsw button{font-family:inherit;font-size:11.5px;font-weight:700;padding:4px 9px;border:0;border-radius:0;
+    background:transparent;color:#D6E2F0;cursor:pointer;white-space:nowrap;}
+  .langsw button:hover{background:rgba(255,255,255,.14);}
+  .langsw button.on{background:#F4F7FB;color:var(--navy-dark);}
+  @media (max-width:600px){
+    header.cover{padding:7px 10px;}
+    header.cover h1{font-size:14px;}
+    .hver{font-size:10.5px;padding:2px 7px;}
+    .langsw button{font-size:10.5px;padding:3px 7px;}
+  }
   .container{max-width:1200px;margin:0 auto;padding:10px 14px 24px;}
   .card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 2px rgba(20,40,63,.05);margin-bottom:10px;}
   .card-header{background:var(--card-header-bg);padding:7px 12px;font-weight:700;color:var(--navy-dark);font-size:13.5px;border-bottom:1px solid var(--border);}
@@ -98,53 +111,60 @@
 </head>
 <body>
 
-<header class="cover"><div class="inner"><h1>PCB 비전 검사 시뮬레이터 (Z·Rx·Ry 3축 헤드)</h1></div></header>
+<header class="cover"><div class="inner">
+  <span class="hver" id="hVer">v2.8</span>
+  <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (Z·Rx·Ry 3축 헤드)</h1>
+  <div class="langsw">
+    <button id="btnKo" class="on" type="button">한국어</button>
+    <button id="btnEn" type="button">English</button>
+  </div>
+</div></header>
 
 <main class="container">
   <div class="grid2">
     <div class="left-col">
     <section class="card">
-      <div class="card-header">동작 애니메이션 · Z축 직결 Z·Rx·Ry 3축 헤드</div>
+      <div class="card-header" data-i18n="ch_anim">동작 애니메이션 · Z축 직결 Z·Rx·Ry 3축 헤드</div>
       <div class="card-body">
         <div id="stepMobile" class="step-mobile"><span class="no">1</span><span id="stepMobileText">START 대기</span></div>
-        <div id="alarmBanner" class="alarm-banner">⚠ NG 검사 중단 — NG품 제거 후 [검사 계속]</div>
+        <div id="alarmBanner" class="alarm-banner" data-i18n="alarmban">⚠ NG 검사 중단 — NG품 제거 후 [검사 계속]</div>
 
         <div class="axisbar">
-          <div class="ax" id="axZ"><div class="k">Z축 (승강)</div><div class="v" id="vZ">-</div></div>
-          <div class="ax" id="axT"><div class="k">Rx축 (θ)</div><div class="v" id="vT">-</div></div>
-          <div class="ax" id="axP"><div class="k">Ry축 (φ)</div><div class="v" id="vP">-</div></div>
-          <div class="ax" id="axF"><div class="k">초점거리</div><div class="v" id="vF">-</div></div>
+          <div class="ax" id="axZ"><div class="k" data-i18n="ax_z">Z축 (승강)</div><div class="v" id="vZ">-</div></div>
+          <div class="ax" id="axT"><div class="k" data-i18n="ax_rx">Rx축 (θ)</div><div class="v" id="vT">-</div></div>
+          <div class="ax" id="axP"><div class="k" data-i18n="ax_ry">Ry축 (φ)</div><div class="v" id="vP">-</div></div>
+          <div class="ax" id="axF"><div class="k" data-i18n="ax_foc">초점거리</div><div class="v" id="vF">-</div></div>
         </div>
 
         <div class="statechips">
-          <span class="chip">PCB 기울기 <b id="tiltVal">-</b></span>
-          <span class="chip">직각 정렬 <b id="alignVal">-</b></span>
-          <span class="chip" id="chipLamp">레이저 <b id="lampVal">OFF</b></span>
-          <span class="chip" id="chipSen">센서 <b id="senVal">OFF</b></span>
+          <span class="chip"><span data-i18n="cp_tilt">PCB 기울기</span> <b id="tiltVal">-</b></span>
+          <span class="chip"><span data-i18n="cp_align">직각 정렬</span> <b id="alignVal">-</b></span>
+          <span class="chip" id="chipLamp"><span data-i18n="cp_laser">레이저</span> <b id="lampVal">OFF</b></span>
+          <span class="chip" id="chipSen"><span data-i18n="cp_sen">센서</span> <b id="senVal">OFF</b></span>
         </div>
 
         <div class="verdict-box">
           <div class="verdict-lamp" id="verdictLamp">--</div>
           <div>
-            <div style="font-size:11.5px;color:var(--text-light);">판정</div>
+            <div style="font-size:11.5px;color:var(--text-light);" data-i18n="lb_verdict">판정</div>
             <div class="mes-ind" id="mesInd"><span class="dot"></span>MES 전송: 대기</div>
           </div>
           <div style="margin-left:auto;">
-            <div style="font-size:11px;color:var(--text-light);margin-bottom:3px;">데모</div>
-            <select id="verdictSel"><option value="auto">자동</option><option value="OK">항상 OK</option><option value="NG">항상 NG</option></select>
+            <div style="font-size:11px;color:var(--text-light);margin-bottom:3px;" data-i18n="lb_demo">데모</div>
+            <select id="verdictSel"><option value="auto" data-i18n="op_auto">자동</option><option value="OK" data-i18n="op_ok">항상 OK</option><option value="NG" data-i18n="op_ng">항상 NG</option></select>
           </div>
         </div>
 
-        <svg viewBox="130 -26 440 540" id="scene"></svg>
+        <svg viewBox="118 -24 490 552" id="scene"></svg>
         <div class="row" style="margin-top:4px;gap:6px;flex-wrap:nowrap;">
-          <span style="font-size:12px;color:var(--text-light);white-space:nowrap;">시점 <b id="yawVal" style="color:var(--navy-dark);">35°</b></span>
+          <span style="font-size:12px;color:var(--text-light);white-space:nowrap;"><span data-i18n="lb_view">시점</span> <b id="yawVal" style="color:var(--navy-dark);">35°</b></span>
           <input type="range" id="viewYaw" min="0" max="90" value="35" style="flex:0 1 140px;min-width:70px;">
-          <button id="btnFront" style="padding:4px 8px;font-size:11.5px;flex:0 0 auto;white-space:nowrap;">정면</button>
-          <button id="btnIso" style="padding:4px 8px;font-size:11.5px;flex:0 0 auto;white-space:nowrap;">45°</button>
-          <button id="btnSide" style="padding:4px 8px;font-size:11.5px;flex:0 0 auto;white-space:nowrap;">측면</button>
+          <button id="btnFront" data-i18n="vw_front" style="padding:4px 8px;font-size:11.5px;flex:0 0 auto;white-space:nowrap;">정면</button>
+          <button id="btnIso" data-i18n="vw_iso" style="padding:4px 8px;font-size:11.5px;flex:0 0 auto;white-space:nowrap;">45°</button>
+          <button id="btnSide" data-i18n="vw_side" style="padding:4px 8px;font-size:11.5px;flex:0 0 auto;white-space:nowrap;">측면</button>
         </div>
         <div class="row" style="margin-top:5px;">
-          <span class="counter">완료 <span id="cycleCount">0</span></span>
+          <span class="counter"><span data-i18n="ct_done">완료</span> <span id="cycleCount">0</span></span>
           <span class="counter" style="color:var(--success);">OK <span id="okCount">0</span></span>
           <span class="counter" style="color:var(--danger);">NG <span id="ngCount">0</span></span>
         </div>
@@ -153,56 +173,57 @@
     </section>
 
     <section class="card">
-      <div class="card-header">운전 / 신호 제어</div>
+      <div class="card-header" data-i18n="ch_ctrl">운전 / 신호 제어</div>
       <div class="card-body">
         <div class="row" style="margin-bottom:10px;">
-          <button id="btnRun" class="primary">▶ 자동 운전 시작</button>
-          <button id="btnStop" class="danger">■ 정지</button>
-          <button id="btnReset">↺ 초기화</button>
-          <label class="ck"><input type="checkbox" id="autoSig" checked> 자동신호</label>
+          <button id="btnRun" class="primary" data-i18n="bt_run">▶ 자동 운전 시작</button>
+          <button id="btnStop" class="danger" data-i18n="bt_stop">■ 정지</button>
+          <button id="btnReset" data-i18n="bt_reset">↺ 초기화</button>
+          <label class="ck"><input type="checkbox" id="autoSig" checked> <span data-i18n="lb_autosig">자동신호</span></label>
           <span style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-            <span style="font-size:12px;color:var(--text-light);">속도</span>
+            <span style="font-size:12px;color:var(--text-light);" data-i18n="lb_speed">속도</span>
             <input type="range" id="speed" min="1" max="10" value="6" style="width:120px;">
           </span>
         </div>
         <div class="row">
           <button id="sigStart" class="sig" disabled>START</button>
-          <button id="btnResume" class="resume" disabled>검사 계속</button>
+          <button id="btnResume" class="resume" disabled data-i18n="bt_resume">검사 계속</button>
         </div>
       </div>
     </section>
     </div>
 
     <section class="card flow-card">
-      <div class="card-header">전체 로직 플로우</div>
+      <div class="card-header" data-i18n="ch_flow">전체 로직 플로우</div>
       <div class="card-body"><div class="steps" id="stepList"></div></div>
     </section>
   </div>
 
   <section class="card log-card">
-    <div class="card-header">동작 로그</div>
+    <div class="card-header" data-i18n="ch_log">동작 로그</div>
     <div class="card-body">
-      <div class="row" style="margin-bottom:8px;"><button id="clearLog">로그 지우기</button></div>
+      <div class="row" style="margin-bottom:8px;"><button id="clearLog" data-i18n="bt_clr">로그 지우기</button></div>
       <pre id="logBox"></pre>
     </div>
   </section>
 </main>
 
-<footer>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · v2.5</footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v2.8</span></footer>
 
 <script>
   // ===== 3D 월드 (X:컨베이어, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
   const U2MM=300/90;
-  const BELT_X0=190, BELT_X1=490, BELT_Y0=0, BELT_Y1=112;   // 컨베이어 1000 × 373mm
-  const BELT_Z=210, BELT_TH=18, RAIL_W=9, RAIL_Z=BELT_Z+4;   // 벨트 상면 = 작업대 상판 700mm
+  const WX0=212, WX1=468, BELT_Y0=0, BELT_Y1=112;            // 작업대 프레임 (좌우 각 200mm 축소)
+  const BELT_X0=WX0-60, BELT_X1=WX1+75;                      // 좌 200mm · 우 250mm 돌출
+  const BELT_Z=210, BELT_TH=120, RAIL_W=9, RAIL_Z=BELT_Z+4;  // 풀리 반경 200mm → 상하 간격 400mm
   // 작업대 (컨베이어 매립)
   const TB_TH=9;                                             // 상판 두께 30mm
-  const HX0=BELT_X0-9, HX1=BELT_X1+9, HY0=BELT_Y0-12, HY1=BELT_Y1+12;   // 개구부
-  const WX0=HX0-29, WX1=HX1+29, WY0=HY0-37, WY1=HY1+37;                 // 상판 외형 1700×700
+  const HX0=WX0-2, HX1=WX1+2, HY0=BELT_Y0-12, HY1=BELT_Y1+12;           // 개구부 (X 전체 관통)
+  const WY0=HY0-37, WY1=HY1+37;
   const SKIRT_Z=0;                                           // 캐비닛이 바닥까지 (받침 구조 없음)
   const INSPECT_X=340, PCB_Z=BELT_Z+3, PCB_YC=(BELT_Y0+BELT_Y1)/2;
   const FOCUS=90, FOCUS_MM=300;          // 초점거리 300mm
-  const BRIDGE_Z=BELT_Z+186;             // 짐벌 간섭 없는 최소 높이 (프레임 높이 축소)
+  const BRIDGE_Z=BELT_Z+176;             // Z 블록 바로 아래에 카메라가 오도록 최소화
   const ZS=3;                            // Z축 유효 스트로크 = 10mm
   const GY_F=-34, GY_B=140;              // 갠트리 레일 Y(앞/뒤)
   const GX0=BELT_X0-6, GX1=BELT_X1+6;    // 레일 X 범위
@@ -235,21 +256,140 @@
            `<line x1="${(a.x-w*0.2).toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${(b.x-w*0.2).toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="#FFFFFF" stroke-width="${(w*0.22).toFixed(1)}" stroke-linecap="butt" opacity=".6"/>`;
   }
 
+  // ===== 다국어 (한국어 / English) =====
+  const VER='v2.8';
+  const I18N={
+    ko:{
+      title:'PCB 비전 검사 시뮬레이터 (3축 헤드)',
+      h1:'PCB 비전 검사 시뮬레이터 (Z·Rx·Ry 3축 헤드)',
+      ch_anim:'동작 애니메이션 · Z축 직결 Z·Rx·Ry 3축 헤드',
+      ch_ctrl:'운전 / 신호 제어', ch_flow:'전체 로직 플로우', ch_log:'동작 로그',
+      alarmban:'⚠ NG 검사 중단 — NG품 제거 후 [검사 계속]',
+      ax_z:'Z축 (승강)', ax_rx:'Rx축 (θ)', ax_ry:'Ry축 (φ)', ax_foc:'초점거리',
+      cp_tilt:'PCB 기울기', cp_align:'직각 정렬', cp_laser:'레이저', cp_sen:'센서',
+      lb_verdict:'판정', lb_demo:'데모', op_auto:'자동', op_ok:'항상 OK', op_ng:'항상 NG',
+      lb_view:'시점', vw_front:'정면', vw_iso:'45°', vw_side:'측면',
+      ct_done:'완료',
+      bt_run:'▶ 자동 운전 시작', bt_stop:'■ 정지', bt_reset:'↺ 초기화',
+      lb_autosig:'자동신호', lb_speed:'속도', bt_resume:'검사 계속', bt_clr:'로그 지우기',
+      ft_dept:'인시스 AI혁신 연구개발실',
+      align_ok:'⊥ 직각', align_adj:'조정중',
+      mes_wait:'MES 전송: 대기', mes_send:v=>'MES 전송 중... ('+v+')', mes_done:v=>'MES 전송 완료 ('+v+')',
+      cur:v=>'진행: '+v,
+      upd:'새 버전이 있습니다 — 지금 적용하려면 여기를 누르세요',
+      // 로직 플로우
+      p_idle:'대기', p_in:'투입', p_meas:'위치 측정', p_axis:'축 구동',
+      p_insp:'비전 검사', p_jdg:'판정', p_ret:'복귀',
+      s_wait:'START 대기',
+      s_index:'벨트 1피치 인덱스 → 검사위치 정지 · 안착위치에 새 PCB 투입',
+      s_sensor:'검사위치 센서 감지',
+      s_measure:'비전 센서 엣지 신호 → 거리·기울기 산출',
+      s_tilt:'Rx·Ry축 구동 → PCB 면에 직각 (Z 대기위치)',
+      s_z:'Z축 미세 하강 10mm → 초점거리 300mm',
+      s_lampon:'레이저 투광 ON', s_shot:'이미지 촬영 (1회 노광)',
+      s_verdict:'판정 + MES 전송', s_alarm:'NG 알람 · 제거 대기',
+      s_lampoff:'레이저 투광 OFF', s_home:'3축 원점 복귀',
+      // 로그
+      lg_conv:k=>'[컨베이어] '+T(k),
+      lg_out:i=>'[배출 완료] PCB #'+i+' 다음 공정으로 이송',
+      lg_load:n=>'[안착] 작업자가 새 PCB 투입 — 벨트 위 '+n+'개',
+      lg_arrive:(i,a,b)=>'[검사위치] PCB #'+i+' 도착 · 기울기 θ'+a+'° φ'+b+'°',
+      lg_sensor:k=>'[센서] '+T(k),
+      lg_meas:'[비전] 엣지 신호 검출 — PCB 윤곽에서 거리·기울기 산출 중...',
+      lg_measdone:(a,b)=>'[측정완료] 기울기 θ'+a+'° φ'+b+'° — Rx·Ry 보정량 산출',
+      lg_tilt:(a,b)=>'[Rx·Ry축] PCB 기울기에 직각 정렬 (θ'+a+'° φ'+b+'°)',
+      lg_z:'[Z축] 미세 하강 10mm → 초점거리 300mm',
+      lg_laser:k=>'[레이저] '+T(k),
+      lg_shot:'[비전] 촬영 — 화각 정렬 후 1회 노광, 영상 취득',
+      lg_verdict:v=>'[판정] '+v,
+      lg_mes:v=>'[MES] '+v+' 전송 완료',
+      lg_alarm:'⚠ [알람] NG 발생 — 검사 중단. NG품 제거 후 [검사 계속]',
+      lg_home:'[3축] 원점 복귀',
+      lg_wait:'[대기] START 신호 대기...',
+      lg_resume:a=>(a?'[자동신호] ':'[신호입력] ')+'NG품 제거 확인 → 검사 재개',
+      lg_start:a=>(a?'[자동신호] ':'[신호입력] ')+'START 수신 → 운전 개시',
+      lg_run:'▶ 자동 운전 시작', lg_stop:'■ 정지', lg_reset:'↺ 초기화',
+      lg_cycle:n=>'=== 1개 검사 완료 (총 '+n+'개) ===',
+      lg_ready:v=>'3축(Z·Rx·Ry) 헤드 비전 검사 시뮬레이터 '+v+' 준비 완료.',
+      lg_lang:'[언어] 한국어로 전환'
+    },
+    en:{
+      title:'PCB Vision Inspection Simulator (3-Axis Head)',
+      h1:'PCB Vision Inspection Simulator (Z·Rx·Ry 3-Axis Head)',
+      ch_anim:'Motion Animation · Z-Axis Direct-Mount Z·Rx·Ry 3-Axis Head',
+      ch_ctrl:'Operation / Signal Control', ch_flow:'Logic Flow', ch_log:'Operation Log',
+      alarmban:'⚠ NG — Inspection Halted. Remove NG part, then [Resume]',
+      ax_z:'Z Axis (Lift)', ax_rx:'Rx Axis (θ)', ax_ry:'Ry Axis (φ)', ax_foc:'Focus Dist.',
+      cp_tilt:'PCB Tilt', cp_align:'Normal Align', cp_laser:'Laser', cp_sen:'Sensor',
+      lb_verdict:'Verdict', lb_demo:'Demo', op_auto:'Auto', op_ok:'Always OK', op_ng:'Always NG',
+      lb_view:'View', vw_front:'Front', vw_iso:'45°', vw_side:'Side',
+      ct_done:'Done',
+      bt_run:'▶ Start Auto Run', bt_stop:'■ Stop', bt_reset:'↺ Reset',
+      lb_autosig:'Auto Signal', lb_speed:'Speed', bt_resume:'Resume', bt_clr:'Clear Log',
+      ft_dept:'INSYS AI Innovation R&D Center',
+      align_ok:'⊥ Normal', align_adj:'Adjusting',
+      mes_wait:'MES Upload: Idle', mes_send:v=>'MES Uploading... ('+v+')', mes_done:v=>'MES Upload Complete ('+v+')',
+      cur:v=>'Current: '+v,
+      upd:'A new version is available — click here to load it now',
+      // Logic flow
+      p_idle:'Idle', p_in:'Infeed', p_meas:'Position Measure', p_axis:'Axis Motion',
+      p_insp:'Vision Inspect', p_jdg:'Verdict', p_ret:'Return',
+      s_wait:'Waiting for START',
+      s_index:'Belt indexes 1 pitch → stops at inspect station · new PCB loaded at infeed',
+      s_sensor:'Inspect-station sensor detects PCB',
+      s_measure:'Vision sensor edge signal → compute distance & tilt',
+      s_tilt:'Rx·Ry axes drive → normal to PCB surface (Z standby)',
+      s_z:'Z axis fine descent 10 mm → focus distance 300 mm',
+      s_lampon:'Laser projection ON', s_shot:'Image capture (single exposure)',
+      s_verdict:'Verdict + MES upload', s_alarm:'NG alarm · awaiting removal',
+      s_lampoff:'Laser projection OFF', s_home:'3 axes return to home',
+      // Log
+      lg_conv:k=>'[Conveyor] '+T(k),
+      lg_out:i=>'[Discharged] PCB #'+i+' transferred to next process',
+      lg_load:n=>'[Infeed] Operator loads new PCB — '+n+' on belt',
+      lg_arrive:(i,a,b)=>'[Inspect Station] PCB #'+i+' arrived · tilt θ'+a+'° φ'+b+'°',
+      lg_sensor:k=>'[Sensor] '+T(k),
+      lg_meas:'[Vision] Edge signal detected — computing distance & tilt from PCB outline...',
+      lg_measdone:(a,b)=>'[Measured] Tilt θ'+a+'° φ'+b+'° — Rx·Ry correction computed',
+      lg_tilt:(a,b)=>'[Rx·Ry Axes] Aligned normal to PCB tilt (θ'+a+'° φ'+b+'°)',
+      lg_z:'[Z Axis] Fine descent 10 mm → focus distance 300 mm',
+      lg_laser:k=>'[Laser] '+T(k),
+      lg_shot:'[Vision] Capture — FOV aligned, single exposure, image acquired',
+      lg_verdict:v=>'[Verdict] '+v,
+      lg_mes:v=>'[MES] '+v+' upload complete',
+      lg_alarm:'⚠ [Alarm] NG detected — inspection halted. Remove NG part, then [Resume]',
+      lg_home:'[3 Axes] Returned to home',
+      lg_wait:'[Idle] Waiting for START signal...',
+      lg_resume:a=>(a?'[Auto Signal] ':'[Signal In] ')+'NG part removal confirmed → inspection resumed',
+      lg_start:a=>(a?'[Auto Signal] ':'[Signal In] ')+'START received → run begins',
+      lg_run:'▶ Start Auto Run', lg_stop:'■ Stop', lg_reset:'↺ Reset',
+      lg_cycle:n=>'=== 1 inspection complete (total '+n+') ===',
+      lg_ready:v=>'3-axis (Z·Rx·Ry) head vision inspection simulator '+v+' ready.',
+      lg_lang:'[Language] Switched to English'
+    }
+  };
+  let LANG='ko';
+  try{ const sv=localStorage.getItem('axis3lang'); if(sv==='ko'||sv==='en') LANG=sv; }catch(e){}
+  function T(k){ const v=I18N[LANG][k];
+    if(typeof v==='function') return v.apply(null,Array.prototype.slice.call(arguments,1));
+    return v===undefined? k : v; }
+
   // ===== 로직 플로우 =====
   const STATES=[
-    { phase:'대기', type:'wait', signal:'START', label:'START 대기' },
-    { phase:'투입', type:'index', label:'벨트 1피치 인덱스 → 검사위치 정지 · 안착위치에 새 PCB 투입' },
-    { phase:'투입', type:'sensor', on:true, label:'검사위치 센서 감지' },
-    { phase:'위치 측정', type:'measure', label:'비전 센서 엣지 신호 → 거리·기울기 산출' },
-    { phase:'축 구동', type:'moveTilt', label:'Rx·Ry축 구동 → PCB 면에 직각 (Z 대기위치)' },
-    { phase:'축 구동', type:'moveZ', label:'Z축 미세 하강 10mm → 초점거리 300mm' },
-    { phase:'비전 검사', type:'light', on:true, label:'레이저 투광 ON' },
-    { phase:'비전 검사', type:'scan', label:'비전 스캔' },
-    { phase:'판정', type:'verdict', label:'판정 + MES 전송' },
-    { phase:'판정', type:'alarmwait', cond:'ng', signal:'RESUME', label:'NG 알람 · 제거 대기' },
-    { phase:'복귀', type:'light', on:false, label:'레이저 투광 OFF' },
-    { phase:'복귀', type:'home', label:'3축 원점 복귀' }
+    { phase:'p_idle', type:'wait', signal:'START', label:'s_wait' },
+    { phase:'p_in',   type:'index', label:'s_index' },
+    { phase:'p_in',   type:'sensor', on:true, label:'s_sensor' },
+    { phase:'p_meas', type:'measure', label:'s_measure' },
+    { phase:'p_axis', type:'moveTilt', label:'s_tilt' },
+    { phase:'p_axis', type:'moveZ', label:'s_z' },
+    { phase:'p_insp', type:'light', on:true, label:'s_lampon' },
+    { phase:'p_insp', type:'scan', label:'s_shot' },
+    { phase:'p_jdg',  type:'verdict', label:'s_verdict' },
+    { phase:'p_jdg',  type:'alarmwait', cond:'ng', signal:'RESUME', label:'s_alarm' },
+    { phase:'p_ret',  type:'light', on:false, label:'s_lampoff' },
+    { phase:'p_ret',  type:'home', label:'s_home' }
   ];
+  const PH=st=>T(st.phase), LB=st=>T(st.label);
   const LOOP_START=1;
 
   // ===== 런타임 =====
@@ -273,7 +413,24 @@
 
   const $=id=>document.getElementById(id);
   const logBox=$('logBox');
-  function addLog(m){const t=new Date().toLocaleTimeString('ko-KR');logBox.textContent+='['+t+'] '+m+'\n';logBox.scrollTop=logBox.scrollHeight;}
+  let LOGS=[];                       // {t:Date, k:키, a:[인자]} — 언어 전환 시 전체 재렌더
+  let curSt=null;                    // 현재 진행 상태 (언어 전환 시 재표시)
+  let mesSt='wait', mesV='';         // MES 표시 상태
+  function addLog(k){
+    LOGS.push({t:new Date(), k:k, a:Array.prototype.slice.call(arguments,1)});
+    if(LOGS.length>500) LOGS.shift();
+    renderLog();
+  }
+  function renderLog(){
+    const loc = LANG==='ko'?'ko-KR':'en-US';
+    logBox.textContent = LOGS.map(e=>'['+e.t.toLocaleTimeString(loc)+'] '+T.apply(null,[e.k].concat(e.a))).join('\n')+(LOGS.length?'\n':'');
+    logBox.scrollTop=logBox.scrollHeight;
+  }
+  function renderMes(){
+    $('mesInd').className='mes-ind'+(mesSt==='send'?' sending':'');
+    const txt = mesSt==='wait'? T('mes_wait') : (mesSt==='send'? T('mes_send',mesV) : T('mes_done',mesV));
+    $('mesInd').innerHTML='<span class="dot"></span>'+txt;
+  }
 
   // ===== PCB 평면 기저 =====
   function pcbCenter(){ return {X:pcbX, Y:pcbY, Z:PCB_Z}; }
@@ -415,10 +572,10 @@
     const c=pcbCenter(), B=basis(th,ph), L=lensPos(), pL=PJ(L);
 
     // 바닥
-    s+=quad(P(126,-92,0),P(556,-92,0),P(556,282,0),P(126,282,0),'url(#gFloor)','#C9D0D9',1);
-    for(let gx=150; gx<=550; gx+=68){ const q1=P(gx,-92,0), q2=P(gx,282,0);
+    s+=quad(P(BELT_X0-16,-92,0),P(BELT_X1+16,-92,0),P(BELT_X1+16,282,0),P(BELT_X0-16,282,0),'url(#gFloor)','#C9D0D9',1);
+    for(let gx=BELT_X0-4; gx<=BELT_X1+10; gx+=68){ const q1=P(gx,-92,0), q2=P(gx,282,0);
       s+=`<line x1="${q1.x.toFixed(1)}" y1="${q1.y.toFixed(1)}" x2="${q2.x.toFixed(1)}" y2="${q2.y.toFixed(1)}" stroke="#D8DEE6"/>`; }
-    for(let gy=-92; gy<=282; gy+=62){ const q1=P(126,gy,0), q2=P(556,gy,0);
+    for(let gy=-92; gy<=282; gy+=62){ const q1=P(BELT_X0-16,gy,0), q2=P(BELT_X1+16,gy,0);
       s+=`<line x1="${q1.x.toFixed(1)}" y1="${q1.y.toFixed(1)}" x2="${q2.x.toFixed(1)}" y2="${q2.y.toFixed(1)}" stroke="#D8DEE6"/>`; }
     // 접지 그림자
     s+=`<g filter="url(#fBlur)" opacity=".3">`;
@@ -474,8 +631,6 @@
     [BRIDGE_X-GXS,BRIDGE_X+GXS].forEach(px=>{ s+=solid(MT,px-11,px+11,GY_B-11,GY_B+11,BELT_Z,BELT_Z+3,MAT.alu); });
 
     // ── 작업대 좌/우/앞 상판 + 스커트 + 다리 ──
-    s+=solid(MT,WX0,HX0,HY0,HY1,BELT_Z-TB_TH,BELT_Z,MAT.alu);
-    s+=solid(MT,HX1,WX1,HY0,HY1,BELT_Z-TB_TH,BELT_Z,MAT.alu);
     s+=solid(MT,WX0,WX1,WY0,HY0,BELT_Z-TB_TH,BELT_Z,MAT.alu);
     s+=quad(P(WX0,WY0,BELT_Z-TB_TH),P(WX1,WY0,BELT_Z-TB_TH),P(WX1,WY0,SKIRT_Z),P(WX0,WY0,SKIRT_Z),'url(#gAluF)','#78838F',1);
     s+=quad(P(WX0,WY0,BELT_Z-TB_TH),P(WX0,WY1,BELT_Z-TB_TH),P(WX0,WY1,SKIRT_Z),P(WX0,WY0,SKIRT_Z),'url(#gAluB)','#78838F',1);
@@ -567,31 +722,30 @@
     { const c0=PJ(MH(6,13,10)), c1=PJ(MH(11,25,6)), c2=PJ(MH(5,34,0));
       s+=`<path d="M${pt(c0)} Q${pt(c1)} ${pt(c2)}" stroke="#12161B" stroke-width="3.8" fill="none" stroke-linecap="round"/>`;
       s+=`<path d="M${pt(c0)} Q${pt(c1)} ${pt(c2)}" stroke="#39424D" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".45"/>`; }
-    s+=solid(MH,-2,21,-13,13,3,SB,MAT.sens);                             // 본체 (높은 쪽)
-    s+=solid(MH,-10,-2,-13,13,15,SB,MAT.sens);                           // 어깨 하부 필러
-    s+=solid(MH,-21,-10,-13,13,15,SB,MAT.sens);                          // 본체 (낮은 쪽)
+    s+=solid(MH,-14,14,-13,13,3,SB,MAT.sens);                            // 본체 — Z축 좌우 중앙
+    s+=solid(MH,-22,-14,-13,13,9,SB,MAT.sens);                           // 어깨 스커트
     // 경사 어깨면 + 적색 액센트 스트라이프
-    { const A=PJ(MH(-2,-13,3)), Bp=PJ(MH(-10,-13,15)), C=PJ(MH(-10,13,15)), D=PJ(MH(-2,13,3));
+    { const A=PJ(MH(-14,-13,3)), Bp=PJ(MH(-20,-13,9)), C=PJ(MH(-20,13,9)), D=PJ(MH(-14,13,3));
       s+=quad(A,Bp,C,D,'rgb(58,63,72)','rgb(28,32,38)',.7);
       const f1=.34, f2=.52;
-      const r1=PJ(MH(-2-8*f1,-13,3+12*f1)), r2=PJ(MH(-2-8*f2,-13,3+12*f2));
-      const r3=PJ(MH(-2-8*f2, 13,3+12*f2)), r4=PJ(MH(-2-8*f1, 13,3+12*f1));
+      const r1=PJ(MH(-14-6*f1,-13,3+6*f1)), r2=PJ(MH(-14-6*f2,-13,3+6*f2));
+      const r3=PJ(MH(-14-6*f2, 13,3+6*f2)), r4=PJ(MH(-14-6*f1, 13,3+6*f1));
       s+=quad(r1,r2,r3,r4,'#C0392F','#8E2820',.5); }
     // 전면 상태 표시부 (LED 3 + 라벨 + 방열 슬릿)
     { const fv=-13.3;
-      s+=quad(PJ(MH(4,fv,9)),PJ(MH(18,fv,9)),PJ(MH(18,fv,15)),PJ(MH(4,fv,15)),'rgb(28,32,38)','rgb(18,21,26)',.5);
-      [[6.5,'#FF7A2F',0],[10.5, lightOn?'#4ADE80':'#2F4436',1],[14.5,'#8FA4BE',0]].forEach(([uu,cc,gl])=>{
+      s+=quad(PJ(MH(0,fv,9)),PJ(MH(12,fv,9)),PJ(MH(12,fv,15)),PJ(MH(0,fv,15)),'rgb(28,32,38)','rgb(18,21,26)',.5);
+      [[2.5,'#FF7A2F',0],[6, lightOn?'#4ADE80':'#2F4436',1],[9.5,'#8FA4BE',0]].forEach(([uu,cc,gl])=>{
         const q=PJ(MH(uu,fv-.4,12));
         s+=`<circle cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" r="1.5" fill="${cc}"${(gl&&lightOn)?' filter="url(#fGlow)"':''}/>`; });
-      const n1=PJ(MH(5,fv-.4,19)), n2=PJ(MH(17,fv-.4,19));
+      const n1=PJ(MH(1,fv-.4,19)), n2=PJ(MH(11,fv-.4,19));
       s+=`<line x1="${n1.x.toFixed(1)}" y1="${n1.y.toFixed(1)}" x2="${n2.x.toFixed(1)}" y2="${n2.y.toFixed(1)}" stroke="rgb(140,150,164)" stroke-width="2.2" opacity=".5"/>`;
-      for(let k=0;k<5;k++){ const a=PJ(MH(4,fv-.2,24+k*2.1)), b2=PJ(MH(18,fv-.2,24+k*2.1));
+      for(let k=0;k<5;k++){ const a=PJ(MH(0,fv-.2,24+k*2.1)), b2=PJ(MH(12,fv-.2,24+k*2.1));
         s+=`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b2.x.toFixed(1)}" y2="${b2.y.toFixed(1)}" stroke="rgba(120,132,148,.35)" stroke-width="1"/>`; } }
     // 하단 투광창 / 수광창
-    const WU=11;
+    const WU=8;
     [-1,1].forEach(sx=>{
-      s+=solid(MH,sx*WU-5,sx*WU+5,-6,6,SB-3.5,SB,MAT.sens2);
-      const w=[MH(sx*WU-3.6,-4.6,SB),MH(sx*WU+3.6,-4.6,SB),MH(sx*WU+3.6,4.6,SB),MH(sx*WU-3.6,4.6,SB)].map(PJ);
+      s+=solid(MH,sx*WU-4.6,sx*WU+4.6,-6,6,SB-3.5,SB,MAT.sens2);
+      const w=[MH(sx*WU-3.3,-4.6,SB),MH(sx*WU+3.3,-4.6,SB),MH(sx*WU+3.3,4.6,SB),MH(sx*WU-3.3,4.6,SB)].map(PJ);
       s+=quad(w[0],w[1],w[2],w[3],lightOn?'#5A2E18':'#14181D','#0A0D11',.7); });
     // ── 엣지 신호 측정 표시 (비전 센서 → PCB 윤곽) ──
     if(measT>=0 && pcbOn){
@@ -611,7 +765,7 @@
         X:pcbX+Bp.n.X*3.4*S, Y:pcbY+Bp.n.Y*3.4*S, Z:PCB_Z+Bp.n.Z*3.4*S };
       const T=PJ(tgt);
       [-1,1].forEach(sx=>{
-        const w=PJ(MH(sx*WU,0,SB+.6)), w2=PJ(MH(sx*(WU-2.6),0,SB+.6));
+        const w=PJ(MH(sx*WU,0,SB+.6)), w2=PJ(MH(sx*(WU-2.2),0,SB+.6));
         s+=`<polygon points="${pt(w)} ${pt(w2)} ${pt(T)}" fill="#F6913A" opacity=".14"/>`;
         s+=`<line x1="${w.x.toFixed(1)}" y1="${w.y.toFixed(1)}" x2="${T.x.toFixed(1)}" y2="${T.y.toFixed(1)}" stroke="#F97316" stroke-width="1.9" filter="url(#fGlow)" opacity=".92"/>`; });
       s+=`<circle cx="${T.x.toFixed(1)}" cy="${T.y.toFixed(1)}" r="2" fill="#FFC77A" filter="url(#fGlow)"/>`;
@@ -625,15 +779,39 @@
       s+=`<line x1="${pL.x.toFixed(1)}" y1="${pL.y.toFixed(1)}" x2="${pc.x.toFixed(1)}" y2="${pc.y.toFixed(1)}" stroke="#2D5C99" stroke-width="1.5" stroke-dasharray="5 4" opacity=".9"/>`;
     }
     if(scanT>=0 && pcbOn){
-      const u=-14.6+29.2*scanT, hv=7.5*Math.sqrt(Math.max(0,1-(u/15)**2));
-      const q1=PJ(pcbPt(u,-hv,4.2)), q2=PJ(pcbPt(u,hv,4.2));
-      s+=`<line x1="${q1.x.toFixed(1)}" y1="${q1.y.toFixed(1)}" x2="${q2.x.toFixed(1)}" y2="${q2.y.toFixed(1)}" stroke="#FF5A5F" stroke-width="3" filter="url(#fGlow)"/>`;
+      // 촬영 방식 : 화각 프레임 + 셔터 플래시 (쓸고 지나가는 스캔 아님)
+      const S4=1.1, B4=basis(tiltA,tiltB);
+      const FP=(u,v2,hh)=>PJ({X:pcbX+B4.u.X*u*S4+B4.v.X*v2*S4+B4.n.X*hh*S4,
+                              Y:pcbY+B4.u.Y*u*S4+B4.v.Y*v2*S4+B4.n.Y*hh*S4,
+                              Z:PCB_Z+B4.u.Z*u*S4+B4.v.Z*v2*S4+B4.n.Z*hh*S4});
+      const FU=18, FV=10.5, HZ=4.3;
+      const c4=[FP(-FU,-FV,HZ),FP(FU,-FV,HZ),FP(FU,FV,HZ),FP(-FU,FV,HZ)];
+      // 셔터 플래시 — 노광 초반에 번쩍
+      const fl = scanT<0.28 ? (1-scanT/0.28) : 0;
+      if(fl>0) s+=`<polygon points="${c4.map(pt).join(' ')}" fill="#FFFFFF" opacity="${(fl*0.7).toFixed(2)}"/>`;
+      // 화각 프레임 (모서리 ㄱ자 마커)
+      const cm=[[0,1,3],[1,0,2],[2,3,1],[3,2,0]];
+      cm.forEach(([i,a,b2])=>{
+        const P0=c4[i], Pa=c4[a], Pb=c4[b2], t=0.26;
+        const A1={x:P0.x+(Pa.x-P0.x)*t, y:P0.y+(Pa.y-P0.y)*t};
+        const B1={x:P0.x+(Pb.x-P0.x)*t, y:P0.y+(Pb.y-P0.y)*t};
+        s+=`<path d="M${A1.x.toFixed(1)},${A1.y.toFixed(1)} L${P0.x.toFixed(1)},${P0.y.toFixed(1)} L${B1.x.toFixed(1)},${B1.y.toFixed(1)}" fill="none" stroke="#FF5A5F" stroke-width="2.2" stroke-linecap="round" filter="url(#fGlow)"/>`; });
+      // 노광 진행 표시 (프레임 상단 게이지)
+      { const g0=c4[0], g1=c4[1], gx=g0.x+(g1.x-g0.x)*scanT, gy=g0.y+(g1.y-g0.y)*scanT;
+        s+=`<line x1="${g0.x.toFixed(1)}" y1="${(g0.y-3).toFixed(1)}" x2="${gx.toFixed(1)}" y2="${(gy-3).toFixed(1)}" stroke="#FF5A5F" stroke-width="1.4" opacity=".75"/>`; }
     }
-    // 경광등
-    const g1=P(BELT_X1+22,GY_B-24,BELT_Z+52), g0=P(BELT_X1+22,GY_B-24,BELT_Z);
-    s+=`<rect x="${(g1.x-2.5).toFixed(1)}" y="${g1.y.toFixed(1)}" width="5" height="${(g0.y-g1.y).toFixed(1)}" fill="url(#gAluF)"/>`;
-    s+=`<rect x="${(g1.x-12).toFixed(1)}" y="${(g1.y-24).toFixed(1)}" width="24" height="24" rx="5" fill="${alarm?'#F0554E':'#E9CFCC'}" stroke="#9E3B34"${alarm?' filter="url(#fGlow)"':''} class="${alarm?'blinkRed':''}"/>`;
-    s+=`<rect x="${(g1.x-12).toFixed(1)}" y="${g1.y.toFixed(1)}" width="24" height="24" rx="5" fill="${(running&&!alarm)?'#2ACB63':'#C6D8CB'}" stroke="#33724A"/>`;
+    // ── 경광등 (원통 스택 타워) ──
+    { const bx=WX1-26, by=GY_B-22, MT2=(x,y,z)=>({X:bx+x, Y:by+y, Z:z});
+      const z0=BELT_Z, zB=z0+6, zG=zB+16, zR=zG+16, zC=zR+5;
+      s+=disc(MT2,7,z0+1.2,MAT.steel,1.0);                               // 베이스
+      s+=cylSide(MT2,7,zB,z0+1.2,MAT.steel);
+      s+=cylSide(MT2,2.6,zG,zB,MAT.alu);                                 // 지주
+      const grn=(running&&!alarm), red=alarm;
+      s+=cylSide(MT2,6.4,zR,zG,grn?[42,203,99]:[198,216,203]);           // 녹색 단
+      s+=cylSide(MT2,6.4,zC,zR,red?[240,85,78]:[233,207,204]);           // 적색 단
+      s+=disc(MT2,6.4,zC,MAT.dark,.95);                                  // 상단 캡
+      if(grn||red){ const q=P(bx,by,red?(zR+zC)/2:(zG+zR)/2);
+        s+=`<ellipse cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" rx="9" ry="7" fill="${red?'#F0554E':'#2ACB63'}" opacity=".3" filter="url(#fGlow)"${red?' class="blinkRed"':''}/>`; } }
 
     scene.innerHTML=s;
 
@@ -651,7 +829,7 @@
     $('axT').classList.toggle('ok',pcbOn&&Math.abs(th-tiltA)<0.6);
     $('axP').classList.toggle('ok',pcbOn&&Math.abs(ph-tiltB)<0.6);
     $('tiltVal').textContent = pcbOn? ('θ'+(tiltA>=0?'+':'')+tiltA.toFixed(1)+'° φ'+(tiltB>=0?'+':'')+tiltB.toFixed(1)+'°') : '-';
-    $('alignVal').textContent = pcbOn? (aligned?'⊥ 직각':'조정중') : '-';
+    $('alignVal').textContent = pcbOn? (aligned?T('align_ok'):T('align_adj')) : '-';
     $('lampVal').textContent = lightOn?'ON':'OFF';
     $('chipLamp').classList.toggle('on',lightOn);
     $('senVal').textContent = s_in?'ON':'OFF';
@@ -662,14 +840,14 @@
   function renderSteps(){
     let html='',last=null;
     STATES.forEach((st,i)=>{
-      if(st.phase!==last){html+=`<div class="phase-h">${st.phase}</div>`;last=st.phase;}
+      if(st.phase!==last){html+=`<div class="phase-h">${PH(st)}</div>`;last=st.phase;}
       const cls=(i<idx?'done ':'')+(i===idx?'cur ':'')+((st.type==='wait'||st.type==='alarmwait')?'wait ':'');
-      html+=`<div class="step ${cls}"><span class="no">${i+1}</span><span>${st.label}</span></div>`;
+      html+=`<div class="step ${cls}"><span class="no">${i+1}</span><span>${LB(st)}</span></div>`;
     });
     stepList.innerHTML=html;
     const cur=stepList.querySelector('.step.cur'); if(cur)cur.scrollIntoView({block:'nearest',behavior:'smooth'});
     const cs=STATES[idx];
-    if(cs){ $('stepMobileText').textContent=cs.label; $('stepMobile').querySelector('.no').textContent=(idx+1);
+    if(cs){ $('stepMobileText').textContent=LB(cs); $('stepMobile').querySelector('.no').textContent=(idx+1);
       const m=$('stepMobile'); m.classList.toggle('wait',cs.type==='wait'); m.classList.toggle('alarm',cs.type==='alarmwait'); }
   }
 
@@ -692,12 +870,12 @@
 
   function runState(){
     if(!running)return; renderSteps();
-    const st=STATES[idx]; $('curStateText').textContent='진행: '+st.label;
+    const st=STATES[idx]; curSt=st; $('curStateText').textContent=T('cur',LB(st));
     if(st.cond==='ng' && verdict!=='NG') return next();
     if(st.cond==='ok' && verdict!=='OK') return next();
 
     if(st.type==='index'){
-      s_in=false; addLog('[컨베이어] '+st.label);
+      s_in=false; addLog('lg_conv',st.label);
       const my=++animToken, dur=durs().move*1.2, t0=performance.now();
       const s0=PCBS.map(q=>q.x); let last=0; convActive=true;
       (function f(now){ if(my!==animToken)return;
@@ -711,34 +889,34 @@
           PCBS=PCBS.filter(q=>q.x<=PCB_OFF_X);
           PCBS.push(newPcb(LOAD_X));              // 작업자가 안착위치에 새 PCB를 올림
           convActive=false; syncActive(); draw();
-          gone.forEach(q=>addLog('[배출 완료] PCB #'+q.id+' 다음 공정으로 이송'));
-          addLog('[안착] 작업자가 새 PCB 투입 — 벨트 위 '+PCBS.length+'개');
+          gone.forEach(q=>addLog('lg_out',q.id));
+          addLog('lg_load',PCBS.length);
           const a=activePcb();
-          if(a) addLog('[검사위치] PCB #'+a.id+' 도착 · 기울기 θ'+a.ta.toFixed(1)+'° φ'+a.tb.toFixed(1)+'°');
+          if(a) addLog('lg_arrive',a.id,a.ta.toFixed(1),a.tb.toFixed(1));
           next(); } })(performance.now());
     } else if(st.type==='sensor'){
-      s_in=st.on; addLog('[센서] '+st.label); draw(); pause(durs().act,next);
+      s_in=st.on; addLog('lg_sensor',st.label); draw(); pause(durs().act,next);
     } else if(st.type==='measure'){
-      addLog('[비전] 엣지 신호 검출 — PCB 윤곽에서 거리·기울기 산출 중...');
+      addLog('lg_meas');
       const my=++animToken, dur=durs().move, t0=performance.now();
       (function f(now){ if(my!==animToken)return;
         let k=Math.min(((now||performance.now())-t0)/dur,1); measT=k; draw();
         if(k<1)requestAnimationFrame(f); else { measT=-1; draw();
-          addLog('[측정완료] 기울기 θ'+tiltA.toFixed(1)+'° φ'+tiltB.toFixed(1)+'° — Rx·Ry 보정량 산출');
+          addLog('lg_measdone',tiltA.toFixed(1),tiltB.toFixed(1));
           next(); } })(performance.now());
     } else if(st.type==='moveXY'){
       return next();   // X·Y축 없음
     } else if(st.type==='moveTilt'){
-      addLog('[Rx·Ry축] PCB 기울기에 직각 정렬 (θ'+tiltA.toFixed(1)+'° φ'+tiltB.toFixed(1)+'°)');
+      addLog('lg_tilt',tiltA.toFixed(1),tiltB.toFixed(1));
       const tz=alignTarget();
       tweenAxes({th:tiltA, ph:tiltB, az:tz.az+ZS}, ['T','P','Z'], next, 1.7);
     } else if(st.type==='moveZ'){
-      const t=alignTarget(); addLog('[Z축] 미세 하강 10mm → 초점거리 300mm');
+      const t=alignTarget(); addLog('lg_z');
       tweenAxes({az:t.az}, ['Z'], next);
     } else if(st.type==='light'){
-      lightOn=st.on; addLog('[레이저] '+st.label); draw(); pause(durs().act,next);
+      lightOn=st.on; addLog('lg_laser',st.label); draw(); pause(durs().act,next);
     } else if(st.type==='scan'){
-      addLog('[비전] 검사 스캔 시작');
+      addLog('lg_shot');
       const my=++animToken, dur=durs().move+300, t0=performance.now();
       (function f(now){ if(my!==animToken)return;
         let k=Math.min(((now||performance.now())-t0)/dur,1); scanT=k; draw();
@@ -747,18 +925,18 @@
       const sel=$('verdictSel').value;
       if(sel==='OK')verdict='OK'; else if(sel==='NG')verdict='NG'; else {verdict=(autoTog%3===2)?'NG':'OK';autoTog++;}
       $('verdictLamp').textContent=verdict; $('verdictLamp').className='verdict-lamp '+(verdict==='OK'?'ok':'ng');
-      addLog('[판정] '+verdict);
-      $('mesInd').className='mes-ind sending'; $('mesInd').innerHTML='<span class="dot"></span>MES 전송 중... ('+verdict+')'; draw();
-      pause(durs().act+300,()=>{ $('mesInd').className='mes-ind'; $('mesInd').innerHTML='<span class="dot"></span>MES 전송 완료 ('+verdict+')'; addLog('[MES] '+verdict+' 전송 완료'); next(); });
+      addLog('lg_verdict',verdict);
+      mesSt='send'; mesV=verdict; renderMes(); draw();
+      pause(durs().act+300,()=>{ mesSt='done'; mesV=verdict; renderMes(); addLog('lg_mes',verdict); next(); });
     } else if(st.type==='alarmwait'){
       alarm=true; $('alarmBanner').classList.add('show'); waitingSignal='RESUME'; updateSigBtns(); draw();
-      addLog('⚠ [알람] NG 발생 — 검사 중단. NG품 제거 후 [검사 계속]');
+      addLog('lg_alarm');
       if($('autoSig').checked) autoTimer=setTimeout(()=>fireSignal('RESUME',true),2600);
     } else if(st.type==='home'){
-      addLog('[5축] 원점 복귀');
+      addLog('lg_home');
       tweenAxes({ax:HOME.ax, ay:HOME.ay, az:HOME.az, th:0, ph:0}, ['X','Y','Z','T','P'], next);
     } else if(st.type==='wait'){
-      waitingSignal=st.signal; addLog('[대기] START 신호 대기...'); updateSigBtns(); draw();
+      waitingSignal=st.signal; addLog('lg_wait'); updateSigBtns(); draw();
       if($('autoSig').checked) autoTimer=setTimeout(()=>fireSignal(st.signal,true),1200);
     }
   }
@@ -768,7 +946,7 @@
     if(idx>=STATES.length){
       idx=LOOP_START; cycleCount++; $('cycleCount').textContent=cycleCount;
       if(verdict==='OK'){okCount++;$('okCount').textContent=okCount;} else if(verdict==='NG'){ngCount++;$('ngCount').textContent=ngCount;}
-      addLog('=== 1개 검사 완료 (총 '+cycleCount+'개) ===');
+      addLog('lg_cycle',cycleCount);
     }
     if(running) runState();
   }
@@ -776,13 +954,13 @@
   function updateSigBtns(){ $('sigStart').disabled=(waitingSignal!=='START'); $('btnResume').disabled=(waitingSignal!=='RESUME'); }
   function fireSignal(sig,auto){
     if(waitingSignal!==sig)return;
-    if(sig==='RESUME'){ const a=activePcb(); if(a) PCBS=PCBS.filter(q=>q!==a); syncActive(); s_in=false; alarm=false; $('alarmBanner').classList.remove('show'); addLog((auto?'[자동신호] ':'[신호입력] ')+'NG품 제거 확인 → 검사 재개'); }
-    else addLog((auto?'[자동신호] ':'[신호입력] ')+'START 수신 → 운전 개시');
+    if(sig==='RESUME'){ const a=activePcb(); if(a) PCBS=PCBS.filter(q=>q!==a); syncActive(); s_in=false; alarm=false; $('alarmBanner').classList.remove('show'); addLog('lg_resume',!!auto); }
+    else addLog('lg_start',!!auto);
     waitingSignal=null; updateSigBtns(); if(autoTimer){clearTimeout(autoTimer);autoTimer=null;} next();
   }
 
-  $('btnRun').addEventListener('click',()=>{ if(running)return; running=true; $('btnRun').disabled=true; addLog('▶ 자동 운전 시작'); runState(); });
-  $('btnStop').addEventListener('click',()=>{ running=false; animToken++; if(autoTimer){clearTimeout(autoTimer);autoTimer=null;} $('btnRun').disabled=false; movingAx={}; addLog('■ 정지'); draw(); });
+  $('btnRun').addEventListener('click',()=>{ if(running)return; running=true; $('btnRun').disabled=true; addLog('lg_run'); runState(); });
+  $('btnStop').addEventListener('click',()=>{ running=false; animToken++; if(autoTimer){clearTimeout(autoTimer);autoTimer=null;} $('btnRun').disabled=false; movingAx={}; addLog('lg_stop'); draw(); });
   $('btnReset').addEventListener('click',()=>{
     running=false; animToken++; if(autoTimer){clearTimeout(autoTimer);autoTimer=null;}
     idx=0; waitingSignal=null; initLine(); convActive=false; beltPhase=0;
@@ -790,12 +968,12 @@
     lightOn=false; scanT=-1; measT=-1; s_in=false; alarm=false; verdict=null;
     $('alarmBanner').classList.remove('show');
     $('verdictLamp').textContent='--'; $('verdictLamp').className='verdict-lamp';
-    $('mesInd').className='mes-ind'; $('mesInd').innerHTML='<span class="dot"></span>MES 전송: 대기';
-    $('btnRun').disabled=false; updateSigBtns(); draw(); renderSteps(); $('curStateText').textContent=''; addLog('↺ 초기화');
+    mesSt='wait'; mesV=''; renderMes();
+    $('btnRun').disabled=false; updateSigBtns(); draw(); renderSteps(); curSt=null; $('curStateText').textContent=''; addLog('lg_reset');
   });
   $('sigStart').addEventListener('click',()=>fireSignal('START',false));
   $('btnResume').addEventListener('click',()=>fireSignal('RESUME',false));
-  $('clearLog').addEventListener('click',()=>logBox.textContent='');
+  $('clearLog').addEventListener('click',()=>{ LOGS=[]; renderLog(); });
   $('autoSig').addEventListener('change',()=>{ if($('autoSig').checked&&running&&waitingSignal) autoTimer=setTimeout(()=>fireSignal(waitingSignal,true),1200); });
 
   function setYaw(v){ VIEW.yaw=+v; $('viewYaw').value=v; $('yawVal').textContent=(+v).toFixed(0)+'°'; draw(); }
@@ -804,9 +982,29 @@
   $('btnIso').addEventListener('click',()=>setYaw(45));
   $('btnSide').addEventListener('click',()=>setYaw(90));
 
+  // ===== 언어 전환 (한국어 / English) =====
+  window.__T=T;
+  function applyLang(){
+    document.documentElement.lang=LANG;
+    document.title=T('title');
+    document.querySelectorAll('[data-i18n]').forEach(e=>{ e.textContent=T(e.getAttribute('data-i18n')); });
+    $('hVer').textContent=VER; $('fVer').textContent=VER;
+    $('btnKo').classList.toggle('on',LANG==='ko');
+    $('btnEn').classList.toggle('on',LANG==='en');
+    renderMes(); renderSteps(); renderLog(); draw();
+    $('curStateText').textContent = curSt? T('cur',LB(curSt)) : '';
+  }
+  function setLang(v){
+    if(v===LANG) return;
+    LANG=v; try{ localStorage.setItem('axis3lang',v); }catch(e){}
+    applyLang(); addLog('lg_lang');
+  }
+  $('btnKo').addEventListener('click',()=>setLang('ko'));
+  $('btnEn').addEventListener('click',()=>setLang('en'));
+
   function initLine(){ PCBS=[]; pcbSeq=0; PCBS.push(newPcb(LOAD_X)); syncActive(); }
-  initLine(); draw(); renderSteps(); updateSigBtns();
-  addLog('3축(Z·Rx·Ry) 헤드 비전 검사 시뮬레이터 v2.5 준비 완료.');
+  initLine(); draw(); renderSteps(); updateSigBtns(); applyLang();
+  addLog('lg_ready',VER);
 </script>
 
 <script>
@@ -819,7 +1017,7 @@
   function banner(){ if(document.getElementById('__upd'))return;
     var d=document.createElement('div'); d.id='__upd';
     d.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#1E3A5F;color:#fff;font-family:"Noto Sans KR",sans-serif;font-size:13px;font-weight:700;padding:10px;text-align:center;cursor:pointer';
-    d.textContent='새 버전이 있습니다 — 지금 적용하려면 여기를 누르세요';
+    d.textContent=(window.__T?window.__T('upd'):'A new version is available — click here to load it now');
     d.onclick=function(){ location.replace(location.pathname+'?v='+Date.now()); };
     document.body.appendChild(d);
     setTimeout(function(){ location.replace(location.pathname+'?v='+Date.now()); },5000); }
