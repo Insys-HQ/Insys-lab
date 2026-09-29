@@ -125,7 +125,7 @@
 
 <header class="cover"><div class="inner">
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (벨트 고정 안착지그)</h1>
-  <span class="hver" id="hVer">v2.6</span>
+  <span class="hver" id="hVer">v2.8</span>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
     <button id="btnEn" type="button">English</button>
@@ -168,7 +168,7 @@
           </div>
         </div>
 
-        <svg viewBox="118 -24 490 552" id="scene"></svg>
+        <svg viewBox="118 -24 525 552" id="scene"></svg>
         <div class="row" style="margin-top:4px;gap:6px;flex-wrap:nowrap;">
           <span style="font-size:12px;color:var(--text-light);white-space:nowrap;"><span data-i18n="lb_view">시점</span> <b id="yawVal" style="color:var(--navy-dark);">35°</b></span>
           <input type="range" id="viewYaw" min="0" max="90" value="35" style="flex:0 1 140px;min-width:70px;">
@@ -223,11 +223,11 @@
   </section>
 </main>
 
-<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v2.6</span></footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v2.8</span></footer>
 
 <script>
   // ===== 3D 월드 (X:이송방향, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
-  const VER='v2.6';
+  const VER='v2.8';
   const U2MM=300/90;
   const WX0=212, WX1=468, BELT_Y0=0, BELT_Y1=112;            // 작업대 프레임 (3축 시뮬레이터와 동일)
   const BELT_X0=WX0-60, BELT_X1=WX1+75;                      // 좌 200mm · 우 250mm 돌출
@@ -253,7 +253,10 @@
   const WD_MM=250, WD=WD_MM/U2MM;                            // 조명 끝단 ~ PCB 상면
   const HEAD_MM=200, HEAD_H=HEAD_MM/U2MM;                    // 헤드 설치높이
   const DOME_Z=PCB_SURF+WD, HEAD_TOP=DOME_Z+HEAD_H;
-  const FALL_Z=30;                                            // 낙하 PCB 착지 높이 (다음 공정 작업자 앞)
+  const SL_X0=NXR+NR-1, SL_X1=NXR+NR+30, SL_Z0=BELT_Z-28;                        // 짧은 미끄럼틀 (회전부 아래 → 수취 작업대)
+  const TB2_X0=SL_X1, TB2_X1=TB2_X0+46, TB2_Z=BELT_Z-45, FALL_Z=TB2_Z;         // 배출구 우측 수취 작업대 (컨베이어보다 150mm 낮음)
+  function slideZ(x){ const t=Math.max(0,Math.min(1,(x-SL_X0)/(SL_X1-SL_X0))); return SL_Z0+(TB2_Z-SL_Z0)*t; }
+  const REL_X=INSPECT_X+PITCH, REL_Z=UP_Z+52;                                  // 배출위치 래치 해제 기구부
   const VIEW={yaw:35, pitch:22};
   const VCX=350, VCY=428, VOX=340, VOY=56;
   function P(X,Y,Z){
@@ -327,7 +330,8 @@
       s_lampon:'돔 조명 ON', s_scan:'고정 비전 촬영 (1회 노광)',
       s_verdict:'판정 + MES 전송', s_alarm:'NG 알람 · 제거 대기',
       s_lampoff:'돔 조명 OFF',
-      s_index:'벨트 1피치 인덱스 이송 (지그 7EA 동시) · 우측 회전부에서 래치 해제 → PCB 자연 낙하 배출',
+      s_rel:'배출위치 — 래치 해제 기구 작동 (락 개방)',
+      s_index:'벨트 1피치 인덱스 이송 · 회전부에서 PCB가 미끄럼틀을 타고 미끄러져 작업대로 배출',
       // SVG 라벨
       sv_load:'안착위치', sv_ins:'검사위치', sv_out:'배출위치', sv_rel:'회전부 래치 해제 → PCB 낙하',
       sv_next:'다음 공정 작업자', sv_sens:'지그 감지센서', sv_vis:'고정식 키엔스 비전',
@@ -345,7 +349,8 @@
       lg_mes:v=>'[MES] '+v+' 전송 완료',
       lg_alarm:'⚠ [알람] NG 발생 — 검사 중단. 래치 수동 해제 후 NG품 제거',
       lg_index:k=>'[인덱스] '+T(k),
-      lg_cam:j=>'[배출] J'+j+' 회전부 진입 — 래치 해제, PCB가 지그에서 빠져 자연 낙하 → 다음 공정 작업자',
+      lg_cam:j=>'[배출] J'+j+' 회전부 진입 — PCB가 지그에서 빠져 미끄럼틀을 타고 작업대로 미끄러짐',
+      lg_rel:j=>'[래치 해제] J'+j+' 배출위치 해제 기구 하강 — 래치 2점 개방',
       lg_idx_done:mm=>'[인덱스] 1피치 '+mm+'mm 이송 완료',
       lg_wait:'[대기] START 신호 대기...',
       lg_resume:a=>(a?'[자동신호] ':'[신호입력] ')+'NG품 제거 확인 → 검사 재개',
@@ -380,7 +385,8 @@
       s_lampon:'Dome light ON', s_scan:'Fixed vision capture (single exposure)',
       s_verdict:'Verdict + MES upload', s_alarm:'NG alarm · awaiting removal',
       s_lampoff:'Dome light OFF',
-      s_index:'Belt indexes 1 pitch (all 7 jigs) · latches release at right turn → PCB drops off naturally',
+      s_rel:'Eject station — latch-release actuator opens the locks',
+      s_index:'Belt indexes 1 pitch · at the turn the PCB slides down the chute onto the table',
       sv_load:'Load Stn', sv_ins:'Inspect Stn', sv_out:'Eject Stn', sv_rel:'Latch releases at turn → PCB drops',
       sv_next:'Next-process operator', sv_sens:'Jig Sensor', sv_vis:'Fixed Keyence Vision',
       sv_pul:'Pulley R', sv_brk:'Fixed Bracket', sv_head:'mm (Head)', sv_wd:'mm (WD)', click:'Click!',
@@ -396,7 +402,8 @@
       lg_mes:v=>'[MES] '+v+' upload complete',
       lg_alarm:'⚠ [Alarm] NG detected — inspection halted. Release latch manually and remove NG part',
       lg_index:k=>'[Index] '+T(k),
-      lg_cam:j=>'[Eject] J'+j+' enters the turn — latch releases, PCB slips off and drops → next-process operator',
+      lg_cam:j=>'[Eject] J'+j+' enters the turn — PCB slips off and slides down the chute onto the table',
+      lg_rel:j=>'[Latch Release] J'+j+' release actuator descends at eject station — 2 latches opened',
       lg_idx_done:mm=>'[Index] 1 pitch ('+mm+' mm) transfer complete',
       lg_wait:'[Idle] Waiting for START signal...',
       lg_resume:a=>(a?'[Auto Signal] ':'[Signal In] ')+'NG part removal confirmed → inspection resumed',
@@ -423,6 +430,7 @@
     { phase:'p_jdg',  type:'verdict',   label:'s_verdict' },
     { phase:'p_jdg',  type:'alarmwait', cond:'ng', signal:'RESUME', label:'s_alarm' },
     { phase:'p_out',  type:'light',  on:false, label:'s_lampoff' },
+    { phase:'p_out',  type:'release',   label:'s_rel' },
     { phase:'p_idx',  type:'index',     label:'s_index' }
   ];
   const PH=st=>T(st.phase), LB=st=>T(st.label);
@@ -431,6 +439,7 @@
   // ===== 런타임 =====
   let idx=0, running=false, waitingSignal=null;
   let beltS=LOAD_X-PX_L;
+  let relE=0;                              // 래치 해제 기구 로드 돌출량 (0~1)
   let FALLS=[], fallRaf=0;                 // 회전부에서 떨어지는 PCB
   const JIGS=[];
   for(let i=0;i<NJIG;i++) JIGS.push({id:i+1, s0:i*PITCH, pcb:false, latch:0, click:-1});
@@ -642,10 +651,10 @@
     let s=DEFS;
 
     // 바닥
-    s+=quad(P(BELT_X0-16,-92,0),P(BELT_X1+16,-92,0),P(BELT_X1+16,282,0),P(BELT_X0-16,282,0),'url(#gFloor)','#C9D0D9',1);
+    s+=quad(P(BELT_X0-16,-92,0),P(BELT_X1+62,-92,0),P(BELT_X1+62,282,0),P(BELT_X0-16,282,0),'url(#gFloor)','#C9D0D9',1);
     for(let gx=BELT_X0-4; gx<=BELT_X1+10; gx+=68){ const q1=P(gx,-92,0), q2=P(gx,282,0);
       s+=`<line x1="${q1.x.toFixed(1)}" y1="${q1.y.toFixed(1)}" x2="${q2.x.toFixed(1)}" y2="${q2.y.toFixed(1)}" stroke="#D8DEE6"/>`; }
-    for(let gy=-92; gy<=282; gy+=62){ const q1=P(BELT_X0-16,gy,0), q2=P(BELT_X1+16,gy,0);
+    for(let gy=-92; gy<=282; gy+=62){ const q1=P(BELT_X0-16,gy,0), q2=P(BELT_X1+62,gy,0);
       s+=`<line x1="${q1.x.toFixed(1)}" y1="${q1.y.toFixed(1)}" x2="${q2.x.toFixed(1)}" y2="${q2.y.toFixed(1)}" stroke="#D8DEE6"/>`; }
     s+=`<g filter="url(#fBlur)" opacity=".3">`;
     s+=quad(P(BELT_X0+6,BELT_Y0+10,0),P(BELT_X1-6,BELT_Y0+10,0),P(BELT_X1-6,BELT_Y1+16,0),P(BELT_X0+6,BELT_Y1+16,0),'#4A5566','',0);
@@ -660,8 +669,17 @@
     // ── 작업대 후면 상판 ──
     s+=solid(MT,WX0,WX1,HY1,WY1,BELT_Z-TB_TH,BELT_Z,MAT.alu);
 
+    // ── 배출구 우측 수취 작업대 (컨베이어보다 낮게) + 짧은 미끄럼틀 ──
+    s+=solid(MT,TB2_X0,TB2_X1,BELT_Y0+8,BELT_Y1-8,SKIRT_Z,TB2_Z-9,MAT.alu);
+    s+=solid(MT,TB2_X0-1,TB2_X1+2,BELT_Y0+3,BELT_Y1-3,TB2_Z-9,TB2_Z,MAT.alu);
+
     // ── 컨베이어 (작업대 개구부 안에 매립, 벨트 상면 flush) ──
     s+=conveyorFull();
+    { const y0=PCB_YC-21, y1=PCB_YC+21;
+      s+=quad(P(SL_X0,y0,SL_Z0),P(SL_X1,y0,TB2_Z),P(SL_X1,y1,TB2_Z),P(SL_X0,y1,SL_Z0),'url(#gAluT)','#7C8896',1);           // 슬라이드 면
+      [y0,y1].forEach(yy=>{ const sg=yy<PCB_YC?-1:1;
+        s+=quad(P(SL_X0,yy,SL_Z0),P(SL_X1,yy,TB2_Z),P(SL_X1,yy,TB2_Z+5),P(SL_X0,yy,SL_Z0+5),'url(#gAluF)','#7C8896',.9);   // 측벽
+        s+=quad(P(SL_X0,yy+sg*2,SL_Z0+5),P(SL_X1,yy+sg*2,TB2_Z+5),P(SL_X1,yy,TB2_Z+5),P(SL_X0,yy,SL_Z0+5),'url(#gSteel)','#7C8896',.6); }); }
     { const sp1=P(INSPECT_X-58,BELT_Y0,RAIL_Z), sp2=P(INSPECT_X-58,BELT_Y0,RAIL_Z+20);   // 검사위치 지그 감지센서
       s+=`<rect x="${(sp2.x-4.5).toFixed(1)}" y="${sp2.y.toFixed(1)}" width="9" height="${(sp1.y-sp2.y).toFixed(1)}" rx="2" fill="url(#gAluF)" stroke="#69737F" stroke-width=".8"/>`;
       s+=`<circle cx="${sp2.x.toFixed(1)}" cy="${sp2.y.toFixed(1)}" r="4.5" fill="${s_in?'#22C55E':'#C4C9D0'}"${s_in?' filter="url(#fGlow)"':''}/>`; }
@@ -776,6 +794,20 @@
     { const q=P(BRIDGE_X,GY_B,BRIDGE_Z+XZ);
       s+=`<rect x="${(q.x-12).toFixed(1)}" y="${(q.y-12).toFixed(1)}" width="24" height="24" rx="4" fill="url(#gSteel)" stroke="#7C8896"/>`; }
 
+    // ── 배출위치 래치 해제 기구부 : 후방 기둥 + 캔틸레버 + 에어실린더 2개 (로드 하강 → 래치 개방) ──
+    { const MC2=(u,v,n)=>({X:REL_X+u, Y:PCB_YC+v, Z:n});
+      s+=solid(MT,REL_X-11,REL_X+11,GY_B-11,GY_B+11,BELT_Z,BELT_Z+3,MAT.alu);
+      s+=solid(MT,REL_X-6,REL_X+6,GY_B-6,GY_B+6,BELT_Z+3,REL_Z+5,MAT.alu);
+      s+=beamY(REL_X,PCB_YC-5,GY_B,REL_Z,5,5);
+      s+=beamX(REL_X-28,REL_X+28,PCB_YC,REL_Z,4.5,4.5);
+      [-1,1].forEach(sx=>{ const cx=sx*16, bodyB=REL_Z-26, rodTop=bodyB, tip=bodyB-2-(10)*relE;
+        const M2=(u,v,n)=>({X:REL_X+cx+u, Y:PCB_YC+v, Z:n});
+        s+=solid(M2,-3.6,3.6,-3.6,3.6,bodyB,REL_Z-4,MAT.dark);                    // 실린더 본체
+        s+=solid(M2,-4.2,4.2,-4.2,4.2,REL_Z-10,REL_Z-7,MAT.steel);                // 밴드
+        s+=solid(M2,-1.3,1.3,-1.3,1.3,tip,rodTop,MAT.steel);                      // 로드
+        s+=solid(M2,-3,3,-3,3,tip-1.6,tip,MAT.black); });                         // 푸시 패드
+    }
+
     // ── 고정식 키엔스 비전 : 흑색 스텝 하우징 + 적색 스트라이프 + LED 3 + 하단 투광/수광 2창 + 후방 케이블 ──
     { const SB=35, az=DOME_Z+SB;                                                  // 하단(창) = DOME_Z
       const MH=(u,v,n)=>({X:BRIDGE_X+u, Y:PCB_YC+v, Z:az-n});
@@ -863,7 +895,7 @@
 
     // 사이클타임 = 지그 1개가 검사위치에 오는 주기 (1회 인덱스 주기). 슬라이더 20~100 → 2.0~10.0초
   function cycleSec(){ return (parseInt($('speed').value,10)||50)/10; }
-  function stepSec(){ return Math.max(0.1,(cycleSec()-0.26)/5.93); }   // 단위시간 u : 1사이클 = 5.93u + 0.26s
+  function stepSec(){ return Math.max(0.1,(cycleSec()-0.26)/6.73); }   // 단위시간 u : 1사이클 = 6.73u + 0.26s
   function durs(){ const sec=stepSec(); return { scan:Math.round(sec*1000*2.2), move:Math.round(sec*1000), act:Math.round(sec*440) }; }
   function renderSpeed(){ $('speedVal').textContent=cycleSec().toFixed(1)+T('sec_u'); }
   function anim(dur,step,done){
@@ -924,6 +956,12 @@
       addLog('lg_alarm');
       if($('autoSig').checked) autoTimer=setTimeout(()=>fireSignal('RESUME',true),2400);
 
+    } else if(st.type==='release'){
+      const j=jigAtOut();
+      if(!(j&&j.pcb)){ return next(); }
+      addLog('lg_rel',j.id);
+      anim(Math.round(durs().move*0.8), (e,k)=>{ relE = k<0.5 ? k/0.5 : 1-(k-0.5)/0.5; j.latch=1-Math.min(1,k/0.5); }, ()=>{ relE=0; j.latch=0; next(); });
+
     } else if(st.type==='index'){
       addLog('lg_index',st.label);
       const s0=beltS;
@@ -931,8 +969,8 @@
         beltS=s0+PITCH*e;
         JIGS.forEach(j=>{ const p=beltPos(beltS+j.s0);
           if(p.X>PX_R-1 && p.nz<0.9 && p.nz>-0.99){
-            j.latch=Math.min(j.latch,Math.max(0,Math.min(1,(p.nz-0.15)/0.7)));         // 회전하며 래치 서서히 개방
-            if(j.pcb && p.nz<0.15) releasePcb(j,p);
+            j.latch=Math.min(j.latch,Math.max(0,Math.min(1,(p.nz-0.5)/0.4)));          // 회전하며 래치 서서히 개방
+            if(j.pcb && p.nz<0.5) releasePcb(j,p);
           } });
       }, ()=>{ beltS=s0+PITCH;
         JIGS.forEach(j=>{ const p=beltPos(beltS+j.s0); if(p.nz<0.9 && p.X>PX_R-1){ j.latch=0; if(j.pcb) releasePcb(j,p); } });
@@ -966,20 +1004,26 @@
   // 래치가 풀린 PCB가 지그에서 빠져 중력으로 낙하
   function releasePcb(j,p){
     j.pcb=false; addLog('lg_cam',j.id);
-    const sec=stepSec(), k=0.9/sec, vb=PITCH/(durs().move/1000);
-    FALLS.push({x:p.X+p.nx*JIG_TH, z:p.Z+p.nz*JIG_TH, vx:p.tx*vb*0.9, vz:p.tz*vb*0.9, k:k, a:1, land:0, t:performance.now()});
+    FALLS.forEach(f=>{ if(f.ph==='rest') f.fade=true; });                         // 앞선 PCB는 작업자가 가져감
+    const k=0.9/stepSec();
+    FALLS.push({x:p.X+p.nx*JIG_TH, z:p.Z+p.nz*JIG_TH, vx:Math.max(8,p.tx*30), vz:p.tz*30, k:k, a:1, ph:'air', fade:false, lt:0, t:performance.now()});
     if(!fallRaf) fallRaf=requestAnimationFrame(fallStep);
   }
   function fallStep(now){
+    const G=420, SLOPE=Math.atan2(SL_Z0-TB2_Z,SL_X1-SL_X0);
     FALLS.forEach(f=>{ const dt=Math.min(0.05,(now-f.t)/1000)*f.k; f.t=now;
-      if(f.z>FALL_Z){ f.vz-=420*dt; f.x+=f.vx*dt; f.z+=f.vz*dt; if(f.z<=FALL_Z){ f.z=FALL_Z; f.land=1; } }
-      else f.a-=dt*1.6; });
+      if(f.ph==='air'){ f.vz-=G*dt; f.x+=f.vx*dt; f.z+=f.vz*dt;
+        if(f.x>=SL_X0 && f.z<=slideZ(f.x)){ f.ph='slide'; f.sv=Math.max(30,Math.hypot(f.vx,f.vz)*0.5); f.z=slideZ(f.x); } }
+      else if(f.ph==='slide'){ f.sv+=G*Math.sin(SLOPE)*0.7*dt; f.x+=f.sv*Math.cos(SLOPE)*dt; f.z=slideZ(f.x);
+        if(f.x>=SL_X1){ f.ph='table'; f.z=TB2_Z; f.tv=f.sv*Math.cos(SLOPE); } }
+      else if(f.ph==='table'){ f.tv*=Math.exp(-3.4*dt); f.x=Math.min(f.x+f.tv*dt,TB2_X1-PCB_HW-3); f.z=TB2_Z; if(f.tv<2) f.ph='rest'; }
+      if(f.fade){ f.lt+=dt; if(f.lt>0.15) f.a-=dt*1.6; } });
     FALLS=FALLS.filter(f=>f.a>0);
     draw();
     fallRaf = FALLS.length ? requestAnimationFrame(fallStep) : 0;
   }
   function initLine(){
-    FALLS=[];
+    FALLS=[]; relE=0;
     beltS=LOAD_X-PX_L;
     JIGS.forEach(j=>{ j.pcb=false; j.latch=0; j.click=-1; });
     const ji=jigAtIns(), jo=jigAtOut();
