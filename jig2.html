@@ -125,7 +125,7 @@
 
 <header class="cover"><div class="inner">
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (벨트 고정 안착지그)</h1>
-  <span class="hver" id="hVer">v2.8</span>
+  <span class="hver" id="hVer">v2.9</span>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
     <button id="btnEn" type="button">English</button>
@@ -223,11 +223,11 @@
   </section>
 </main>
 
-<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v2.8</span></footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v2.9</span></footer>
 
 <script>
   // ===== 3D 월드 (X:이송방향, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
-  const VER='v2.8';
+  const VER='v2.9';
   const U2MM=300/90;
   const WX0=212, WX1=468, BELT_Y0=0, BELT_Y1=112;            // 작업대 프레임 (3축 시뮬레이터와 동일)
   const BELT_X0=WX0-60, BELT_X1=WX1+75;                      // 좌 200mm · 우 250mm 돌출
@@ -248,7 +248,8 @@
   const NJIG=7, PATH=2*L+2*Math.PI*R, PITCH=PATH/NJIG;       // 지그 7EA 균등 배치
   const LOAD_X=INSPECT_X-PITCH, OUT_X=INSPECT_X+PITCH;
   const JIG_HU=24, JIG_HD=24, JIG_TH=6;                      // 지그 반길이(이송방향)/반폭(Y)/두께
-  const PCB_HW=18, PCB_HD=12;
+  const PCB_HW=15, PCB_HD=7.5;                               // PCB 타원 100×50mm (반축)
+  const CASE_A=11, CASE_B=6, CASE_DV=-16;                     // PCB 케이스(타원 디스크) — 지그와 함께 이동
   const PCB_TOP=UP_Z+JIG_TH, PCB_SURF=PCB_TOP+8;
   const WD_MM=250, WD=WD_MM/U2MM;                            // 조명 끝단 ~ PCB 상면
   const HEAD_MM=200, HEAD_H=HEAD_MM/U2MM;                    // 헤드 설치높이
@@ -562,13 +563,39 @@
   const MT=(x,y,z)=>({X:x, Y:y, Z:z});
 
   // ===== PCB (수평 고정) =====
+  function ovalSolid(M,a,b,n0,n1,base,sw){
+    const N=32, vd=viewDir(), out=[];
+    const c0=M(0,0,0), c1=M(0,0,1), nv={x:c1.X-c0.X,y:c1.Y-c0.Y,z:c1.Z-c0.Z};
+    const dot=nv.x*vd.x+nv.y*vd.y+nv.z*vd.z;
+    const ring=(n)=>{ const r=[]; for(let i=0;i<N;i++){ const t=2*Math.PI*i/N; r.push(M(a*Math.cos(t),b*Math.sin(t),n)); } return r; };
+    const R0=ring(n0), R1=ring(n1);
+    for(let i=0;i<N;i++){ const j=(i+1)%N, t=2*Math.PI*(i+.5)/N;
+      const wm=M(Math.cos(t)/a,Math.sin(t)/b,0);
+      const nx=wm.X-c0.X, ny=wm.Y-c0.Y, nz=wm.Z-c0.Z, nl=Math.hypot(nx,ny,nz)||1;
+      if((nx*vd.x+ny*vd.y+nz*vd.z)/nl > -0.03) continue;
+      const lam=Math.max(0,(nx*LGT.x+ny*LGT.y+nz*LGT.z)/nl), k=0.60+0.52*lam;
+      const A=PJ(R0[i]),B=PJ(R0[j]),C=PJ(R1[j]),D=PJ(R1[i]);
+      out.push({d:(A.d+B.d+C.d+D.d)/4, s:quad(A,B,C,D,shadeCol(base,k),shadeCol(base,k*0.62),sw||0.5)}); }
+    let o=out.sort((x,y)=>y.d-x.d).map(q=>q.s).join('');
+    const face=(R,k)=>`<polygon points="${R.map(q=>pt(PJ(q))).join(' ')}" fill="${shadeCol(base,k)}" stroke="${shadeCol(base,k*0.6)}" stroke-width="${sw||0.5}"/>`;
+    const sg=n1>=n0?1:-1;
+    if(dot*sg < -0.03) o+=face(R1,1.08); else if(dot*sg > 0.03) o=face(R0,0.7)+o;
+    return o;
+  }
   function pcbBody(cx,zb){
+    const M=(u,v,n)=>({X:cx+u,Y:PCB_YC+v,Z:n});
     let o='';
-    o+=slab(cx-PCB_HW,cx+PCB_HW,PCB_YC-PCB_HD,PCB_YC+PCB_HD,zb+3,3,'url(#gCase)','url(#gCase)','url(#gCase)','#0B0E11',1.1);
-    o+=slab(cx-PCB_HW+3,cx+PCB_HW-3,PCB_YC-PCB_HD+3,PCB_YC+PCB_HD-3,zb+5,2,'url(#gCover)','url(#gCover)','url(#gCover)','#828C99',.9);
-    o+=slab(cx-PCB_HW+7,cx+PCB_HW-7,PCB_YC-PCB_HD+5,PCB_YC+PCB_HD-5,zb+6.6,1.6,'url(#gPcb)','url(#gPcb)','url(#gPcb)','#17501E',.9);
-    [[-8,'#E3B93C',4],[0,'#48535F',6],[8,'#C0463A',3]].forEach(q=>{
-      o+=slab(cx+q[0],cx+q[0]+q[2],PCB_YC-3,PCB_YC+2,zb+8,1.4,q[1],q[1],q[1],'#00000033',.5); });
+    o+=ovalSolid(M,PCB_HW,PCB_HD,zb+3,zb+5,[30,107,39],.6);
+    o+=ovalSolid(M,PCB_HW-1.6,PCB_HD-1.4,zb+5,zb+5.6,[58,154,68],.4);
+    [[-8,'#E3B93C',4,-2.5],[-1,'#48535F',5,0],[6,'#C0463A',3,-2.5],[3,'#F08A2B',3,2]].forEach(q=>{
+      o+=slab(cx+q[0],cx+q[0]+q[2],PCB_YC+q[3]-1.5,PCB_YC+q[3]+1.5,zb+7,1.4,q[1],q[1],q[1],'#00000033',.5); });
+    return o;
+  }
+  // PCB 케이스 : 지그 위(벨트와 동시 이동) 검정 타원 디스크
+  function caseBody(M){
+    let o='';
+    o+=ovalSolid(M,CASE_A,CASE_B,JIG_TH+.2,JIG_TH+4.2,[32,38,45],.5);
+    o+=ovalSolid(M,CASE_A-2.5,CASE_B-1.8,JIG_TH+4.2,JIG_TH+4.9,[58,66,75],.4);
     return o;
   }
 
@@ -577,6 +604,7 @@
     let o='';
     const JP=(du,dv,dn)=>P(p.X+p.tx*du+p.nx*dn, PCB_YC+dv, p.Z+p.tz*du+p.nz*dn);
     const up = p.nz>0.9;
+    const MW=(u,v,n)=>({X:p.X+p.tx*u+p.nx*n, Y:PCB_YC+v, Z:p.Z+p.tz*u+p.nz*n});
     function face(dn){ return quad(JP(-JIG_HU,-JIG_HD,dn),JP(JIG_HU,-JIG_HD,dn),JP(JIG_HU,JIG_HD,dn),JP(-JIG_HU,JIG_HD,dn),
       dn>0?'url(#gJigT)':'url(#gJigB)','#1F252C',1.1); }
     function rim(){ let r='';
@@ -587,10 +615,10 @@
     o+=quad(JP(-JIG_HU+6,-10,0),JP(JIG_HU-6,-10,0),JP(JIG_HU-6,10,0),JP(-JIG_HU+6,10,0),'#5F6975','#454E58',.8);   // 벨트 체결 브래킷
     if(up){ o+=face(0); o+=rim(); o+=face(JIG_TH); }
     else  { o+=face(JIG_TH); o+=rim(); o+=face(0); }
-    if(!up && j.pcb && p.nz>-0.2){                                   // 회전 중에도 PCB 안착 상태 유지 (기울어진 표현)
-      const q=(hw,hd,dn,f,s2)=>quad(JP(-hw,-hd,dn),JP(hw,-hd,dn),JP(hw,hd,dn),JP(-hw,hd,dn),f,s2,.8);
-      o+=q(PCB_HW,PCB_HD,JIG_TH+3,'url(#gCase)','#0B0E11');
-      o+=q(PCB_HW-7,PCB_HD-5,JIG_TH+4.6,'url(#gPcb)','#17501E'); }
+    o+=caseBody((u,v,n)=>MW(u,v+CASE_DV,n));
+    if(j.pcb){ o+=bar(JP(-2,0,JIG_TH+4),JP(3,CASE_DV,JIG_TH+4),2.4,'#161A1F','#0B0E11'); }
+    if(!up && j.pcb && p.nz>-0.2){
+      o+=ovalSolid(MW,PCB_HW,PCB_HD,JIG_TH+3,JIG_TH+5,[30,107,39],.5); }
     if(up){
       o+=quad(JP(-PCB_HW-1,-PCB_HD-1,JIG_TH+.2),JP(PCB_HW+1,-PCB_HD-1,JIG_TH+.2),JP(PCB_HW+1,PCB_HD+1,JIG_TH+.2),JP(-PCB_HW-1,PCB_HD+1,JIG_TH+.2),'#8A94A2','#4B5560',.8);
       [[-PCB_HW-3.5,-PCB_HD-3.5],[PCB_HW+3.5,PCB_HD+3.5]].forEach(([du,dv])=>{
