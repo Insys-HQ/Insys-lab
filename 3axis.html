@@ -188,7 +188,7 @@
   </section>
 </main>
 
-<footer>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · v2.2</footer>
+<footer>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · v2.3</footer>
 
 <script>
   // ===== 3D 월드 (X:컨베이어, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
@@ -479,7 +479,7 @@
     [-GXS,GXS].forEach(dx=>{ const q=P(BRIDGE_X+dx,GY_B,BRIDGE_Z);
       s+=`<rect x="${(q.x-8).toFixed(1)}" y="${(q.y-11).toFixed(1)}" width="16" height="22" rx="3" fill="url(#gSteel)" stroke="#7C8896"/>`; });
     // 캔틸레버 암 (브릿지 → 헤드)
-    s+=beamY(BRIDGE_X,GY_F+8,GY_B,BRIDGE_Z+XZ,7,7);
+    s+=beamY(BRIDGE_X,ay-13,GY_B,BRIDGE_Z+XZ,7,7);   // 헤드까지만 — 앞쪽 돌출 제거
     { const q=P(BRIDGE_X,GY_B,BRIDGE_Z+XZ);
       s+=`<rect x="${(q.x-12).toFixed(1)}" y="${(q.y-12).toFixed(1)}" width="24" height="24" rx="4" fill="url(#gSteel)" stroke="#7C8896"/>`; }
     // 헤드 마운트 블록
@@ -766,7 +766,7 @@
 
   function initLine(){ PCBS=[]; pcbSeq=0; PCBS.push(newPcb(LOAD_X)); syncActive(); }
   initLine(); draw(); renderSteps(); updateSigBtns();
-  addLog('3축(Z·Rx·Ry) 헤드 비전 검사 시뮬레이터 v2.2 준비 완료.');
+  addLog('3축(Z·Rx·Ry) 헤드 비전 검사 시뮬레이터 v2.3 준비 완료.');
 </script>
 
 <script>
