@@ -125,7 +125,7 @@
 
 <header class="cover"><div class="inner">
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (벨트 고정 안착지그)</h1>
-  <span class="hver" id="hVer">v2.1</span>
+  <span class="hver" id="hVer">v2.2</span>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
     <button id="btnEn" type="button">English</button>
@@ -223,11 +223,11 @@
   </section>
 </main>
 
-<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v2.1</span></footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v2.2</span></footer>
 
 <script>
   // ===== 3D 월드 (X:이송방향, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
-  const VER='v2.1';
+  const VER='v2.2';
   const U2MM=300/90;
   const WX0=212, WX1=468, BELT_Y0=0, BELT_Y1=112;            // 작업대 프레임 (3축 시뮬레이터와 동일)
   const BELT_X0=WX0-60, BELT_X1=WX1+75;                      // 좌 200mm · 우 250mm 돌출
@@ -254,7 +254,7 @@
   const WD_MM=250, WD=WD_MM/U2MM;                            // 조명 끝단 ~ PCB 상면
   const HEAD_MM=200, HEAD_H=HEAD_MM/U2MM;                    // 헤드 설치높이
   const DOME_Z=PCB_SURF+WD, HEAD_TOP=DOME_Z+HEAD_H;
-  const CHUTE_X0=NXR+22, CHUTE_X1=CHUTE_X0+64, CHUTE_DROP=24;
+  const CHUTE_X0=NXR+NR-4, CHUTE_X1=CHUTE_X0+34, CHUTE_DROP=120;   // 컨베이어 끝에서 낙하 (슈트·기둥 없음)
   const VIEW={yaw:35, pitch:22};
   const VCX=350, VCY=428, VOX=340, VOY=56;
   function P(X,Y,Z){
@@ -289,7 +289,7 @@
            `<rect x="${(t.x-w*0.23).toFixed(1)}" y="${(t.y+3).toFixed(1)}" width="${(w*0.26).toFixed(1)}" height="${Math.max(0,b.y-t.y-8).toFixed(1)}" fill="#FFFFFF" opacity=".45"/>`;
   }
   function chuteZ(x){ if(x<=CHUTE_X0) return PCB_TOP;
-    return PCB_TOP - Math.min(1,(x-CHUTE_X0)/(CHUTE_X1-CHUTE_X0))*CHUTE_DROP; }
+    const t=Math.min(1,(x-CHUTE_X0)/(CHUTE_X1-CHUTE_X0)); return PCB_TOP - t*t*CHUTE_DROP; }
 
   // ===== 벨트 경로 : 직선 상단 → 우 풀리 랩 → 직선 하단 → 좌 풀리 랩 =====
   const A1=L, A2=L+Math.PI*R, A3=2*L+Math.PI*R;
@@ -330,11 +330,11 @@
       s_lampon:'돔 조명 ON', s_scan:'고정 비전 촬영 (1회 노광)',
       s_verdict:'판정 + MES 전송', s_alarm:'NG 알람 · 제거 대기',
       s_lampoff:'돔 조명 OFF',
-      s_disch:'배출위치 — 스트리퍼 분리 → 푸셔 → 슈트 배출',
+      s_disch:'배출위치 — 스트리퍼 분리 → 푸셔 → 벨트 끝 낙하 배출',
       s_index:'벨트 1피치 인덱스 이송 (지그 7EA 동시) · 캠 래치 개방',
       // SVG 라벨
       sv_load:'안착위치', sv_ins:'검사위치', sv_out:'배출위치', sv_cam:'래치 해제 캠',
-      sv_chute:'배출 슈트 → 다음 공정', sv_sens:'지그 감지센서', sv_vis:'고정식 키엔스 비전',
+      sv_chute:'낙하 → 다음 공정 작업자', sv_sens:'지그 감지센서', sv_vis:'고정식 키엔스 비전',
       sv_pul:'풀리 R', sv_brk:'고정 브라켓', sv_head:'mm (헤드)', sv_wd:'mm (WD)', click:'딸깍',
       // 로그
       lg_load_none:'[안착위치] 지그 없음 — 생략',
@@ -388,10 +388,10 @@
       s_lampon:'Dome light ON', s_scan:'Fixed vision capture (single exposure)',
       s_verdict:'Verdict + MES upload', s_alarm:'NG alarm · awaiting removal',
       s_lampoff:'Dome light OFF',
-      s_disch:'Eject station — stripper separates → pusher → chute',
+      s_disch:'Eject station — stripper separates → pusher → drops off belt end',
       s_index:'Belt indexes 1 pitch (all 7 jigs) · cam opens latches',
       sv_load:'Load Stn', sv_ins:'Inspect Stn', sv_out:'Eject Stn', sv_cam:'Latch Release Cam',
-      sv_chute:'Chute → Next Process', sv_sens:'Jig Sensor', sv_vis:'Fixed Keyence Vision',
+      sv_chute:'Drops → Next-process operator', sv_sens:'Jig Sensor', sv_vis:'Fixed Keyence Vision',
       sv_pul:'Pulley R', sv_brk:'Fixed Bracket', sv_head:'mm (Head)', sv_wd:'mm (WD)', click:'Click!',
       lg_load_none:'[Load Stn] No jig — skipped',
       lg_load_full:j=>'[Load Stn] J'+j+' already loaded — skipped',
@@ -645,7 +645,7 @@
         const pts=[[-15,-4],[3,-4],[3,-9],[16,0],[3,9],[3,4],[-15,4]].map(q=>pt(P(pa.X+q[0],PCB_YC+q[1],UP_Z+.6))).join(' ');
         g+=`<polygon points="${pts}" fill="#FFD22E" stroke="#B08600" stroke-width=".8" opacity=".95"/>`; } }
     JIGS.forEach(j=>{ const p=beltPos(beltS+j.s0); if(p.nz<=0.9) g+=drawJig(j,p); });   // 하부/랩 구간 지그
-    g+=`<polygon points="${framePath(BELT_Y0)}" fill="url(#gAluF)" fill-opacity=".40" stroke="#78838F" stroke-width="1"/>`;   // 앞 측판 (반투명)
+    g+=`<polygon points="${framePath(BELT_Y0)}" fill="url(#gAluF)" stroke="#78838F" stroke-width="1"/>`;   // 앞 측판 (불투명)
     g+=quad(P(NXL,BELT_Y0,RAIL_Z),P(NXR,BELT_Y0,RAIL_Z),P(NXR,yA,RAIL_Z),P(NXL,yA,RAIL_Z),'url(#gAluT)','#8892A0',1);
     g+=quad(P(NXL,yB,RAIL_Z),P(NXR,yB,RAIL_Z),P(NXR,BELT_Y1,RAIL_Z),P(NXL,BELT_Y1,RAIL_Z),'url(#gAluT)','#8892A0',1);
     g+=wrapFace(NXL,NR,NZC,-1,BELT_Y0,yA,'url(#gAluT)','#7C8896');
@@ -765,15 +765,9 @@
       const g1=P(CAM_X+CAM_RUN+58,PCB_YC-40,UP_Z+58), g2=P(CAM_X+CAM_RUN+10,cy,z1);
       s+=`<line x1="${g1.x.toFixed(1)}" y1="${g1.y.toFixed(1)}" x2="${g2.x.toFixed(1)}" y2="${g2.y.toFixed(1)}" stroke="#B45309" stroke-width=".9" stroke-dasharray="3 2"/>`; }
 
-    // ── 스트리퍼 레일 + 배출 슈트 ──
-    [PCB_YC-PCB_HD-3,PCB_YC+PCB_HD+3].forEach(yy=>{
-      s+=slab(OUT_X-24,CHUTE_X0+4,yy-2,yy+2,PCB_TOP,3,'url(#gSteel)','url(#gSteel)','url(#gSteel)','#8892A0',.8); });
-    { const cy0=PCB_YC-PCB_HD-6, cy1=PCB_YC+PCB_HD+6;
-      s+=column(CHUTE_X1-6,PCB_YC,PCB_TOP-CHUTE_DROP-1,0,9,'url(#gAluF)');
-      s+=quad(P(CHUTE_X0,cy0,PCB_TOP),P(CHUTE_X1,cy0,PCB_TOP-CHUTE_DROP),P(CHUTE_X1,cy1,PCB_TOP-CHUTE_DROP),P(CHUTE_X0,cy1,PCB_TOP),'url(#gAluT)','#7C8896',1);
-      [cy0,cy1].forEach(yy=>{ s+=quad(P(CHUTE_X0,yy,PCB_TOP+5),P(CHUTE_X1,yy,PCB_TOP-CHUTE_DROP+5),P(CHUTE_X1,yy,PCB_TOP-CHUTE_DROP),P(CHUTE_X0,yy,PCB_TOP),'url(#gAluF)','#7C8896',.9); });
-      const cl=P(CHUTE_X0-22,PCB_YC,96);
-      if(VIEW.yaw<70) s+=`<text x="${cl.x.toFixed(1)}" y="${cl.y.toFixed(1)}" text-anchor="start" font-size="9.5" font-weight="900" fill="#2D5C99">${T('sv_chute')}</text>`; }
+    // ── 배출 : 컨베이어 끝에서 다음 공정 작업자 앞으로 낙하 (가이드 레일·기둥 없음) ──
+    { const cl=P(CHUTE_X1+6,PCB_YC+8,BELT_Z-96);
+      if(VIEW.yaw<70) s+=`<text x="${cl.x.toFixed(1)}" y="${cl.y.toFixed(1)}" text-anchor="end" font-size="9.5" font-weight="900" fill="#2D5C99">${T('sv_chute')}</text>`; }
 
     // ── 스테이션 마커 (앞 상판 스트립 위 라벨 + 지그 방향 화살표) ──
     [[LOAD_X,'sv_load'],[INSPECT_X,'sv_ins'],[OUT_X,'sv_out']].forEach(([sx,lb])=>{
