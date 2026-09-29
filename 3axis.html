@@ -188,7 +188,7 @@
   </section>
 </main>
 
-<footer>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · v2.0</footer>
+<footer>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · v2.1</footer>
 
 <script>
   // ===== 3D 월드 (X:컨베이어, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
@@ -199,7 +199,7 @@
   const TB_TH=9;                                             // 상판 두께 30mm
   const HX0=BELT_X0-9, HX1=BELT_X1+9, HY0=BELT_Y0-12, HY1=BELT_Y1+12;   // 개구부
   const WX0=HX0-29, WX1=HX1+29, WY0=HY0-37, WY1=HY1+37;                 // 상판 외형 1700×700
-  const SKIRT_Z=20;                                          // 캐비닛 하단 (다리 없음, 아래는 걸레받이)
+  const SKIRT_Z=0;                                           // 캐비닛이 바닥까지 (받침 구조 없음)
   const INSPECT_X=340, PCB_Z=BELT_Z+3, PCB_YC=(BELT_Y0+BELT_Y1)/2;
   const FOCUS=90, FOCUS_MM=300;          // 초점거리 300mm
   const BRIDGE_Z=BELT_Z+186;             // 짐벌 간섭 없는 최소 높이 (프레임 높이 축소)
@@ -462,9 +462,6 @@
       s+=`<line x1="${d1.x.toFixed(1)}" y1="${d1.y.toFixed(1)}" x2="${d2.x.toFixed(1)}" y2="${d2.y.toFixed(1)}" stroke="rgba(90,100,114,.45)" stroke-width="1.2"/>`;
       [-14,14].forEach(dx=>{ const a=P(dm+dx,WY0-3,(BELT_Z-TB_TH+SKIRT_Z)/2+12), b=P(dm+dx,WY0-3,(BELT_Z-TB_TH+SKIRT_Z)/2-12);
         s+=bar(a,b,4,'url(#gSteel)','#5A6470'); }); }
-    // 걸레받이 (인셋 플린스)
-    s+=quad(P(WX0+10,WY0+8,SKIRT_Z),P(WX1-10,WY0+8,SKIRT_Z),P(WX1-10,WY0+8,0),P(WX0+10,WY0+8,0),'url(#gAluB)','#6E7885',1);
-    s+=quad(P(WX0+10,WY0+8,SKIRT_Z),P(WX0+10,WY1-8,SKIRT_Z),P(WX0+10,WY1-8,0),P(WX0+10,WY0+8,0),'url(#gAluB)','#6E7885',1);
 
     const lb=P(INSPECT_X-118,BELT_Y0-34,BELT_Z+10);
 
@@ -770,7 +767,7 @@
 
   function initLine(){ PCBS=[]; pcbSeq=0; PCBS.push(newPcb(LOAD_X)); syncActive(); }
   initLine(); draw(); renderSteps(); updateSigBtns();
-  addLog('3축(Z·Rx·Ry) 헤드 비전 검사 시뮬레이터 v2.0 준비 완료.');
+  addLog('3축(Z·Rx·Ry) 헤드 비전 검사 시뮬레이터 v2.1 준비 완료.');
 </script>
 
 <script>
