@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCB 비전 검사 시뮬레이터 (안착지그 순환)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1E3A5F; --navy-dark:#122540; --text:#2B3648; --text-light:#5B6472;
+    --bg:#F3F5F9; --card-bg:#FFFFFF; --card-header-bg:#E7EFFA; --border:#E1E6ED;
+    --accent:#2D5C99; --success:#16A34A; --danger:#DC2626; --warning:#C2740A; --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.45;}
+  header.cover{background:linear-gradient(135deg,var(--navy),var(--navy-dark));color:#F4F7FB;padding:9px 16px;}
+  header.cover .inner{max-width:1200px;margin:0 auto;text-align:center;}
+  header.cover h1{font-size:18px;font-weight:900;margin:0;}
+  .container{max-width:1200px;margin:0 auto;padding:10px 14px 24px;}
+  .card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 2px rgba(20,40,63,.05);margin-bottom:10px;}
+  .card-header{background:var(--card-header-bg);padding:7px 12px;font-weight:700;color:var(--navy-dark);font-size:13.5px;border-bottom:1px solid var(--border);}
+  .card-body{padding:9px 12px;}
+  .grid2{display:grid;grid-template-columns:1.35fr .65fr;gap:10px;align-items:start;}
+  .left-col{display:flex;flex-direction:column;}
+  @media (max-width:900px){.grid2{grid-template-columns:1fr;}}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  button{font-family:inherit;font-size:13px;font-weight:700;padding:8px 13px;border-radius:8px;border:1px solid var(--border);background:#F5F7FA;color:var(--navy-dark);cursor:pointer;}
+  button:hover{background:#EAF0F8;}
+  button:disabled{opacity:.45;cursor:not-allowed;}
+  button.primary{background:var(--navy);color:#fff;border-color:var(--navy);}
+  button.sig:not(:disabled){background:var(--warning);color:#fff;border-color:var(--warning);animation:sigPulse 1.1s ease-in-out infinite;}
+  button.sig:disabled{background:#FDF3E3;color:#8A5407;border-color:#E6C79A;}
+  button.resume:not(:disabled){background:var(--danger);color:#fff;border-color:var(--danger);animation:sigPulse .8s ease-in-out infinite;}
+  @keyframes sigPulse{0%,100%{box-shadow:0 0 0 0 rgba(194,116,10,.5);}50%{box-shadow:0 0 0 7px rgba(194,116,10,0);}}
+  button.danger{background:#FCEBEA;color:var(--danger);border-color:#F4C6C3;}
+  select{font-family:inherit;font-size:13px;padding:8px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);}
+  .hint{font-size:12px;color:var(--text-light);margin-top:6px;}
+  svg{width:100%;height:auto;display:block;}
+  .axisbar{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:7px;}
+  @media (max-width:600px){.axisbar{grid-template-columns:repeat(3,1fr);}}
+  .ax{background:#F2F6FC;border:1px solid #D3E0F0;border-radius:7px;padding:4px 6px;text-align:center;}
+  .ax .k{font-size:10px;color:var(--text-light);font-weight:700;}
+  .ax .v{font-size:12.5px;font-weight:900;color:var(--navy-dark);white-space:nowrap;}
+  .ax.mv{background:#FFF4DE;border-color:#EDCF95;}
+  .ax.ok{background:#E7F7EC;border-color:#A9DDB8;}
+  .statechips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px;}
+  .chip{font-size:11px;font-weight:700;padding:4px 8px;border-radius:20px;border:1px solid var(--border);color:var(--text-light);background:#F7F9FC;}
+  .chip b{color:var(--navy-dark);}
+  .chip.on{background:var(--success);color:#fff;border-color:var(--success);}
+  .chip.on b{color:#fff;}
+  .verdict-box{display:flex;gap:10px;align-items:center;margin-bottom:7px;}
+  .verdict-lamp{flex:0 0 auto;width:66px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;background:#C9CDD3;letter-spacing:1px;}
+  .verdict-lamp.ok{background:var(--success);} .verdict-lamp.ng{background:var(--danger);}
+  .mes-ind{font-size:12.5px;font-weight:700;color:var(--text-light);}
+  .mes-ind.sending{color:var(--accent);}
+  .mes-ind .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#C9CDD3;margin-right:5px;}
+  .mes-ind.sending .dot{background:var(--accent);animation:sigPulse 1s infinite;}
+  .alarm-banner{display:none;background:var(--danger);color:#fff;font-weight:900;text-align:center;padding:8px;border-radius:8px;margin-bottom:7px;font-size:13px;animation:alarmBlink .7s step-end infinite;}
+  .alarm-banner.show{display:block;}
+  @keyframes alarmBlink{0%,100%{opacity:1;}50%{opacity:.55;}}
+  .blinkRed{animation:alarmBlink .7s step-end infinite;}
+  .steps{overflow:visible;}
+  .step{display:flex;gap:9px;align-items:flex-start;padding:4px 8px;border-radius:7px;font-size:12px;border:1px solid transparent;}
+  .step .no{flex:0 0 20px;height:20px;border-radius:50%;background:#EDEFF3;color:var(--text-light);font-weight:700;font-size:10.5px;display:flex;align-items:center;justify-content:center;}
+  .step.done .no{background:var(--success);color:#fff;}
+  .step.cur{background:#EAF1FB;border-color:#BCD3EF;}
+  .step.cur .no{background:var(--navy);color:#fff;}
+  .step.wait.cur{background:#FBF1DF;border-color:#E6C79A;}
+  .step.wait.cur .no{background:var(--warning);color:#fff;}
+  .phase-h{font-size:11.5px;font-weight:900;color:var(--navy-dark);margin:7px 0 3px;padding-left:4px;}
+  .phase-h:first-child{margin-top:0;}
+  .log-card pre{margin:0;max-height:140px;overflow-y:auto;background:#F8F9FB;border:1px solid var(--border);border-radius:8px;padding:10px;font-family:'Noto Sans KR',monospace;font-size:12px;white-space:pre-wrap;word-break:break-all;}
+  label.ck{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--navy-dark);cursor:pointer;}
+  footer{text-align:center;padding:10px 20px 18px;font-size:11.5px;color:var(--text-light);}
+  .counter{font-size:12.5px;font-weight:700;color:var(--navy-dark);}
+  .step-mobile{display:none;}
+  @media (max-width:900px){
+    .left-col{position:sticky;top:0;z-index:20;background:var(--bg);padding-top:2px;}
+    .left-col .card:first-child{margin-bottom:6px;}
+    .flow-card{display:none;}
+    .step-mobile{display:flex;align-items:center;gap:8px;background:#EAF1FB;border:1px solid #BCD3EF;border-radius:8px;
+      padding:7px 10px;margin-bottom:6px;font-size:12.5px;font-weight:700;color:var(--navy-dark);
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .step-mobile .no{flex:0 0 20px;height:20px;border-radius:50%;background:var(--navy);color:#fff;font-size:10.5px;display:flex;align-items:center;justify-content:center;}
+    .step-mobile.wait{background:#FBF1DF;border-color:#E6C79A;} .step-mobile.wait .no{background:var(--warning);}
+    .step-mobile.alarm{background:#FCEBEA;border-color:#F4C6C3;color:var(--danger);} .step-mobile.alarm .no{background:var(--danger);}
+    .container{padding:8px 10px 20px;}
+    #curStateText{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="cover"><div class="inner"><h1>PCB 비전 검사 시뮬레이터 (안착지그 2대 순환식)</h1></div></header>
+
+<main class="container">
+  <div class="grid2">
+    <div class="left-col">
+    <section class="card">
+      <div class="card-header">동작 애니메이션 · 안착지그 2대 순환 컨베이어 + 고정 비전 헤드</div>
+      <div class="card-body">
+        <div id="stepMobile" class="step-mobile"><span class="no">1</span><span id="stepMobileText">START 대기</span></div>
+        <div id="alarmBanner" class="alarm-banner">⚠ NG 검사 중단 — NG품 제거 후 [검사 계속]</div>
+
+        <div class="axisbar" style="grid-template-columns:repeat(4,1fr);">
+          <div class="ax" id="axX"><div class="k">지그 이송위치</div><div class="v" id="vX">-</div></div>
+          <div class="ax" id="axZ"><div class="k">지그 높이</div><div class="v" id="vZ">-</div></div>
+          <div class="ax" id="axL"><div class="k">래치</div><div class="v" id="vL">-</div></div>
+          <div class="ax" id="axF"><div class="k">조명~PCB (WD)</div><div class="v" id="vF">250 mm</div></div>
+        </div>
+
+        <div class="statechips">
+          <span class="chip">PCB 수평 <b id="flatVal">-</b></span>
+          <span class="chip" id="chipJig">검사 <b id="jigVal">#1 하부 리턴</b></span>
+          <span class="chip" id="chipJig2">대기 <b id="jig2Val">#2 하부 리턴</b></span>
+          <span class="chip" id="chipLamp">돔조명 <b id="lampVal">OFF</b></span>
+          <span class="chip" id="chipSen">안착센서 <b id="senVal">OFF</b></span>
+        </div>
+
+        <div class="verdict-box">
+          <div class="verdict-lamp" id="verdictLamp">--</div>
+          <div>
+            <div style="font-size:11.5px;color:var(--text-light);">판정</div>
+            <div class="mes-ind" id="mesInd"><span class="dot"></span>MES 전송: 대기</div>
+          </div>
+          <div style="margin-left:auto;">
+            <div style="font-size:11px;color:var(--text-light);margin-bottom:3px;">데모</div>
+            <select id="verdictSel"><option value="auto">자동</option><option value="OK">항상 OK</option><option value="NG">항상 NG</option></select>
+          </div>
+        </div>
+
+        <svg viewBox="20 -46 690 400" id="scene"></svg>
+        <div class="row" style="margin-top:4px;gap:6px;flex-wrap:nowrap;">
+          <span style="font-size:12px;color:var(--text-light);white-space:nowrap;">시점 <b id="yawVal" style="color:var(--navy-dark);">35°</b></span>
+          <input type="range" id="viewYaw" min="0" max="90" value="35" style="flex:0 1 140px;min-width:70px;">
+          <button id="btnFront" style="padding:4px 8px;font-size:11.5px;flex:0 0 auto;white-space:nowrap;">정면</button>
+          <button id="btnIso" style="padding:4px 8px;font-size:11.5px;flex:0 0 auto;white-space:nowrap;">45°</button>
+          <button id="btnSide" style="padding:4px 8px;font-size:11.5px;flex:0 0 auto;white-space:nowrap;">측면</button>
+        </div>
+        <div class="row" style="margin-top:5px;">
+          <span class="counter">완료 <span id="cycleCount">0</span></span>
+          <span class="counter" style="color:var(--success);">OK <span id="okCount">0</span></span>
+          <span class="counter" style="color:var(--danger);">NG <span id="ngCount">0</span></span>
+        </div>
+        <p class="hint" id="curStateText"></p>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">운전 / 신호 제어</div>
+      <div class="card-body">
+        <div class="row" style="margin-bottom:10px;">
+          <button id="btnRun" class="primary">▶ 자동 운전 시작</button>
+          <button id="btnStop" class="danger">■ 정지</button>
+          <button id="btnReset">↺ 초기화</button>
+          <label class="ck"><input type="checkbox" id="autoSig" checked> 자동신호</label>
+          <span style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:12px;color:var(--text-light);">속도</span>
+            <input type="range" id="speed" min="1" max="10" value="6" style="width:120px;">
+          </span>
+        </div>
+        <div class="row">
+          <button id="sigStart" class="sig" disabled>START</button>
+          <button id="btnResume" class="resume" disabled>검사 계속</button>
+        </div>
+      </div>
+    </section>
+    </div>
+
+    <section class="card flow-card">
+      <div class="card-header">전체 로직 플로우</div>
+      <div class="card-body"><div class="steps" id="stepList"></div></div>
+    </section>
+  </div>
+
+  <section class="card log-card">
+    <div class="card-header">동작 로그</div>
+    <div class="card-body">
+      <div class="row" style="margin-bottom:8px;"><button id="clearLog">로그 지우기</button></div>
+      <pre id="logBox"></pre>
+    </div>
+  </section>
+</main>
+
+<footer>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · Vision-JIG v1.4</footer>
+
+<script>
+  // ===== 3D 월드 (X:이송방향, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
+  const U2MM=300/90;
+  const TBL_X0=133, TBL_X1=567, TBL_Y0=0, TBL_Y1=88;
+  const TBL_YC=(TBL_Y0+TBL_Y1)/2;
+  const UP_Z=64, LO_Z=16, DECK_TH=5;          // 상부 이송면 / 하부 리턴면 / 데크 두께
+  const LIFT_L=182, LIFT_R=518, OPEN_HW=30;   // 리프터 중심 X / 개구부 반폭
+  const INSPECT_X=340;
+  const JIG_HW=30, JIG_HD=24, JIG_TH=6;       // 지그 반폭 / 반깊이 / 두께
+  const PCB_HW=23, PCB_HD=12;                 // PCB 반폭 / 반깊이
+  const CAM_X=442, CAM_RUN=24;                // 래치 해제 캠 위치 / 작용 구간
+  const SAFE_GAP=2*30+16;                     // 지그 간 최소 안전 간격(unit)
+  const CHUTE_X0=TBL_X1-34, CHUTE_X1=TBL_X1+70, CHUTE_DROP=22;
+  const PCB_TOP=UP_Z+JIG_TH;                  // 지그 상면 = PCB 하면
+  const PCB_SURF=PCB_TOP+8;                   // PCB 기판 상면
+  const WD_MM=250, WD=WD_MM/U2MM;             // 조명 끝단 ~ PCB 상면 = 250mm
+  const HEAD_MM=200, HEAD_H=HEAD_MM/U2MM;     // 카메라+렌즈+조명 설치높이 = 200mm
+  const DOME_Z=PCB_SURF+WD;                   // 조명 끝단(최하단) 높이
+  const LENS_Z=DOME_Z+HEAD_H*0.24;            // 렌즈 중심
+  const HEAD_TOP=DOME_Z+HEAD_H;               // 헤드 어셈블리 상단
+  const PORTAL_X=INSPECT_X, PORTAL_Z=HEAD_TOP+11;   // 브릿지 높이는 헤드에 종속(제한 없음)
+  const GY_F=-34, GY_B=122;
+  const VIEW={yaw:35, pitch:28};
+  const VCX=350, VCY=250, VOX=340, VOY=72;
+  function P(X,Y,Z){
+    const ty=VIEW.yaw*Math.PI/180, tp=VIEW.pitch*Math.PI/180;
+    const x0=X-VOX, y0=Y-VOY;
+    const dep=x0*Math.sin(ty)+y0*Math.cos(ty);
+    return {x:VCX + x0*Math.cos(ty) - y0*Math.sin(ty),
+            y:VCY - Z*Math.cos(tp) - dep*Math.sin(tp), d:dep};
+  }
+  const pt=p=>p.x.toFixed(1)+','+p.y.toFixed(1);
+  function quad(a,b,c,d,fill,stroke,sw){
+    return `<polygon points="${pt(a)} ${pt(b)} ${pt(c)} ${pt(d)}" fill="${fill}"${stroke?` stroke="${stroke}" stroke-width="${sw||1}"`:''}/>`;
+  }
+  function bar(a,b,w,fill,stroke){
+    return `<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="${stroke||'#8A94A1'}" stroke-width="${w+3}" stroke-linecap="round"/>`+
+           `<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="${fill}" stroke-width="${w}" stroke-linecap="round"/>`;
+  }
+  // 3D 직육면체(슬래브) — 좌단·우단 → 앞면 → 윗면 순서로 그려 가림 처리
+  function slab(x0,x1,y0,y1,zt,th,fTop,fFront,fSide,st,sw){
+    const zb=zt-th; let o='';
+    o+=quad(P(x0,y0,zt),P(x0,y1,zt),P(x0,y1,zb),P(x0,y0,zb),fSide,st,sw||1);
+    o+=quad(P(x1,y0,zt),P(x1,y1,zt),P(x1,y1,zb),P(x1,y0,zb),fSide,st,sw||1);
+    o+=quad(P(x0,y0,zt),P(x1,y0,zt),P(x1,y0,zb),P(x0,y0,zb),fFront,st,sw||1);
+    o+=quad(P(x0,y0,zt),P(x1,y0,zt),P(x1,y1,zt),P(x0,y1,zt),fTop,st,sw||1);
+    return o;
+  }
+  function column(X,Y,zt,zb,w,fill,st){
+    const t=P(X,Y,zt), b=P(X,Y,zb);
+    return `<rect x="${(t.x-w/2).toFixed(1)}" y="${t.y.toFixed(1)}" width="${w}" height="${Math.max(0,b.y-t.y).toFixed(1)}" fill="${fill}" stroke="${st||'#7C8896'}" stroke-width=".8"/>`+
+           `<rect x="${(t.x-w*0.23).toFixed(1)}" y="${(t.y+3).toFixed(1)}" width="${(w*0.26).toFixed(1)}" height="${Math.max(0,b.y-t.y-8).toFixed(1)}" fill="#FFFFFF" opacity=".45"/>`;
+  }
+  function chuteZ(x){ if(x<=CHUTE_X0) return PCB_TOP;
+    return PCB_TOP - Math.min(1,(x-CHUTE_X0)/(CHUTE_X1-CHUTE_X0))*CHUTE_DROP; }
+
+  // ===== 로직 플로우 =====
+  const STATES=[
+    { phase:'대기',      type:'wait',      signal:'START', label:'START 대기' },
+    { phase:'지그 순환', type:'lift',      label:'1번 지그 상승 (하부 리턴면 → 상부 이송면)' },
+    { phase:'투입',      type:'load',      label:'작업자 PCB 안착 → 딸깍 래치 고정' },
+    { phase:'투입',      type:'feed',      label:'검사 지그 안착위치 → 검사위치 이송' },
+    { phase:'투입',      type:'sensor', on:true, label:'검사위치 센서 감지' },
+    { phase:'선행 대기', type:'standby',   label:'대기 지그 안착위치 상승 · PCB 안착 · 딸깍 고정' },
+    { phase:'비전 검사', type:'light',  on:true, label:'돔 조명 ON' },
+    { phase:'비전 검사', type:'scan',      label:'고정 비전 헤드 스캔 (초점 300mm)' },
+    { phase:'판정',      type:'verdict',   label:'판정 + MES 전송' },
+    { phase:'판정',      type:'alarmwait', cond:'ng', signal:'RESUME', label:'NG 알람 · 제거 대기' },
+    { phase:'배출',      type:'light',  on:false, label:'돔 조명 OFF' },
+    { phase:'배출',      type:'release',   label:'검사 지그 배출위치 이동 (동시: 대기 지그 → 검사위치)' },
+    { phase:'배출',      type:'strip',     label:'수직구간 진입 → 지그 하강 · PCB 분리' },
+    { phase:'배출',      type:'discharge', label:'PCB 배출 (동시: 빈 지그 즉시 안착위치로 하부 리턴)' },
+    { phase:'지그 순환', type:'swap',      label:'지그 교대 — 대기 지그가 다음 검사 지그로' }
+  ];
+  const LOOP_START=1;
+
+  let idx=0, running=false, waitingSignal=null;
+  const JIGS=[{id:'#1',x:LIFT_L,z:LO_Z,latch:0,pcb:false,click:-1},
+              {id:'#2',x:LIFT_R,z:LO_Z,latch:0,pcb:false,click:-1}];
+  let act=0, outX=null, pushOn=false;
+  const A=()=>JIGS[act], B=()=>JIGS[1-act];
+  const isUp=j=>j.z>(UP_Z+LO_Z)/2;
+  let lightOn=false, scanT=-1, s_in=false, alarm=false;
+  let verdict=null, autoTog=0, cycleCount=0, okCount=0, ngCount=0;
+  let animToken=0, autoTimer=null;
+
+  const $=id=>document.getElementById(id);
+  const logBox=$('logBox'), stepList=$('stepList');
+  function addLog(m){const t=new Date().toLocaleTimeString('ko-KR');logBox.textContent+='['+t+'] '+m+'\n';logBox.scrollTop=logBox.scrollHeight;}
+
+  const DEFS=`<defs>
+    <linearGradient id="gAluT" x1="0" y1="0" x2="0.35" y2="1"><stop offset="0" stop-color="#FAFCFE"/><stop offset=".28" stop-color="#DCE3EB"/><stop offset=".62" stop-color="#BFC8D3"/><stop offset="1" stop-color="#A5AFBC"/></linearGradient>
+    <linearGradient id="gAluF" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9EEF4"/><stop offset=".22" stop-color="#C3CCD7"/><stop offset=".7" stop-color="#9BA6B3"/><stop offset="1" stop-color="#7E8996"/></linearGradient>
+    <linearGradient id="gAluB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B8C1CC"/><stop offset="1" stop-color="#6E7885"/></linearGradient>
+    <linearGradient id="gSteel" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#F0F4F8"/><stop offset=".4" stop-color="#CAD3DD"/><stop offset="1" stop-color="#94A0AE"/></linearGradient>
+    <linearGradient id="gBelt" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#C8CED6"/><stop offset=".45" stop-color="#AEB5BE"/><stop offset="1" stop-color="#949BA5"/></linearGradient>
+    <linearGradient id="gCam" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#5E6A79"/><stop offset=".45" stop-color="#3A4451"/><stop offset="1" stop-color="#1E242C"/></linearGradient>
+    <linearGradient id="gCase" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#3B424A"/><stop offset=".5" stop-color="#24292F"/><stop offset="1" stop-color="#101317"/></linearGradient>
+    <linearGradient id="gPcb" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#4C9E53"/><stop offset=".5" stop-color="#2E7D36"/><stop offset="1" stop-color="#1C5E24"/></linearGradient>
+    <linearGradient id="gCover" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#E3E8EE"/><stop offset=".45" stop-color="#B7C0CA"/><stop offset="1" stop-color="#8F99A5"/></linearGradient>
+    <radialGradient id="gFloor" cx="0.5" cy="0.45" r="0.75"><stop offset="0" stop-color="#F4F6F9"/><stop offset=".65" stop-color="#E5E9EF"/><stop offset="1" stop-color="#D3D9E1"/></radialGradient>
+    <radialGradient id="gDomeOn" cx="0.5" cy="0.42" r="0.62"><stop offset="0" stop-color="#FFFDF0"/><stop offset=".55" stop-color="#FFE68A"/><stop offset="1" stop-color="#E9B93C"/></radialGradient>
+    <radialGradient id="gDomeOff" cx="0.5" cy="0.42" r="0.62"><stop offset="0" stop-color="#F4F1E2"/><stop offset="1" stop-color="#CFC8AC"/></radialGradient>
+    <radialGradient id="gPulley" cx="0.35" cy="0.32" r="0.8"><stop offset="0" stop-color="#D8DEE6"/><stop offset=".55" stop-color="#98A2AE"/><stop offset="1" stop-color="#616B78"/></radialGradient>
+    <linearGradient id="gBeam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF3C4" stop-opacity=".62"/><stop offset="1" stop-color="#FFD84A" stop-opacity=".10"/></linearGradient>
+    <radialGradient id="gPool" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#FFF6CC" stop-opacity=".75"/><stop offset="1" stop-color="#FFE07A" stop-opacity="0"/></radialGradient>
+    <filter id="fBlur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="7"/></filter>
+    <filter id="fBlurS" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>
+    <filter id="fGlow" x="-70%" y="-70%" width="240%" height="240%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="fDrop" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#233046" flood-opacity=".33"/></filter>
+  </defs>`;
+
+  const scene=$('scene');
+  function draw(){
+    let s=DEFS;
+
+    // ── 바닥 ──
+    s+=quad(P(85,-70,0),P(700,-70,0),P(700,255,0),P(85,255,0),'url(#gFloor)','#C9D0D9',1);
+    for(let gx=110; gx<=680; gx+=80){ const a=P(gx,-70,0), b=P(gx,255,0);
+      s+=`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="#D8DEE6"/>`; }
+    for(let gy=-70; gy<=255; gy+=65){ const a=P(85,gy,0), b=P(700,gy,0);
+      s+=`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="#D8DEE6"/>`; }
+    s+=`<g filter="url(#fBlur)" opacity=".28">`;
+    s+=quad(P(TBL_X0+8,TBL_Y0+12,0),P(TBL_X1-8,TBL_Y0+12,0),P(TBL_X1-8,TBL_Y1+18,0),P(TBL_X0+8,TBL_Y1+18,0),'#4A5566','',0);
+    s+=`</g>`;
+
+    // ── 포탈 뒤 기둥 ──
+    s+=column(PORTAL_X-1,GY_B,PORTAL_Z,0,13,'url(#gAluF)');
+    { const b=P(PORTAL_X-1,GY_B,0);
+      s+=`<ellipse cx="${b.x.toFixed(1)}" cy="${b.y.toFixed(1)}" rx="14" ry="5" fill="url(#gAluT)" stroke="#8A94A1"/>`; }
+
+    // ── 테이블 프레임 : 뒤쪽(상부 종빔 · 하부 종빔 · 기둥) ──
+    function frameRail(yy,zt,th){ return slab(TBL_X0,TBL_X1,yy-3.5,yy+3.5,zt,th,'url(#gAluT)','url(#gAluF)','url(#gAluB)','#78838F'); }
+    [TBL_X0+8,TBL_X0+150,TBL_X1-150,TBL_X1-8].forEach(lx=>{ s+=column(lx,TBL_Y1-4,UP_Z-DECK_TH,0,11,'url(#gAluB)','#6E7885'); });
+    s+=frameRail(TBL_Y1,LO_Z-6,7);
+    s+=frameRail(TBL_Y1,UP_Z-DECK_TH,8);
+
+    // ── 하부 리턴면 ──
+    s+=slab(TBL_X0+8,TBL_X1-8,TBL_Y0+9,TBL_Y1-9,LO_Z,5,'url(#gAluB)','url(#gAluB)','url(#gAluB)','#5F6975');
+    [TBL_X0+130,TBL_X0+250,TBL_X0+370].forEach(ax=>{
+      const a=[P(ax,TBL_YC-8,LO_Z+1),P(ax-24,TBL_YC-8,LO_Z+1),P(ax-24,TBL_YC-15,LO_Z+1),P(ax-42,TBL_YC,LO_Z+1),P(ax-24,TBL_YC+15,LO_Z+1),P(ax-24,TBL_YC+8,LO_Z+1),P(ax,TBL_YC+8,LO_Z+1)];
+      s+=`<polygon points="${a.map(pt).join(' ')}" fill="#F0A93B" stroke="#B57511" stroke-width=".7" opacity=".92"/>`; });
+
+    // ── 하부 리턴 중인 지그 ──
+    JIGS.filter(j=>!isUp(j)).sort((a,b)=>a.x-b.x).forEach(j=>{ s+=drawJig(j); });
+
+    // ── 리프터 2기 (개구부 승강 샤프트) ──
+    [LIFT_L,LIFT_R].forEach(lx=>{
+      s+=column(lx-19,TBL_YC+9,UP_Z-DECK_TH-1,LO_Z-10,7,'url(#gSteel)','#8A94A1');
+      s+=column(lx+19,TBL_YC+9,UP_Z-DECK_TH-1,LO_Z-10,7,'url(#gSteel)','#8A94A1'); });
+    JIGS.forEach(j=>{ if(j.z>LO_Z+1 && Math.min(Math.abs(j.x-LIFT_L),Math.abs(j.x-LIFT_R))<OPEN_HW){
+      const lx=(Math.abs(j.x-LIFT_L)<Math.abs(j.x-LIFT_R))?LIFT_L:LIFT_R;
+      s+=slab(lx-26,lx+26,TBL_YC-20,TBL_YC+20,j.z,4,'url(#gAluT)','url(#gAluF)','url(#gAluB)','#78838F');
+    } });
+    [[LIFT_L,'리프터 A ↑',-46],[LIFT_R,'리프터 B ↓',34]].forEach(([lx,lb,dx])=>{
+      const q=P(lx+dx,TBL_Y1+26,UP_Z+22);
+      s+=`<text x="${q.x.toFixed(1)}" y="${q.y.toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="900" fill="#2D5C99">${lb}</text>`; });
+
+    // ── 상부 데크 3구간 (양끝 승강 개구부) ──
+    const segs=[[TBL_X0,LIFT_L-OPEN_HW],[LIFT_L+OPEN_HW,LIFT_R-OPEN_HW],[LIFT_R+OPEN_HW,TBL_X1]];
+    segs.forEach(([a,b])=>{ s+=slab(a,b,TBL_Y0,TBL_Y1,UP_Z,DECK_TH,'url(#gAluT)','url(#gAluF)','url(#gAluB)','#7C8896'); });
+    { const ax=INSPECT_X-96;
+      const a=[P(ax-30,TBL_YC-6,UP_Z+.4),P(ax-4,TBL_YC-6,UP_Z+.4),P(ax-4,TBL_YC-13,UP_Z+.4),P(ax+14,TBL_YC,UP_Z+.4),P(ax-4,TBL_YC+13,UP_Z+.4),P(ax-4,TBL_YC+6,UP_Z+.4),P(ax-30,TBL_YC+6,UP_Z+.4)];
+      s+=`<polygon points="${a.map(pt).join(' ')}" fill="#FFD22E" stroke="#B08600" stroke-width=".8"/>`; }
+    { const q=P(LIFT_L-44,TBL_Y1+30,UP_Z+4);
+      s+=`<text x="${q.x.toFixed(1)}" y="${(q.y+11).toFixed(1)}" text-anchor="middle" font-size="8.5" font-weight="700" fill="#6C7684">테이블 개구부</text>`; }
+
+    // ── 테이블 프레임 : 앞쪽 ──
+    s+=frameRail(TBL_Y0,LO_Z-6,7);
+    s+=frameRail(TBL_Y0,UP_Z-DECK_TH,8);
+    [TBL_X0+8,TBL_X0+150,TBL_X1-150,TBL_X1-8].forEach(lx=>{ s+=column(lx,TBL_Y0+4,UP_Z-DECK_TH-4,0,11,'url(#gAluF)');
+      const b=P(lx,TBL_Y0+4,0); s+=`<ellipse cx="${b.x.toFixed(1)}" cy="${b.y.toFixed(1)}" rx="11" ry="4" fill="url(#gAluT)" stroke="#8A94A1"/>`; });
+    { const q=P(TBL_X0+186,TBL_Y0-26,LO_Z-14);
+      s+=`<text x="${q.x.toFixed(1)}" y="${(q.y+14).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="900" fill="#B45309">← 하부 리턴면 (빈 지그 순환)</text>`; }
+
+    // ── 이송 가이드 레일 (상부) ──
+    [TBL_Y0+9,TBL_Y1-9].forEach(yy=>{ s+=slab(LIFT_L+OPEN_HW,LIFT_R-OPEN_HW,yy-1.6,yy+1.6,UP_Z+3,3,'url(#gSteel)','url(#gSteel)','url(#gSteel)','#8892A0',.8); });
+
+    // ── 래치 해제 캠 (컨베이어 앞 가장자리 구조물) ──
+    { const cy=TBL_Y0-6, z0=UP_Z+2, z1=UP_Z+11;
+      const p1=P(CAM_X-10,cy,z0), p2=P(CAM_X+CAM_RUN,cy,z1), p3=P(CAM_X+CAM_RUN+46,cy,z1), p4=P(CAM_X+CAM_RUN+46,cy,z0);
+      s+=`<polygon points="${pt(p1)} ${pt(p2)} ${pt(p3)} ${pt(p4)}" fill="url(#gAluT)" stroke="#7C8896" stroke-width="1"/>`;
+      s+=slab(CAM_X-10,CAM_X+CAM_RUN+46,cy-3,cy,z0,10,'url(#gAluF)','url(#gAluF)','url(#gAluB)','#78838F');
+      const cl=P(CAM_X+8,cy-28,z1+16);
+      s+=`<text x="${cl.x.toFixed(1)}" y="${cl.y.toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="900" fill="#B45309">래치 해제 캠</text>`;
+      const g1=P(CAM_X+8,cy-22,z1+13), g2=P(CAM_X+8,cy-2,z1+2);
+      s+=`<line x1="${g1.x.toFixed(1)}" y1="${g1.y.toFixed(1)}" x2="${g2.x.toFixed(1)}" y2="${g2.y.toFixed(1)}" stroke="#B45309" stroke-width=".9" stroke-dasharray="3 2"/>`; }
+
+    // ── 스트리퍼 레일 (지그 하강 시 PCB를 붙잡는 고정 레일) ──
+    [TBL_YC-PCB_HD-3,TBL_YC+PCB_HD+3].forEach(yy=>{
+      s+=slab(LIFT_R-OPEN_HW-6,CHUTE_X0+4,yy-2,yy+2,PCB_TOP,3,'url(#gSteel)','url(#gSteel)','url(#gSteel)','#8892A0',.8); });
+    { const q=P(LIFT_R-30,TBL_Y1+16,PCB_TOP+8);
+      s+=`<text x="${q.x.toFixed(1)}" y="${q.y.toFixed(1)}" text-anchor="middle" font-size="8.5" font-weight="700" fill="#6C7684">스트리퍼 레일</text>`; }
+
+    // ── 배출 슈트 ──
+    { const y0=TBL_YC-PCB_HD-6, y1=TBL_YC+PCB_HD+6;
+      s+=quad(P(CHUTE_X0,y0,PCB_TOP),P(CHUTE_X1,y0,PCB_TOP-CHUTE_DROP),P(CHUTE_X1,y1,PCB_TOP-CHUTE_DROP),P(CHUTE_X0,y1,PCB_TOP),'url(#gAluT)','#7C8896',1);
+      [y0,y1].forEach(yy=>{ s+=quad(P(CHUTE_X0,yy,PCB_TOP+5),P(CHUTE_X1,yy,PCB_TOP-CHUTE_DROP+5),P(CHUTE_X1,yy,PCB_TOP-CHUTE_DROP),P(CHUTE_X0,yy,PCB_TOP),'url(#gAluF)','#7C8896',.9); });
+      const cl=P(CHUTE_X1-6,y0-16,PCB_TOP-CHUTE_DROP-14);
+      s+=`<text x="${cl.x.toFixed(1)}" y="${(cl.y+14).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="900" fill="#2D5C99">배출 슈트 → 다음 공정 작업자</text>`; }
+
+    // ── 상부 이송 중인 지그 ──
+    JIGS.filter(isUp).sort((a,b)=>a.x-b.x).forEach(j=>{ s+=drawJig(j); });
+
+    // ── 분리되어 배출되는 PCB + 푸셔 ──
+    if(outX!==null){
+      const z=chuteZ(outX);
+      s+=pcbBody(outX,z,false);
+      if(pushOn){ const px=outX-PCB_HW-5;
+        s+=slab(px-6,px,TBL_YC-10,TBL_YC+10,chuteZ(px)+11,11,'url(#gSteel)','url(#gAluF)','url(#gAluB)','#78838F');
+        const a=P(px-14,TBL_YC,z+6), b=P(px-3,TBL_YC,z+6);
+        s+=`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="#F0A93B" stroke-width="3" marker-end=""/>`; }
+    }
+
+    // ── 검사위치 센서 ──
+    { const s1=P(INSPECT_X-58,TBL_Y0-2,UP_Z+2), s2=P(INSPECT_X-58,TBL_Y0-2,UP_Z+22);
+      s+=`<rect x="${(s2.x-4.5).toFixed(1)}" y="${s2.y.toFixed(1)}" width="9" height="${(s1.y-s2.y).toFixed(1)}" rx="2" fill="url(#gAluF)" stroke="#69737F" stroke-width=".8"/>`;
+      s+=`<circle cx="${s2.x.toFixed(1)}" cy="${s2.y.toFixed(1)}" r="4.5" fill="${s_in?'#22C55E':'#C4C9D0'}"${s_in?' filter="url(#fGlow)"':''}/>`;
+      const lb=P(INSPECT_X-58,TBL_Y0-30,UP_Z+18);
+      s+=`<text x="${lb.x.toFixed(1)}" y="${lb.y.toFixed(1)}" text-anchor="middle" font-size="9" font-weight="700" fill="#5B6472">검사위치 센서</text>`; }
+
+    // ── 조명 풀 / 빔 ──
+    if(lightOn && A().pcb && isUp(A())){
+      const jigX=A().x;
+      const lp=P(jigX,TBL_YC,PCB_TOP+1);
+      s+=`<ellipse cx="${lp.x.toFixed(1)}" cy="${lp.y.toFixed(1)}" rx="66" ry="24" fill="url(#gPool)"/>`;
+      const l0=P(PORTAL_X,TBL_YC,DOME_Z);
+      const c1=P(jigX-PCB_HW-8,TBL_YC-PCB_HD-6,PCB_TOP+1), c2=P(jigX+PCB_HW+8,TBL_YC+PCB_HD+6,PCB_TOP+1);
+      s+=`<polygon points="${pt(l0)} ${pt(c1)} ${pt(c2)}" fill="url(#gBeam)"/>`;
+    }
+
+    // ── 포탈 앞 기둥 + 빔 + 고정 비전 헤드 ──
+    s+=`<g opacity=".62">`+column(PORTAL_X-1,GY_F,PORTAL_Z,0,13,'url(#gAluF)')+`</g>`;
+    { const b=P(PORTAL_X-1,GY_F,0);
+      s+=`<ellipse cx="${b.x.toFixed(1)}" cy="${b.y.toFixed(1)}" rx="14" ry="5" fill="url(#gAluT)" stroke="#8A94A1" opacity=".62"/>`; }
+    s+=slab(PORTAL_X-6,PORTAL_X+6,GY_F,GY_B,PORTAL_Z,11,'url(#gSteel)','url(#gAluF)','url(#gAluB)','#7C8896');
+    { const q=P(PORTAL_X,GY_B+14,PORTAL_Z);
+      s+=`<text x="${q.x.toFixed(1)}" y="${(q.y-12).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="900" fill="#2D5C99">고정 브릿지</text>`; }
+    // 헤드 브라켓 + 카메라 본체 + 돔 조명
+    s+=slab(PORTAL_X-25,PORTAL_X+25,TBL_YC-23,TBL_YC+23,PORTAL_Z-11,5,'url(#gAluT)','url(#gAluF)','url(#gAluB)','#7C8896');
+    // 헤드 어셈블리 200mm : 카메라 본체 → 렌즈 → 돔 조명 (조명 끝단 = DOME_Z)
+    { const camB=DOME_Z+HEAD_H*0.40;          // 카메라 본체 하단
+      s+=slab(PORTAL_X-13,PORTAL_X+13,TBL_YC-13,TBL_YC+13,HEAD_TOP,HEAD_TOP-camB,'url(#gCam)','url(#gCase)','url(#gCase)','#20262E');
+      s+=slab(PORTAL_X-8,PORTAL_X+8,TBL_YC-8,TBL_YC+8,camB,HEAD_H*0.18,'url(#gSteel)','url(#gCam)','url(#gCam)','#3C4652');   // 렌즈 경통
+      const dTop=DOME_Z+HEAD_H*0.22, dBot=DOME_Z;
+      const t1=P(PORTAL_X-11,TBL_YC,dTop), t2=P(PORTAL_X-22,TBL_YC,dBot);
+      const t3=P(PORTAL_X+22,TBL_YC,dBot), t4=P(PORTAL_X+11,TBL_YC,dTop);
+      s+=`<polygon points="${pt(t1)} ${pt(t2)} ${pt(t3)} ${pt(t4)}" fill="url(#gAluF)" stroke="#8A94A1" stroke-width=".9"/>`;
+      const d=P(PORTAL_X,TBL_YC,dBot);
+      s+=`<ellipse cx="${d.x.toFixed(1)}" cy="${d.y.toFixed(1)}" rx="22" ry="8.6" fill="${lightOn?'url(#gDomeOn)':'url(#gDomeOff)'}" stroke="#9AA3AF" stroke-width="1"${lightOn?' filter="url(#fGlow)"':''}/>`;
+      const l=P(PORTAL_X,TBL_YC,dBot+1.5);
+      s+=`<ellipse cx="${l.x.toFixed(1)}" cy="${l.y.toFixed(1)}" rx="7.5" ry="3.4" fill="#12161B" stroke="#3C4652"/>`;
+      s+=`<circle cx="${l.x.toFixed(1)}" cy="${l.y.toFixed(1)}" r="2.6" fill="#4E8CC9"/>`; }
+    { const q=P(PORTAL_X-58,TBL_YC-30,HEAD_TOP+2);
+      s+=`<text x="${(q.x-6).toFixed(1)}" y="${q.y.toFixed(1)}" text-anchor="end" font-size="9.5" font-weight="900" fill="#2D5C99">고정 비전 헤드</text>`; }
+    // 치수선 : 헤드 설치높이 200mm / 조명 끝단~PCB 250mm
+    function dimLine(dx,z0,z1,txt,col){
+      const a=P(PORTAL_X+dx,TBL_YC,z1), b=P(PORTAL_X+dx,TBL_YC,z0);
+      let o=`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="${col}" stroke-width="1" stroke-dasharray="4 3"/>`;
+      [a,b].forEach(q=>{ o+=`<line x1="${(q.x-4).toFixed(1)}" y1="${q.y.toFixed(1)}" x2="${(q.x+4).toFixed(1)}" y2="${q.y.toFixed(1)}" stroke="${col}" stroke-width="1"/>`; });
+      o+=`<text x="${(a.x+6).toFixed(1)}" y="${((a.y+b.y)/2+3).toFixed(1)}" font-size="10" font-weight="900" fill="${col}">${txt}</text>`;
+      return o; }
+    s+=dimLine(32,DOME_Z,HEAD_TOP,HEAD_MM+'mm (헤드)','#7A3E9D');
+    s+=dimLine(32,PCB_SURF,DOME_Z,WD_MM+'mm (WD)','#2D5C99');
+
+    // ── 스캔 라인 ──
+    if(scanT>=0 && A().pcb && isUp(A())){
+      const sx=A().x-PCB_HW+2*PCB_HW*scanT;
+      const a=P(sx,TBL_YC-PCB_HD,PCB_TOP+1.5), b=P(sx,TBL_YC+PCB_HD,PCB_TOP+1.5);
+      s+=`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="#E5484D" stroke-width="2.6" filter="url(#fGlow)"/>`;
+    }
+
+    // ── 경광등 ──
+    { const bx=TBL_X0+62, by=TBL_Y1+58;
+      s+=column(bx,by,UP_Z+52,0,7,'url(#gAluF)');
+      const t=P(bx,by,UP_Z+52);
+      const red = alarm, grn = !alarm && verdict==='OK';
+      s+=`<rect x="${(t.x-13).toFixed(1)}" y="${(t.y-46).toFixed(1)}" width="26" height="24" rx="5" fill="${red?'#DC2626':'#F1D2D0'}" stroke="#B4483F"${red?' filter="url(#fGlow)"':''}/>`;
+      s+=`<rect x="${(t.x-13).toFixed(1)}" y="${(t.y-22).toFixed(1)}" width="26" height="24" rx="5" fill="${grn?'#16A34A':'#D3E6D6'}" stroke="#4B8B58"${grn?' filter="url(#fGlow)"':''}/>`; }
+
+    // ── 검사위치 라벨 ──
+    { const q=P(INSPECT_X-30,TBL_Y1+18,UP_Z-8);
+      s+=`<text x="${q.x.toFixed(1)}" y="${q.y.toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="#5B6472">검사위치</text>`; }
+
+    scene.innerHTML=s;
+    updHUD();
+  }
+
+  // ===== PCB 본체 =====
+  function pcbBody(cx,zb,onJig){
+    let o='';
+    o+=slab(cx-PCB_HW,cx+PCB_HW,TBL_YC-PCB_HD,TBL_YC+PCB_HD,zb+3,3,'url(#gCase)','url(#gCase)','url(#gCase)','#0B0E11',1.1);
+    o+=slab(cx-PCB_HW+4,cx+PCB_HW-4,TBL_YC-PCB_HD+3,TBL_YC+PCB_HD-3,zb+5,2,'url(#gCover)','url(#gCover)','url(#gCover)','#828C99',.9);
+    o+=slab(cx-PCB_HW+9,cx+PCB_HW-9,TBL_YC-PCB_HD+5,TBL_YC+PCB_HD-5,zb+6.6,1.6,'url(#gPcb)','url(#gPcb)','url(#gPcb)','#17501E',.9);
+    for(let gu=-PCB_HW+13; gu<=PCB_HW-13; gu+=6){
+      const a=P(cx+gu,TBL_YC-PCB_HD+6,zb+6.8), b=P(cx+gu,TBL_YC+PCB_HD-6,zb+6.8);
+      o+=`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="#7FC98A" stroke-width=".7" opacity=".35"/>`; }
+    [[-11,'#E3B93C',5],[-1,'#48535F',7],[8,'#C0463A',4]].forEach(q=>{
+      o+=slab(cx+q[0],cx+q[0]+q[2],TBL_YC-3,TBL_YC+2,zb+8,1.4,q[1],q[1],q[1],'#00000033',.5); });
+    const cn=P(cx-PCB_HW-7,TBL_YC-4,zb+4);
+    o+=`<rect x="${(cn.x-7).toFixed(1)}" y="${(cn.y-5).toFixed(1)}" width="14" height="10" rx="2" fill="#F58B1F" stroke="#B2600F" stroke-width=".7"/>`;
+    return o;
+  }
+
+  // ===== 안착지그 =====
+  function drawJig(jg){
+    let o='';
+    const jigX=jg.x, jigZ=jg.z, latch=jg.latch, pcbOn=jg.pcb, clickT=jg.click;
+    const zt=jigZ+JIG_TH;
+    // 접지 그림자
+    if(jigZ>LO_Z+2){ const sh=P(jigX+3,TBL_YC+5,jigZ-0.5);
+      o+=`<ellipse cx="${sh.x.toFixed(1)}" cy="${sh.y.toFixed(1)}" rx="46" ry="16" fill="#0C1014" opacity=".22" filter="url(#fBlurS)"/>`; }
+    // 지그 베이스
+    o+=slab(jigX-JIG_HW,jigX+JIG_HW,TBL_YC-JIG_HD,TBL_YC+JIG_HD,zt,JIG_TH,'url(#gAluT)','url(#gAluF)','url(#gAluB)','#6E7885',1.1);
+    // 안착 포켓(가공면)
+    o+=quad(P(jigX-PCB_HW-1,TBL_YC-PCB_HD-1,zt+.2),P(jigX+PCB_HW+1,TBL_YC-PCB_HD-1,zt+.2),P(jigX+PCB_HW+1,TBL_YC+PCB_HD+1,zt+.2),P(jigX-PCB_HW-1,TBL_YC+PCB_HD+1,zt+.2),'#B9C2CC','#8A94A1',.8);
+    // 위치결정 핀 2개(대각)
+    [[-PCB_HW-3.5,-PCB_HD-3.5],[PCB_HW+3.5,PCB_HD+3.5]].forEach(([dx,dy])=>{
+      const a=P(jigX+dx,TBL_YC+dy,zt), b=P(jigX+dx,TBL_YC+dy,zt+7);
+      o+=bar(a,b,4.5,'url(#gSteel)','#6E7885');
+      o+=`<circle cx="${b.x.toFixed(1)}" cy="${b.y.toFixed(1)}" r="2.4" fill="#DCE3EB" stroke="#7C8896" stroke-width=".7"/>`; });
+    // PCB
+    if(pcbOn) o+=pcbBody(jigX,zt,true);
+    // 스프링 래치 2개 (±X)
+    [1,-1].forEach(sx=>{
+      const pivX=jigX+sx*(JIG_HW-2), pivZ=zt+7;
+      const a=P(pivX,TBL_YC,zt), b=P(pivX,TBL_YC,pivZ);
+      o+=bar(a,b,5,'url(#gSteel)','#6E7885');
+      const dxC=-sx, dzC=-0.5, dxO=sx*0.55, dzO=0.84;
+      const dx=dxO+(dxC-dxO)*latch, dz=dzO+(dzC-dzO)*latch;
+      const n=Math.hypot(dx,dz), L=11;
+      const e=P(pivX+dx/n*L, TBL_YC, pivZ+dz/n*L);
+      const p=P(pivX,TBL_YC,pivZ);
+      o+=bar(p,e,4.5,latch>0.5?'#F0A93B':'url(#gSteel)',latch>0.5?'#B57511':'#6E7885');
+      o+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" fill="#8C97A4" stroke="#5A6470"/>`; });
+    // 캠 롤러(앞면)
+    { const r=P(jigX,TBL_YC-JIG_HD-2,zt+5);
+      o+=`<circle cx="${r.x.toFixed(1)}" cy="${r.y.toFixed(1)}" r="4" fill="url(#gPulley)" stroke="#5B6470"/>`; }
+    // 딸깍 효과
+    if(clickT>=0){ const c=P(jigX,TBL_YC,zt+10), rr=12+16*clickT;
+      o+=`<ellipse cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" rx="${rr.toFixed(1)}" ry="${(rr*0.36).toFixed(1)}" fill="none" stroke="#F0A93B" stroke-width="${(2.6*(1-clickT)).toFixed(1)}" opacity="${(1-clickT).toFixed(2)}"/>`;
+      const tx=P(jigX,TBL_YC,zt+22);
+      o+=`<text x="${tx.x.toFixed(1)}" y="${tx.y.toFixed(1)}" text-anchor="middle" font-size="11" font-weight="900" fill="#B45309" opacity="${(1-clickT).toFixed(2)}">딸깍</text>`; }
+    // 라벨
+    { const q=P(jigX+JIG_HW+12,TBL_YC+JIG_HD+14,jigZ+16), on=(jg===A());
+      o+=`<text x="${q.x.toFixed(1)}" y="${q.y.toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="900" fill="${on?'#2D5C99':'#7A8492'}">안착지그 ${jg.id}</text>`; }
+    return o;
+  }
+
+  function updHUD(){
+    const a=A(), b=B();
+    function pos(j){ if(j.z<=LO_Z+1) return '하부 리턴';
+      if(j.z<UP_Z-1) return '승강 중';
+      if(Math.abs(j.x-LIFT_L)<8) return '안착부위 대기';
+      if(Math.abs(j.x-INSPECT_X)<8) return '검사위치';
+      if(Math.abs(j.x-LIFT_R)<8) return '배출부';
+      return '이송 중'; }
+    $('vX').textContent=((a.x-TBL_X0)*U2MM).toFixed(0)+' mm';
+    $('vZ').textContent=((a.z-LO_Z)*U2MM).toFixed(0)+' mm';
+    $('vL').textContent=a.latch>0.5?'고정':'해제';
+    $('axL').className='ax '+(a.latch>0.5?'ok':(a.latch>0.02?'mv':''));
+    $('axZ').className='ax '+((a.z>LO_Z+1&&a.z<UP_Z-1)?'mv':'');
+    $('axX').className='ax';
+    $('flatVal').textContent = a.pcb ? (a.latch>0.5?'지그 고정 0.0°':'해제') : '-';
+    $('jigVal').textContent = a.id+' '+pos(a);
+    $('chipJig').className='chip on';
+    $('jig2Val').textContent = b.id+' '+pos(b);
+    $('chipJig2').className='chip'+(isUp(b)?' on':'');
+    $('lampVal').textContent=lightOn?'ON':'OFF';
+    $('chipLamp').className='chip'+(lightOn?' on':'');
+    $('senVal').textContent=s_in?'ON':'OFF';
+    $('chipSen').className='chip'+(s_in?' on':'');
+  }
+
+  function renderSteps(){
+    let html='',last=null;
+    STATES.forEach((st,i)=>{
+      if(st.phase!==last){html+=`<div class="phase-h">${st.phase}</div>`;last=st.phase;}
+      const cls=(i<idx?'done ':'')+(i===idx?'cur ':'')+((st.type==='wait'||st.type==='alarmwait')?'wait ':'');
+      html+=`<div class="step ${cls}"><span class="no">${i+1}</span><span>${st.label}</span></div>`;
+    });
+    stepList.innerHTML=html;
+    const cur=stepList.querySelector('.step.cur'); if(cur)cur.scrollIntoView({block:'nearest',behavior:'smooth'});
+    const cs=STATES[idx];
+    if(cs){ $('stepMobileText').textContent=cs.label; $('stepMobile').querySelector('.no').textContent=(idx+1);
+      const m=$('stepMobile'); m.classList.toggle('wait',cs.type==='wait'); m.classList.toggle('alarm',cs.type==='alarmwait'); }
+  }
+
+  function durs(){const v=parseInt($('speed').value||6,10);return {move:1750-v*125, act:680-v*44};}
+  function anim(dur,step,done){
+    const my=++animToken, t0=performance.now();
+    (function f(now){ if(my!==animToken)return;
+      const k=Math.min(((now||performance.now())-t0)/dur,1);
+      const e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+      step(e,k); draw();
+      if(k<1)requestAnimationFrame(f); else { step(1,1); draw(); done&&done(); } })(performance.now());
+  }
+  function pause(ms,done){const my=++animToken;setTimeout(()=>{if(my===animToken)done&&done();},ms);}
+
+  function runState(){
+    if(!running)return; renderSteps();
+    const st=STATES[idx]; $('curStateText').textContent='진행: '+st.label;
+    if(st.cond==='ng' && verdict!=='NG') return next();
+    if(st.cond==='ok' && verdict!=='OK') return next();
+
+    if(st.type==='lift'){
+      const a=A();
+      if(a.z>=UP_Z-1) return next();                    // 이미 상부 이송면이면 생략
+      addLog('[리프터 A] '+st.label);
+      a.x=LIFT_L; a.latch=0; a.pcb=false; outX=null; pushOn=false;
+      anim(durs().move, e=>{ a.z=LO_Z+(UP_Z-LO_Z)*e; }, ()=>{ addLog('[지그'+a.id+'] 상부 이송면 도달'); next(); });
+
+    } else if(st.type==='load'){
+      const a=A();
+      if(a.pcb) return next();                          // 이미 적재 완료면 생략
+      addLog('[작업자] 지그'+a.id+'에 PCB 안착');
+      a.pcb=true; draw();
+      pause(durs().act, ()=>{
+        anim(durs().act*1.1, e=>{ a.latch=e; a.click=e; }, ()=>{
+          a.click=-1; a.latch=1;
+          addLog('[안착지그'+a.id+'] 딸깍 — 위치결정 핀 2점 + 래치 2점 고정 (수평 0.0°)');
+          next(); });
+      });
+
+    } else if(st.type==='feed'){
+      const a=A(), b=B();
+      if(isUp(a) && Math.abs(a.x-INSPECT_X)<2){ addLog('[이송] 지그'+a.id+' 이미 검사위치 — 이송 생략'); return next(); }
+      addLog('[이송] '+st.label);
+      const bx0=b.x, bRet=(!isUp(b) && Math.abs(b.x-LIFT_L)>4);
+      if(bRet) addLog('[리턴] 지그'+b.id+' 하부 리턴 이송 (우 → 좌)');
+      anim(durs().move*1.2, e=>{
+        a.x=LIFT_L+(INSPECT_X-LIFT_L)*e;
+        if(bRet) b.x=bx0+(LIFT_L-bx0)*e;
+      }, ()=>{ addLog('[이송] 지그'+a.id+' 검사위치 정지 (X'+((a.x-TBL_X0)*U2MM).toFixed(0)+'mm)'); next(); });
+
+    } else if(st.type==='standby'){
+      const b=B();
+      if(isUp(b) && b.pcb) return next();
+      addLog('[선행 대기] '+st.label);
+      b.x=LIFT_L; b.latch=0;
+      const z0=b.z, rise=(UP_Z-z0)>1;
+      if(rise) addLog('[리프터 A] 지그'+b.id+' 상승 → 안착위치');
+      anim(rise?durs().move:1, e=>{ b.z=z0+(UP_Z-z0)*e; }, ()=>{
+        b.z=UP_Z; b.pcb=true; addLog('[작업자] 지그'+b.id+'에 PCB 안착'); draw();
+        anim(durs().act*1.1, e=>{ b.latch=e; b.click=e; }, ()=>{
+          b.click=-1; b.latch=1;
+          addLog('[안착지그'+b.id+'] 딸깍 고정 — 안착부위에서 다음 검사 대기');
+          next(); });
+      });
+
+    } else if(st.type==='sensor'){
+      s_in=st.on; addLog('[센서] '+st.label); draw(); pause(durs().act,next);
+
+    } else if(st.type==='light'){
+      lightOn=st.on; addLog('[조명] '+st.label); draw(); pause(durs().act,next);
+
+    } else if(st.type==='scan'){
+      addLog('[비전] 고정 헤드 스캔 시작 — 헤드 '+HEAD_MM+'mm · WD '+WD_MM+'mm 고정');
+      anim(durs().move+320, e=>{ scanT=e; }, ()=>{ scanT=-1; draw(); next(); });
+
+    } else if(st.type==='verdict'){
+      const sel=$('verdictSel').value;
+      if(sel==='OK')verdict='OK'; else if(sel==='NG')verdict='NG'; else {verdict=(autoTog%3===2)?'NG':'OK';autoTog++;}
+      $('verdictLamp').textContent=verdict; $('verdictLamp').className='verdict-lamp '+(verdict==='OK'?'ok':'ng');
+      addLog('[판정] '+verdict);
+      $('mesInd').className='mes-ind sending'; $('mesInd').innerHTML='<span class="dot"></span>MES 전송 중... ('+verdict+')'; draw();
+      pause(durs().act+300,()=>{ $('mesInd').className='mes-ind'; $('mesInd').innerHTML='<span class="dot"></span>MES 전송 완료 ('+verdict+')'; addLog('[MES] '+verdict+' 전송 완료'); next(); });
+
+    } else if(st.type==='alarmwait'){
+      alarm=true; $('alarmBanner').classList.add('show'); waitingSignal='RESUME'; updateSigBtns(); draw();
+      addLog('⚠ [알람] NG 발생 — 검사 중단. 래치 수동 해제 후 NG품 제거');
+      if($('autoSig').checked) autoTimer=setTimeout(()=>fireSignal('RESUME',true),2600);
+
+    } else if(st.type==='release'){
+      const a=A(), b=B();
+      addLog('[배출 이송] '+st.label);
+      s_in=false;
+      const x0=a.x, bx0=b.x;
+      const bReady = isUp(b) && b.pcb && Math.abs(b.x-LIFT_L)<8;
+      let held=false, logged=false;
+      if(bReady) addLog('[선행 이송] 지그'+b.id+' 안착위치 → 검사위치 동시 이동');
+      else       addLog('[대기] 지그'+b.id+' 안착위치에서 대기 (준비 미완)');
+      anim(durs().move*1.25, e=>{
+        a.x=x0+(LIFT_R-x0)*e;
+        if(a.pcb||a.latch>0){
+          const nl=1-Math.max(0,Math.min(1,(a.x-CAM_X)/CAM_RUN));
+          if(nl<a.latch) a.latch=nl;
+          if(!logged && a.latch<0.99){ logged=true; addLog('[캠 접촉] 지그'+a.id+' 롤러가 해제 캠에 닿음 → 래치 개방 시작'); }
+        }
+        if(bReady){                                  // 안전 간격 내로 접근하면 안착위치에서 대기
+          const want=bx0+(INSPECT_X-bx0)*e, lim=a.x-SAFE_GAP;
+          if(want>lim){ b.x=Math.max(bx0,lim); if(!held){held=true; addLog('[간섭 회피] 지그'+b.id+' 안전간격 확보 위해 감속 대기');} }
+          else b.x=want;
+        }
+      }, ()=>{ a.x=LIFT_R; a.latch=0;
+        if(bReady){ b.x=INSPECT_X; addLog('[선행 이송] 지그'+b.id+' 검사위치 도착'); }
+        addLog('[래치] 개방 완료 — PCB 구속 해제'); next(); });
+
+    } else if(st.type==='strip'){
+      const a=A();
+      addLog('[리프터 B] '+st.label);
+      if(a.pcb){ outX=LIFT_R; a.pcb=false; addLog('[분리] 스트리퍼 레일이 PCB를 잡아 지그'+a.id+'에서 분리'); }
+      anim(durs().move, e=>{ a.z=UP_Z+(LO_Z-UP_Z)*e; }, ()=>{ addLog('[지그'+a.id+'] 하부 리턴면 도달'); next(); });
+
+    } else if(st.type==='discharge'){
+      const a=A(), has=(outX!==null);
+      if(has) addLog('[배출] 푸셔 전진 → PCB 슈트로 밀어냄');
+      addLog('[즉시 복귀] PCB 분리 완료 → 지그'+a.id+' 하부 리턴 개시 (우 → 좌)');
+      pushOn=has;
+      const px0=LIFT_R, px1=CHUTE_X1-6, jx0=a.x;
+      anim(durs().move*1.3, e=>{
+        if(has) outX=px0+(px1-px0)*Math.min(1,e/0.8);
+        a.x=jx0+(LIFT_L-jx0)*e; a.z=LO_Z;
+      }, ()=>{
+        a.x=LIFT_L; a.z=LO_Z; pushOn=false;
+        if(has) addLog('[배출 완료] 다음 공정 작업자 앞으로 이송');
+        addLog('[지그'+a.id+'] 안착위치 하부 도착 — 앞 지그 출발 후 상승'); draw();
+        pause(durs().act,()=>{ outX=null; next(); }); });
+
+    } else if(st.type==='swap'){
+      act=1-act;
+      addLog('[교대] 검사 지그 → '+A().id+' (안착부위 대기 중) · 대기 지그 → '+B().id);
+      draw(); pause(durs().act,next);
+
+    } else if(st.type==='wait'){
+      waitingSignal=st.signal; addLog('[대기] START 신호 대기...'); updateSigBtns(); draw();
+      if($('autoSig').checked) autoTimer=setTimeout(()=>fireSignal(st.signal,true),1200);
+    }
+  }
+
+  function next(){
+    idx++;
+    if(idx>=STATES.length){
+      idx=LOOP_START; cycleCount++; $('cycleCount').textContent=cycleCount;
+      if(verdict==='OK'){okCount++;$('okCount').textContent=okCount;} else if(verdict==='NG'){ngCount++;$('ngCount').textContent=ngCount;}
+      addLog('=== 1개 검사 완료 (총 '+cycleCount+'개) ===');
+    }
+    if(running) runState();
+  }
+
+  function updateSigBtns(){ $('sigStart').disabled=(waitingSignal!=='START'); $('btnResume').disabled=(waitingSignal!=='RESUME'); }
+  function fireSignal(sig,auto){
+    if(waitingSignal!==sig)return;
+    if(sig==='RESUME'){ A().pcb=false; A().latch=0; s_in=false; alarm=false; $('alarmBanner').classList.remove('show');
+      addLog((auto?'[자동신호] ':'[신호입력] ')+'NG품 제거 확인 → 검사 재개'); }
+    else addLog((auto?'[자동신호] ':'[신호입력] ')+'START 수신 → 운전 개시');
+    waitingSignal=null; updateSigBtns(); if(autoTimer){clearTimeout(autoTimer);autoTimer=null;} next();
+  }
+
+  $('btnRun').addEventListener('click',()=>{ if(running)return; running=true; $('btnRun').disabled=true; addLog('▶ 자동 운전 시작'); runState(); });
+  $('btnStop').addEventListener('click',()=>{ running=false; animToken++; if(autoTimer){clearTimeout(autoTimer);autoTimer=null;} $('btnRun').disabled=false; addLog('■ 정지'); draw(); });
+  $('btnReset').addEventListener('click',()=>{
+    running=false; animToken++; if(autoTimer){clearTimeout(autoTimer);autoTimer=null;}
+    idx=0; waitingSignal=null;
+    act=0; outX=null; pushOn=false;
+    JIGS[0].x=LIFT_L; JIGS[0].z=LO_Z; JIGS[1].x=LIFT_R; JIGS[1].z=LO_Z;
+    JIGS.forEach(j=>{ j.latch=0; j.pcb=false; j.click=-1; });
+    lightOn=false; scanT=-1; s_in=false; alarm=false; verdict=null;
+    $('alarmBanner').classList.remove('show');
+    $('verdictLamp').textContent='--'; $('verdictLamp').className='verdict-lamp';
+    $('mesInd').className='mes-ind'; $('mesInd').innerHTML='<span class="dot"></span>MES 전송: 대기';
+    $('btnRun').disabled=false; updateSigBtns(); draw(); renderSteps(); $('curStateText').textContent=''; addLog('↺ 초기화');
+  });
+  $('sigStart').addEventListener('click',()=>fireSignal('START',false));
+  $('btnResume').addEventListener('click',()=>fireSignal('RESUME',false));
+  $('clearLog').addEventListener('click',()=>logBox.textContent='');
+  $('autoSig').addEventListener('change',()=>{ if($('autoSig').checked&&running&&waitingSignal) autoTimer=setTimeout(()=>fireSignal(waitingSignal,true),1200); });
+
+  function setYaw(v){ VIEW.yaw=+v; $('viewYaw').value=v; $('yawVal').textContent=(+v).toFixed(0)+'°'; draw(); }
+  $('viewYaw').addEventListener('input',e=>setYaw(e.target.value));
+  $('btnFront').addEventListener('click',()=>setYaw(0));
+  $('btnIso').addEventListener('click',()=>setYaw(45));
+  $('btnSide').addEventListener('click',()=>setYaw(90));
+
+  draw(); renderSteps(); updateSigBtns();
+  addLog('안착지그 2대 순환식 비전 검사 시뮬레이터 Vision-JIG v1.4 준비 완료.');
+</script>
+<script>
+(function(){
+  if(location.protocol==='file:') return;
+  var cur=null, TICK=30000;
+  function hash(s){ var h=0; for(var i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0;} return h; }
+  function fetchSelf(cb){ fetch(location.pathname+'?_cb='+Date.now(),{cache:'no-store'})
+    .then(function(r){return r.ok?r.text():null;}).then(function(t){ if(t) cb(hash(t)); }).catch(function(){}); }
+  function banner(){ if(document.getElementById('__upd'))return;
+    var d=document.createElement('div'); d.id='__upd';
+    d.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#1E3A5F;color:#fff;font-family:"Noto Sans KR",sans-serif;font-size:13px;font-weight:700;padding:10px;text-align:center;cursor:pointer';
+    d.textContent='새 버전이 있습니다 — 지금 적용하려면 여기를 누르세요';
+    d.onclick=function(){ location.replace(location.pathname+'?v='+Date.now()); };
+    document.body.appendChild(d);
+    setTimeout(function(){ location.replace(location.pathname+'?v='+Date.now()); },5000); }
+  fetchSelf(function(h){cur=h;});
+  setInterval(function(){ fetchSelf(function(h){ if(cur!==null&&h!==cur) banner(); }); },TICK);
+})();
+</script>
+</body>
+</html>
