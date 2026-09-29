@@ -125,7 +125,7 @@
 
 <header class="cover"><div class="inner">
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (벨트 고정 안착지그)</h1>
-  <span class="hver" id="hVer">v2.0</span>
+  <span class="hver" id="hVer">v2.1</span>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
     <button id="btnEn" type="button">English</button>
@@ -223,11 +223,11 @@
   </section>
 </main>
 
-<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v2.0</span></footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v2.1</span></footer>
 
 <script>
   // ===== 3D 월드 (X:이송방향, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
-  const VER='v2.0';
+  const VER='v2.1';
   const U2MM=300/90;
   const WX0=212, WX1=468, BELT_Y0=0, BELT_Y1=112;            // 작업대 프레임 (3축 시뮬레이터와 동일)
   const BELT_X0=WX0-60, BELT_X1=WX1+75;                      // 좌 200mm · 우 250mm 돌출
@@ -327,7 +327,7 @@
       s_wait:'START 대기',
       s_load:'안착위치 — 작업자 PCB 안착 → 딸깍 래치 고정',
       s_sensor:'검사위치 지그 감지',
-      s_lampon:'돔 조명 ON', s_scan:'고정 비전 헤드 스캔',
+      s_lampon:'돔 조명 ON', s_scan:'고정 비전 촬영 (1회 노광)',
       s_verdict:'판정 + MES 전송', s_alarm:'NG 알람 · 제거 대기',
       s_lampoff:'돔 조명 OFF',
       s_disch:'배출위치 — 스트리퍼 분리 → 푸셔 → 슈트 배출',
@@ -344,7 +344,7 @@
       lg_sens:(k,j)=>'[센서] '+T(k)+(j?' — J'+j:' — 지그 없음'),
       lg_lamp_skip:'[조명] 검사위치 PCB 없음 — 검사 생략',
       lg_lamp:k=>'[조명] '+T(k),
-      lg_scan:(j,s,h,w)=>'[비전] J'+j+' 스캔 — 검사시간 '+s+'초 · 헤드 '+h+'mm · WD '+w+'mm',
+      lg_scan:(j,s,h,w)=>'[비전] J'+j+' 촬영 — 화각 정렬 후 1회 노광 ('+s+'초) · 헤드 '+h+'mm · WD '+w+'mm',
       lg_verdict:(j,v)=>'[판정] J'+j+' → '+v,
       lg_mes:v=>'[MES] '+v+' 전송 완료',
       lg_alarm:'⚠ [알람] NG 발생 — 검사 중단. 래치 수동 해제 후 NG품 제거',
@@ -385,7 +385,7 @@
       s_wait:'Waiting for START',
       s_load:'Load station — operator seats PCB → click-latch locks',
       s_sensor:'Inspect-station jig detected',
-      s_lampon:'Dome light ON', s_scan:'Fixed vision head scan',
+      s_lampon:'Dome light ON', s_scan:'Fixed vision capture (single exposure)',
       s_verdict:'Verdict + MES upload', s_alarm:'NG alarm · awaiting removal',
       s_lampoff:'Dome light OFF',
       s_disch:'Eject station — stripper separates → pusher → chute',
@@ -400,7 +400,7 @@
       lg_sens:(k,j)=>'[Sensor] '+T(k)+(j?' — J'+j:' — no jig'),
       lg_lamp_skip:'[Light] No PCB at inspect station — inspection skipped',
       lg_lamp:k=>'[Light] '+T(k),
-      lg_scan:(j,s,h,w)=>'[Vision] J'+j+' scan — inspect time '+s+' s · head '+h+' mm · WD '+w+' mm',
+      lg_scan:(j,s,h,w)=>'[Vision] J'+j+' capture — FOV aligned, single exposure ('+s+' s) · head '+h+' mm · WD '+w+' mm',
       lg_verdict:(j,v)=>'[Verdict] J'+j+' → '+v,
       lg_mes:v=>'[MES] '+v+' upload complete',
       lg_alarm:'⚠ [Alarm] NG detected — inspection halted. Release latch manually and remove NG part',
@@ -870,12 +870,19 @@
     s+=dimLine(-34,DOME_Z,HEAD_TOP,HEAD_MM+T('sv_head'),'#7A3E9D');
     s+=dimLine(-34,PCB_SURF,DOME_Z,WD_MM+T('sv_wd'),'#2D5C99');
 
-    // ── 스캔 라인 ──
+    // ── 촬영 : 화각 프레임 + 셔터 플래시 (쓸고 지나가는 스캔 아님) ──
     { const ji=jigAtIns();
       if(scanT>=0 && ji && ji.pcb){
-        const sx=INSPECT_X-PCB_HW+2*PCB_HW*scanT;
-        const a=P(sx,PCB_YC-PCB_HD,PCB_TOP+1.5), b=P(sx,PCB_YC+PCB_HD,PCB_TOP+1.5);
-        s+=`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="#E5484D" stroke-width="2.6" filter="url(#fGlow)"/>`;
+        const fz=PCB_SURF+.6, FU=PCB_HW+3, FV=PCB_HD+3;
+        const c4=[P(INSPECT_X-FU,PCB_YC-FV,fz),P(INSPECT_X+FU,PCB_YC-FV,fz),P(INSPECT_X+FU,PCB_YC+FV,fz),P(INSPECT_X-FU,PCB_YC+FV,fz)];
+        const fl = scanT<0.28 ? (1-scanT/0.28) : 0;
+        if(fl>0) s+=`<polygon points="${c4.map(pt).join(' ')}" fill="#FFFFFF" opacity="${(fl*0.75).toFixed(2)}"/>`;
+        [[0,1,3],[1,0,2],[2,3,1],[3,2,0]].forEach(([i2,a2,b2])=>{
+          const P0=c4[i2], Pa=c4[a2], Pb=c4[b2], t=0.26;
+          const A1={x:P0.x+(Pa.x-P0.x)*t, y:P0.y+(Pa.y-P0.y)*t}, B1={x:P0.x+(Pb.x-P0.x)*t, y:P0.y+(Pb.y-P0.y)*t};
+          s+=`<path d="M${A1.x.toFixed(1)},${A1.y.toFixed(1)} L${P0.x.toFixed(1)},${P0.y.toFixed(1)} L${B1.x.toFixed(1)},${B1.y.toFixed(1)}" fill="none" stroke="#FF5A5F" stroke-width="2.2" stroke-linecap="round" filter="url(#fGlow)"/>`; });
+        { const g0=c4[0], g1=c4[1], gx=g0.x+(g1.x-g0.x)*scanT, gy=g0.y+(g1.y-g0.y)*scanT;   // 노광 진행 게이지
+          s+=`<line x1="${g0.x.toFixed(1)}" y1="${(g0.y-3).toFixed(1)}" x2="${gx.toFixed(1)}" y2="${(gy-3).toFixed(1)}" stroke="#FF5A5F" stroke-width="1.4" opacity=".75"/>`; }
       } }
 
     scene.innerHTML=s;
