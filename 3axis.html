@@ -124,7 +124,7 @@
 <body>
 
 <header class="cover"><div class="inner">
-  <span class="hver" id="hVer">v3.3</span>
+  <span class="hver" id="hVer">v3.4</span>
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (Z·Rx·Ry 3축 헤드)</h1>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
@@ -195,8 +195,8 @@
           <button id="btnReset" data-i18n="bt_reset">↺ 초기화</button>
           <label class="ck"><input type="checkbox" id="autoSig" checked> <span data-i18n="lb_autosig">자동신호</span></label>
           <span style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-            <span style="font-size:12px;color:var(--text-light);" data-i18n="lb_speed">속도</span>
-            <input type="range" id="speed" min="1" max="10" value="6" style="width:120px;">
+            <span style="font-size:12px;color:var(--text-light);"><span data-i18n="lb_speed">동작시간</span> <b id="speedVal" style="color:var(--navy-dark);">0.9초</b></span>
+            <input type="range" id="speed" min="3" max="30" step="1" value="9" style="width:120px;">
           </span>
         </div>
         <div class="row">
@@ -222,7 +222,7 @@
   </section>
 </main>
 
-<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.3</span></footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.4</span></footer>
 
 <script>
   // ===== 3D 월드 (X:컨베이어, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
@@ -271,7 +271,7 @@
   }
 
   // ===== 다국어 (한국어 / English) =====
-  const VER='v3.3';
+  const VER='v3.4';
   const I18N={
     ko:{
       title:'PCB 비전 검사 시뮬레이터 (3축 헤드)',
@@ -285,7 +285,7 @@
       lb_view:'시점', vw_front:'정면', vw_iso:'45°', vw_side:'측면',
       ct_done:'완료',
       bt_run:'▶ 자동 운전 시작', bt_stop:'■ 정지', bt_reset:'↺ 초기화',
-      lb_autosig:'자동신호', lb_speed:'속도', bt_resume:'검사 계속', bt_clr:'로그 지우기',
+      lb_autosig:'자동신호', lb_speed:'동작시간', sec_u:'초', bt_resume:'검사 계속', bt_clr:'로그 지우기',
       ft_dept:'인시스 AI혁신 연구개발실',
       align_ok:'⊥ 직각', align_adj:'조정중',
       mes_wait:'MES 전송: 대기', mes_send:v=>'MES 전송 중... ('+v+')', mes_done:v=>'MES 전송 완료 ('+v+')',
@@ -339,7 +339,7 @@
       lb_view:'View', vw_front:'Front', vw_iso:'45°', vw_side:'Side',
       ct_done:'Done',
       bt_run:'▶ Start Auto Run', bt_stop:'■ Stop', bt_reset:'↺ Reset',
-      lb_autosig:'Auto Signal', lb_speed:'Speed', bt_resume:'Resume', bt_clr:'Clear Log',
+      lb_autosig:'Auto Signal', lb_speed:'Step Time', sec_u:'s', bt_resume:'Resume', bt_clr:'Clear Log',
       ft_dept:'INSYS AI Innovation R&D Center',
       align_ok:'⊥ Normal', align_adj:'Adjusting',
       mes_wait:'MES Upload: Idle', mes_send:v=>'MES Uploading... ('+v+')', mes_done:v=>'MES Upload Complete ('+v+')',
@@ -941,7 +941,9 @@
       const m=$('stepMobile'); m.classList.toggle('wait',cs.type==='wait'); m.classList.toggle('alarm',cs.type==='alarmwait'); }
   }
 
-  function durs(){const v=parseInt($('speed').value||6,10);return {move:1650-v*120, act:660-v*42};}
+  function stepSec(){ return (parseInt($('speed').value,10)||9)/10; }
+  function durs(){ const sec=stepSec(); return {move:Math.round(sec*1000), act:Math.round(sec*440)}; }
+  function renderSpeed(){ $('speedVal').textContent=stepSec().toFixed(1)+T('sec_u'); }
   function tweenAxes(tg, marks, done, k2){
     const my=++animToken, s0={ax,ay,az,th,ph}, dur=durs().move*(k2||1), t0=performance.now();
     movingAx={}; (marks||[]).forEach(k=>movingAx[k]=true);
@@ -1067,6 +1069,7 @@
   $('autoSig').addEventListener('change',()=>{ if($('autoSig').checked&&running&&waitingSignal) autoTimer=setTimeout(()=>fireSignal(waitingSignal,true),1200); });
 
   function setYaw(v){ VIEW.yaw=+v; $('viewYaw').value=v; $('yawVal').textContent=(+v).toFixed(0)+'°'; draw(); }
+  $('speed').addEventListener('input',renderSpeed);
   $('viewYaw').addEventListener('input',e=>setYaw(e.target.value));
   $('btnFront').addEventListener('click',()=>setYaw(0));
   $('btnIso').addEventListener('click',()=>setYaw(45));
@@ -1081,7 +1084,7 @@
     $('hVer').textContent=VER; $('fVer').textContent=VER;
     $('btnKo').classList.toggle('on',LANG==='ko');
     $('btnEn').classList.toggle('on',LANG==='en');
-    renderMes(); renderSteps(); renderLog(); draw();
+    renderMes(); renderSteps(); renderLog(); renderSpeed(); draw();
     $('curStateText').textContent = curSt? T('cur',LB(curSt)) : '';
   }
   function setLang(v){
