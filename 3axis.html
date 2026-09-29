@@ -124,7 +124,7 @@
 <body>
 
 <header class="cover"><div class="inner">
-  <span class="hver" id="hVer">v3.1</span>
+  <span class="hver" id="hVer">v3.2</span>
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (Z·Rx·Ry 3축 헤드)</h1>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
@@ -222,7 +222,7 @@
   </section>
 </main>
 
-<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.1</span></footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.2</span></footer>
 
 <script>
   // ===== 3D 월드 (X:컨베이어, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
@@ -271,7 +271,7 @@
   }
 
   // ===== 다국어 (한국어 / English) =====
-  const VER='v3.1';
+  const VER='v3.2';
   const I18N={
     ko:{
       title:'PCB 비전 검사 시뮬레이터 (3축 헤드)',
@@ -680,6 +680,52 @@
     // ── 좌측 투입구 : 프레임(캐비닛)이 가리지 않도록 캐비닛 위에 재그리기 ──
     s+=`<clipPath id="clpIn">${hullPoly(BELT_X0-3,WX0,BELT_Y0-3,BELT_Y1+3,BELT_Z-BELT_TH-3,RAIL_Z+3)}</clipPath>`;
     s+=`<g clip-path="url(#clpIn)">${conveyorGeo()}</g>`;
+
+    // ── 검사결과 확인용 19" 모니터 (프레임 우측 상단) ──
+    // 19" 16:9 : 유효화면 420.6 x 236.6mm, 베젤 포함 440 x 256mm
+    { const MA=25*Math.PI/180, ca=Math.cos(MA), sa=Math.sin(MA);
+      const MCX=470, MCY=148, MCZ=BELT_Z+132;                       // 모니터 중심 (우측 상단)
+      const MM2=(u,v,n)=>({X:MCX+u*ca-n*sa, Y:MCY+u*sa-n*ca, Z:MCZ+v});
+      const HW=66, HH=38.4, SW=63, SH=35.5;                         // 외형 반치수 / 유효화면 반치수
+      // 지지 암 : 갠트리 우측 기둥 → 모니터 뒤판
+      s+=solid(MT,BRIDGE_X+GXS-5,MCX-4,GY_B-3.5,GY_B+3.5,MCZ-4,MCZ+4,MAT.alu,.7);
+      s+=solid(MT,BRIDGE_X+GXS-8,BRIDGE_X+GXS+8,GY_B-7,GY_B+7,MCZ-9,MCZ+9,MAT.steel,.7);   // 기둥 클램프
+      s+=solid(MM2,-9,9,-9,9,-15,-8,MAT.steel,.7);                                          // VESA 브래킷
+      s+=solid(MM2,-HW,HW,-HH,HH,-8,0,MAT.black,.8);                                        // 케이스 + 베젤
+      // 유효화면 평면 → 로컬 2D 좌표 변환 (좌상단 원점, x 우측 / y 하단)
+      const O=PJ(MM2(-SW,SH,0.6)), UX=PJ(MM2(-SW+1,SH,0.6)), VY=PJ(MM2(-SW,SH-1,0.6));
+      const mtx=[(UX.x-O.x).toFixed(4),(UX.y-O.y).toFixed(4),(VY.x-O.x).toFixed(4),(VY.y-O.y).toFixed(4),O.x.toFixed(2),O.y.toFixed(2)].join(' ');
+      const SWW=SW*2, SHH=SH*2;
+      const vOK=verdict==='OK', vNG=verdict==='NG';
+      const vCol=vOK?'#16A34A':(vNG?'#DC2626':'#39424D'), vTxt=verdict||'--';
+      const shooting=scanT>=0, measuring=measT>=0;
+      const stCol=alarm?'#DC2626':(running?'#22C55E':'#6B7683');
+      let sc=`<g transform="matrix(${mtx})">`;
+      sc+=`<rect x="0" y="0" width="${SWW}" height="${SHH}" fill="#0C141C"/>`;
+      sc+=`<rect x="0" y="0" width="${SWW}" height="11" fill="#17304F"/>`;              // 상단 타이틀바
+      sc+=`<circle cx="7" cy="5.5" r="2.8" fill="${stCol}"/>`;
+      sc+=`<rect x="14" y="3.6" width="26" height="3.8" rx="1.6" fill="#4E6party"/>`.replace('#4E6party','#4E6C93');
+      sc+=`<rect x="${SWW-30}" y="3.6" width="24" height="3.8" rx="1.6" fill="#33506F"/>`;
+      // 좌측 : 취득 영상 패널
+      sc+=`<rect x="5" y="15" width="56" height="50" fill="#0F1A24" stroke="#26394C" stroke-width=".8"/>`;
+      sc+=`<rect x="14" y="24" width="38" height="24" rx="2" fill="${shooting?'#3E9E48':'#2A6B31'}"/>`;
+      for(let gi=0;gi<5;gi++) sc+=`<rect x="${18+gi*7}" y="${28+(gi%2)*8}" width="4.6" height="4.6" rx=".6" fill="#16351B" opacity=".85"/>`;
+      sc+=`<line x1="33" y1="18" x2="33" y2="62" stroke="#E8873A" stroke-width=".6" opacity="${shooting||measuring?'.95':'.30'}"/>`;
+      sc+=`<line x1="8" y1="36" x2="58" y2="36" stroke="#E8873A" stroke-width=".6" opacity="${shooting||measuring?'.95':'.30'}"/>`;
+      if(shooting) sc+=`<rect x="14" y="24" width="38" height="24" rx="2" fill="#FFFFFF" opacity="${(Math.max(0,1-scanT/0.3)*0.55).toFixed(2)}"/>`;
+      sc+=`<rect x="5" y="15" width="56" height="50" fill="none" stroke="${shooting?'#E8873A':'#26394C'}" stroke-width="${shooting?1.4:0.8}"/>`;
+      // 우측 : 판정 램프 + 카운터
+      sc+=`<rect x="66" y="15" width="55" height="29" rx="2.5" fill="${vCol}"/>`;
+      sc+=`<text x="93.5" y="36.5" text-anchor="middle" font-family="'Noto Sans KR',sans-serif" font-size="20" font-weight="900" fill="#FFFFFF">${vTxt}</text>`;
+      [[cycleCount,'#93A4B8',66],[okCount,'#3FBF63',85.5],[ngCount,'#EF5A52',105]].forEach(([n,c,x])=>{
+        sc+=`<rect x="${x}" y="48" width="17" height="17" rx="2" fill="#132030" stroke="#26394C" stroke-width=".7"/>`;
+        sc+=`<rect x="${x}" y="48" width="17" height="3" rx="1.2" fill="${c}"/>`;
+        sc+=`<text x="${x+8.5}" y="61.5" text-anchor="middle" font-family="'Noto Sans KR',sans-serif" font-size="8.5" font-weight="900" fill="${c}">${n}</text>`; });
+      sc+=`</g>`;
+      s+=sc;
+      s+=`<polygon points="${[MM2(-SW,SH,0.62),MM2(SW,SH,0.62),MM2(SW,-SH,0.62),MM2(-SW,-SH,0.62)].map(q=>pt(PJ(q))).join(' ')}" fill="#FFFFFF" opacity=".05"/>`;  // 화면 반사
+      { const pl=PJ(MM2(HW-6,-HH+4,0.8));                                              // 전원 LED
+        s+=`<circle cx="${pl.x.toFixed(1)}" cy="${pl.y.toFixed(1)}" r="1.5" fill="${running?'#22C55E':'#5A6470'}"/>`; } }
 
     const lb=P(INSPECT_X-118,BELT_Y0-34,BELT_Z+10);
 
