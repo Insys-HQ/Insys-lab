@@ -125,7 +125,7 @@
 
 <header class="cover"><div class="inner">
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (벨트 고정 안착지그)</h1>
-  <span class="hver" id="hVer">v2.9</span>
+  <span class="hver" id="hVer">v3.0</span>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
     <button id="btnEn" type="button">English</button>
@@ -223,11 +223,11 @@
   </section>
 </main>
 
-<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v2.9</span></footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.0</span></footer>
 
 <script>
   // ===== 3D 월드 (X:이송방향, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
-  const VER='v2.9';
+  const VER='v3.0';
   const U2MM=300/90;
   const WX0=212, WX1=468, BELT_Y0=0, BELT_Y1=112;            // 작업대 프레임 (3축 시뮬레이터와 동일)
   const BELT_X0=WX0-60, BELT_X1=WX1+75;                      // 좌 200mm · 우 250mm 돌출
@@ -332,7 +332,7 @@
       s_verdict:'판정 + MES 전송', s_alarm:'NG 알람 · 제거 대기',
       s_lampoff:'돔 조명 OFF',
       s_rel:'배출위치 — 래치 해제 기구 작동 (락 개방)',
-      s_index:'벨트 1피치 인덱스 이송 · 회전부에서 PCB가 미끄럼틀을 타고 미끄러져 작업대로 배출',
+      s_index:'벨트 1피치 인덱스 이송 · 회전부에서 PCB·케이스가 함께 미끄럼틀을 타고 미끄러져 작업대로 배출',
       // SVG 라벨
       sv_load:'안착위치', sv_ins:'검사위치', sv_out:'배출위치', sv_rel:'회전부 래치 해제 → PCB 낙하',
       sv_next:'다음 공정 작업자', sv_sens:'지그 감지센서', sv_vis:'고정식 키엔스 비전',
@@ -350,7 +350,7 @@
       lg_mes:v=>'[MES] '+v+' 전송 완료',
       lg_alarm:'⚠ [알람] NG 발생 — 검사 중단. 래치 수동 해제 후 NG품 제거',
       lg_index:k=>'[인덱스] '+T(k),
-      lg_cam:j=>'[배출] J'+j+' 회전부 진입 — PCB가 지그에서 빠져 미끄럼틀을 타고 작업대로 미끄러짐',
+      lg_cam:j=>'[배출] J'+j+' 회전부 진입 — PCB·케이스·케이블이 함께 지그에서 빠져 미끄럼틀을 타고 작업대로 미끄러짐',
       lg_rel:j=>'[래치 해제] J'+j+' 배출위치 해제 기구 하강 — 래치 2점 개방',
       lg_idx_done:mm=>'[인덱스] 1피치 '+mm+'mm 이송 완료',
       lg_wait:'[대기] START 신호 대기...',
@@ -387,7 +387,7 @@
       s_verdict:'Verdict + MES upload', s_alarm:'NG alarm · awaiting removal',
       s_lampoff:'Dome light OFF',
       s_rel:'Eject station — latch-release actuator opens the locks',
-      s_index:'Belt indexes 1 pitch · at the turn the PCB slides down the chute onto the table',
+      s_index:'Belt indexes 1 pitch · at the turn the PCB with its case slides down the chute onto the table',
       sv_load:'Load Stn', sv_ins:'Inspect Stn', sv_out:'Eject Stn', sv_rel:'Latch releases at turn → PCB drops',
       sv_next:'Next-process operator', sv_sens:'Jig Sensor', sv_vis:'Fixed Keyence Vision',
       sv_pul:'Pulley R', sv_brk:'Fixed Bracket', sv_head:'mm (Head)', sv_wd:'mm (WD)', click:'Click!',
@@ -403,7 +403,7 @@
       lg_mes:v=>'[MES] '+v+' upload complete',
       lg_alarm:'⚠ [Alarm] NG detected — inspection halted. Release latch manually and remove NG part',
       lg_index:k=>'[Index] '+T(k),
-      lg_cam:j=>'[Eject] J'+j+' enters the turn — PCB slips off and slides down the chute onto the table',
+      lg_cam:j=>'[Eject] J'+j+' enters the turn — PCB + case + cable slip off together and slide down the chute onto the table',
       lg_rel:j=>'[Latch Release] J'+j+' release actuator descends at eject station — 2 latches opened',
       lg_idx_done:mm=>'[Index] 1 pitch ('+mm+' mm) transfer complete',
       lg_wait:'[Idle] Waiting for START signal...',
@@ -592,11 +592,18 @@
     return o;
   }
   // PCB 케이스 : 지그 위(벨트와 동시 이동) 검정 타원 디스크
-  function caseBody(M){
+  function caseBody(M,z0){
     let o='';
-    o+=ovalSolid(M,CASE_A,CASE_B,JIG_TH+.2,JIG_TH+4.2,[32,38,45],.5);
-    o+=ovalSolid(M,CASE_A-2.5,CASE_B-1.8,JIG_TH+4.2,JIG_TH+4.9,[58,66,75],.4);
+    o+=ovalSolid(M,CASE_A,CASE_B,z0+.2,z0+4.2,[32,38,45],.5);
+    o+=ovalSolid(M,CASE_A-2.5,CASE_B-1.8,z0+4.2,z0+4.9,[58,66,75],.4);
     return o;
+  }
+
+  // 검사품 일체 = PCB + 연결케이블 + PCB 케이스 (항상 함께 이동/배출)
+  function asmBody(cx,zb){
+    let o=caseBody((u,v,n)=>({X:cx+u,Y:PCB_YC+v+CASE_DV,Z:n}),zb);
+    o+=bar(P(cx-2,PCB_YC,zb+4),P(cx+3,PCB_YC+CASE_DV,zb+4),2.4,'#161A1F','#0B0E11');
+    return o+pcbBody(cx,zb);
   }
 
   // ===== 벨트 고정 안착지그 (자세 = 벨트 접선) =====
@@ -615,8 +622,7 @@
     o+=quad(JP(-JIG_HU+6,-10,0),JP(JIG_HU-6,-10,0),JP(JIG_HU-6,10,0),JP(-JIG_HU+6,10,0),'#5F6975','#454E58',.8);   // 벨트 체결 브래킷
     if(up){ o+=face(0); o+=rim(); o+=face(JIG_TH); }
     else  { o+=face(JIG_TH); o+=rim(); o+=face(0); }
-    o+=caseBody((u,v,n)=>MW(u,v+CASE_DV,n));
-    if(j.pcb){ o+=bar(JP(-2,0,JIG_TH+4),JP(3,CASE_DV,JIG_TH+4),2.4,'#161A1F','#0B0E11'); }
+    if(j.pcb){ o+=caseBody((u,v,n)=>MW(u,v+CASE_DV,n),JIG_TH); o+=bar(JP(-2,0,JIG_TH+4),JP(3,CASE_DV,JIG_TH+4),2.4,'#161A1F','#0B0E11'); }
     if(!up && j.pcb && p.nz>-0.2){
       o+=ovalSolid(MW,PCB_HW,PCB_HD,JIG_TH+3,JIG_TH+5,[30,107,39],.5); }
     if(up){
@@ -795,7 +801,7 @@
     JIGS.forEach(j=>{ const p=beltPos(beltS+j.s0); if(p.nz>0.9) s+=drawJig(j,p); });
 
     // ── 회전부에서 낙하하는 PCB ──
-    FALLS.forEach(f=>{ s+=`<g opacity="${f.a.toFixed(2)}">`+pcbBody(f.x,f.z)+`</g>`; });
+    FALLS.forEach(f=>{ s+=`<g opacity="${f.a.toFixed(2)}">`+asmBody(f.x,f.z)+`</g>`; });
 
     // ── 검사 시에만 조명이 PCB에 비침 (하단 2개 창 → PCB 면) ──
     { const ji=jigAtIns();
