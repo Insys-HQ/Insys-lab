@@ -40,6 +40,9 @@
   select{font-family:inherit;font-size:13px;padding:8px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);}
   .hint{font-size:12px;color:var(--text-light);margin-top:6px;}
   svg{width:100%;height:auto;display:block;}
+  /* 애니메이션이 한 화면을 넘지 않도록 높이 제한 (스크롤 방지) */
+  #scene{max-height:calc(100vh - 330px);min-height:260px;margin:0 auto;}
+  @media (max-width:900px){ #scene{max-height:calc(100vh - 430px);} }
   .axisbar{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:7px;}
   @media (max-width:600px){.axisbar{grid-template-columns:repeat(3,1fr);}}
   .ax{background:#F2F6FC;border:1px solid #D3E0F0;border-radius:7px;padding:4px 6px;text-align:center;}
@@ -132,7 +135,7 @@
           </div>
         </div>
 
-        <svg viewBox="118 -14 386 518" id="scene"></svg>
+        <svg viewBox="130 -26 440 540" id="scene"></svg>
         <div class="row" style="margin-top:4px;gap:6px;flex-wrap:nowrap;">
           <span style="font-size:12px;color:var(--text-light);white-space:nowrap;">시점 <b id="yawVal" style="color:var(--navy-dark);">35°</b></span>
           <input type="range" id="viewYaw" min="0" max="90" value="35" style="flex:0 1 140px;min-width:70px;">
@@ -185,7 +188,7 @@
   </section>
 </main>
 
-<footer>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · v1.9</footer>
+<footer>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · v2.0</footer>
 
 <script>
   // ===== 3D 월드 (X:컨베이어, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
@@ -199,7 +202,7 @@
   const SKIRT_Z=20;                                          // 캐비닛 하단 (다리 없음, 아래는 걸레받이)
   const INSPECT_X=340, PCB_Z=BELT_Z+3, PCB_YC=(BELT_Y0+BELT_Y1)/2;
   const FOCUS=90, FOCUS_MM=300;          // 초점거리 300mm
-  const BRIDGE_Z=BELT_Z+206;             // Z 액추에이터가 짐벌 위에 오도록 상향
+  const BRIDGE_Z=BELT_Z+186;             // 짐벌 간섭 없는 최소 높이 (프레임 높이 축소)
   const ZS=3;                            // Z축 유효 스트로크 = 10mm
   const GY_F=-34, GY_B=140;              // 갠트리 레일 Y(앞/뒤)
   const GX0=BELT_X0-6, GX1=BELT_X1+6;    // 레일 X 범위
@@ -354,8 +357,15 @@
       return ps.map(pt).join(' '); };
     const PU=15, PV=7.5;          // 기판 반장축 / 반단축 (100 × 50mm)
     const CU=16.5, CV=9, CS=-34;  // 케이스 반경 / 케이스 중심 v (기판 우측)
-    const shc=P(px+2,py-6,BELT_Z+.5);
-    o+=`<ellipse cx="${shc.x.toFixed(1)}" cy="${shc.y.toFixed(1)}" rx="30" ry="15" fill="#0C1014" opacity=".3" filter="url(#fBlurS)"/>`;
+    // 부상 그림자 — 기판/케이스 바로 아래 벨트면
+    [[0,0,16,8],[0,-34,17,9]].forEach(([su,sv,rx,ry])=>{
+      const q=P(px+2,py+sv*1.1-3,BELT_Z+.4);
+      o+=`<ellipse cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" rx="${rx}" ry="${ry}" fill="#0C1014" opacity=".42" filter="url(#fBlurS)"/>`; });
+    // 지지 스탠드오프 — 벨트면에서 10mm 부상 (앞 가장자리에 배치해 가려지지 않게)
+    [[-11,-6.4],[11,-6.4],[-11,6.4],[11,6.4],[-11,-41],[11,-41]].forEach(([su,sv])=>{
+      const tp=PT(su,sv,0), bs=P(tp.X,tp.Y,BELT_Z+.3);
+      o+=`<ellipse cx="${bs.x.toFixed(1)}" cy="${bs.y.toFixed(1)}" rx="3" ry="1.2" fill="#8A94A1" opacity=".8"/>`;
+      o+=bar(bs,PJ(tp),2.1,'url(#gSteel)','#5F6975'); });
     // PCB 기판 (검사 대상)
     o+=`<polygon points="${ell(0,0,PU,PV,3)}" fill="url(#gPcb)" stroke="#17501E" stroke-width=".9"/>`;
     for(let gu=-12; gu<=12; gu+=3){ const hv=PV*Math.sqrt(Math.max(0,1-(gu/PU)**2))*0.8;
@@ -458,15 +468,6 @@
 
     const lb=P(INSPECT_X-118,BELT_Y0-34,BELT_Z+10);
 
-    // ── 조명 풀/빔 (PCB 아래) ──
-    if(lightOn && pcbOn){
-      const lp=P(c.X,c.Y,BELT_Z+1);
-      s+=`<ellipse cx="${lp.x.toFixed(1)}" cy="${lp.y.toFixed(1)}" rx="34" ry="11" fill="url(#gPool)"/>`;
-      const cs=[pcbPt(-17,-9),pcbPt(17,-9),pcbPt(17,9),pcbPt(-17,9)].map(PJ);
-      let mn=cs[0], mx=cs[0]; cs.forEach(q=>{ if(q.x<mn.x)mn=q; if(q.x>mx.x)mx=q; });
-      s+=`<polygon points="${pt(pL)} ${pt(mn)} ${pt(mx)}" fill="url(#gBeam)"/>`;
-    }
-
     // ── 벨트 위 PCB 전체 (안착·검사·배출) : 먼 것부터 ──
     PCBS.slice().sort((a,b)=>b.x-a.x).forEach(q=>{ s+=drawPcbAt(q.x,q.y,q.ta,q.tb); });
 
@@ -568,13 +569,16 @@
       const w=[MH(sx*WU-3.6,-4.6,SB),MH(sx*WU+3.6,-4.6,SB),MH(sx*WU+3.6,4.6,SB),MH(sx*WU-3.6,4.6,SB)].map(PJ);
       s+=quad(w[0],w[1],w[2],w[3],lightOn?'#5A2E18':'#14181D','#0A0D11',.7); });
     // ── 레이저 투광 : 2창 → 대상면 수렴 ──
-    if(lightOn){
-      const T=PJ(MH(0,0,SB+FOCUS));
+    if(lightOn && pcbOn){
+      // 투광·수광 빔은 PCB 상면에서 끝난다 (벨트로 새지 않도록 대상면에 종단)
+      const S=1.1, Bp=basis(tiltA,tiltB), tgt={
+        X:pcbX+Bp.n.X*3.4*S, Y:pcbY+Bp.n.Y*3.4*S, Z:PCB_Z+Bp.n.Z*3.4*S };
+      const T=PJ(tgt);
       [-1,1].forEach(sx=>{
         const w=PJ(MH(sx*WU,0,SB+.6)), w2=PJ(MH(sx*(WU-2.6),0,SB+.6));
-        s+=`<polygon points="${pt(w)} ${pt(w2)} ${pt(T)}" fill="#F6913A" opacity=".16"/>`;
+        s+=`<polygon points="${pt(w)} ${pt(w2)} ${pt(T)}" fill="#F6913A" opacity=".14"/>`;
         s+=`<line x1="${w.x.toFixed(1)}" y1="${w.y.toFixed(1)}" x2="${T.x.toFixed(1)}" y2="${T.y.toFixed(1)}" stroke="#F97316" stroke-width="1.9" filter="url(#fGlow)" opacity=".92"/>`; });
-      s+=`<circle cx="${T.x.toFixed(1)}" cy="${T.y.toFixed(1)}" r="3.4" fill="#FFB35C" filter="url(#fGlow)"/>`;
+      s+=`<circle cx="${T.x.toFixed(1)}" cy="${T.y.toFixed(1)}" r="2" fill="#FFC77A" filter="url(#fGlow)"/>`;
     }
 
     // ── 초점축/거리 ──
@@ -583,9 +587,6 @@
       const pc=P(c.X,c.Y,c.Z);
       mmNow=Math.hypot(L.X-c.X, L.Y-c.Y, L.Z-c.Z)/FOCUS*FOCUS_MM;
       s+=`<line x1="${pL.x.toFixed(1)}" y1="${pL.y.toFixed(1)}" x2="${pc.x.toFixed(1)}" y2="${pc.y.toFixed(1)}" stroke="#2D5C99" stroke-width="1.5" stroke-dasharray="5 4" opacity=".9"/>`;
-      const mx=((pL.x+pc.x)/2+11), my=((pL.y+pc.y)/2);
-      s+=`<rect x="${(mx-4).toFixed(1)}" y="${(my-11).toFixed(1)}" width="52" height="15" rx="4" fill="#FFFFFFCC"/>`;
-      s+=`<text x="${mx.toFixed(1)}" y="${my.toFixed(1)}" font-size="9.5" font-weight="900" fill="#2D5C99">${mmNow.toFixed(0)}mm</text>`;
     }
     if(scanT>=0 && pcbOn){
       const u=-14.6+29.2*scanT, hv=7.5*Math.sqrt(Math.max(0,1-(u/15)**2));
@@ -769,7 +770,7 @@
 
   function initLine(){ PCBS=[]; pcbSeq=0; PCBS.push(newPcb(LOAD_X)); syncActive(); }
   initLine(); draw(); renderSteps(); updateSigBtns();
-  addLog('3축(Z·Rx·Ry) 헤드 비전 검사 시뮬레이터 v1.9 준비 완료.');
+  addLog('3축(Z·Rx·Ry) 헤드 비전 검사 시뮬레이터 v2.0 준비 완료.');
 </script>
 
 <script>
