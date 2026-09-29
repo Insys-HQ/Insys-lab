@@ -125,7 +125,7 @@
 
 <header class="cover"><div class="inner">
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (벨트 고정 안착지그)</h1>
-  <span class="hver" id="hVer">v2.3</span>
+  <span class="hver" id="hVer">v2.6</span>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
     <button id="btnEn" type="button">English</button>
@@ -196,8 +196,8 @@
           <button id="btnReset" data-i18n="bt_reset">↺ 초기화</button>
           <label class="ck"><input type="checkbox" id="autoSig" checked> <span data-i18n="lb_autosig">자동신호</span></label>
           <span style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-            <span style="font-size:12px;color:var(--text-light);"><span data-i18n="lb_speed">동작시간</span> <b id="speedVal" style="color:var(--navy-dark);">0.9초</b></span>
-            <input type="range" id="speed" min="3" max="30" step="1" value="9" style="width:120px;">
+            <span style="font-size:12px;color:var(--text-light);"><span data-i18n="lb_speed">사이클타임</span> <b id="speedVal" style="color:var(--navy-dark);">5.0초</b></span>
+            <input type="range" id="speed" min="20" max="100" step="5" value="50" style="width:120px;">
           </span>
         </div>
         <div class="row">
@@ -223,11 +223,11 @@
   </section>
 </main>
 
-<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v2.3</span></footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v2.6</span></footer>
 
 <script>
   // ===== 3D 월드 (X:이송방향, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
-  const VER='v2.3';
+  const VER='v2.6';
   const U2MM=300/90;
   const WX0=212, WX1=468, BELT_Y0=0, BELT_Y1=112;            // 작업대 프레임 (3축 시뮬레이터와 동일)
   const BELT_X0=WX0-60, BELT_X1=WX1+75;                      // 좌 200mm · 우 250mm 돌출
@@ -308,13 +308,13 @@
       ch_anim:'동작 애니메이션 · 벨트 고정 안착지그 + 고정식 키엔스 비전',
       ch_ctrl:'운전 / 신호 제어', ch_flow:'전체 로직 플로우', ch_log:'동작 로그',
       alarmban:'⚠ NG 검사 중단 — NG품 제거 후 [검사 계속]',
-      ax_x:'벨트 누적이송', ax_p:'지그 피치', ax_t:'택트', ax_wd:'작업거리(WD)',
+      ax_x:'벨트 누적이송', ax_p:'지그 피치', ax_t:'사이클타임', ax_wd:'작업거리(WD)',
       cp_flat:'PCB 수평', cp_load:'안착위치', cp_ins:'검사위치', cp_out:'배출위치', cp_lamp:'돔조명',
       lb_verdict:'판정', lb_demo:'데모', op_auto:'자동', op_ok:'항상 OK', op_ng:'항상 NG',
       lb_view:'시점', vw_front:'정면', vw_iso:'45°', vw_side:'측면',
       ct_done:'완료',
       bt_run:'▶ 자동 운전 시작', bt_stop:'■ 정지', bt_reset:'↺ 초기화',
-      lb_autosig:'자동신호', lb_speed:'동작시간', sec_u:'초', bt_resume:'검사 계속', bt_clr:'로그 지우기',
+      lb_autosig:'자동신호', lb_speed:'사이클타임', sec_u:'초', bt_resume:'검사 계속', bt_clr:'로그 지우기',
       ft_dept:'인시스 AI혁신 연구개발실',
       mes_wait:'MES 전송: 대기', mes_send:v=>'MES 전송 중... ('+v+')', mes_done:v=>'MES 전송 완료 ('+v+')',
       cur:v=>'진행: '+v,
@@ -361,13 +361,13 @@
       ch_anim:'Motion Animation · Belt-Fixed Seating Jigs + Fixed Keyence Vision',
       ch_ctrl:'Operation / Signal Control', ch_flow:'Logic Flow', ch_log:'Operation Log',
       alarmban:'⚠ NG — Inspection Halted. Remove NG part, then [Resume]',
-      ax_x:'Belt Travel', ax_p:'Jig Pitch', ax_t:'Tact Time', ax_wd:'Working Dist.',
+      ax_x:'Belt Travel', ax_p:'Jig Pitch', ax_t:'Cycle Time', ax_wd:'Working Dist.',
       cp_flat:'PCB Level', cp_load:'Load Stn', cp_ins:'Inspect Stn', cp_out:'Eject Stn', cp_lamp:'Dome Light',
       lb_verdict:'Verdict', lb_demo:'Demo', op_auto:'Auto', op_ok:'Always OK', op_ng:'Always NG',
       lb_view:'View', vw_front:'Front', vw_iso:'45°', vw_side:'Side',
       ct_done:'Done',
       bt_run:'▶ Start Auto Run', bt_stop:'■ Stop', bt_reset:'↺ Reset',
-      lb_autosig:'Auto Signal', lb_speed:'Step Time', sec_u:'s', bt_resume:'Resume', bt_clr:'Clear Log',
+      lb_autosig:'Auto Signal', lb_speed:'Cycle Time', sec_u:'s', bt_resume:'Resume', bt_clr:'Clear Log',
       ft_dept:'INSYS AI Innovation R&D Center',
       mes_wait:'MES Upload: Idle', mes_send:v=>'MES Uploading... ('+v+')', mes_done:v=>'MES Upload Complete ('+v+')',
       cur:v=>'Current: '+v,
@@ -597,12 +597,8 @@
         o+=bar(pA,pB,4.5,j.latch>0.5?'#F0A93B':'url(#gSteel)',j.latch>0.5?'#B57511':'#6E7885');
         o+=`<circle cx="${pA.x.toFixed(1)}" cy="${pA.y.toFixed(1)}" r="3" fill="#8C97A4" stroke="#5A6470"/>`; });
       if(j.click>=0){ const c=JP(0,0,JIG_TH+12), rr=12+16*j.click;
-        o+=`<ellipse cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" rx="${rr.toFixed(1)}" ry="${(rr*0.36).toFixed(1)}" fill="none" stroke="#F0A93B" stroke-width="${(2.6*(1-j.click)).toFixed(1)}" opacity="${(1-j.click).toFixed(2)}"/>`;
-        const tx=JP(0,0,JIG_TH+24);
-        o+=`<text x="${tx.x.toFixed(1)}" y="${tx.y.toFixed(1)}" text-anchor="middle" font-size="11" font-weight="900" fill="#B45309" opacity="${(1-j.click).toFixed(2)}">${T('click')}</text>`; }
+        o+=`<ellipse cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" rx="${rr.toFixed(1)}" ry="${(rr*0.36).toFixed(1)}" fill="none" stroke="#F0A93B" stroke-width="${(2.6*(1-j.click)).toFixed(1)}" opacity="${(1-j.click).toFixed(2)}"/>`; }
     }
-    { const q=JP(0,-JIG_HD-8,JIG_TH+2);
-      o+=`<text x="${q.x.toFixed(1)}" y="${(q.y+3).toFixed(1)}" text-anchor="middle" font-size="8.5" font-weight="900" fill="${up?'#2D5C99':'#8A94A1'}">J${j.id}</text>`; }
     return o;
   }
 
@@ -718,11 +714,13 @@
       if(shooting) sc+=`<rect x="14" y="24" width="38" height="24" rx="2" fill="#FFFFFF" opacity="${(Math.max(0,1-scanT/0.3)*0.55).toFixed(2)}"/>`;
       sc+=`<rect x="5" y="15" width="56" height="50" fill="none" stroke="${shooting?'#E8873A':'#26394C'}" stroke-width="${shooting?1.4:0.8}"/>`;
       sc+=`<rect x="66" y="15" width="55" height="29" rx="2.5" fill="${vCol}"/>`;
-      sc+=`<text x="93.5" y="36.5" text-anchor="middle" font-family="'Noto Sans KR',sans-serif" font-size="20" font-weight="900" fill="#FFFFFF">${vTxt}</text>`;
-      [[cycleCount,'#93A4B8',66],[okCount,'#3FBF63',85.5],[ngCount,'#EF5A52',105]].forEach(([n,c,x])=>{
+      if(vOK) sc+=`<path d="M80,30 L90,38 L107,22" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+      else if(vNG) sc+=`<path d="M84,22 L103,38 M103,22 L84,38" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round"/>`;
+      else sc+=`<rect x="84" y="28" width="19" height="3.5" rx="1.5" fill="#7C8794"/>`;
+      [['#93A4B8',66,cycleCount],['#3FBF63',85.5,okCount],['#EF5A52',105,ngCount]].forEach(([c,x,n])=>{
         sc+=`<rect x="${x}" y="48" width="17" height="17" rx="2" fill="#132030" stroke="#26394C" stroke-width=".7"/>`;
         sc+=`<rect x="${x}" y="48" width="17" height="3" rx="1.2" fill="${c}"/>`;
-        sc+=`<text x="${x+8.5}" y="61.5" text-anchor="middle" font-family="'Noto Sans KR',sans-serif" font-size="8.5" font-weight="900" fill="${c}">${n}</text>`; });
+        sc+=`<rect x="${x+3}" y="${(62-Math.min(10,n)*1.1).toFixed(1)}" width="11" height="${(Math.min(10,n)*1.1).toFixed(1)}" fill="${c}" opacity=".85"/>`; });
       }
       sc+=`</g>`;
       s+=sc;
@@ -730,35 +728,22 @@
       { const pl=PJ(MM2(HW-6,-HH+4,0.8));
         s+=`<circle cx="${pl.x.toFixed(1)}" cy="${pl.y.toFixed(1)}" r="1.5" fill="${running?'#22C55E':'#5A6470'}"/>`; } }
 
-    // ── 경광등 (원뿔형 스택 타워 · 작업대 후면 우측) ──
-    { const bx=WX1-26, by=GY_B-22, MT2=(x,y,z)=>({X:bx+x, Y:by+y, Z:z}), K=1.25;
-      const z0=BELT_Z, zP=z0+8*K, zG1=zP+13*K, zR1=zG1+13*K, zTop=zR1+10*K;
-      const grn=(running&&!alarm), red=alarm;
-      s+=disc(MT2,8.5*K,z0+1.2,MAT.steel,1.0);                            // 베이스
-      s+=coneSide(MT2,8.5*K,7*K,z0+1.2,z0+3,MAT.steel);
-      s+=coneSide(MT2,2.6,2.6,z0+3,zP,MAT.alu);                           // 지주
-      s+=coneSide(MT2,8.4*K,6.0*K,zP,zG1,grn?[42,203,99]:[176,204,184],grn);      // 녹색 원뿔대
-      s+=disc(MT2,6.2*K,zG1,MAT.dark,.9);
-      s+=coneSide(MT2,6.0*K,3.4*K,zG1,zR1,red?[240,85,78]:[222,184,180],red);      // 적색 원뿔대
-      s+=coneSide(MT2,3.4*K,0.6,zR1,zTop,MAT.dark);                       // 정상 캡(원뿔 끝)
-      if(grn||red){ const q=P(bx,by,red?(zG1+zR1)/2:(zP+zG1)/2);
-        s+=`<ellipse cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" rx="14" ry="11" fill="${red?'#F0554E':'#2ACB63'}" opacity=".3" filter="url(#fGlow)"${red?' class="blinkRed"':''}/>`; } }
-
-    // ── 배출 안내 라벨 (우측 회전부) ──
-    if(VIEW.yaw<70){ const cl=P(NXR+NR+6,PCB_YC+8,BELT_Z-125), c2=P(NXR+NR+6,PCB_YC+8,BELT_Z-139);
-      s+=`<text x="${cl.x.toFixed(1)}" y="${cl.y.toFixed(1)}" text-anchor="end" font-size="9.5" font-weight="900" fill="#B45309">${T('sv_rel')}</text>`;
-      s+=`<text x="${c2.x.toFixed(1)}" y="${c2.y.toFixed(1)}" text-anchor="end" font-size="9.5" font-weight="900" fill="#2D5C99">→ ${T('sv_next')}</text>`; }
-
-    // ── 스테이션 마커 (앞 상판 스트립 위 라벨 + 지그 방향 화살표) ──
-    [[LOAD_X,'sv_load'],[INSPECT_X,'sv_ins'],[OUT_X,'sv_out']].forEach(([sx,lb])=>{
-      const a=P(sx,BELT_Y0-4,BELT_Z+1.5), b2=P(sx,BELT_Y0-10,BELT_Z+1.5);
-      s+=`<polygon points="${pt(P(sx-4,BELT_Y0-10,BELT_Z+1.5))} ${pt(P(sx+4,BELT_Y0-10,BELT_Z+1.5))} ${pt(P(sx,BELT_Y0-3,BELT_Z+1.5))}" fill="#2D5C99"/>`;
-      const t=P(sx,BELT_Y0-27,BELT_Z+1.5);
-      s+=`<text x="${t.x.toFixed(1)}" y="${t.y.toFixed(1)}" text-anchor="middle" font-size="10" font-weight="900" fill="#1E3A5F">${T(lb)}</text>`; });
-    { const lb=P(INSPECT_X-58,BELT_Y0-13,BELT_Z+1.5);
-      s+=`<text x="${lb.x.toFixed(1)}" y="${lb.y.toFixed(1)}" text-anchor="middle" font-size="8.5" font-weight="700" fill="#5B6472">${T('sv_sens')}</text>`; }
-    { const c=P(NXL,BELT_Y0,NZC);
-      s+=`<text x="${(c.x-6).toFixed(1)}" y="${(c.y+NR+18).toFixed(1)}" text-anchor="end" font-size="9" font-weight="900" fill="#2D5C99">${T('sv_pul')}${RMM}</text>`; }
+    // ── 경광등 : 원기둥 3색(녹·황·적) 스택 타워 — 총 500mm (하부 기둥 200mm + 램프부 300mm) · 좌측 후방 ──
+    { const bx=WX0+16, by=GY_B-22, MT2=(x,y,z)=>({X:bx+x, Y:by+y, Z:z});
+      const H1=200/U2MM, HT=500/U2MM, z0=BELT_Z, zP=z0+H1, TH=(HT-H1)/3, RL=7.5;
+      const grn=(running&&!alarm&&!waitingSignal), red=alarm, yel=!grn&&!red;
+      const tiers=[[grn,[42,203,99],[176,204,184],'#2ACB63'],[yel,[247,196,24],[226,214,160],'#F5C518'],[red,[240,85,78],[222,184,180],'#F0554E']];
+      s+=disc(MT2,10,z0+1.2,MAT.steel,1.0);                               // 베이스 플레이트
+      s+=coneSide(MT2,10,10,z0,z0+1.2,MAT.steel);
+      s+=coneSide(MT2,3.2,3.2,z0+1.2,zP,MAT.alu);                         // 하부 기둥 (200mm)
+      s+=coneSide(MT2,6,6,zP,zP+2,MAT.dark);                              // 램프 마운트
+      tiers.forEach((t,k)=>{ const za=zP+2+k*(TH-.7), zb=za+TH-.7;
+        s+=coneSide(MT2,RL,RL,za,zb,t[0]?t[1]:t[2],t[0]);                 // 원기둥 램프 단
+        s+=disc(MT2,RL,zb,t[0]?t[1]:t[2],1.08);
+        s+=coneSide(MT2,RL+.5,RL+.5,zb,zb+.7,MAT.dark);                   // 단 사이 링
+        if(t[0]){ const q=P(bx,by,(za+zb)/2);
+          s+=`<ellipse cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" rx="15" ry="13" fill="${t[3]}" opacity=".3" filter="url(#fGlow)"${red&&k===2?' class="blinkRed"':''}/>`; } });
+      s+=disc(MT2,RL,zP+2+3*(TH-.7)+.7,MAT.dark,.95); }
 
     // ── 상부 지그 (캐비닛·모니터 위에 그림) ──
     JIGS.forEach(j=>{ const p=beltPos(beltS+j.s0); if(p.nz>0.9) s+=drawJig(j,p); });
@@ -766,20 +751,16 @@
     // ── 회전부에서 낙하하는 PCB ──
     FALLS.forEach(f=>{ s+=`<g opacity="${f.a.toFixed(2)}">`+pcbBody(f.x,f.z)+`</g>`; });
 
-    // ── 조명 풀 / 빔 ──
+    // ── 검사 시에만 조명이 PCB에 비침 (하단 2개 창 → PCB 면) ──
     { const ji=jigAtIns();
       if(lightOn && ji && ji.pcb){
         const lp=P(INSPECT_X,PCB_YC,PCB_TOP+1);
-        s+=`<ellipse cx="${lp.x.toFixed(1)}" cy="${lp.y.toFixed(1)}" rx="60" ry="22" fill="url(#gPool)"/>`;
-        const l0=P(BRIDGE_X,PCB_YC,DOME_Z);
-        const c1=P(INSPECT_X-PCB_HW-8,PCB_YC-PCB_HD-6,PCB_TOP+1), c2=P(INSPECT_X+PCB_HW+8,PCB_YC+PCB_HD+6,PCB_TOP+1);
-        s+=`<polygon points="${pt(l0)} ${pt(c1)} ${pt(c2)}" fill="url(#gBeam)"/>`;
+        s+=`<ellipse cx="${lp.x.toFixed(1)}" cy="${lp.y.toFixed(1)}" rx="46" ry="17" fill="url(#gPool)"/>`;
+        const c1=P(INSPECT_X-PCB_HW-4,PCB_YC-PCB_HD-4,PCB_SURF), c2=P(INSPECT_X+PCB_HW+4,PCB_YC+PCB_HD+4,PCB_SURF),
+              c3=P(INSPECT_X+PCB_HW+4,PCB_YC-PCB_HD-4,PCB_SURF), c4=P(INSPECT_X-PCB_HW-4,PCB_YC+PCB_HD+4,PCB_SURF);
+        [-8,8].forEach(u=>{ const w0=P(BRIDGE_X+u-4,PCB_YC,DOME_Z), w1=P(BRIDGE_X+u+4,PCB_YC,DOME_Z);
+          s+=`<polygon points="${pt(w0)} ${pt(w1)} ${pt(c3)} ${pt(c1)} ${pt(c4)} ${pt(c2)}" fill="url(#gBeam)" opacity=".8"/>`; });
       } }
-    // 키엔스 비전 시야선 (주황 점선)
-    { const l0=P(BRIDGE_X,PCB_YC,DOME_Z);
-      const f1=P(INSPECT_X-PCB_HW,PCB_YC-PCB_HD,PCB_TOP+1), f2=P(INSPECT_X+PCB_HW,PCB_YC+PCB_HD,PCB_TOP+1);
-      [f1,f2].forEach(function(f){
-        s+=`<line x1="${l0.x.toFixed(1)}" y1="${l0.y.toFixed(1)}" x2="${f.x.toFixed(1)}" y2="${f.y.toFixed(1)}" stroke="#F97316" stroke-width="1" stroke-dasharray="3 2" opacity=".9"/>`; }); }
 
     // ── 고정 브릿지 + 캔틸레버 암 + 헤드 마운트 (3축 시뮬레이터와 동일) ──
     function beamX(x0,x1,yy,zc,hw,hh){
@@ -794,50 +775,42 @@
     s+=beamY(BRIDGE_X,PCB_YC-13,GY_B,BRIDGE_Z+XZ,7,7);
     { const q=P(BRIDGE_X,GY_B,BRIDGE_Z+XZ);
       s+=`<rect x="${(q.x-12).toFixed(1)}" y="${(q.y-12).toFixed(1)}" width="24" height="24" rx="4" fill="url(#gSteel)" stroke="#7C8896"/>`; }
-    { const bq=P(BRIDGE_X,GY_B+14,BRIDGE_Z+XZ+2);
-      s+=`<text x="${bq.x.toFixed(1)}" y="${(bq.y-12).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="900" fill="#2D5C99">${T('sv_brk')}</text>`; }
 
-    // ── 고정식 키엔스 비전 카메라 : 마운트 블록 + 어댑터 + 흑색 본체 + 주황 띠/케이블 + 돔 조명 ──
-    { const camB=DOME_Z+HEAD_H*0.40;
-      const bx0=BRIDGE_X-13, bx1=BRIDGE_X+13, by0=PCB_YC-13, by1=PCB_YC+13;
+    // ── 고정식 키엔스 비전 : 흑색 스텝 하우징 + 적색 스트라이프 + LED 3 + 하단 투광/수광 2창 + 후방 케이블 ──
+    { const SB=35, az=DOME_Z+SB;                                                  // 하단(창) = DOME_Z
+      const MH=(u,v,n)=>({X:BRIDGE_X+u, Y:PCB_YC+v, Z:az-n});
       const MC=(u,v,n)=>({X:BRIDGE_X+u, Y:PCB_YC+v, Z:n});
-      s+=solid(MC,-8,8,-8,8,HEAD_TOP-1,BRIDGE_Z+XZ-6,MAT.steel);                 // 고정 어댑터 컬럼
-      { const q=P(BRIDGE_X,PCB_YC,BRIDGE_Z+XZ);                                   // 헤드 마운트 블록
+      s+=solid(MC,-8,8,-8,8,az,BRIDGE_Z+XZ-6,MAT.steel);                          // 고정 어댑터 컬럼
+      { const q=P(BRIDGE_X,PCB_YC,BRIDGE_Z+XZ);                                   // 마운트 블록
         s+=`<rect x="${(q.x-22).toFixed(1)}" y="${(q.y-17).toFixed(1)}" width="44" height="30" rx="6" fill="url(#gSteel)" stroke="#77838F" stroke-width="1.4"/>`;
         s+=`<rect x="${(q.x-17).toFixed(1)}" y="${(q.y-13).toFixed(1)}" width="10" height="21" rx="4" fill="#FFFFFF" opacity=".5"/>`; }
-      [-5,5].forEach(function(dx){                                                // 주황 케이블 (후방)
-        const ca=P(BRIDGE_X+dx,by1,HEAD_TOP-9), cm=P(BRIDGE_X+dx*1.8,by1+26,HEAD_TOP-6), cb=P(BRIDGE_X+dx*1.8,by1+30,HEAD_TOP-44);
-        const dd='M'+pt(ca)+' Q'+pt(cm)+' '+pt(cb);
-        s+=`<path d="${dd}" fill="none" stroke="#B4530A" stroke-width="4.8" stroke-linecap="round"/>`;
-        s+=`<path d="${dd}" fill="none" stroke="#F28C28" stroke-width="3" stroke-linecap="round"/>`;
-        s+=`<circle cx="${cb.x.toFixed(1)}" cy="${cb.y.toFixed(1)}" r="3" fill="#2F3843"/>`; });
-      s+=solid(MC,-13,13,-13,13,camB,HEAD_TOP,MAT.black);                         // 흑색 본체
-      { const fy=by0-0.3, sx0=bx0-0.3, zs1=HEAD_TOP-9, zs2=HEAD_TOP-16;
-        s+=quad(P(bx0,fy,zs1),P(bx1,fy,zs1),P(bx1,fy,zs2),P(bx0,fy,zs2),'#E8590C','#B8430A',.6);
-        s+=quad(P(sx0,by0,zs1),P(sx0,by1,zs1),P(sx0,by1,zs2),P(sx0,by0,zs2),'#E8590C','#B8430A',.6);
-        s+=quad(P(bx0+4,fy,HEAD_TOP-21),P(bx1-4,fy,HEAD_TOP-21),P(bx1-4,fy,HEAD_TOP-31),P(bx0+4,fy,HEAD_TOP-31),'#C9D0D8','#8A94A1',.6);
-        const l1=P(bx0+6,fy,HEAD_TOP-4.5), l2=P(bx0+11,fy,HEAD_TOP-4.5);
-        s+=`<circle cx="${l1.x.toFixed(1)}" cy="${l1.y.toFixed(1)}" r="1.7" fill="#22C55E"/>`;
-        s+=`<circle cx="${l2.x.toFixed(1)}" cy="${l2.y.toFixed(1)}" r="1.7" fill="#DC2626"/>`; }
-      s+=solid(MC,-8,8,-8,8,camB-HEAD_H*0.18,camB,MAT.steel);                     // 렌즈 넥
-      const dTop=DOME_Z+HEAD_H*0.22;
-      const t1=P(BRIDGE_X-11,PCB_YC,dTop), t2=P(BRIDGE_X-22,PCB_YC,DOME_Z), t3=P(BRIDGE_X+22,PCB_YC,DOME_Z), t4=P(BRIDGE_X+11,PCB_YC,dTop);
-      s+=`<polygon points="${pt(t1)} ${pt(t2)} ${pt(t3)} ${pt(t4)}" fill="url(#gAluF)" stroke="#8A94A1" stroke-width=".9"/>`;
-      const d=P(BRIDGE_X,PCB_YC,DOME_Z);
-      s+=`<ellipse cx="${d.x.toFixed(1)}" cy="${d.y.toFixed(1)}" rx="22" ry="8.4" fill="${lightOn?'url(#gDomeOn)':'url(#gDomeOff)'}" stroke="#9AA3AF" stroke-width="1"${lightOn?' filter="url(#fGlow)"':''}/>`;
-      const l=P(BRIDGE_X,PCB_YC,DOME_Z+1.5);
-      s+=`<ellipse cx="${l.x.toFixed(1)}" cy="${l.y.toFixed(1)}" rx="7.5" ry="3.4" fill="#12161B" stroke="#3C4652"/>`;
-      s+=`<circle cx="${l.x.toFixed(1)}" cy="${l.y.toFixed(1)}" r="2.6" fill="#4E8CC9"/>`; }
-    { const q=P(BRIDGE_X-58,PCB_YC-30,HEAD_TOP+34);
-      s+=`<text x="${(q.x-26).toFixed(1)}" y="${q.y.toFixed(1)}" text-anchor="end" font-size="9.5" font-weight="900" fill="#2D5C99">${T('sv_vis')}</text>`; }
-    function dimLine(dx,z0,z1,txt,col){
-      const a=P(BRIDGE_X+dx,PCB_YC,z1), b=P(BRIDGE_X+dx,PCB_YC,z0);
-      let o=`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="${col}" stroke-width="1" stroke-dasharray="4 3"/>`;
-      [a,b].forEach(q=>{ o+=`<line x1="${(q.x-4).toFixed(1)}" y1="${q.y.toFixed(1)}" x2="${(q.x+4).toFixed(1)}" y2="${q.y.toFixed(1)}" stroke="${col}" stroke-width="1"/>`; });
-      o+=`<text x="${(a.x-7).toFixed(1)}" y="${((a.y+b.y)/2+3).toFixed(1)}" text-anchor="end" font-size="10" font-weight="900" fill="${col}">${txt}</text>`;
-      return o; }
-    s+=dimLine(-34,DOME_Z,HEAD_TOP,HEAD_MM+T('sv_head'),'#7A3E9D');
-    s+=dimLine(-34,PCB_SURF,DOME_Z,WD_MM+T('sv_wd'),'#2D5C99');
+      s+=solid(MC,-9,9,-9,9,az-3,az+1,MAT.alu);                                   // 어댑터 플레이트
+      { const c0=PJ(MH(6,13,10)), c1=PJ(MH(11,25,6)), c2=PJ(MH(5,34,0));          // 후방 케이블 (본체보다 먼저)
+        s+=`<path d="M${pt(c0)} Q${pt(c1)} ${pt(c2)}" stroke="#12161B" stroke-width="3.8" fill="none" stroke-linecap="round"/>`;
+        s+=`<path d="M${pt(c0)} Q${pt(c1)} ${pt(c2)}" stroke="#39424D" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".45"/>`; }
+      const SENS=[44,48,55], SENS2=[62,68,78];
+      s+=solid(MH,-14,14,-13,13,3,SB,SENS);                                       // 본체
+      s+=solid(MH,-22,-14,-13,13,9,SB,SENS);                                      // 어깨 스커트
+      { const A=PJ(MH(-14,-13,3)), Bp=PJ(MH(-20,-13,9)), C=PJ(MH(-20,13,9)), D=PJ(MH(-14,13,3));   // 경사 어깨면 + 적색 스트라이프
+        s+=quad(A,Bp,C,D,'rgb(58,63,72)','rgb(28,32,38)',.7);
+        const f1=.34, f2=.52;
+        const r1=PJ(MH(-14-6*f1,-13,3+6*f1)), r2=PJ(MH(-14-6*f2,-13,3+6*f2)), r3=PJ(MH(-14-6*f2,13,3+6*f2)), r4=PJ(MH(-14-6*f1,13,3+6*f1));
+        s+=quad(r1,r2,r3,r4,'#C0392F','#8E2820',.5); }
+      { const fv=-13.3;                                                           // 전면 상태 표시부
+        s+=quad(PJ(MH(0,fv,9)),PJ(MH(12,fv,9)),PJ(MH(12,fv,15)),PJ(MH(0,fv,15)),'rgb(28,32,38)','rgb(18,21,26)',.5);
+        [[2.5,'#FF7A2F',0],[6, lightOn?'#4ADE80':'#2F4436',1],[9.5,'#8FA4BE',0]].forEach(([uu,cc,gl])=>{
+          const q=PJ(MH(uu,fv-.4,12));
+          s+=`<circle cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" r="1.5" fill="${cc}"${(gl&&lightOn)?' filter="url(#fGlow)"':''}/>`; });
+        const n1=PJ(MH(1,fv-.4,19)), n2=PJ(MH(11,fv-.4,19));
+        s+=`<line x1="${n1.x.toFixed(1)}" y1="${n1.y.toFixed(1)}" x2="${n2.x.toFixed(1)}" y2="${n2.y.toFixed(1)}" stroke="rgb(140,150,164)" stroke-width="2.2" opacity=".5"/>`;
+        for(let k=0;k<5;k++){ const a=PJ(MH(0,fv-.2,24+k*2.1)), b2=PJ(MH(12,fv-.2,24+k*2.1));
+          s+=`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b2.x.toFixed(1)}" y2="${b2.y.toFixed(1)}" stroke="rgba(120,132,148,.35)" stroke-width="1"/>`; } }
+      [-1,1].forEach(sx=>{ const WU=8;                                            // 하단 2창 (검사 시에만 조명 점등)
+        s+=solid(MH,sx*WU-4.6,sx*WU+4.6,-6,6,SB-3.5,SB,SENS2);
+        const w=[MH(sx*WU-3.3,-4.6,SB),MH(sx*WU+3.3,-4.6,SB),MH(sx*WU+3.3,4.6,SB),MH(sx*WU-3.3,4.6,SB)].map(PJ);
+        s+=quad(w[0],w[1],w[2],w[3],lightOn?'#FFE9A0':'#14181D','#0A0D11',.7);
+        if(lightOn){ const g=PJ(MH(sx*WU,0,SB+.5));
+          s+=`<ellipse cx="${g.x.toFixed(1)}" cy="${g.y.toFixed(1)}" rx="7" ry="3.2" fill="#FFE68A" opacity=".85" filter="url(#fGlow)"/>`; } }); }
 
     // ── 촬영 : 화각 프레임 + 셔터 플래시 (쓸고 지나가는 스캔 아님) ──
     { const ji=jigAtIns();
@@ -863,7 +836,7 @@
     const t=durs();
     $('vX').textContent=(beltS*U2MM).toFixed(0)+' mm';
     $('vP').textContent=(PITCH*U2MM).toFixed(0)+' mm';
-    $('vT').textContent=((t.scan+t.move+t.act*3)/1000).toFixed(1)+' '+T('sec_u');
+    $('vT').textContent=cycleSec().toFixed(1)+' '+T('sec_u');
     $('vF').textContent=WD_MM+' mm';
     $('flatVal').textContent = (ji&&ji.pcb) ? T('val_fix') : '-';
     const set=(cid,vid,j)=>{ $(vid).textContent = j ? ('J'+j.id+' · '+(j.pcb?'PCB':T('val_emp'))) : T('val_none');
@@ -888,10 +861,11 @@
       const m=$('stepMobile'); m.classList.toggle('wait',cs.type==='wait'); m.classList.toggle('alarm',cs.type==='alarmwait'); }
   }
 
-  // 동작시간 슬라이더 : 3(0.3초) ~ 30(3.0초)
-  function stepSec(){ return (parseInt($('speed').value,10)||9)/10; }
+    // 사이클타임 = 지그 1개가 검사위치에 오는 주기 (1회 인덱스 주기). 슬라이더 20~100 → 2.0~10.0초
+  function cycleSec(){ return (parseInt($('speed').value,10)||50)/10; }
+  function stepSec(){ return Math.max(0.1,(cycleSec()-0.26)/5.93); }   // 단위시간 u : 1사이클 = 5.93u + 0.26s
   function durs(){ const sec=stepSec(); return { scan:Math.round(sec*1000*2.2), move:Math.round(sec*1000), act:Math.round(sec*440) }; }
-  function renderSpeed(){ $('speedVal').textContent=stepSec().toFixed(1)+T('sec_u'); }
+  function renderSpeed(){ $('speedVal').textContent=cycleSec().toFixed(1)+T('sec_u'); }
   function anim(dur,step,done){
     const my=++animToken, t0=performance.now();
     (function f(now){ if(my!==animToken)return;
