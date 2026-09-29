@@ -37,9 +37,20 @@
   .card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 2px rgba(20,40,63,.05);margin-bottom:10px;}
   .card-header{background:var(--card-header-bg);padding:7px 12px;font-weight:700;color:var(--navy-dark);font-size:13.5px;border-bottom:1px solid var(--border);}
   .card-body{padding:9px 12px;}
-  .grid2{display:grid;grid-template-columns:1.35fr .65fr;gap:10px;align-items:start;}
-  .left-col{display:flex;flex-direction:column;}
-  @media (max-width:900px){.grid2{grid-template-columns:1fr;}}
+  .grid2{display:grid;grid-template-columns:1.32fr .68fr;gap:10px;align-items:start;}
+  .left-col{display:flex;flex-direction:column;min-width:0;}
+  /* 우측 컬럼 : 운전/신호 제어 + 전체 로직 플로우 (플로우가 남는 높이를 채우고 내부 스크롤) */
+  .right-col{display:flex;flex-direction:column;gap:10px;min-width:0;max-height:calc(100vh - 275px);}
+  .right-col .card{margin-bottom:0;}
+  .right-col>.card:first-child{flex:0 0 auto;}                 /* 운전 카드는 줄어들지 않음 */
+  .right-col .flow-card{flex:1 1 auto;min-height:130px;display:flex;flex-direction:column;overflow:hidden;}
+  .right-col .flow-card .card-body{flex:1 1 auto;min-height:0;overflow-y:auto;}
+  @media (max-width:900px){
+    .grid2{grid-template-columns:1fr;}
+    .right-col{max-height:none;}
+    .right-col .card{margin-bottom:10px;}
+    .right-col .flow-card{display:none;}   /* 모바일은 상단 단일 스텝 표시로 대체 */
+  }
   .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
   button{font-family:inherit;font-size:13px;font-weight:700;padding:8px 13px;border-radius:8px;border:1px solid var(--border);background:#F5F7FA;color:var(--navy-dark);cursor:pointer;}
   button:hover{background:#EAF0F8;}
@@ -54,9 +65,9 @@
   .hint{font-size:12px;color:var(--text-light);margin-top:6px;}
   svg{width:100%;height:auto;display:block;}
   /* 애니메이션이 한 화면을 넘지 않도록 높이 제한 (스크롤 방지) */
-  #scene{max-height:calc(100vh - 700px);min-height:160px;margin:0 auto;}
-  @media (max-width:900px){ #scene{max-height:calc(100vh - 725px);} }
-  @media (max-width:600px){ #scene{max-height:calc(100vh - 830px);} }
+  #scene{max-height:calc(100vh - 549px);min-height:200px;margin:0 auto;}
+  @media (max-width:900px){ #scene{max-height:calc(100vh - 729px);} }
+  @media (max-width:600px){ #scene{max-height:calc(100vh - 833px);min-height:160px;} }
   .axisbar{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:7px;}
   @media (max-width:600px){.axisbar{grid-template-columns:repeat(3,1fr);}}
   .ax{background:#F2F6FC;border:1px solid #D3E0F0;border-radius:7px;padding:4px 6px;text-align:center;}
@@ -113,7 +124,7 @@
 <body>
 
 <header class="cover"><div class="inner">
-  <span class="hver" id="hVer">v3.0</span>
+  <span class="hver" id="hVer">v3.1</span>
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (Z·Rx·Ry 3축 헤드)</h1>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
@@ -172,7 +183,9 @@
         <p class="hint" id="curStateText"></p>
       </div>
     </section>
+    </div>
 
+    <div class="right-col">
     <section class="card">
       <div class="card-header" data-i18n="ch_ctrl">운전 / 신호 제어</div>
       <div class="card-body">
@@ -192,12 +205,12 @@
         </div>
       </div>
     </section>
-    </div>
 
     <section class="card flow-card">
       <div class="card-header" data-i18n="ch_flow">전체 로직 플로우</div>
       <div class="card-body"><div class="steps" id="stepList"></div></div>
     </section>
+    </div>
   </div>
 
   <section class="card log-card">
@@ -209,7 +222,7 @@
   </section>
 </main>
 
-<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.0</span></footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.1</span></footer>
 
 <script>
   // ===== 3D 월드 (X:컨베이어, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
@@ -258,7 +271,7 @@
   }
 
   // ===== 다국어 (한국어 / English) =====
-  const VER='v3.0';
+  const VER='v3.1';
   const I18N={
     ko:{
       title:'PCB 비전 검사 시뮬레이터 (3축 헤드)',
