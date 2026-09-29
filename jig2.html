@@ -187,7 +187,7 @@
   </section>
 </main>
 
-<footer>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · JIG2 v1.3</footer>
+<footer>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · JIG2 v1.4</footer>
 
 <script>
   // ===== 3D 월드 (X:이송방향, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
@@ -394,13 +394,13 @@
         s+=`<polygon points="${ptsA}" fill="#F2B01E" stroke="#B98305" stroke-width=".8" opacity=".95"/>`; } }
 
     // ── 하부/랩 구간 지그 (프레임 앞판보다 먼저) ──
-    JIGS.forEach(j=>{ const p=beltPos(beltS+j.s0); if(p.nz<=0.9 && p.nz>0.3) s+=drawJig(j,p); });   // 하부 복귀 구간 지그는 그리지 않음 (벨트 위 지그만 표시)
+    JIGS.forEach(j=>{ const p=beltPos(beltS+j.s0); if(p.nz<=0.9) s+=drawJig(j,p); });
 
     // ── 앞 측판 (스타디움 링 · 반투명 커버) + 풀리 허브 ──
-    s+=sideFrame(TBL_Y0-6,'url(#gAluF)','#78838F');
-    [PX_L,PX_R].forEach(px=>{
-      s+=disc(px,TBL_Y0-6.6,ZC,R-14,'url(#gPulley)','#5B6470');
-      s+=disc(px,TBL_Y0-6.8,ZC,6,'#39424D','#2A3038'); });
+    s+=sideFrame(TBL_Y0-6,'url(#gAluF)','#78838F','#DCE3EC');
+    [PX_L,PX_R].forEach(px=>{ const c=P(px,TBL_Y0-6,ZC);
+      s+=`<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="15" fill="url(#gPulley)" stroke="#5B6470" stroke-width="1"/>`;
+      s+=`<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="5" fill="#39424D"/>`; });
 
     // ── 캐비닛 전면 커버판 (벨트 하부를 가림) ──
     s+=slab(CAB_X0+6,CAB_X1-6,CAB_Y0+2,TBL_Y0-8,LIP_TOP,LIP_TOP-TBLTOP_Z,'url(#gAluT)','url(#gAluF)','url(#gAluB)','#7C8896');
@@ -524,15 +524,14 @@
     updHUD();
   }
 
-  // 측판 : 솔리드 스타디움 플레이트 (벨트보다 약간 안쪽 · 불투명) + 하이라이트 테두리
+  // 측판 : 스타디움 링(밴드) + 선택적 반투명 커버
   function sideFrame(Y,fill,st,tint){
-    let o=`<polygon points="${stadium(Y,PX_L,PX_R,ZC,R-3).map(pt).join(' ')}" fill="${fill}" stroke="${st}" stroke-width="1"/>`;
-    o+=`<polygon points="${stadium(Y,PX_L,PX_R,ZC,R-9).map(pt).join(' ')}" fill="none" stroke="#FFFFFF" stroke-opacity=".55" stroke-width="1"/>`;
+    const outer=stadium(Y,PX_L,PX_R,ZC,R), inner=stadium(Y,PX_L,PX_R,ZC,R-11).reverse();
+    const d='M'+outer.map(pt).join(' L')+' Z M'+inner.map(pt).join(' L')+' Z';
+    let o='';
+    if(tint) o+=`<polygon points="${stadium(Y,PX_L,PX_R,ZC,R-11).map(pt).join(' ')}" fill="${tint}" fill-opacity=".36"/>`;
+    o+=`<path d="${d}" fill="${fill}" fill-rule="evenodd" stroke="${st}" stroke-width="1"/>`;
     return o;
-  }
-  function disc(X,Y,Z,r,fill,st){
-    const ps=[]; for(let i=0;i<28;i++){ const a=i/28*2*Math.PI; ps.push(P(X+r*Math.cos(a),Y,Z+r*Math.sin(a))); }
-    return `<polygon points="${ps.map(pt).join(' ')}" fill="${fill}" stroke="${st}" stroke-width="1"/>`;
   }
 
   // ===== PCB (수평 고정) =====
@@ -765,7 +764,7 @@
   $('btnSide').addEventListener('click',()=>setYaw(90));
 
   initLine(); draw(); renderSteps(); updateSigBtns();
-  addLog('벨트 고정 안착지그 인덱싱 컨베이어 시뮬레이터 JIG2 v1.3 준비 완료. (지그 '+NJIG+'EA · 피치 '+(PITCH*U2MM).toFixed(0)+'mm · 풀리 R'+RMM+'mm)');
+  addLog('벨트 고정 안착지그 인덱싱 컨베이어 시뮬레이터 JIG2 v1.4 준비 완료. (지그 '+NJIG+'EA · 피치 '+(PITCH*U2MM).toFixed(0)+'mm · 풀리 R'+RMM+'mm)');
 </script>
 <script>
 (function(){
