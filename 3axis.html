@@ -113,7 +113,7 @@
 <body>
 
 <header class="cover"><div class="inner">
-  <span class="hver" id="hVer">v2.9</span>
+  <span class="hver" id="hVer">v3.0</span>
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (Z·Rx·Ry 3축 헤드)</h1>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
@@ -209,14 +209,14 @@
   </section>
 </main>
 
-<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v2.9</span></footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.0</span></footer>
 
 <script>
   // ===== 3D 월드 (X:컨베이어, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
   const U2MM=300/90;
   const WX0=212, WX1=468, BELT_Y0=0, BELT_Y1=112;            // 작업대 프레임 (좌우 각 200mm 축소)
   const BELT_X0=WX0-60, BELT_X1=WX1+75;                      // 좌 200mm · 우 250mm 돌출
-  const BELT_Z=210, BELT_TH=120, RAIL_W=9, RAIL_Z=BELT_Z+4;  // 풀리 반경 200mm → 상하 간격 400mm
+  const BELT_Z=210, BELT_TH=60, RAIL_W=9, RAIL_Z=BELT_Z+4;   // 풀리 반경 100mm → 상하 간격 200mm
   // 작업대 (컨베이어 매립)
   const TB_TH=9;                                             // 상판 두께 30mm
   const HX0=WX0-2, HX1=WX1+2, HY0=BELT_Y0-12, HY1=BELT_Y1+12;           // 개구부 (X 전체 관통)
@@ -258,7 +258,7 @@
   }
 
   // ===== 다국어 (한국어 / English) =====
-  const VER='v2.9';
+  const VER='v3.0';
   const I18N={
     ko:{
       title:'PCB 비전 검사 시뮬레이터 (3축 헤드)',
@@ -504,6 +504,18 @@
     }
     return out.sort((a,b)=>b.d-a.d).map(o=>o.s).join('');
   }
+  // 박스 8꼭짓점의 화면공간 볼록껍질 — 부분 재그리기용 클립 도형
+  function hullPoly(x0,x1,y0,y1,z0,z1){
+    const ps=[];
+    [x0,x1].forEach(X=>[y0,y1].forEach(Y=>[z0,z1].forEach(Z=>ps.push(P(X,Y,Z)))));
+    ps.sort((a,b)=>(a.x-b.x)||(a.y-b.y));
+    const cr=(o,a,b)=>(a.x-o.x)*(b.y-o.y)-(a.y-o.y)*(b.x-o.x);
+    const lo=[], up=[];
+    ps.forEach(q=>{ while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],q)<=0)lo.pop(); lo.push(q); });
+    ps.slice().reverse().forEach(q=>{ while(up.length>=2&&cr(up[up.length-2],up[up.length-1],q)<=0)up.pop(); up.push(q); });
+    const h=lo.slice(0,-1).concat(up.slice(0,-1));
+    return `<polygon points="${h.map(pt).join(' ')}"/>`;
+  }
   function solid(M,u0,u1,v0,v1,n0,n1,base,sw){
     const cw=[[u0,v0,n0],[u1,v0,n0],[u1,v1,n0],[u0,v1,n0],[u0,v0,n1],[u1,v0,n1],[u1,v1,n1],[u0,v1,n1]]
               .map(a=>M(a[0],a[1],a[2]));
@@ -542,11 +554,18 @@
     [[0,0,16,8],[0,-34,17,9]].forEach(([su,sv,rx,ry])=>{
       const q=P(px+2,py+sv*1.1-3,BELT_Z+.4);
       o+=`<ellipse cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" rx="${rx}" ry="${ry}" fill="#0C1014" opacity=".42" filter="url(#fBlurS)"/>`; });
-    // 지지 스탠드오프 — 벨트면에서 10mm 부상 (앞 가장자리에 배치해 가려지지 않게)
+    // 지지 브래킷 — ㅏ 형상(수직 기둥 + 수평 받침암)으로 벨트에 고정, 기판을 10mm 부상
     [[-11,-6.4],[11,-6.4],[-11,6.4],[11,6.4],[-11,-41],[11,-41]].forEach(([su,sv])=>{
-      const tp=PT(su,sv,0), bs=P(tp.X,tp.Y,BELT_Z+.3);
-      o+=`<ellipse cx="${bs.x.toFixed(1)}" cy="${bs.y.toFixed(1)}" rx="3" ry="1.2" fill="#8A94A1" opacity=".8"/>`;
-      o+=bar(bs,PJ(tp),2.1,'url(#gSteel)','#5F6975'); });
+      const tp=PT(su,sv,0);                          // 기판 하면 접촉점
+      const sg=su>0?1:-1, ARM=5.4, PW=1.6, AT=0.9;
+      const cx=tp.X+sg*ARM;                          // 기둥 중심 X (기판 바깥쪽)
+      const MB=(u,v,n)=>({X:cx+u, Y:tp.Y+v, Z:n});
+      o+=solid(MB,-2.7,2.7,-2.4,2.4,BELT_Z,BELT_Z+1.2,MAT.steel,.55);            // 베이스 플레이트 (벨트 고정)
+      o+=solid(MB,-PW,PW,-PW,PW,BELT_Z+1.2,tp.Z+1.5,MAT.alu,.55);                // 수직 기둥 ( ㅣ )
+      const MA=(u,v,n)=>({X:u, Y:tp.Y+v, Z:n});
+      o+=solid(MA,Math.min(tp.X,cx),Math.max(tp.X,cx),-1.2,1.2,tp.Z-AT,tp.Z,MAT.alu,.55);  // 수평 받침암 ( ㅡ )
+      const bl=P(cx,tp.Y,BELT_Z+1.3);                // 고정 볼트
+      o+=`<circle cx="${bl.x.toFixed(1)}" cy="${bl.y.toFixed(1)}" r="1" fill="#59636F" opacity=".75"/>`; });
     // PCB 기판 (검사 대상)
     o+=`<polygon points="${ell(0,0,PU,PV,3)}" fill="url(#gPcb)" stroke="#17501E" stroke-width=".9"/>`;
     for(let gu=-12; gu<=12; gu+=3){ const hv=PV*Math.sqrt(Math.max(0,1-(gu/PU)**2))*0.8;
@@ -608,21 +627,24 @@
       for(let i=0;i<=N;i++){ const a=(90-180*i/N)*Math.PI/180, X=cx+dir*rr*Math.cos(a), Z=zc+rr*Math.sin(a);
         u.push(P(X,y1,Z)); v.push(P(X,y2,Z)); }
       return `<polygon points="${u.concat(v.reverse()).map(pt).join(' ')}" fill="${fill}" stroke="${stroke}" stroke-width="1"/>`; }
-    s+=`<polygon points="${framePath(BELT_Y0)}" fill="url(#gAluF)" stroke="#78838F" stroke-width="1"/>`;
-    s+=`<polygon points="${framePath(BELT_Y1)}" fill="url(#gAluB)" stroke="#6E7885" stroke-width="1"/>`;
-    s+=wrapFace(NXL,NR,NZC,-1,yB,BELT_Y1,'url(#gAluT)','#7C8896');
-    s+=wrapFace(NXR,NR,NZC, 1,yB,BELT_Y1,'url(#gAluT)','#7C8896');
-    s+=quad(P(NXL,yA,BELT_Z),P(NXR,yA,BELT_Z),P(NXR,yB,BELT_Z),P(NXL,yB,BELT_Z),'url(#gBelt)','#7E8792',1);
-    s+=wrapFace(NXL,BWR,BWZ,-1,yA,yB,'url(#gBelt)','#7E8792');
-    s+=wrapFace(NXR,BWR,BWZ, 1,yA,yB,'url(#gBelt)','#7E8792');
-    const sp=30, off=((beltPhase%sp)+sp)%sp;
-    for(let rx=NXL+off-sp; rx<NXR; rx+=sp){ if(rx<=NXL) continue;
-      const a1=P(rx,yA,BELT_Z), a2=P(rx,yB,BELT_Z);
-      s+=`<line x1="${a1.x.toFixed(1)}" y1="${a1.y.toFixed(1)}" x2="${a2.x.toFixed(1)}" y2="${a2.y.toFixed(1)}" stroke="#8B939D" stroke-width="1.6" opacity=".8"/>`; }
-    s+=quad(P(NXL,BELT_Y0,RAIL_Z),P(NXR,BELT_Y0,RAIL_Z),P(NXR,yA,RAIL_Z),P(NXL,yA,RAIL_Z),'url(#gAluT)','#8892A0',1);
-    s+=quad(P(NXL,yB,RAIL_Z),P(NXR,yB,RAIL_Z),P(NXR,BELT_Y1,RAIL_Z),P(NXL,BELT_Y1,RAIL_Z),'url(#gAluT)','#8892A0',1);
-    s+=wrapFace(NXL,NR,NZC,-1,BELT_Y0,yA,'url(#gAluT)','#7C8896');
-    s+=wrapFace(NXR,NR,NZC, 1,BELT_Y0,yA,'url(#gAluT)','#7C8896');
+    function conveyorGeo(){ let g='';
+      g+=`<polygon points="${framePath(BELT_Y0)}" fill="url(#gAluF)" stroke="#78838F" stroke-width="1"/>`;
+      g+=`<polygon points="${framePath(BELT_Y1)}" fill="url(#gAluB)" stroke="#6E7885" stroke-width="1"/>`;
+      g+=wrapFace(NXL,NR,NZC,-1,yB,BELT_Y1,'url(#gAluT)','#7C8896');
+      g+=wrapFace(NXR,NR,NZC, 1,yB,BELT_Y1,'url(#gAluT)','#7C8896');
+      g+=quad(P(NXL,yA,BELT_Z),P(NXR,yA,BELT_Z),P(NXR,yB,BELT_Z),P(NXL,yB,BELT_Z),'url(#gBelt)','#7E8792',1);
+      g+=wrapFace(NXL,BWR,BWZ,-1,yA,yB,'url(#gBelt)','#7E8792');
+      g+=wrapFace(NXR,BWR,BWZ, 1,yA,yB,'url(#gBelt)','#7E8792');
+      const sp=30, off=((beltPhase%sp)+sp)%sp;
+      for(let rx=NXL+off-sp; rx<NXR; rx+=sp){ if(rx<=NXL) continue;
+        const a1=P(rx,yA,BELT_Z), a2=P(rx,yB,BELT_Z);
+        g+=`<line x1="${a1.x.toFixed(1)}" y1="${a1.y.toFixed(1)}" x2="${a2.x.toFixed(1)}" y2="${a2.y.toFixed(1)}" stroke="#8B939D" stroke-width="1.6" opacity=".8"/>`; }
+      g+=quad(P(NXL,BELT_Y0,RAIL_Z),P(NXR,BELT_Y0,RAIL_Z),P(NXR,yA,RAIL_Z),P(NXL,yA,RAIL_Z),'url(#gAluT)','#8892A0',1);
+      g+=quad(P(NXL,yB,RAIL_Z),P(NXR,yB,RAIL_Z),P(NXR,BELT_Y1,RAIL_Z),P(NXL,BELT_Y1,RAIL_Z),'url(#gAluT)','#8892A0',1);
+      g+=wrapFace(NXL,NR,NZC,-1,BELT_Y0,yA,'url(#gAluT)','#7C8896');
+      g+=wrapFace(NXR,NR,NZC, 1,BELT_Y0,yA,'url(#gAluT)','#7C8896');
+      return g; }
+    s+=conveyorGeo();
     const ar=[P(400,PCB_YC-8,BELT_Z+1),P(428,PCB_YC-8,BELT_Z+1),P(428,PCB_YC-17,BELT_Z+1),P(450,PCB_YC,BELT_Z+1),P(428,PCB_YC+17,BELT_Z+1),P(428,PCB_YC+8,BELT_Z+1),P(400,PCB_YC+8,BELT_Z+1)];
     s+=`<polygon points="${ar.map(pt).join(' ')}" fill="#FFD22E" stroke="#B08600" stroke-width="1"/>`;
     const sp1=P(INSPECT_X-58,BELT_Y0,RAIL_Z), sp2=P(INSPECT_X-58,BELT_Y0,RAIL_Z+20);
@@ -641,6 +663,10 @@
       s+=`<line x1="${d1.x.toFixed(1)}" y1="${d1.y.toFixed(1)}" x2="${d2.x.toFixed(1)}" y2="${d2.y.toFixed(1)}" stroke="rgba(90,100,114,.45)" stroke-width="1.2"/>`;
       [-14,14].forEach(dx=>{ const a=P(dm+dx,WY0-3,(BELT_Z-TB_TH+SKIRT_Z)/2+12), b=P(dm+dx,WY0-3,(BELT_Z-TB_TH+SKIRT_Z)/2-12);
         s+=bar(a,b,4,'url(#gSteel)','#5A6470'); }); }
+
+    // ── 좌측 투입구 : 프레임(캐비닛)이 가리지 않도록 캐비닛 위에 재그리기 ──
+    s+=`<clipPath id="clpIn">${hullPoly(BELT_X0-3,WX0,BELT_Y0-3,BELT_Y1+3,BELT_Z-BELT_TH-3,RAIL_Z+3)}</clipPath>`;
+    s+=`<g clip-path="url(#clpIn)">${conveyorGeo()}</g>`;
 
     const lb=P(INSPECT_X-118,BELT_Y0-34,BELT_Z+10);
 
