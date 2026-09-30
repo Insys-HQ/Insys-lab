@@ -125,7 +125,7 @@
 
 <header class="cover"><div class="inner">
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (벨트 고정 안착지그)</h1>
-  <span class="hver" id="hVer">v3.0</span>
+  <span class="hver" id="hVer">v3.1</span>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
     <button id="btnEn" type="button">English</button>
@@ -136,7 +136,7 @@
   <div class="grid2">
     <div class="left-col">
     <section class="card">
-      <div class="card-header" data-i18n="ch_anim">동작 애니메이션 · 벨트 고정 안착지그 + 고정식 키엔스 비전</div>
+      <div class="card-header" data-i18n="ch_anim">동작 애니메이션 · 벨트 고정 안착지그 + 고정식 비전시스템</div>
       <div class="card-body">
         <div id="stepMobile" class="step-mobile"><span class="no">1</span><span id="stepMobileText">START 대기</span></div>
         <div id="alarmBanner" class="alarm-banner" data-i18n="alarmban">⚠ NG 검사 중단 — NG품 제거 후 [검사 계속]</div>
@@ -223,11 +223,11 @@
   </section>
 </main>
 
-<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.0</span></footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.1</span></footer>
 
 <script>
   // ===== 3D 월드 (X:이송방향, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
-  const VER='v3.0';
+  const VER='v3.1';
   const U2MM=300/90;
   const WX0=212, WX1=468, BELT_Y0=0, BELT_Y1=112;            // 작업대 프레임 (3축 시뮬레이터와 동일)
   const BELT_X0=WX0-60, BELT_X1=WX1+75;                      // 좌 200mm · 우 250mm 돌출
@@ -309,7 +309,7 @@
     ko:{
       title:'PCB 비전 검사 시뮬레이터 (안착지그 컨베이어)',
       h1:'PCB 비전 검사 시뮬레이터 (벨트 고정 안착지그)',
-      ch_anim:'동작 애니메이션 · 벨트 고정 안착지그 + 고정식 키엔스 비전',
+      ch_anim:'동작 애니메이션 · 벨트 고정 안착지그 + 고정식 비전시스템',
       ch_ctrl:'운전 / 신호 제어', ch_flow:'전체 로직 플로우', ch_log:'동작 로그',
       alarmban:'⚠ NG 검사 중단 — NG품 제거 후 [검사 계속]',
       ax_x:'벨트 누적이송', ax_p:'지그 피치', ax_t:'사이클타임', ax_wd:'작업거리(WD)',
@@ -335,7 +335,7 @@
       s_index:'벨트 1피치 인덱스 이송 · 회전부에서 PCB·케이스가 함께 미끄럼틀을 타고 미끄러져 작업대로 배출',
       // SVG 라벨
       sv_load:'안착위치', sv_ins:'검사위치', sv_out:'배출위치', sv_rel:'회전부 래치 해제 → PCB 낙하',
-      sv_next:'다음 공정 작업자', sv_sens:'지그 감지센서', sv_vis:'고정식 키엔스 비전',
+      sv_next:'다음 공정 작업자', sv_sens:'지그 감지센서', sv_vis:'고정식 비전시스템',
       sv_pul:'풀리 R', sv_brk:'고정 브라켓', sv_head:'mm (헤드)', sv_wd:'mm (WD)', click:'딸깍',
       // 로그
       lg_load_none:'[안착위치] 지그 없음 — 생략',
@@ -364,7 +364,7 @@
     en:{
       title:'PCB Vision Inspection Simulator (Seating-Jig Conveyor)',
       h1:'PCB Vision Inspection Simulator (Belt-Fixed Seating Jig)',
-      ch_anim:'Motion Animation · Belt-Fixed Seating Jigs + Fixed Keyence Vision',
+      ch_anim:'Motion Animation · Belt-Fixed Seating Jigs + Fixed Vision System',
       ch_ctrl:'Operation / Signal Control', ch_flow:'Logic Flow', ch_log:'Operation Log',
       alarmban:'⚠ NG — Inspection Halted. Remove NG part, then [Resume]',
       ax_x:'Belt Travel', ax_p:'Jig Pitch', ax_t:'Cycle Time', ax_wd:'Working Dist.',
@@ -389,7 +389,7 @@
       s_rel:'Eject station — latch-release actuator opens the locks',
       s_index:'Belt indexes 1 pitch · at the turn the PCB with its case slides down the chute onto the table',
       sv_load:'Load Stn', sv_ins:'Inspect Stn', sv_out:'Eject Stn', sv_rel:'Latch releases at turn → PCB drops',
-      sv_next:'Next-process operator', sv_sens:'Jig Sensor', sv_vis:'Fixed Keyence Vision',
+      sv_next:'Next-process operator', sv_sens:'Jig Sensor', sv_vis:'Fixed Vision System',
       sv_pul:'Pulley R', sv_brk:'Fixed Bracket', sv_head:'mm (Head)', sv_wd:'mm (WD)', click:'Click!',
       lg_load_none:'[Load Stn] No jig — skipped',
       lg_load_full:j=>'[Load Stn] J'+j+' already loaded — skipped',
@@ -842,7 +842,7 @@
         s+=solid(M2,-3,3,-3,3,tip-1.6,tip,MAT.black); });                         // 푸시 패드
     }
 
-    // ── 고정식 키엔스 비전 : 흑색 스텝 하우징 + 적색 스트라이프 + LED 3 + 하단 투광/수광 2창 + 후방 케이블 ──
+    // ── 고정식 비전시스템 : 흑색 스텝 하우징 + 적색 스트라이프 + LED 3 + 하단 투광/수광 2창 + 후방 케이블 ──
     { const SB=35, az=DOME_Z+SB;                                                  // 하단(창) = DOME_Z
       const MH=(u,v,n)=>({X:BRIDGE_X+u, Y:PCB_YC+v, Z:az-n});
       const MC=(u,v,n)=>({X:BRIDGE_X+u, Y:PCB_YC+v, Z:n});
