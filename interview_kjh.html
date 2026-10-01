@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="robots" content="noindex, nofollow">
+<title>면접 평가서 v5.0 | 김종훈 | 인시스 AI혁신 연구개발실</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;}
+@media (min-width:768px){html{font-size:16px;}}
+body{font-family:'Noto Sans KR',sans-serif;background:#eef1f5;color:#1f2d3d;line-height:1.5;font-size:1rem;}
+button,input,select,textarea{font-family:inherit;font-size:1rem;color:#1f2d3d;}
+a{color:#1a3a6a;}
+.nav{width:100%;background:#1a2a4a;position:sticky;top:0;z-index:50;}
+.nav-inner{max-width:1100px;margin:0 auto;padding:6px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.nav-logo{color:#fff;font-weight:700;font-size:1rem;}
+.nav-logo span{color:#b9d3ee;font-weight:300;}
+.nav-right{display:flex;align-items:center;gap:8px;}
+.ver{color:#dbe8f6;font-size:0.875rem;font-weight:500;}
+.vt{display:flex;border:1px solid #9db8d6;border-radius:6px;overflow:hidden;}
+.vt button{background:transparent;color:#dbe8f6;border:none;padding:3px 10px;cursor:pointer;font-size:0.875rem;}
+.vt button.on{background:#dbe8f6;color:#1a2a4a;font-weight:700;}
+.wrap{max-width:1100px;margin:0 auto;padding:8px 12px 40px;}
+.wrap.mobile{max-width:430px;}
+.card{background:#fff;border:1px solid #d5dce6;border-radius:8px;padding:12px;margin-bottom:8px;}
+.card h2{font-size:1.1rem;color:#14284b;font-weight:700;margin-bottom:6px;}
+.notice{background:#e8f0fa;border-color:#b8cde6;}
+.notice p{font-size:0.875rem;color:#1f2d3d;}
+.grid{display:grid;grid-template-columns:1fr;gap:6px;}
+.wrap:not(.mobile) .grid{grid-template-columns:repeat(4,1fr);}
+.fld label{display:block;font-size:0.875rem;color:#34495e;font-weight:500;}
+.fld input,.fld select{width:100%;padding:6px 8px;border:1px solid #b9c5d4;border-radius:6px;background:#fff;}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:0.875rem;margin-top:6px;}
+.chk input{margin-top:3px;width:18px;height:18px;flex:none;}
+.tags{display:flex;flex-wrap:wrap;gap:6px;}
+.tag{background:#e8f0fa;color:#14284b;border-radius:12px;padding:2px 10px;font-size:0.875rem;}
+ul.pts{padding-left:18px;font-size:0.875rem;}
+ul.pts li{margin-bottom:2px;}
+.sec-h{display:flex;justify-content:space-between;align-items:center;background:#dfe8f4;color:#14284b;border-radius:6px;padding:6px 10px;margin:8px 0 6px;font-weight:700;}
+.sec-h small{font-weight:500;font-size:0.875rem;}
+.q{border:1px solid #d5dce6;border-radius:8px;background:#fff;padding:8px 10px;margin-bottom:6px;}
+.q-t{font-weight:500;}
+.q-t b{color:#14284b;margin-right:4px;}
+.q-p{font-size:0.875rem;color:#4a5b70;margin:2px 0 6px;}
+.q-row{display:flex;flex-direction:column;gap:6px;}
+.wrap:not(.mobile) .q-row{flex-direction:row;align-items:flex-start;}
+.sc{display:flex;gap:4px;flex:none;}
+.sc button{width:40px;height:36px;border:1px solid #b9c5d4;border-radius:6px;cursor:pointer;font-weight:500;}
+.sc button[data-v="1"]{background:#f8d7da;}
+.sc button[data-v="2"]{background:#fde5cc;}
+.sc button[data-v="3"]{background:#fff3c4;}
+.sc button[data-v="4"]{background:#d8efd0;}
+.sc button[data-v="5"]{background:#bfe5c0;}
+.sc button.sel{outline:3px solid #1a2a4a;font-weight:900;}
+.memo{flex:1;width:100%;min-height:36px;padding:6px 8px;border:1px solid #b9c5d4;border-radius:6px;resize:vertical;}
+.bar{background:#e3e8ef;border-radius:6px;height:12px;overflow:hidden;}
+.bar i{display:block;height:100%;background:#2a5a9a;width:0;transition:width .2s;}
+.res-row{display:grid;grid-template-columns:1fr;gap:2px;margin-bottom:6px;font-size:0.875rem;}
+.total{display:flex;justify-content:space-between;align-items:center;background:#dfe8f4;border-radius:8px;padding:8px 12px;margin:6px 0;}
+.total b{font-size:1.4rem;color:#14284b;}
+.grade{font-size:1.4rem;font-weight:900;color:#14284b;}
+textarea.ta{width:100%;min-height:64px;padding:6px 8px;border:1px solid #b9c5d4;border-radius:6px;resize:vertical;margin-bottom:6px;}
+.lb{font-size:0.875rem;font-weight:700;color:#34495e;}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.btn{border:1px solid #1a2a4a;background:#1a2a4a;color:#fff;border-radius:6px;padding:7px 12px;cursor:pointer;font-weight:500;}
+.btn.sub{background:#e8f0fa;color:#14284b;}
+.status{font-size:0.875rem;color:#34495e;margin-top:6px;}
+.footer{text-align:center;font-size:0.875rem;color:#4a5b70;padding:8px;}
+/* gate */
+#gate{position:fixed;inset:0;background:#1a2a4a;z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
+.gate-box{background:#fff;border-radius:10px;padding:16px;width:100%;max-width:340px;color:#1f2d3d;}
+.gate-box h1{font-size:1.1rem;color:#14284b;margin-bottom:4px;}
+.gate-box p{font-size:0.875rem;margin-bottom:8px;}
+.gate-box input{width:100%;padding:8px;border:1px solid #b9c5d4;border-radius:6px;margin-bottom:6px;}
+.err{color:#9b1c1c;font-size:0.875rem;min-height:1.2em;}
+/* cert */
+#certWrap{display:none;position:fixed;inset:0;background:rgba(20,30,50,.6);z-index:150;overflow:auto;padding:12px;}
+.cert-panel{max-width:760px;margin:0 auto;}
+.cert-ctl{background:#fff;border-radius:8px;padding:10px;margin-bottom:8px;}
+.cert-paper{background:#fff;color:#1f2d3d;padding:28px 24px;border:1px solid #b9c5d4;}
+.cert-paper h1{text-align:center;font-size:1.6rem;letter-spacing:6px;color:#14284b;margin-bottom:16px;}
+.cert-paper table{width:100%;border-collapse:collapse;margin-bottom:14px;}
+.cert-paper th,.cert-paper td{border:1px solid #8497ad;padding:6px 8px;text-align:left;}
+.cert-paper th{background:#e8f0fa;width:28%;color:#14284b;}
+.cert-paper p{margin-bottom:8px;}
+.cert-sign{text-align:center;margin-top:18px;}
+.cert-sign b{font-size:1.15rem;}
+@media print{
+  .nav,.noprint,#gate{display:none !important;}
+  body{background:#fff;}
+  .card,.q{break-inside:avoid;}
+  body.print-cert #app{display:none !important;}
+  body.print-cert #certWrap{display:block !important;position:static;background:#fff;padding:0;}
+  body.print-cert .cert-ctl{display:none !important;}
+  body:not(.print-cert) #certWrap{display:none !important;}
+}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-box">
+    <h1>인시스 면접 평가서</h1>
+    <p>채용 관계자 전용 문서입니다. 접속번호를 입력하세요.</p>
+    <input type="password" id="gateIn" inputmode="numeric" autocomplete="off" placeholder="접속번호">
+    <div class="err" id="gateErr"></div>
+    <button class="btn" id="gateBtn" style="width:100%">확인</button>
+  </div>
+</div>
+
+<div id="app" hidden>
+  <div class="nav">
+    <div class="nav-inner">
+      <div class="nav-logo">면접 평가서 <span>| 인시스 AI혁신 연구개발실</span></div>
+      <div class="nav-right">
+        <span class="ver" id="verTxt"></span>
+        <div class="vt" role="group" aria-label="화면 선택">
+          <button id="vtM" class="on" type="button">모바일</button>
+          <button id="vtP" type="button">PC</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap mobile" id="wrap">
+
+    <div class="card notice">
+      <h2>개인정보 수집·이용 및 보관/파기 안내</h2>
+      <p><b>수집 항목</b>: 성명, 지원 직무, 면접 일자, 면접 평가 내용(점수·메모) / <b>목적</b>: 채용 전형 평가 및 면접확인서 발급</p>
+      <p><b>보관</b>: 채용 절차 종료 후 <span id="retTxt">3개월</span> 보관 / <b>파기</b>: 보관기간 경과 즉시 복구 불가능한 방법으로 파기</p>
+      <p><b>열람</b>: 인사·채용 담당자 및 면접관에 한함. 접속번호 없이는 열람할 수 없습니다.</p>
+      <label class="chk"><input type="checkbox" id="consent"><span>지원자에게 위 내용을 안내하고 동의를 받았음을 확인합니다. (저장 시 필수)</span></label>
+    </div>
+
+    <div class="card">
+      <h2>면접 기본 정보</h2>
+      <div class="grid">
+        <div class="fld"><label>지원자</label><input id="fName" value="김종훈"></div>
+        <div class="fld"><label>지원 직무</label><input id="fPos" value="AI혁신연구소 소프트웨어 연구원 (R&D)"></div>
+        <div class="fld"><label>면접 일자</label><input type="date" id="fDate"></div>
+        <div class="fld"><label>면접관</label><input id="fIv" placeholder="면접관 성명"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>서류 분석 (면접관 내부 참고)</h2>
+      <div class="tags" style="margin-bottom:6px">
+        <span class="tag">경남대 컴퓨터공학부(스마트제조ICT) 졸업</span>
+        <span class="tag">AWS SAA-C03 (2025.10)</span>
+        <span class="tag">인턴 2건 (2026.02 / 2026.05~07)</span>
+      </div>
+      <div class="lb">강점 후보</div>
+      <ul class="pts">
+        <li>Terraform·EKS·ArgoCD 기반 인프라 코드화와 GitOps 배포 구성 경험 (MindScape, 2025.07~08)</li>
+        <li>AI Trend Short(2026.02): 서버리스 설계부터 배포까지 1인 수행, OpenAI API로 클릭 데이터 트렌드 분석 기능 구현</li>
+        <li>제조·헬스케어 AI 경진대회 장려상 3건 (2022.11~2023.06): 모델 개발·데이터 전처리 경험</li>
+      </ul>
+      <div class="lb" style="margin-top:6px">면접 확인 포인트</div>
+      <ul class="pts">
+        <li>지원 직무는 AI 연구원인데 최근 경력은 클라우드·DevOps 중심 → 직무 전환 이유와 AI/LLM 직접 구현 깊이</li>
+        <li>MindScape는 부트캠프 팀 프로젝트 → 본인이 직접 설계·구현한 범위</li>
+        <li>k6 부하 테스트 수치(최대 63.9 req/s, p95 10.16ms)의 측정 조건과 해석 능력</li>
+        <li>OpenAI API 활용 시 프롬프트 설계, 비용, 결과 검증 방식</li>
+      </ul>
+      <div class="btns">
+        <a class="btn sub" style="text-decoration:none" href="https://bit.ly/4cVQsSR" target="_blank" rel="noopener noreferrer">포트폴리오 열기</a>
+        <a class="btn sub" style="text-decoration:none" href="https://github.com/yhy0009" target="_blank" rel="noopener noreferrer">GitHub 열기</a>
+      </div>
+    </div>
+
+    <div id="qBox"></div>
+
+    <div class="card" id="resCard">
+      <h2>종합 결과</h2>
+      <div id="resRows"></div>
+      <div class="total"><div>총점 (100점 환산) <span id="answered" class="lb"></span></div><div><b id="totalV">0</b> <span class="grade" id="gradeV">-</span></div></div>
+      <div class="lb">참고: 지원자 전용 질문 평균 (총점 미포함)</div>
+      <div id="indAvg" style="margin-bottom:6px">-</div>
+      <div class="btns noprint"><button class="btn" id="btnAnalyze" type="button">종합 분석 생성</button></div>
+      <div style="margin-top:8px">
+        <div class="lb">강점</div><textarea class="ta" id="sStr"></textarea>
+        <div class="lb">보완점</div><textarea class="ta" id="sWeak"></textarea>
+        <div class="lb">총평</div><textarea class="ta" id="sSum"></textarea>
+        <div class="lb">최종 판정</div>
+        <select id="sDec" style="width:100%;padding:6px 8px;border:1px solid #b9c5d4;border-radius:6px;margin-bottom:6px">
+          <option value="">선택</option><option>채용 추천</option><option>보류(추가 검토)</option><option>비추천</option>
+        </select>
+      </div>
+      <div class="btns noprint">
+        <button class="btn" id="btnSave" type="button">저장</button>
+        <button class="btn sub" id="btnLoad" type="button">저장본 불러오기</button>
+        <button class="btn sub" id="btnPdf" type="button">PDF 저장(인쇄)</button>
+        <button class="btn sub" id="btnCert" type="button">면접확인서 발급</button>
+        <button class="btn sub" id="btnReset" type="button">초기화</button>
+      </div>
+      <div class="status" id="status"></div>
+    </div>
+
+    <div class="footer" id="footTxt"></div>
+  </div>
+</div>
+
+<div id="certWrap">
+  <div class="cert-panel">
+    <div class="cert-ctl noprint">
+      <div class="grid" style="grid-template-columns:1fr 1fr;">
+        <div class="fld"><label>생년월일 (발급 시 입력, 저장 안 함)</label><input id="cBirth" type="date"></div>
+        <div class="fld"><label>연락처 (발급 시 입력, 저장 안 함)</label><input id="cTel" placeholder="010-0000-0000"></div>
+      </div>
+      <div class="btns">
+        <button class="btn" id="cPrint" type="button">PDF 저장(인쇄)</button>
+        <button class="btn sub" id="cClose" type="button">닫기</button>
+      </div>
+    </div>
+    <div class="cert-paper" id="certPaper">
+      <h1>면 접 확 인 서</h1>
+      <table>
+        <tr><th>성명</th><td id="ctName"></td></tr>
+        <tr><th>생년월일</th><td id="ctBirth">&nbsp;</td></tr>
+        <tr><th>연락처</th><td id="ctTel">&nbsp;</td></tr>
+        <tr><th>지원 직무</th><td id="ctPos"></td></tr>
+        <tr><th>면접 일자</th><td id="ctDate"></td></tr>
+        <tr><th>면접 장소</th><td>주식회사 인시스 (창원시 의창구 원이대로 271 1301호)</td></tr>
+      </table>
+      <p>위 사람은 위 일자에 주식회사 인시스 채용 면접에 참석하였음을 확인합니다.</p>
+      <div class="cert-sign">
+        <p id="ctIssue"></p>
+        <p><b>주식회사 인시스</b> (인)</p>
+        <p>담당자: 황혜선 / 전화: 1677-6788</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var VERSION='v5.0';
+var GATE_CODE='953200';
+var DRAFT_KEY='iv_kjh_draft';
+var REC_KEY='iv_kjh_records';
+/* Firebase 설정: 비워두면 이 기기(로컬)에만 저장. 값을 채우면 Firestore 'interviews' 컬렉션에 함께 저장 */
+var FIREBASE_CONFIG={};
+
+var CATS=[
+ {id:'A',name:'직무 역량',w:30,qs:[
+  ['A1','가장 최근에 한 프로젝트에서 맡은 역할과 결과물을 설명해 주세요.','본인 역할·팀/개인 구분이 명확한가'],
+  ['A2','AI 또는 LLM 기능을 직접 구현한 경험과 해결한 문제를 말씀해 주세요.','직접 구현 범위, 문제 정의 능력'],
+  ['A3','업무를 자동화한 사례 하나를 시작부터 결과까지 설명해 주세요.','전후 비교(시간·건수) 제시 여부'],
+  ['A4','최근 새로 배운 기술과 학습 방법을 말씀해 주세요.','자기주도 학습, 적용 사례']]},
+ {id:'B',name:'문제해결·사고력',w:25,qs:[
+  ['B1','장애나 에러를 해결했던 경험과 원인 파악 과정을 말씀해 주세요.','원인 분석 순서, 재발 방지']
+  ,['B2','바로 풀리지 않던 문제는 어떻게 접근하고 어디서 도움을 구하나요?','접근 방식, 정보 탐색, 협력']
+  ,['B3','일정이 촉박할 때 우선순위를 정하는 기준은 무엇인가요?','판단 기준, 커뮤니케이션']]},
+ {id:'C',name:'인성·성격·협업',w:20,qs:[
+  ['C1','팀 안에서 의견이 달랐을 때 어떻게 조율했나요?','경청, 조율, 결과'],
+  ['C2','피드백을 받고 바꾼 경험이 있나요?','수용성, 실행'],
+  ['C3','본인의 장점과 보완할 점을 각각 말씀해 주세요.','자기 인식의 구체성'],
+  ['C4','함께 일한 동료는 본인을 어떻게 평가할 것 같나요?','객관적 자기 인식']]},
+ {id:'D',name:'태도·근속·근무조건',w:15,qs:[
+  ['D1','본 직무에 지원한 동기는 무엇인가요?','직무 이해, 진정성'],
+  ['D2','3~5년 뒤 어떤 모습이 되고 싶으신가요?','성장 계획과 회사 방향의 일치'],
+  ['D3','창원 근무와 출퇴근 방식에 문제가 없는지 말씀해 주세요.','근무지·통근 가능 여부'],
+  ['D4','입사 가능 시기는 언제인가요?','입사 시기 확정 여부'],
+  ['D5','제조 현장과 협업하는 업무 방식에 대해 어떻게 생각하나요?','현장 마인드, 소통 의지']]},
+ {id:'E',name:'지원 적합성',w:10,qs:[
+  ['E1','제조 현장에 AI를 적용한다면 어떤 과제부터 시작하겠습니까?','제조 이해, 아이디어 구체성'],
+  ['E2','입사 후 3개월 동안 만들어 낼 수 있는 결과는 무엇인가요?','현실적 목표 설정'],
+  ['E3','회사나 업무에 대해 궁금한 점이 있나요?','관심도, 질문의 질']]}
+];
+var IND=[
+ ['P1','MindScape에서 Terraform·ArgoCD 구성 중 직접 설계한 부분과 팀이 맡은 부분을 구분해 설명해 주세요. k6 결과는 어떤 조건에서 측정했나요?','개인 기여 범위, 수치 해석'],
+ ['P2','AI Trend Short에서 OpenAI API는 어떤 모델·프롬프트로 사용했고, 결과의 정확성은 어떻게 검증했나요?','LLM 활용 깊이, 검증·비용 관점'],
+ ['P3','클라우드·DevOps 경험이 많은데 AI 연구원(R&D)으로 지원한 이유는 무엇이고, 2022~2023 해커톤의 모델 개발 경험은 어떤 역할이었나요?','직무 전환 동기, ML 실무 역량']
+];
+
+var scores={},memos={};
+var $=function(id){return document.getElementById(id);};
+
+function todayStr(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+
+function qHtml(q){
+  var id=q[0];
+  var btns='';for(var v=1;v<=5;v++){btns+='<button type="button" data-q="'+id+'" data-v="'+v+'">'+v+'</button>';}
+  return '<div class="q"><div class="q-t"><b>'+id+'</b>'+esc(q[1])+'</div><div class="q-p">평가 포인트: '+esc(q[2])+'</div>'+
+    '<div class="q-row"><div class="sc" id="sc_'+id+'">'+btns+'</div><textarea class="memo" id="m_'+id+'" data-m="'+id+'" placeholder="메모" rows="1"></textarea></div></div>';
+}
+function renderQ(){
+  var h='';
+  CATS.forEach(function(c){
+    h+='<div class="sec-h"><span>'+c.id+'. '+esc(c.name)+'</span><small>'+c.w+'점 / '+c.qs.length+'문항</small></div>';
+    c.qs.forEach(function(q){h+=qHtml(q);});
+  });
+  h+='<div class="sec-h"><span>P. 지원자 전용 질문</span><small>참고 평가 / 총점 미포함</small></div>';
+  IND.forEach(function(q){h+=qHtml(q);});
+  $('qBox').innerHTML=h;
+  var rr='';
+  CATS.forEach(function(c){rr+='<div class="res-row"><div>'+esc(c.name)+' <b id="rv_'+c.id+'">0</b> / '+c.w+'</div><div class="bar"><i id="rb_'+c.id+'"></i></div></div>';});
+  $('resRows').innerHTML=rr;
+}
+
+function calc(){
+  var total=0,ans=0,all=0,res={};
+  CATS.forEach(function(c){
+    var s=0,n=0;
+    c.qs.forEach(function(q){all++;if(scores[q[0]]){s+=scores[q[0]];n++;ans++;}});
+    var pts=Math.round(s/(c.qs.length*5)*c.w*10)/10;
+    res[c.id]={pts:pts,pct:s/(c.qs.length*5),n:n,len:c.qs.length};
+    total+=pts;
+  });
+  total=Math.round(total*10)/10;
+  return {total:total,ans:ans,all:all,res:res};
+}
+function gradeOf(t){return t>=85?'A':t>=70?'B':t>=55?'C':'D';}
+function indAvg(){
+  var s=0,n=0;IND.forEach(function(q){if(scores[q[0]]){s+=scores[q[0]];n++;}});
+  return n?{avg:Math.round(s/n*10)/10,n:n}:null;
+}
+function refresh(){
+  var r=calc();
+  CATS.forEach(function(c){
+    $('rv_'+c.id).textContent=r.res[c.id].pts;
+    $('rb_'+c.id).style.width=Math.round(r.res[c.id].pct*100)+'%';
+  });
+  $('totalV').textContent=r.total;
+  $('answered').textContent='(채점 '+r.ans+'/'+r.all+')';
+  $('gradeV').textContent=r.ans?gradeOf(r.total):'-';
+  var ia=indAvg();
+  $('indAvg').textContent=ia?('평균 '+ia.avg+' / 5 ('+ia.n+'/'+IND.length+'문항)'):'-';
+  document.querySelectorAll('.sc button').forEach(function(b){
+    b.classList.toggle('sel',scores[b.getAttribute('data-q')]===Number(b.getAttribute('data-v')));
+  });
+}
+function analyze(){
+  var r=calc();
+  if(!r.ans){setStatus('채점된 문항이 없습니다. 점수를 먼저 입력하세요.');return;}
+  var strong=[],weak=[];
+  CATS.forEach(function(c){
+    var x=r.res[c.id];if(!x.n)return;
+    var avg5=x.pct*5;
+    if(x.pct>=0.8)strong.push(c.name+' (평균 '+(Math.round(avg5*10)/10)+'점)');
+    if(x.pct<=0.6)weak.push(c.name+' (평균 '+(Math.round(avg5*10)/10)+'점)');
+  });
+  var g=gradeOf(r.total);
+  $('sStr').value=strong.length?strong.join(', ')+' 영역에서 우수한 평가.':'뚜렷하게 높은 영역 없음.';
+  $('sWeak').value=weak.length?weak.join(', ')+' 영역 추가 확인 필요.':'평균 이하로 평가된 영역 없음.';
+  $('sSum').value='총점 '+r.total+'점(등급 '+g+'), 채점 '+r.ans+'/'+r.all+'문항 기준. 메모와 지원자 전용 질문 결과를 함께 검토하여 최종 판단 바랍니다.';
+  $('sDec').value=g==='A'?'채용 추천':(g==='B'||g==='C')?'보류(추가 검토)':'비추천';
+  setStatus('종합 분석을 생성했습니다. 내용은 수정할 수 있습니다.');saveDraft();
+}
+function setStatus(t){$('status').textContent=t;}
+
+function collect(){
+  var r=calc();
+  return {id:($('fName').value||'noname')+'_'+($('fDate').value||todayStr()),
+    name:$('fName').value,position:$('fPos').value,date:$('fDate').value,interviewer:$('fIv').value,
+    scores:scores,memos:memos,total:r.total,grade:r.ans?gradeOf(r.total):'',
+    strengths:$('sStr').value,weaknesses:$('sWeak').value,summary:$('sSum').value,decision:$('sDec').value,
+    consent:$('consent').checked,version:VERSION,savedAt:new Date().toISOString()};
+}
+function apply(d){
+  $('fName').value=d.name||'';$('fPos').value=d.position||'';$('fDate').value=d.date||todayStr();$('fIv').value=d.interviewer||'';
+  scores=d.scores||{};memos=d.memos||{};
+  document.querySelectorAll('.memo').forEach(function(t){t.value=memos[t.getAttribute('data-m')]||'';});
+  $('sStr').value=d.strengths||'';$('sWeak').value=d.weaknesses||'';$('sSum').value=d.summary||'';$('sDec').value=d.decision||'';
+  $('consent').checked=!!d.consent;
+  refresh();
+}
+function saveDraft(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify(collect()));}catch(e){}}
+function getRecs(){try{return JSON.parse(localStorage.getItem(REC_KEY)||'[]');}catch(e){return [];}}
+
+var fdb=null;
+function initFirebase(){
+  if(!FIREBASE_CONFIG||!FIREBASE_CONFIG.apiKey){return;}
+  var s1=document.createElement('script');s1.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js';
+  s1.onload=function(){
+    var s2=document.createElement('script');s2.src='https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js';
+    s2.onload=function(){try{firebase.initializeApp(FIREBASE_CONFIG);fdb=firebase.firestore();}catch(e){fdb=null;}};
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s1);
+}
+function save(){
+  if(!$('consent').checked){setStatus('개인정보 수집·이용 동의 확인에 체크해야 저장할 수 있습니다.');return;}
+  var d=collect();
+  var recs=getRecs().filter(function(x){return x.id!==d.id;});recs.push(d);
+  try{localStorage.setItem(REC_KEY,JSON.stringify(recs));}catch(e){setStatus('로컬 저장 실패');return;}
+  if(fdb){
+    fdb.collection('interviews').doc(d.id).set(d).then(function(){setStatus('저장 완료 (Firebase + 이 기기) '+VERSION);}).catch(function(){setStatus('이 기기에는 저장됨. Firebase 저장 실패(보안 규칙·로그인 확인 필요)');});
+  }else{
+    setStatus('이 기기에 저장됨. Firebase 미연결 상태입니다. '+VERSION);
+  }
+}
+function loadList(){
+  var recs=getRecs();
+  if(!recs.length){setStatus('저장된 기록이 없습니다.');return;}
+  var last=recs[recs.length-1];apply(last);setStatus('최근 저장본을 불러왔습니다: '+last.id);
+}
+function resetAll(){
+  if(!confirm('입력한 점수·메모를 모두 초기화할까요?'))return;
+  scores={};memos={};document.querySelectorAll('.memo').forEach(function(t){t.value='';});
+  ['sStr','sWeak','sSum'].forEach(function(i){$(i).value='';});$('sDec').value='';
+  refresh();saveDraft();setStatus('초기화했습니다.');
+}
+
+function fmtDate(s){if(!s)return '';var p=s.split('-');return p[0]+'년 '+Number(p[1])+'월 '+Number(p[2])+'일';}
+function openCert(){
+  $('ctName').textContent=$('fName').value;
+  $('ctPos').textContent=$('fPos').value;
+  $('ctDate').textContent=fmtDate($('fDate').value);
+  $('ctIssue').textContent='발급일: '+fmtDate(todayStr());
+  $('certWrap').style.display='block';
+  updCert();
+}
+function updCert(){
+  $('ctBirth').textContent=$('cBirth').value?fmtDate($('cBirth').value):'\u00a0';
+  $('ctTel').textContent=$('cTel').value||'\u00a0';
+}
+function printMain(){document.body.classList.remove('print-cert');window.print();}
+function printCert(){updCert();document.body.classList.add('print-cert');window.print();setTimeout(function(){document.body.classList.remove('print-cert');},300);}
+
+function setView(m){
+  $('wrap').classList.toggle('mobile',m);
+  $('vtM').classList.toggle('on',m);$('vtP').classList.toggle('on',!m);
+}
+function enter(){
+  $('gate').style.display='none';$('app').hidden=false;
+}
+function tryGate(){
+  if($('gateIn').value===GATE_CODE){try{sessionStorage.setItem('iv_ok','1');}catch(e){}enter();}
+  else{$('gateErr').textContent='접속번호가 올바르지 않습니다.';}
+}
+
+function init(){
+  document.title='면접 평가서 '+VERSION+' | 김종훈 | 인시스 AI혁신 연구개발실';
+  $('verTxt').textContent=VERSION;
+  $('footTxt').textContent='인시스 AI혁신 연구개발실 · 면접 평가서 '+VERSION+' · 대외비';
+  $('fDate').value=todayStr();
+  renderQ();refresh();
+  $('qBox').addEventListener('click',function(e){
+    var b=e.target.closest('button[data-q]');if(!b)return;
+    var id=b.getAttribute('data-q'),v=Number(b.getAttribute('data-v'));
+    if(scores[id]===v){delete scores[id];}else{scores[id]=v;}
+    refresh();saveDraft();
+  });
+  $('qBox').addEventListener('input',function(e){
+    var t=e.target;if(t.getAttribute&&t.getAttribute('data-m')){memos[t.getAttribute('data-m')]=t.value;saveDraft();}
+  });
+  ['fName','fPos','fDate','fIv','sStr','sWeak','sSum','sDec','consent'].forEach(function(i){$(i).addEventListener('input',saveDraft);$(i).addEventListener('change',saveDraft);});
+  $('btnAnalyze').addEventListener('click',analyze);
+  $('btnSave').addEventListener('click',save);
+  $('btnLoad').addEventListener('click',loadList);
+  $('btnPdf').addEventListener('click',printMain);
+  $('btnCert').addEventListener('click',openCert);
+  $('btnReset').addEventListener('click',resetAll);
+  $('cPrint').addEventListener('click',printCert);
+  $('cClose').addEventListener('click',function(){$('certWrap').style.display='none';});
+  $('cBirth').addEventListener('input',updCert);$('cTel').addEventListener('input',updCert);
+  $('vtM').addEventListener('click',function(){setView(true);});
+  $('vtP').addEventListener('click',function(){setView(false);});
+  $('gateBtn').addEventListener('click',tryGate);
+  $('gateIn').addEventListener('keydown',function(e){if(e.key==='Enter')tryGate();});
+  try{var d=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');if(d)apply(d);}catch(e){}
+  initFirebase();
+  var ok=false;try{ok=sessionStorage.getItem('iv_ok')==='1';}catch(e){}
+  if(ok)enter();
+}
+init();
+})();
+</script>
+</body>
+</html>
