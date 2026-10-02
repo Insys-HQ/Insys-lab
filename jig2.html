@@ -64,10 +64,8 @@
   select{font-family:inherit;font-size:13px;padding:8px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);}
   .hint{font-size:12px;color:var(--text-light);margin-top:6px;}
   svg{width:100%;height:auto;display:block;}
-  /* 애니메이션이 한 화면을 넘지 않도록 높이 제한 (스크롤 방지) */
-  #scene{max-height:calc(100vh - 549px);min-height:200px;margin:0 auto;}
-  @media (max-width:900px){ #scene{max-height:calc(100vh - 729px);} }
-  @media (max-width:600px){ #scene{max-height:calc(100vh - 833px);min-height:160px;} }
+  /* 애니메이션 크기 */
+  #scene{max-height:none;min-height:0;margin:0 auto;}   /* v3.2 : 높이 제한 해제 — 카드 폭 가득 크게 표시 */
   .axisbar{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:7px;}
   @media (max-width:600px){.axisbar{grid-template-columns:repeat(3,1fr);}}
   .ax{background:#F2F6FC;border:1px solid #D3E0F0;border-radius:7px;padding:4px 6px;text-align:center;}
@@ -125,7 +123,7 @@
 
 <header class="cover"><div class="inner">
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (벨트 고정 안착지그)</h1>
-  <span class="hver" id="hVer">v3.1</span>
+  <span class="hver" id="hVer">v3.2</span>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
     <button id="btnEn" type="button">English</button>
@@ -223,11 +221,11 @@
   </section>
 </main>
 
-<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.1</span></footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.2</span></footer>
 
 <script>
   // ===== 3D 월드 (X:이송방향, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
-  const VER='v3.1';
+  const VER='v3.2';
   const U2MM=300/90;
   const WX0=212, WX1=468, BELT_Y0=0, BELT_Y1=112;            // 작업대 프레임 (3축 시뮬레이터와 동일)
   const BELT_X0=WX0-60, BELT_X1=WX1+75;                      // 좌 200mm · 우 250mm 돌출
