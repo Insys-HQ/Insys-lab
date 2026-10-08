@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>법인카드 결정사항 입력 v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<style>
+/* v1.0 — 법인카드 사용 규정 결정사항 입력 (인시스 AI혁신 연구개발실) */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#1f2a44; --ink2:#374151; --mute:#4b5563;
+  --navy:#1e3a5f; --navy-l:#e8eef7; --line:#cfd8e3;
+  --c1:#e3eefb; --c2:#e6f2e6; --bg:#f3f5f8; --ok:#14532d; --warn:#7c2d12;
+  --w:480px;
+}
+html{font-size:14px}
+@media (min-width:768px){html{font-size:16px}}
+body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);font-size:1rem;line-height:1.5}
+body.v-pc{--w:1100px}
+body.v-mobile{--w:480px}
+button,input,select,textarea{font-family:inherit;font-size:1rem;color:var(--ink)}
+.hdr{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50}
+.nav-inner,.wrap{max-width:var(--w);margin:0 auto;padding-left:12px;padding-right:12px}
+.nav-inner{padding-top:6px;padding-bottom:6px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;justify-content:space-between}
+.ttl{font-weight:700;color:var(--navy);font-size:1.0625rem}
+.ttl small{font-weight:400;color:var(--mute);font-size:.875rem;margin-left:4px}
+.badge{background:var(--navy-l);color:var(--navy);font-weight:700;font-size:.875rem;padding:1px 6px;border-radius:4px;margin-left:4px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;background:#fff;padding:3px 10px;cursor:pointer}
+.seg button.on{background:var(--navy);color:#fff}
+.bar{background:#fff;border-bottom:1px solid var(--line)}
+.bar .wrap{padding-top:6px;padding-bottom:6px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.btn{border:1px solid var(--navy);background:#fff;color:var(--navy);padding:4px 10px;border-radius:6px;cursor:pointer;font-weight:500}
+.btn.pri{background:var(--navy);color:#fff}
+.btn.sm{padding:1px 8px;font-size:.875rem}
+.btn:disabled{opacity:.5;cursor:default}
+#status{font-size:.875rem;color:var(--mute);margin-left:auto}
+#status.dirty{color:var(--warn);font-weight:500}
+#status.ok{color:var(--ok)}
+.wrap{padding-top:8px;padding-bottom:8px}
+.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:8px 0}
+.card h2{font-size:1.0625rem;color:var(--navy);padding:2px 0}
+.princ{color:var(--ink2);font-size:.9375rem;padding:2px 0 4px}
+.note{background:var(--navy-l);color:var(--ink);border-radius:6px;padding:6px 10px;font-size:.9375rem;margin:4px 0}
+.meta{display:grid;gap:6px;grid-template-columns:1fr}
+.meta label{display:block;font-weight:500;font-size:.9375rem}
+input[type=text],input[type=date],input[type=password],input[type=number],select,textarea{width:100%;border:1px solid var(--line);border-radius:6px;padding:4px 8px;background:#fff}
+textarea{resize:vertical;min-height:56px}
+.cols{display:none}
+.item{border-top:1px solid var(--line);padding:6px 0;display:grid;gap:4px;grid-template-columns:1fr}
+.item:first-of-type{border-top:0}
+.lbl{font-weight:700}
+.ref{font-size:.9375rem;color:var(--ink);border-radius:6px;padding:3px 8px;display:flex;gap:6px;align-items:flex-start;justify-content:space-between}
+.ref.r1{background:var(--c1)}
+.ref.r2{background:var(--c2)}
+.ref b{white-space:nowrap}
+.ref .tx{flex:1}
+.inp{display:grid;gap:4px;grid-template-columns:1fr}
+.inp .f{display:flex;flex-direction:column}
+.inp .f span{font-size:.875rem;color:var(--mute)}
+body.v-pc .cols{display:grid;grid-template-columns:1.1fr 1fr 1fr 1.3fr;gap:8px;font-weight:700;background:var(--navy-l);color:var(--navy);padding:4px 8px;border-radius:6px;margin-top:4px}
+body.v-pc .item{grid-template-columns:1.1fr 1fr 1fr 1.3fr;gap:8px;align-items:start}
+body.v-pc .meta{grid-template-columns:1fr 2fr}
+.gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;padding:12px}
+.gate .box{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;width:100%;max-width:340px;display:grid;gap:8px}
+.gate h1{font-size:1.125rem;color:var(--navy)}
+.gate .err{color:#9b1c1c;font-size:.9375rem;min-height:1.4em}
+.ftr{max-width:var(--w);margin:0 auto;padding:6px 12px;display:flex;justify-content:space-between;color:var(--mute);font-size:.875rem}
+.toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:6px 14px;border-radius:8px;z-index:200;display:none;max-width:90%}
+#printArea{display:none}
+@media print{
+  @page{size:A4;margin:14mm 12mm}
+  body{background:#fff}
+  #app,#gate,.toast,.hdr,.bar,.ftr{display:none!important}
+  #printArea{display:block;font-size:10.5pt;color:#1f2a44}
+  #printArea h1{font-size:15pt;color:#1e3a5f;margin-bottom:2pt}
+  #printArea .pm{color:#374151;font-size:9.5pt;margin-bottom:6pt}
+  #printArea h2{font-size:11.5pt;color:#1e3a5f;margin:8pt 0 3pt;break-after:avoid}
+  #printArea table{width:100%;border-collapse:collapse;margin-bottom:4pt}
+  #printArea th,#printArea td{border:1px solid #9aa8b8;padding:2pt 5pt;vertical-align:top;text-align:left}
+  #printArea th{background:#e8eef7;color:#1e3a5f}
+  #printArea tr{break-inside:avoid}
+  #printArea td.l{width:36%;font-weight:500}
+  #printArea .un{color:#7c2d12}
+  #printArea .pf{margin-top:8pt;font-size:9pt;color:#4b5563;display:flex;justify-content:space-between}
+}
+</style>
+</head>
+<body class="v-mobile">
+
+<div class="gate" id="gate">
+  <form class="box" id="gateForm" autocomplete="off">
+    <h1>법인카드 결정사항 <span class="badge" id="gv"></span></h1>
+    <div style="font-size:.9375rem;color:var(--ink2)">비밀번호를 입력하세요. (인시스 AI혁신 연구개발실)</div>
+    <input type="password" id="pw" inputmode="numeric" maxlength="12" placeholder="비밀번호" aria-label="비밀번호">
+    <div class="err" id="gerr"></div>
+    <button class="btn pri" type="submit" id="gbtn">확인</button>
+  </form>
+</div>
+
+<div id="app" style="display:none">
+  <header class="hdr"><div class="nav-inner">
+    <div class="ttl">법인카드 결정사항 입력<span class="badge" id="hv"></span><small>대외비 · 내부용</small></div>
+    <div class="seg" role="group" aria-label="화면 선택"><button id="vM" class="on" type="button">모바일</button><button id="vP" type="button">PC</button></div>
+  </div></header>
+  <div class="bar"><div class="wrap">
+    <button class="btn pri" id="bSave" type="button">저장</button>
+    <button class="btn" id="bPdf" type="button">PDF 출력</button>
+    <button class="btn" id="bC1" type="button">CASE1 일괄 입력</button>
+    <button class="btn" id="bC2" type="button">CASE2 일괄 입력</button>
+    <button class="btn" id="bLoad" type="button">다시 불러오기</button>
+    <button class="btn" id="bReset" type="button">초기화</button>
+    <span id="status">대기 중</span>
+  </div></div>
+  <main class="wrap" id="main"></main>
+  <div class="ftr"><span>인시스 AI혁신 연구개발실 · 2026</span><span id="fv"></span></div>
+</div>
+
+<div id="printArea"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const VERSION='v1.0';
+const PW_HASH=5162193379604907;
+const COLL='card_policy_survey', DOCID='main', LS_KEY='cardPolicySurvey_v1';
+
+/* ── 해시(비밀번호 비교용) ── */
+function hs(str){let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}
+  h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);
+  h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);
+  return 4294967296*(2097151&h2)+(h1>>>0);}
+const pwHash=p=>hs('insys-card-'+p);
+
+/* ── 질문 데이터 (CASE1: 일반 기업 / CASE2: 인시스) ── */
+const YN=['예','아니오'];
+function T(id,label,c1,c2,ph){return {id,label,join:' — ',f:[{k:'v',t:'text',ph:ph||'결정 내용'}],c1:{v:c1},c2:{v:c2}};}
+function S(id,label,opts,c1,c2,n1,n2){return {id,label,join:' — ',f:[{k:'v',t:'sel',o:opts},{k:'n',t:'text',ph:'조건·메모'}],c1:{v:c1,n:n1||''},c2:{v:c2,n:n2||''}};}
+function M(id,label,f,c1,c2,join){return {id,label,join:join||' · ',f,c1,c2};}
+const Q4=[
+ ['임원이 직원과 둘이 업무 식사','조건부','1인당 회의비 한도 내','허용','메모만 남기면 회의비 처리'],
+ ['임원 둘만 식사(외부 상대 없음)','조건부','사전 승인·업무 목적 명시','조건부','업무 목적 메모 후 사후 보고 (건당 30만 원 초과 시 사전 승인)'],
+ ['부서 전체 공식 회식 2차(노래방 등)','조건부','부서 전체 참석·1인당 상한·부서 운영비 카드','조건부','동일 요건, 1·2차 합산 1인당 상한 완화'],
+ ['임직원 일부만 따로 간 유흥','불가','비용 부인, 참석자 과세 위험','불가','동일'],
+ ['임원끼리만 간 유흥(외부 상대 없음)','불가','임원 상여로 과세 위험','불가','동일 (세무상 허용 불가)'],
+ ['퇴근 후 순수 개인 식사','불가','급여로 과세 위험','불가','동일'],
+ ['명절 거래처 선물','조건부','건당 10만 원 이내','허용','건당 20만 원 이내, 연 접대비 한도 내'],
+ ['주말·휴일 골프·회식 접대','조건부','거래처 동반·사전 승인','조건부','거래처 동반·사후 메모 (건당 100만 원 초과 시 사전 승인)'],
+ ['임원 혼자 식사(출장·외근 중)','조건부','출장·외근 증빙 첨부','허용','출장·외근 사유 메모'],
+ ['직원 경조사 지원(결혼·상 등)','조건부','사내 기준 금액 내','허용','사내 기준 금액 내, 사후 메모'],
+ ['부서 전체 회식','조건부','1인당 3만 원 상한','허용','1인당 5만 원 이내, 부서 운영비 카드'],
+ ['거래처 접대 중 주류·유흥','조건부','금액 상한·사전 승인','조건부','거래처 동반·금액 상한 내 사후 메모 (고액만 사전 승인)'],
+ ['임원 가족 동반 식사','불가','사적 지출','불가','동일'],
+ ['명절·연말 직원 선물·상품권','조건부','1인당 상한 설정','허용','직원 전체 동일 기준, 1인당 상한 내'],
+ ['자기계발·도서·세미나','조건부','업무 연관 증빙','허용','업무 연관 메모'],
+ ['야근·회식 후 택시·교통비','조건부','사유 메모 필수','허용','사유 메모'],
+ ['커피·간식 등 소액 일상 결제','조건부','월 한도 내','허용','월 한도 내'],
+ ['경조사 화환·축의금','조건부','거래처·직원 모두 건당 10만 원 이내','허용','건당 20만 원 이내 (거래처는 업무추진비, 직원은 복리후생비)'],
+ ['해외 출장 중 접대·식사','조건부','출장 목적·상대 명시','허용','출장 목적·상대 메모, 사후 보고']
+];
+const SECTIONS=[
+ {id:'q1',title:'질문 1 — 직급별 개인 업무추진비 월 한도 (단위: 만 원)',
+  princ:'개인 업무추진비는 임원이 본인 판단으로 쓰는 접대·업무 식사 비용입니다. 부서 운영비는 질문 2에서 따로 다룹니다. 금액은 예시이며 법인별 매출·임원 수 확인 후 조정합니다.',
+  items:[
+   T('q1_a','영업 임원','300','500','월 한도(만 원)'),
+   T('q1_b','내근 임원','150','300','월 한도(만 원)'),
+   T('q1_c','영업 관리자','100','150','월 한도(만 원)'),
+   T('q1_d','내근 관리자','50','100','월 한도(만 원)'),
+   T('q1_e','일반 직원','팀 단위만 (부서 운영비 카드)','팀 단위만 (부서 운영비 카드)','사용 불가 / 팀 단위만')]},
+ {id:'q2',title:'질문 2 — 부서 운영비와 개인 업무추진비 분리',
+  princ:'이천공장 식대·연구소 물품구입처럼 부서가 돌아가려고 나가는 돈은 부서 운영비 카드로 분리하고, 개인 한도와 섞지 않습니다.',
+  items:[
+   S('q2_a','부서 운영비 카드 별도 발급',YN,'예','예','','임원 개인 한도와 분리해 한도 보호'),
+   S('q2_b','부서 예산 승인 주기',['월별','분기별'],'분기별','분기별','','연초 연간 총액 승인 후 분기 배분'),
+   S('q2_c','예산 초과분 집행',['사전 승인 필수','사후 보고 허용'],'사전 승인 필수','사후 보고 허용','','10% 이내 사후 보고, 초과 시 사전 승인'),
+   T('q2_d','부서 회식 예산 기준 (1인당 금액·분기 횟수)','1인당 3만 원, 분기 1회','1인당 5만 원, 분기 2회'),
+   T('q2_e','현장 간식비 월 한도 (현장 관리자 전결)','현장당 월 30만 원','현장당 월 50만 원')]},
+ {id:'q3',title:'질문 3 — 업무추진비와 복리후생비 구분',
+  princ:'누구와 먹었느냐에 따라 계정이 달라집니다. 직원 회식을 업무추진비로 처리하면 한도만 소진되므로 복리후생비·회의비로 분류합니다.',
+  items:[
+   S('q3_a','카드 분리 vs 영수증 메모 구분',['카드 물리 분리','메모로 구분','카드 분리 + 메모 병행'],'카드 분리 + 메모 병행','메모로 구분','','카드 추가 발급 없이 메모로 구분, 경리팀이 월 마감 시 분류'),
+   T('q3_b','직원과의 식사 회의비 인정 기준 (1인당)','1인당 3만 원 이내','1인당 5만 원 이내 (사회통념 범위)')]},
+ {id:'q4',title:'질문 4 — 애매한 상황별 허용 여부',
+  princ:'각 상황을 허용 / 불가 / 조건부 중 하나로 정하고 조건을 적습니다. 임원끼리만 간 유흥·가족 동반·순수 개인 식사·일부 임직원만의 유흥은 CASE2에서도 불가입니다 (비용 부인 + 임원 상여 과세).',
+  items:Q4.map((r,i)=>S('q4_'+(i+1),r[0],['허용','불가','조건부'],r[1],r[3],r[2],r[4]))},
+ {id:'q5',title:'질문 5 — 증빙과 사전 승인 규정',
+  princ:'영수증 메모에는 누구와(내부/외부)·사용 목적·참석 인원을 남깁니다. 아래는 사전 승인 기준입니다.',
+  items:[
+   T('q5_a','사전 승인 기준 금액','건당 50만 원 초과','건당 100만 원 초과'),
+   S('q5_b','임원끼리만 식사·유흥 사전 승인 의무',YN,'예','아니오','','업무 목적 메모 + 사후 보고 (건당 30만 원 초과 시만 사전 승인, 유흥은 질문 4 기준)'),
+   S('q5_c','월 한도 초과 시',['자동 차단','사후 소명'],'자동 차단','사후 소명','한도 상향은 경영지원실 요청','결제 차단 없음, 한도 150% 초과 시 경영지원실장 확인')]},
+ {id:'q6',title:'질문 6 — 전결 규정 (결재 권한 한도)',
+  princ:'금액 구간별 전결권자와 사전 승인 여부를 정합니다. 구간은 예시이며 조정할 수 있습니다.',
+  items:[
+   M('q6_a','10만 원 이하',[{k:'a',t:'text',l:'전결권자',ph:'전결권자'},{k:'p',t:'sel',l:'승인',o:['불필요','사후 보고','사전 승인']}],{a:'본인',p:'불필요'},{a:'본인',p:'불필요'}),
+   M('q6_b','10만 ~ 30만 원',[{k:'a',t:'text',l:'전결권자',ph:'전결권자'},{k:'p',t:'sel',l:'승인',o:['불필요','사후 보고','사전 승인']}],{a:'부서장',p:'불필요'},{a:'본인',p:'불필요'}),
+   M('q6_c','30만 ~ 100만 원',[{k:'a',t:'text',l:'전결권자',ph:'전결권자'},{k:'p',t:'sel',l:'승인',o:['불필요','사후 보고','사전 승인']}],{a:'담당 임원',p:'사후 보고'},{a:'본인',p:'사후 보고'}),
+   M('q6_d','100만 ~ 300만 원',[{k:'a',t:'text',l:'전결권자',ph:'전결권자'},{k:'p',t:'sel',l:'승인',o:['불필요','사후 보고','사전 승인']}],{a:'경영지원실장',p:'사전 승인'},{a:'담당 임원',p:'사후 보고'}),
+   M('q6_e','300만 ~ 500만 원',[{k:'a',t:'text',l:'전결권자',ph:'전결권자'},{k:'p',t:'sel',l:'승인',o:['불필요','사후 보고','사전 승인']}],{a:'대표이사',p:'사전 승인'},{a:'대표이사 (메신저 승인 인정)',p:'사전 승인'}),
+   M('q6_f','500만 원 초과',[{k:'a',t:'text',l:'전결권자',ph:'전결권자'},{k:'p',t:'sel',l:'승인',o:['불필요','사후 보고','사전 승인']}],{a:'대표이사 + 이사회 보고',p:'사전 승인'},{a:'대표이사 + 이사회 보고',p:'사전 승인'}),
+   S('q6_g','월 누계 한도 초과 시에도 전결 기준 적용',YN,'예','예','','초과분에 한해 적용, 사후 소명 가능'),
+   S('q6_h','부서 운영비 별도 예산 전결표',YN,'예','예'),
+   S('q6_i','긴급 집행 시 사후 승인 허용',YN,'예','예','3일 내','7일 내'),
+   T('q6_j','전결권자 부재 시 대결 순서','전결권자 → 직상위자 → 경영지원실장','전결권자 → 동급 임원(메신저 승인 포함) → 대표이사')]},
+ {id:'q7',title:'질문 7 — 법인별 카드 사용 원칙',
+  princ:'업무추진비 손금 한도는 법인마다 별도이므로 원칙적으로 소속 법인 카드만 사용합니다.',
+  items:[
+   S('q7_a','소속 법인 카드만 사용하는 것을 원칙으로',YN,'예','예','','겸직 법인 업무는 해당 법인 카드'),
+   S('q7_b','다른 법인 업무 지출 시 절차',['사전 승인','해당 법인 카드 사용','사후 정산'],'해당 법인 카드 사용','사후 정산','불가피 시 사전 승인','해당 법인 카드가 원칙, 불가피 시 사후 정산 (실제 거래 관계가 있는 법인에 한함)'),
+   S('q7_c','영수증 메모에 어느 법인 업무인지 명시',YN,'예','예','','한 줄 메모')]},
+ {id:'q8',title:'질문 8 — 차량 유류대와 운행기록부',
+  princ:'운행기록부를 작성하지 않으면 차량 1대당 연간 1,500만 원까지만 비용으로 인정됩니다. 업무용 자동차 보험 가입은 전제 조건입니다.',
+  items:[
+   S('q8_a','임원 차량 운행기록부 작성 의무화',YN,'예','아니오','','미작성 시 차량 1대당 연 1,500만 원까지 인정, 한도 초과 차량만 작성'),
+   S('q8_b','업무용 자동차 보험 가입을 전제 조건으로',YN,'예','예','','미가입 시 비용 인정 불가'),
+   S('q8_c','유류대 월 한도를 별도로 둘까요',YN,'예','아니오','월 30만 원','별도 한도 없이 차량당 연 1,500만 원 이내 관리, 초과 임박 시 경리팀 알림'),
+   T('q8_d','출퇴근·개인 용무 주유 구분·처리','개인 용무 주유는 개인 카드로 분리 결제','법인카드 허용, 명백한 개인 용무는 자부담')]},
+ {id:'q9',title:'질문 9 — 본사·현장사무실 간식비와 사기진작비 한도',
+  princ:'간식비·사기진작비는 복리후생비로 한도 없이 인정되지만, 사업장별 총액 한도를 둡니다 (인원 × 1인당 기준).',
+  items:[
+   T('q9_a','간식비 1인당 월 기준 금액','1만 원','2만 원'),
+   S('q9_b','사기진작비 한도 주기',['월 한도','분기 한도','반기 한도'],'분기 한도','월 한도','인원 × 5만 원','인원 × 3만 원, 분기 합산 정산'),
+   T('q9_c','사기진작비로 인정할 지출 범위','격려 회식·체육행사·워크숍 (포상·상품권은 별도 승인)','격려 회식·포상·체육행사·워크숍 모두'),
+   T('q9_d','현금성 지급(상품권 등) 1인당 상한','예 — 연 10만 원','예 — 연 20만 원 (초과분은 근로소득 처리, 세무사 확인)'),
+   S('q9_e','남은 한도 이월',['이월 허용','소멸'],'소멸','이월 허용','월 단위 관리','분기 내 이월, 분기 말 소멸'),
+   S('q9_f','영수증 메모에 용도·인원 기재',YN,'예','예','','앱 메모 한 줄')]
+  .concat(['본사','현장사무실 A','현장사무실 B','이천공장'].map((nm,i)=>M('q9_s'+(i+1),'사업장: '+nm,
+     [{k:'n',t:'text',l:'인원',ph:'인원'},{k:'s',t:'text',l:'간식비 월 한도',ph:'간식비 월 한도'},{k:'m',t:'text',l:'사기진작비 한도',ph:'사기진작비 한도'},{k:'a',t:'text',l:'전결권자',ph:'전결권자'}],
+     {n:'',s:'인원 × 1만 원',m:'분기 인원 × 5만 원',a:i==0?'경영지원실장':(i==3?'공장장':'현장 관리자')},
+     {n:'',s:'인원 × 2만 원',m:'월 인원 × 3만 원',a:i==0?'담당 임원':(i==3?'공장 책임자':'현장 책임자')},' · ')))},
+ {id:'q10',title:'질문 10 — 본사 관리자 식대: 법인카드 vs 현금(급여) 지급',
+  princ:'식대를 급여에 포함하면 월 20만 원까지 비과세이나 통상임금·퇴직금 영향이 있고 되돌리기 어렵습니다. 도입 전 노무사·세무사 확인을 권합니다.',
+  items:[
+   S('q10_a','본사 관리자 식대를 현금(급여)으로 전환',['찬성','반대'],'반대','반대','정기·일률 지급 시 통상임금·퇴직금 증가, 되돌리기 어려움. 오남용은 월 1회 경리팀 샘플 점검','카드 사용의 자율성 유지. 오남용은 영수증 메모와 월 소명으로 관리')]}
+];
+
+/* ── 상태 ── */
+let data={}, dirty=false, db=null, fbOK=false;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function lsGet(){try{return localStorage.getItem(LS_KEY)}catch(e){return null}}
+function lsSet(v){try{localStorage.setItem(LS_KEY,v)}catch(e){}}
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(toast._t);toast._t=setTimeout(()=>t.style.display='none',2600)}
+function setStatus(m,cls){const s=$('status');s.textContent=m;s.className=cls||''}
+function fmt(d){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())}
+
+function refText(it,c){const o=it['c'+c];return it.f.map(f=>{const v=o[f.k];if(!v)return '';return f.l?f.l+': '+v:v}).filter(Boolean).join(it.join)}
+
+/* ── 렌더 ── */
+function ctl(it,f){
+  const key=it.id+'.'+f.k, v=data[key]||'';
+  const lab=f.l?'<span>'+esc(f.l)+'</span>':'';
+  if(f.t==='sel'){
+    return '<div class="f">'+lab+'<select data-k="'+key+'" aria-label="'+esc(it.label)+'"><option value="">선택</option>'+f.o.map(o=>'<option'+(o===v?' selected':'')+'>'+esc(o)+'</option>').join('')+'</select></div>';
+  }
+  return '<div class="f">'+lab+'<input type="text" data-k="'+key+'" value="'+esc(v)+'" placeholder="'+esc(f.ph||'')+'" aria-label="'+esc(it.label+(f.l?' '+f.l:''))+'"></div>';
+}
+function render(){
+  let h='';
+  h+='<section class="card"><h2>회의 정보</h2><div class="meta"><div><label for="m_date">회의일</label><input type="date" id="m_date" data-k="meta.date" value="'+esc(data['meta.date']||'')+'"></div><div><label for="m_memo">메모</label><textarea id="m_memo" data-k="meta.memo" placeholder="회의 메모(선택)">'+esc(data['meta.memo']||'')+'</textarea></div></div>'
+    +'<div class="note">CASE1 = 일반 기업 기준 추천 / CASE2 = 인시스 기준 추천 (세무상 허용 범위 내 임원 카드 사용 자율성 확대). 각 항목의 「적용」을 누르면 해당 추천값이 입력됩니다.</div></section>';
+  SECTIONS.forEach(sec=>{
+    h+='<section class="card" id="'+sec.id+'"><h2>'+esc(sec.title)+'</h2><div class="princ">'+esc(sec.princ)+'</div>'
+      +'<div class="cols"><div>항목</div><div>CASE1 · 일반 기업</div><div>CASE2 · 인시스</div><div>우리 회사 결정</div></div>';
+    sec.items.forEach(it=>{
+      h+='<div class="item"><div class="lbl">'+esc(it.label)+'</div>'
+        +'<div class="ref r1"><span class="tx"><b>CASE1</b> '+esc(refText(it,1))+'</span><button type="button" class="btn sm" data-ap="1" data-id="'+it.id+'">적용</button></div>'
+        +'<div class="ref r2"><span class="tx"><b>CASE2</b> '+esc(refText(it,2))+'</span><button type="button" class="btn sm" data-ap="2" data-id="'+it.id+'">적용</button></div>'
+        +'<div class="inp">'+it.f.map(f=>ctl(it,f)).join('')+'</div></div>';
+    });
+    h+='</section>';
+  });
+  $('main').innerHTML=h;
+}
+function allItems(){return SECTIONS.reduce((a,s)=>a.concat(s.items),[])}
+function applyCase(it,c){const o=it['c'+c];it.f.forEach(f=>{data[it.id+'.'+f.k]=o[f.k]||''});}
+function markDirty(){dirty=true;setStatus('저장 안 된 변경 있음','dirty');lsSet(JSON.stringify({data,v:VERSION,t:Date.now()}))}
+
+/* ── 이벤트 ── */
+function onInput(e){const k=e.target.getAttribute&&e.target.getAttribute('data-k');if(!k)return;data[k]=e.target.value;markDirty()}
+$('main').addEventListener('input',onInput);
+$('main').addEventListener('change',onInput);
+$('main').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-ap]');if(!b)return;
+  const it=allItems().find(x=>x.id===b.getAttribute('data-id'));if(!it)return;
+  applyCase(it,b.getAttribute('data-ap'));markDirty();render();
+});
+$('bC1').onclick=()=>{allItems().forEach(it=>applyCase(it,1));markDirty();render();toast('CASE1 값을 모두 입력했습니다')};
+$('bC2').onclick=()=>{allItems().forEach(it=>applyCase(it,2));markDirty();render();toast('CASE2 값을 모두 입력했습니다')};
+function setView(v){document.body.className=v==='pc'?'v-pc':'v-mobile';$('vM').classList.toggle('on',v!=='pc');$('vP').classList.toggle('on',v==='pc')}
+$('vM').onclick=()=>setView('m');$('vP').onclick=()=>setView('pc');
+
+let resetArmed=false;
+$('bReset').onclick=()=>{
+  if(!resetArmed){resetArmed=true;$('bReset').textContent='한 번 더 누르면 모두 삭제';setTimeout(()=>{resetArmed=false;$('bReset').textContent='초기화'},4000);return}
+  resetArmed=false;$('bReset').textContent='초기화';data={};markDirty();render();toast('입력값을 모두 지웠습니다. 저장을 눌러야 서버에 반영됩니다');
+};
+
+/* ── Firebase ── */
+function initFB(){
+  try{
+    if(!window.firebase)throw new Error('SDK 로드 실패');
+    firebase.initializeApp({apiKey:"AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",authDomain:"insys-work.firebaseapp.com",projectId:"insys-work",storageBucket:"insys-work.firebasestorage.app",messagingSenderId:"225275784859",appId:"1:225275784859:web:bd12815c6dc47c0c49e03e"});
+    db=firebase.firestore();fbOK=true;
+  }catch(e){fbOK=false;console.warn('Firebase 초기화 실패:',e.message)}
+}
+async function save(){
+  const b=$('bSave');b.disabled=true;
+  data['meta.version']=VERSION;
+  const payload={data:data,version:VERSION,updatedAt:fmt(new Date())};
+  lsSet(JSON.stringify({data,v:VERSION,t:Date.now()}));
+  try{
+    if(!fbOK)throw new Error('Firebase 미연결');
+    await db.collection(COLL).doc(DOCID).set(payload);
+    dirty=false;setStatus('저장됨 '+payload.updatedAt+' · Firebase','ok');toast('Firebase에 저장했습니다');
+  }catch(e){
+    console.warn('저장 실패:',e.message||e);
+    setStatus('이 기기에만 저장됨 (Firebase 저장 실패)','dirty');toast('Firebase 저장 실패 — 이 기기에는 저장됨. 보안 규칙을 확인하세요');
+  }
+  b.disabled=false;
+}
+async function load(manual){
+  try{
+    if(!fbOK)throw new Error('Firebase 미연결');
+    const s=await db.collection(COLL).doc(DOCID).get();
+    if(s.exists){data=(s.data()&&s.data().data)||{};dirty=false;render();setStatus('불러옴 '+(s.data().updatedAt||'')+' · Firebase','ok');if(manual)toast('서버 저장본을 불러왔습니다');return}
+    setStatus('서버 저장본 없음 (새 문서)');if(manual)toast('서버에 저장된 내용이 없습니다');
+  }catch(e){
+    console.warn('불러오기 실패:',e.message||e);
+    const l=lsGet();
+    if(l){try{data=JSON.parse(l).data||{};render();setStatus('이 기기 임시 저장본 표시 (Firebase 불러오기 실패)','dirty');return}catch(_){}}
+    setStatus('Firebase 불러오기 실패','dirty');
+  }
+}
+$('bSave').onclick=save;
+$('bLoad').onclick=()=>load(true);
+
+/* ── PDF 출력 ── */
+function decText(it){
+  const parts=it.f.map(f=>{const v=data[it.id+'.'+f.k];if(!v)return '';return f.l?f.l+': '+v:v}).filter(Boolean);
+  return parts.join(it.join);
+}
+function buildPrint(){
+  let h='<h1>법인카드 사용 규정 결정사항</h1><div class="pm">회의일: '+esc(data['meta.date']||'-')+' · 인시스 AI혁신 연구개발실 · '+VERSION+' · 출력 '+fmt(new Date())+' · 대외비</div>';
+  if(data['meta.memo'])h+='<div class="pm">메모: '+esc(data['meta.memo'])+'</div>';
+  SECTIONS.forEach(sec=>{
+    h+='<h2>'+esc(sec.title)+'</h2><table><tr><th>항목</th><th>우리 회사 결정</th></tr>';
+    sec.items.forEach(it=>{const t=decText(it);h+='<tr><td class="l">'+esc(it.label)+'</td><td>'+(t?esc(t):'<span class="un">(미결정)</span>')+'</td></tr>'});
+    h+='</table>';
+  });
+  h+='<div class="pf"><span>인시스 AI혁신 연구개발실 · 대외비</span><span>'+VERSION+'</span></div>';
+  $('printArea').innerHTML=h;
+}
+$('bPdf').onclick=()=>{buildPrint();toast('인쇄 창에서 대상을 「PDF로 저장」으로 선택하세요');setTimeout(()=>window.print(),300)};
+
+/* ── 비밀번호 게이트 ── */
+function unlock(){
+  $('gate').style.display='none';$('app').style.display='block';
+  try{sessionStorage.setItem('cps_ok','1')}catch(e){}
+  initFB();render();load(false);
+}
+$('gateForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  if(pwHash($('pw').value.trim())===PW_HASH){unlock()}
+  else{$('gerr').textContent='비밀번호가 올바르지 않습니다.';$('pw').value='';$('pw').focus()}
+});
+['gv','hv','fv'].forEach(i=>{$(i).textContent=VERSION});
+try{if(sessionStorage.getItem('cps_ok')==='1')unlock();else $('pw').focus()}catch(e){$('pw').focus()}
+</script>
+</body>
+</html>
