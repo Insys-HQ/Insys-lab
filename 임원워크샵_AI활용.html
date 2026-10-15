@@ -60,6 +60,9 @@ body.pc .frame{max-width:1100px}
 .sumtot{color:#1e3a5f;font-weight:900;font-size:1.25rem}
 .plink{margin:0 0 6px}
 .plink a{display:inline-block;background:#1e3a5f;color:#ffffff;text-decoration:none;border-radius:8px;padding:4px 12px;font-size:0.875rem;font-weight:500}
+.plink a.yt{background:#7f1d1d}
+.plink a.yt2{background:#ffffff;color:#1e3a5f;border:1px solid #b8c6d9;margin-left:4px}
+.ytnote{color:#374151;font-size:0.875rem;margin-left:8px}
 .ctl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
 .ctl button{background:#ffffff;color:#1e3a5f;border:1px solid #b8c6d9;border-radius:8px;padding:4px 10px;font-size:0.875rem;font-family:inherit;cursor:pointer}
 .ctl span{color:#374151;font-size:0.875rem}
@@ -113,7 +116,7 @@ a{color:#1e4f9a}
     <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
     <button type="submit" class="go" id="gateBtn">확인</button>
     <div class="gate-err" id="gateErr" role="alert"></div>
-    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.7</span></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.8</span></div>
   </form>
 </div>
 
@@ -127,7 +130,7 @@ a{color:#1e4f9a}
         <button type="button" id="btnPc" class="on">PC</button>
       </div>
       <button type="button" class="btn" id="btnAll">전체 펼치기</button>
-      <span class="ver" id="verBadge">v1.7</span>
+      <span class="ver" id="verBadge">v1.8</span>
     </div>
   </div>
 </div>
@@ -217,7 +220,7 @@ a{color:#1e4f9a}
   <details class="card" id="p5" data-min="10">
     <summary><label class="ck"><input type="checkbox" class="sel" data-p="5" checked aria-label="5번 포함"></label><span class="no">5</span>클로드 코드 소개<span class="tm">10분</span></summary>
     <div class="body">
-      <p class="plink"><a href="https://insys-erp.teulai.com/portal/home" target="_blank" rel="noopener">Insys 포털 열기 ↗</a></p>
+      <p class="plink"><a class="yt" href="https://www.youtube.com/watch?v=C6xlOsQFyOQ" target="_blank" rel="noopener">▶ 클로드 코드 시작 가이드 영상</a> <a class="yt2" href="https://docs.claude.com/en/docs/claude-code/overview" target="_blank" rel="noopener">공식 소개 ↗</a><span class="ytnote">유튜브 검색 결과 기준 추천 영상</span></p>
       <h4>무엇인가</h4>
       <p>채팅처럼 대화하지만, 내 PC의 파일을 읽고 문서를 만들고 명령까지 실행하는 AI 작업 도구입니다. 터미널, 개발도구(IDE), 데스크톱 앱, 웹에서 쓸 수 있습니다.</p>
       <div class="tbl"><table>
@@ -234,7 +237,7 @@ a{color:#1e4f9a}
   <details class="card" id="p6" data-min="15">
     <summary><label class="ck"><input type="checkbox" class="sel" data-p="6" checked aria-label="6번 포함"></label><span class="no">6</span>에이전트 설정·사용법<span class="tm">15분</span></summary>
     <div class="body">
-      <p class="plink"><a href="https://insys-erp.teulai.com/portal/home" target="_blank" rel="noopener">Insys 포털 열기 ↗</a></p>
+      <p class="plink"><a class="yt" href="https://www.youtube.com/watch?v=2eqPBLgVH0U" target="_blank" rel="noopener">▶ 스킬·서브에이전트·커맨드 개념 영상</a><span class="ytnote">유튜브 검색 결과 기준 추천 영상</span></p>
       <h4>에이전트와 서브에이전트</h4>
       <div class="tbl"><table>
         <tr><th>구분</th><th>에이전트(메인)</th><th>서브에이전트</th></tr>
@@ -262,7 +265,7 @@ model: sonnet
   <details class="card" id="p7" data-min="10">
     <summary><label class="ck"><input type="checkbox" class="sel" data-p="7" checked aria-label="7번 포함"></label><span class="no">7</span>하네스 소개<span class="tm">10분</span></summary>
     <div class="body">
-      <p class="plink"><a href="https://insys-erp.teulai.com/portal/home" target="_blank" rel="noopener">Insys 포털 열기 ↗</a></p>
+      <p class="plink"><a class="yt" href="https://www.youtube.com/watch?v=2n8eg8eLWhQ" target="_blank" rel="noopener">▶ 15분 하네스 엔지니어링 입문 영상</a><span class="ytnote">유튜브 검색 결과 기준 추천 영상</span></p>
       <h4>하네스란</h4>
       <p>AI가 안전하고 일관되게 일하도록 감싸는 규칙·도구·권한의 틀입니다. 말로 부탁하는 수준을 넘어 "항상 지키게" 만드는 장치입니다.</p>
       <div class="tbl"><table>
@@ -315,7 +318,7 @@ model: sonnet
     </div>
   </details>
 
-  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v1.7</span></div>
+  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v1.8</span></div>
 
 </div></div>
 </div>
@@ -324,7 +327,7 @@ model: sonnet
 
 <script>
 (function(){
-  var VERSION = 'v1.7';
+  var VERSION = 'v1.8';
   document.getElementById('verBadge').textContent = VERSION;
   document.getElementById('verFoot').textContent = VERSION;
 
