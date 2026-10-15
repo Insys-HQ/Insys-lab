@@ -149,7 +149,7 @@ body.mobile-mode .section{scroll-margin-top:calc(var(--hdr-h) + 52px)}
         <span class="brand-title" style="font-size:min(var(--fs-h2),4.8vw);white-space:nowrap;">하이브리드 무선망 사용자 가이드</span>
       </div>
       <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
-        <span style="background:var(--accent);color:#fff;font-size:var(--fs-xs);font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;" class="app-version">v4.9</span>
+        <span style="background:var(--accent);color:#fff;font-size:var(--fs-xs);font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;" class="app-version">v5.0</span>
         <button onclick="forceRefresh()" title="최신 버전 강제 새로고침" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:5px;padding:2px 7px;font-size:var(--fs-xs);cursor:pointer;font-family:inherit;white-space:nowrap;">🔄</button>
       </div>
     </div>
@@ -553,6 +553,21 @@ body.mobile-mode .section{scroll-margin-top:calc(var(--hdr-h) + 52px)}
           <tr><td>FTM-310DR/DE</td><td>F(BACK) 길게 → <mono>63 RADIO ID</mono> → 화면 상단</td></tr>
           <tr><td>FT3DR/DE</td><td>DISP 키 길게 → GM 터치 → <mono>2 RADIO ID CHECK</mono></td></tr>
         </table></div>
+        <p class="sub">그 외 C4FM 기종 — 모바일·핸디 (YAESU 설명서 기준)</p>
+        <div class="alert aw"><span>ℹ️</span><div>아래 절차는 YAESU 공식 설명서에서 확인한 내용이며 <strong>실기 확인 전</strong>입니다. 기종·펌웨어에 따라 항목 번호가 다를 수 있으니 <strong>실제 화면의 RADIO ID 항목</strong>을 기준으로 확인하세요. ID는 영문+숫자 5자리 · 대소문자 구분 · 수정 불가.</div></div>
+        <div class="tbl-wrap"><table>
+          <tr><th>기종</th><th>확인 방법</th></tr>
+          <tr><td><strong style="white-space:nowrap">FTM-400DR/DE</strong><br><span style="font-size:var(--fs-xs);color:var(--g3);">📻 모바일</span></td><td>DISP(SETUP) 길게 → GM 터치 → <mono>3 RADIO ID CHECK</mono><br><span style="font-size:var(--fs-xs);color:var(--g3);">화면 표시 · 400XDR/XDE와 동일</span></td></tr>
+          <tr><td><strong style="white-space:nowrap">FTM-300DR/DE</strong><br><span style="font-size:var(--fs-xs);color:var(--g3);">📻 모바일</span></td><td>F(SETUP) 길게 → DIAL로 <mono>GM</mono> 선택 후 누름 → DIAL로 <mono>3 RADIO ID CHECK</mono><br><span style="font-size:var(--fs-xs);color:var(--g3);">화면 상단에 표시</span></td></tr>
+          <tr><td><strong style="white-space:nowrap">FTM-200DR/DE</strong><br><span style="font-size:var(--fs-xs);color:var(--g3);">📻 모바일</span></td><td>F MENU 길게 → DIAL로 <mono>59 RADIO ID</mono> 선택<br><span style="font-size:var(--fs-xs);color:var(--g3);">화면 하단에 표시</span></td></tr>
+          <tr><td><strong style="white-space:nowrap">FTM-100DR/DE</strong><br><span style="font-size:var(--fs-xs);color:var(--g3);">📻 모바일</span></td><td>DISP(SETUP) 길게 → DIAL로 <mono>6 GM</mono> 선택 후 DISP(SETUP) → DIAL로 <mono>4 RADIO ID CHECK</mono> → DISP(SETUP)<br><span style="font-size:var(--fs-xs);color:var(--g3);">화면 표시</span></td></tr>
+          <tr><td><strong style="white-space:nowrap">FTM-3200DR/DE</strong><br><span style="font-size:var(--fs-xs);color:var(--g3);">📻 모바일</span></td><td>MHz(SETUP) 1초 길게 → DIAL로 <mono>31 RADIO ID</mono><br><span style="font-size:var(--fs-xs);color:var(--g3);">화면 표시 · 수정 불가</span></td></tr>
+          <tr><td><strong style="white-space:nowrap">FTM-500DR/DE</strong><br><span style="font-size:var(--fs-xs);color:var(--g3);">📻 모바일</span></td><td>GM 설정 메뉴의 <mono>RADIO ID CHECK</mono> 항목<br><span style="font-size:var(--fs-xs);color:var(--g3);">⚠ 번호·조작이 설명서에서 미확인 — 실기 확인 필요</span></td></tr>
+          <tr><td><strong style="white-space:nowrap">FT2DR/DE</strong><br><span style="font-size:var(--fs-xs);color:var(--g3);">📱 핸디</span></td><td>DISP 길게 → GM 터치 → <mono>2 RADIO ID CHECK</mono><br><span style="font-size:var(--fs-xs);color:var(--g3);">화면 표시</span></td></tr>
+          <tr><td><strong style="white-space:nowrap">FT1DR/DE</strong><br><span style="font-size:var(--fs-xs);color:var(--g3);">📱 핸디</span></td><td>GM 설정 항목 <mono>3 RADIO ID CHECK</mono><br><span style="font-size:var(--fs-xs);color:var(--g3);">진입 조작은 기본 설명서 참조</span></td></tr>
+          <tr><td><strong style="white-space:nowrap">FT-70DR/DE</strong><br><span style="font-size:var(--fs-xs);color:var(--g3);">📱 핸디</span></td><td>F 길게 (Set Mode) → DIAL로 <mono>43 RAD ID</mono><br><span style="font-size:var(--fs-xs);color:var(--g3);">화면 표시 · 수정 불가</span></td></tr>
+        </table></div>
+        <p style="font-size:var(--fs-xs);color:var(--g3);">※ FT1DR · FT-70DR · FTM-3200DR 설명서에는 WIRES-X 노드(PDN) 기능 설명이 없습니다. 노드 등록용으로 쓰기 전에 YAESU에서 지원 여부를 먼저 확인하세요.</p>
         <p class="sub">RC-NET 노드별 Radio ID</p>
         <div class="tbl-wrap"><table>
           <tr><th>콜사인</th><th>Radio ID</th><th>비고</th></tr>
@@ -1962,12 +1977,12 @@ FT5D 봉사원(C4FM) ──RF──→ <span class="cn">DS0ARC(HRI-200)</span> �
 
 <div class="doc-footer">
   <div>대한적십자사 서울특별시지사 재난대응봉사회 · HL0FRC / NDRT</div>
-  <div>YAESU HRI-200 Manual 기반 · HL2TLS 기술팀장 · <strong class="app-version">v4.9</strong> · 2026-10-15</div>
+  <div>YAESU HRI-200 Manual 기반 · HL2TLS 기술팀장 · <strong class="app-version">v5.0</strong> · 2026-10-15</div>
 </div>
 
 <script>
 // ── 버전 관리 ──────────────────────────────────────
-const APP_VERSION = 'v4.9';
+const APP_VERSION = 'v5.0';
 const APP_DATE    = '2026-10-15';
 const VERSION_KEY = 'rcnet_guide_version';
 
