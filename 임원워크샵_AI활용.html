@@ -51,6 +51,16 @@ body.pc .frame{max-width:1100px}
 .card>summary::-webkit-details-marker{display:none}
 .card>summary .no{background:var(--navy);color:#ffffff;border-radius:6px;min-width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:0.875rem}
 .card>summary .tm{margin-left:auto;color:#374151;font-weight:500;font-size:0.875rem}
+.ck{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.ck input{width:18px;height:18px;accent-color:#1e3a5f;cursor:pointer}
+.sumrow td{background:#e8eef6;color:#1e3a5f;font-weight:700}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
+.ctl button{background:#ffffff;color:#1e3a5f;border:1px solid #b8c6d9;border-radius:8px;padding:4px 10px;font-size:0.875rem;font-family:inherit;cursor:pointer}
+.ctl span{color:#374151;font-size:0.875rem}
+tr.off td{color:#6b7280;text-decoration:line-through;background:#f3f4f6}
+details.card.off>summary{background:#eceff3;color:#6b7280}
+details.card.off>summary .no{background:#9ca3af}
+details.card.off>summary .tm{text-decoration:line-through}
 .card>summary::after{content:"▾";color:var(--navy2);margin-left:8px}
 .card[open]>summary::after{content:"▴"}
 .body{padding:10px 12px}
@@ -97,7 +107,7 @@ a{color:#1e4f9a}
     <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
     <button type="submit" class="go" id="gateBtn">확인</button>
     <div class="gate-err" id="gateErr" role="alert"></div>
-    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.1</span></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.2</span></div>
   </form>
 </div>
 
@@ -111,7 +121,7 @@ a{color:#1e4f9a}
         <button type="button" id="btnPc">PC</button>
       </div>
       <button type="button" class="btn" id="btnAll">전체 펼치기</button>
-      <span class="ver" id="verBadge">v1.1</span>
+      <span class="ver" id="verBadge">v1.2</span>
     </div>
   </div>
 </div>
@@ -123,7 +133,7 @@ a{color:#1e4f9a}
     <h1>포털·ERP 활용과<br>AI 업무혁신 워크샵</h1>
     <p>ERP 숨은 기능, WIKI, AI 비서, 클로드 코드, 에이전트·하네스, 그룹 조직도 재구성 토의</p>
     <div class="chips">
-      <span class="chip">약 120분</span><span class="chip">9개 파트</span><span class="chip">2026년 10월</span><span class="chip">담당: 인시스 AI혁신 연구개발실</span>
+      <span class="chip" id="chipTime">약 120분</span><span class="chip" id="chipCnt">9개 파트</span><span class="chip">2026년 10월</span><span class="chip">담당: 인시스 AI혁신 연구개발실</span>
     </div>
   </div>
 
@@ -131,17 +141,19 @@ a{color:#1e4f9a}
     <summary><span class="no">◎</span>진행 순서</summary>
     <div class="body">
       <div class="tbl"><table>
-        <tr><th>#</th><th>파트</th><th>시간</th></tr>
-        <tr><td>1</td><td>포털 소개</td><td>10분</td></tr>
-        <tr><td>2</td><td>ERP 즐겨찾기·숨은 기능</td><td>15분</td></tr>
-        <tr><td>3</td><td>WIKI·게시판 활용</td><td>10분</td></tr>
-        <tr><td>4</td><td>AI 비서 사용법, 좋아요/나빠요</td><td>15분</td></tr>
-        <tr><td>5</td><td>클로드 코드 소개</td><td>10분</td></tr>
-        <tr><td>6</td><td>에이전트 설정·사용법</td><td>15분</td></tr>
-        <tr><td>7</td><td>하네스 소개</td><td>10분</td></tr>
-        <tr><td>8</td><td>예시 시연</td><td>15분</td></tr>
-        <tr><td>9</td><td>토의: 그룹 전체 조직도 재구성</td><td>20분</td></tr>
+        <tr><th>선택 #</th><th>파트</th><th>시간</th></tr>
+        <tr data-p="1" data-min="10"><td><label class="ck"><input type="checkbox" class="sel" data-p="1" checked aria-label="1번 포함">1</label></td><td>포털 소개</td><td>10분</td></tr>
+        <tr data-p="2" data-min="15"><td><label class="ck"><input type="checkbox" class="sel" data-p="2" checked aria-label="2번 포함">2</label></td><td>ERP 즐겨찾기·숨은 기능</td><td>15분</td></tr>
+        <tr data-p="3" data-min="10"><td><label class="ck"><input type="checkbox" class="sel" data-p="3" checked aria-label="3번 포함">3</label></td><td>WIKI·게시판 활용</td><td>10분</td></tr>
+        <tr data-p="4" data-min="15"><td><label class="ck"><input type="checkbox" class="sel" data-p="4" checked aria-label="4번 포함">4</label></td><td>AI 비서 사용법, 좋아요/나빠요</td><td>15분</td></tr>
+        <tr data-p="5" data-min="10"><td><label class="ck"><input type="checkbox" class="sel" data-p="5" checked aria-label="5번 포함">5</label></td><td>클로드 코드 소개</td><td>10분</td></tr>
+        <tr data-p="6" data-min="15"><td><label class="ck"><input type="checkbox" class="sel" data-p="6" checked aria-label="6번 포함">6</label></td><td>에이전트 설정·사용법</td><td>15분</td></tr>
+        <tr data-p="7" data-min="10"><td><label class="ck"><input type="checkbox" class="sel" data-p="7" checked aria-label="7번 포함">7</label></td><td>하네스 소개</td><td>10분</td></tr>
+        <tr data-p="8" data-min="15"><td><label class="ck"><input type="checkbox" class="sel" data-p="8" checked aria-label="8번 포함">8</label></td><td>예시 시연</td><td>15분</td></tr>
+        <tr data-p="9" data-min="20"><td><label class="ck"><input type="checkbox" class="sel" data-p="9" checked aria-label="9번 포함">9</label></td><td>토의: 그룹 전체 조직도 재구성</td><td>20분</td></tr>
+      <tr class="sumrow"><td colspan="2" id="sumLabel">선택 합계</td><td id="sumTime">120분</td></tr>
       </table></div>
+      <div class="ctl"><button type="button" id="selAll">전체 선택</button><button type="button" id="selNone">전체 해제</button><span id="sumNote"></span></div>
       <div class="toc" style="margin-top:6px">
         <a href="#p1">1</a><a href="#p2">2</a><a href="#p3">3</a><a href="#p4">4</a><a href="#p5">5</a><a href="#p6">6</a><a href="#p7">7</a><a href="#p8">8</a><a href="#p9">9</a>
       </div>
@@ -149,7 +161,7 @@ a{color:#1e4f9a}
   </details>
 
   <details class="card" id="p1">
-    <summary><span class="no">1</span>포털 소개<span class="tm">10분</span></summary>
+    <summary><label class="ck"><input type="checkbox" class="sel" data-p="1" checked aria-label="1번 포함"></label><span class="no">1</span>포털 소개<span class="tm">10분</span></summary>
     <div class="body">
       <h4>목적</h4>
       <p>업무에 필요한 시스템을 한 곳에서 시작하는 입구로 포털을 소개합니다.</p>
@@ -161,7 +173,7 @@ a{color:#1e4f9a}
   </details>
 
   <details class="card" id="p2">
-    <summary><span class="no">2</span>ERP 즐겨찾기·숨은 기능<span class="tm">15분</span></summary>
+    <summary><label class="ck"><input type="checkbox" class="sel" data-p="2" checked aria-label="2번 포함"></label><span class="no">2</span>ERP 즐겨찾기·숨은 기능<span class="tm">15분</span></summary>
     <div class="body">
       <h4>즐겨찾기 활용</h4>
       <ul><li>자주 쓰는 화면을 즐겨찾기에 등록해 클릭 수 줄이기</li><li>임원이 매일 보는 화면 3~5개를 우선 등록</li></ul>
@@ -177,7 +189,7 @@ a{color:#1e4f9a}
   </details>
 
   <details class="card" id="p3">
-    <summary><span class="no">3</span>WIKI·게시판 활용<span class="tm">10분</span></summary>
+    <summary><label class="ck"><input type="checkbox" class="sel" data-p="3" checked aria-label="3번 포함"></label><span class="no">3</span>WIKI·게시판 활용<span class="tm">10분</span></summary>
     <div class="body">
       <h4>WIKI</h4>
       <ul><li>규정, 업무 매뉴얼, 자주 묻는 질문을 검색해서 찾기</li><li>문서 작성자가 최신본으로 관리하는 방식</li></ul>
@@ -188,7 +200,7 @@ a{color:#1e4f9a}
   </details>
 
   <details class="card" id="p4">
-    <summary><span class="no">4</span>AI 비서 사용법, 좋아요/나빠요<span class="tm">15분</span></summary>
+    <summary><label class="ck"><input type="checkbox" class="sel" data-p="4" checked aria-label="4번 포함"></label><span class="no">4</span>AI 비서 사용법, 좋아요/나빠요<span class="tm">15분</span></summary>
     <div class="body">
       <h4>잘 묻는 4가지 요소</h4>
       <div class="tbl"><table>
@@ -205,7 +217,7 @@ a{color:#1e4f9a}
   </details>
 
   <details class="card" id="p5">
-    <summary><span class="no">5</span>클로드 코드 소개<span class="tm">10분</span></summary>
+    <summary><label class="ck"><input type="checkbox" class="sel" data-p="5" checked aria-label="5번 포함"></label><span class="no">5</span>클로드 코드 소개<span class="tm">10분</span></summary>
     <div class="body">
       <h4>무엇인가</h4>
       <p>채팅처럼 대화하지만, 내 PC의 파일을 읽고 문서를 만들고 명령까지 실행하는 AI 작업 도구입니다. 터미널, 개발도구(IDE), 데스크톱 앱, 웹에서 쓸 수 있습니다.</p>
@@ -221,7 +233,7 @@ a{color:#1e4f9a}
   </details>
 
   <details class="card" id="p6">
-    <summary><span class="no">6</span>에이전트 설정·사용법<span class="tm">15분</span></summary>
+    <summary><label class="ck"><input type="checkbox" class="sel" data-p="6" checked aria-label="6번 포함"></label><span class="no">6</span>에이전트 설정·사용법<span class="tm">15분</span></summary>
     <div class="body">
       <h4>에이전트와 서브에이전트</h4>
       <div class="tbl"><table>
@@ -248,7 +260,7 @@ model: sonnet
   </details>
 
   <details class="card" id="p7">
-    <summary><span class="no">7</span>하네스 소개<span class="tm">10분</span></summary>
+    <summary><label class="ck"><input type="checkbox" class="sel" data-p="7" checked aria-label="7번 포함"></label><span class="no">7</span>하네스 소개<span class="tm">10분</span></summary>
     <div class="body">
       <h4>하네스란</h4>
       <p>AI가 안전하고 일관되게 일하도록 감싸는 규칙·도구·권한의 틀입니다. 말로 부탁하는 수준을 넘어 "항상 지키게" 만드는 장치입니다.</p>
@@ -266,7 +278,7 @@ model: sonnet
   </details>
 
   <details class="card" id="p8">
-    <summary><span class="no">8</span>예시 시연<span class="tm">15분</span></summary>
+    <summary><label class="ck"><input type="checkbox" class="sel" data-p="8" checked aria-label="8번 포함"></label><span class="no">8</span>예시 시연<span class="tm">15분</span></summary>
     <div class="body">
       <div class="tbl"><table>
         <tr><th>#</th><th>시나리오</th><th>시연 문장</th></tr>
@@ -282,7 +294,7 @@ model: sonnet
   </details>
 
   <details class="card" id="p9">
-    <summary><span class="no">9</span>토의: 그룹 전체 조직도 재구성<span class="tm">20분</span></summary>
+    <summary><label class="ck"><input type="checkbox" class="sel" data-p="9" checked aria-label="9번 포함"></label><span class="no">9</span>토의: 그룹 전체 조직도 재구성<span class="tm">20분</span></summary>
     <div class="body">
       <h4>진행 방식</h4>
       <p>발표가 아닌 임원 토의입니다. AI는 초안과 비교표를 빠르게 만드는 도구로 활용합니다.</p>
@@ -300,7 +312,7 @@ model: sonnet
     </div>
   </details>
 
-  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v1.1</span></div>
+  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v1.2</span></div>
 
 </div></div>
 </div>
@@ -309,7 +321,7 @@ model: sonnet
 
 <script>
 (function(){
-  var VERSION = 'v1.1';
+  var VERSION = 'v1.2';
   document.getElementById('verBadge').textContent = VERSION;
   document.getElementById('verFoot').textContent = VERSION;
 
@@ -380,6 +392,52 @@ model: sonnet
       navigator.clipboard.writeText(text).then(function(){ showToast('복사되었습니다'); }, fallback);
     } else { fallback(); }
   });
+
+
+  var sels = document.querySelectorAll('input.sel');
+  var STORE = 'ws_sel_v12';
+  function calc(){
+    var total = 0, cnt = 0;
+    var rows = document.querySelectorAll('tr[data-p]');
+    for(var i=0;i<rows.length;i++){
+      var p = rows[i].getAttribute('data-p');
+      var on = document.querySelector('#agenda input.sel[data-p="'+p+'"]').checked;
+      rows[i].classList.toggle('off', !on);
+      document.getElementById('p'+p).classList.toggle('off', !on);
+      if(on){ total += parseInt(rows[i].getAttribute('data-min'),10); cnt++; }
+    }
+    var h = Math.floor(total/60), m = total%60;
+    var hm = total >= 60 ? ' (' + h + '시간' + (m ? ' ' + m + '분' : '') + ')' : '';
+    document.getElementById('sumTime').textContent = total + '분';
+    document.getElementById('sumNote').textContent = cnt + '개 파트 · ' + total + '분' + hm;
+    document.getElementById('chipTime').textContent = '약 ' + total + '분';
+    document.getElementById('chipCnt').textContent = cnt + '개 파트';
+    return total;
+  }
+  function saveSel(){
+    try{
+      var a = []; var l = document.querySelectorAll('#agenda input.sel');
+      for(var i=0;i<l.length;i++){ a.push(l[i].checked ? 1 : 0); }
+      localStorage.setItem(STORE, a.join(''));
+    }catch(e){}
+  }
+  function setP(p, v){
+    var l = document.querySelectorAll('input.sel[data-p="'+p+'"]');
+    for(var i=0;i<l.length;i++){ l[i].checked = v; }
+  }
+  for(var k=0;k<sels.length;k++){
+    sels[k].addEventListener('click', function(e){ e.stopPropagation(); });
+    sels[k].addEventListener('change', function(){ setP(this.getAttribute('data-p'), this.checked); calc(); saveSel(); });
+  }
+  var lbls = document.querySelectorAll('summary label.ck');
+  for(var q=0;q<lbls.length;q++){ lbls[q].addEventListener('click', function(e){ e.stopPropagation(); }); }
+  document.getElementById('selAll').addEventListener('click', function(){ for(var i=1;i<=9;i++){ setP(i,true); } calc(); saveSel(); });
+  document.getElementById('selNone').addEventListener('click', function(){ for(var i=1;i<=9;i++){ setP(i,false); } calc(); saveSel(); });
+  try{
+    var sv = localStorage.getItem(STORE);
+    if(sv && sv.length === 9){ for(var j=0;j<9;j++){ setP(j+1, sv.charAt(j) === '1'); } }
+  }catch(e){}
+  calc();
 
   var links = document.querySelectorAll('.toc a');
   for(var i=0;i<links.length;i++){
