@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>임원 워크샵 - 포털·ERP·AI 활용</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f5f9; --card:#ffffff; --line:#d5dce8;
+  --text:#1f2937; --navy:#1e3a5f; --navy2:#2c5282;
+  --pastel:#e6edf8; --pastel2:#eef3fa; --warn-bg:#fff6e0; --warn:#7a4b00;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;font-size:0.875rem}
+@media (min-width:768px){body{font-size:1rem}}
+
+/* header / nav : 배경 전체폭, 내부는 컨테이너 폭 */
+.nav{position:sticky;top:0;z-index:10;background:var(--navy);width:100%}
+.nav-inner{max-width:1100px;margin:0 auto;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.nav-title{color:#ffffff;font-weight:700;font-size:0.95rem}
+.nav-title small{font-weight:400;opacity:.9;margin-left:6px}
+.ctrl{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid #9fb3d1;border-radius:8px;overflow:hidden}
+.seg button{background:#e6edf8;color:#1e3a5f;border:0;padding:5px 12px;font-family:inherit;font-size:0.875rem;font-weight:500;cursor:pointer}
+.seg button.on{background:#ffffff;color:#1e3a5f;font-weight:700;box-shadow:inset 0 -3px 0 #2c5282}
+.btn{background:#e6edf8;color:#1e3a5f;border:1px solid #9fb3d1;border-radius:8px;padding:5px 12px;font-family:inherit;font-size:0.875rem;font-weight:500;cursor:pointer}
+.btn:hover{background:#ffffff}
+.ver{background:#ffffff;color:#1e3a5f;border-radius:8px;padding:3px 10px;font-weight:700;font-size:0.875rem}
+
+/* 화면 폭 (모바일 기본) */
+.stage{width:100%;padding:8px 0}
+.frame{margin:0 auto;max-width:430px;width:100%}
+body.pc .frame{max-width:1100px}
+.wrap{padding:0 12px}
+
+.cover{background:var(--pastel);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px}
+.cover h1{color:var(--navy);font-size:1.35rem;font-weight:900;line-height:1.35}
+.cover p{color:var(--text);margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:#ffffff;color:#1e3a5f;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:0.875rem;font-weight:500}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.card>summary{list-style:none;cursor:pointer;padding:10px 12px;display:flex;align-items:center;gap:8px;background:var(--pastel2);color:var(--navy);font-weight:700}
+.card>summary::-webkit-details-marker{display:none}
+.card>summary .no{background:var(--navy);color:#ffffff;border-radius:6px;min-width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:0.875rem}
+.card>summary .tm{margin-left:auto;color:#374151;font-weight:500;font-size:0.875rem}
+.card>summary::after{content:"▾";color:var(--navy2);margin-left:8px}
+.card[open]>summary::after{content:"▴"}
+.body{padding:10px 12px}
+.body h4{color:var(--navy);margin:8px 0 4px;font-size:0.95rem}
+.body h4:first-child{margin-top:0}
+.body ul{padding-left:18px}
+.body li{margin:2px 0}
+.body p{margin:4px 0}
+
+table{width:100%;border-collapse:collapse;margin:4px 0;font-size:0.875rem}
+th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+th{background:var(--pastel);color:#1e3a5f;font-weight:700}
+.tbl{overflow-x:auto}
+
+.note{background:var(--warn-bg);color:var(--warn);border:1px solid #f0d9a0;border-radius:8px;padding:6px 10px;margin:6px 0;font-size:0.875rem}
+.tip{background:#e9f3ec;color:#14532d;border:1px solid #bfdcc8;border-radius:8px;padding:6px 10px;margin:6px 0;font-size:0.875rem}
+pre{background:#f1f4f9;color:#1f2937;border:1px solid var(--line);border-radius:8px;padding:8px 10px;overflow-x:auto;font-size:0.875rem;line-height:1.5;white-space:pre}
+.code-head{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.code-head span{font-weight:700;color:var(--navy);font-size:0.875rem}
+a{color:#1e4f9a}
+.foot{text-align:center;color:#374151;font-size:0.875rem;padding:8px 12px 16px}
+.toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#1e3a5f;color:#ffffff;padding:6px 14px;border-radius:8px;font-size:0.875rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+.toc a{display:inline-block;margin:2px 6px 2px 0;text-decoration:none;background:#ffffff;border:1px solid var(--line);border-radius:6px;padding:1px 8px;color:#1e3a5f;font-size:0.875rem}
+
+/* 로그인 화면 */
+.gate{position:fixed;inset:0;z-index:100;background:#1e3a5f;display:flex;align-items:center;justify-content:center;padding:12px}
+.gate.hide{display:none}
+.gate-box{background:#ffffff;color:#1f2937;border-radius:12px;padding:16px;width:100%;max-width:340px;text-align:center}
+.gate-box h2{color:#1e3a5f;font-size:1.1rem;margin-bottom:4px}
+.gate-box p{font-size:0.875rem;margin-bottom:8px}
+.gate-box input{width:100%;padding:8px 10px;border:1px solid #9fb3d1;border-radius:8px;font-family:inherit;font-size:1rem;text-align:center;letter-spacing:6px;color:#1f2937;background:#ffffff}
+.gate-box .go{width:100%;margin-top:8px;padding:8px;border:0;border-radius:8px;background:#1e3a5f;color:#ffffff;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer}
+.gate-err{color:#9b1c1c;font-size:0.875rem;min-height:1.3em;margin-top:6px}
+.gate-ver{color:#374151;font-size:0.875rem;margin-top:6px}
+</style>
+</head>
+<body class="mobile">
+
+<div class="gate" id="gate">
+  <form class="gate-box" id="gateForm" autocomplete="off">
+    <h2>임원 워크샵 자료</h2>
+    <p>비밀번호를 입력하세요</p>
+    <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
+    <button type="submit" class="go" id="gateBtn">확인</button>
+    <div class="gate-err" id="gateErr" role="alert"></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.1</span></div>
+  </form>
+</div>
+
+
+<div class="nav">
+  <div class="nav-inner">
+    <div class="nav-title">임원 워크샵 자료<small>인시스 AI혁신 연구개발실</small></div>
+    <div class="ctrl">
+      <div class="seg" role="group" aria-label="화면 선택">
+        <button type="button" id="btnMobile" class="on">모바일</button>
+        <button type="button" id="btnPc">PC</button>
+      </div>
+      <button type="button" class="btn" id="btnAll">전체 펼치기</button>
+      <span class="ver" id="verBadge">v1.1</span>
+    </div>
+  </div>
+</div>
+
+<div class="stage">
+<div class="frame"><div class="wrap">
+
+  <div class="cover">
+    <h1>포털·ERP 활용과<br>AI 업무혁신 워크샵</h1>
+    <p>ERP 숨은 기능, WIKI, AI 비서, 클로드 코드, 에이전트·하네스, 그룹 조직도 재구성 토의</p>
+    <div class="chips">
+      <span class="chip">약 120분</span><span class="chip">9개 파트</span><span class="chip">2026년 10월</span><span class="chip">담당: 인시스 AI혁신 연구개발실</span>
+    </div>
+  </div>
+
+  <details class="card" open id="agenda">
+    <summary><span class="no">◎</span>진행 순서</summary>
+    <div class="body">
+      <div class="tbl"><table>
+        <tr><th>#</th><th>파트</th><th>시간</th></tr>
+        <tr><td>1</td><td>포털 소개</td><td>10분</td></tr>
+        <tr><td>2</td><td>ERP 즐겨찾기·숨은 기능</td><td>15분</td></tr>
+        <tr><td>3</td><td>WIKI·게시판 활용</td><td>10분</td></tr>
+        <tr><td>4</td><td>AI 비서 사용법, 좋아요/나빠요</td><td>15분</td></tr>
+        <tr><td>5</td><td>클로드 코드 소개</td><td>10분</td></tr>
+        <tr><td>6</td><td>에이전트 설정·사용법</td><td>15분</td></tr>
+        <tr><td>7</td><td>하네스 소개</td><td>10분</td></tr>
+        <tr><td>8</td><td>예시 시연</td><td>15분</td></tr>
+        <tr><td>9</td><td>토의: 그룹 전체 조직도 재구성</td><td>20분</td></tr>
+      </table></div>
+      <div class="toc" style="margin-top:6px">
+        <a href="#p1">1</a><a href="#p2">2</a><a href="#p3">3</a><a href="#p4">4</a><a href="#p5">5</a><a href="#p6">6</a><a href="#p7">7</a><a href="#p8">8</a><a href="#p9">9</a>
+      </div>
+    </div>
+  </details>
+
+  <details class="card" id="p1">
+    <summary><span class="no">1</span>포털 소개<span class="tm">10분</span></summary>
+    <div class="body">
+      <h4>목적</h4>
+      <p>업무에 필요한 시스템을 한 곳에서 시작하는 입구로 포털을 소개합니다.</p>
+      <p><a href="https://insys-erp.teulai.com/portal/home" target="_blank" rel="noopener">Portal-insys 열기</a></p>
+      <h4>시연 순서</h4>
+      <ul><li>로그인 후 첫 화면 구성 보기</li><li>상단·좌측 메뉴 구성 살펴보기</li><li>자주 쓰는 메뉴로 바로 이동하기</li></ul>
+      <div class="note">실제 화면 확인 후 캡처와 메뉴 설명을 보완합니다.</div>
+    </div>
+  </details>
+
+  <details class="card" id="p2">
+    <summary><span class="no">2</span>ERP 즐겨찾기·숨은 기능<span class="tm">15분</span></summary>
+    <div class="body">
+      <h4>즐겨찾기 활용</h4>
+      <ul><li>자주 쓰는 화면을 즐겨찾기에 등록해 클릭 수 줄이기</li><li>임원이 매일 보는 화면 3~5개를 우선 등록</li></ul>
+      <h4>숨은 기능 소개 항목</h4>
+      <div class="tbl"><table>
+        <tr><th>구분</th><th>내용</th></tr>
+        <tr><td>조회·검색</td><td>조건 저장, 빠른 검색 등 (확인 후 작성)</td></tr>
+        <tr><td>승인·결재</td><td>결재 현황 확인 방법 (확인 후 작성)</td></tr>
+        <tr><td>출력·다운로드</td><td>엑셀·PDF 내보내기 (확인 후 작성)</td></tr>
+      </table></div>
+      <div class="note">ERP 화면 확인 후 실제 기능명으로 교체합니다.</div>
+    </div>
+  </details>
+
+  <details class="card" id="p3">
+    <summary><span class="no">3</span>WIKI·게시판 활용<span class="tm">10분</span></summary>
+    <div class="body">
+      <h4>WIKI</h4>
+      <ul><li>규정, 업무 매뉴얼, 자주 묻는 질문을 검색해서 찾기</li><li>문서 작성자가 최신본으로 관리하는 방식</li></ul>
+      <h4>게시판 요약</h4>
+      <ul><li>공지가 많을 때 핵심만 요약해서 확인</li><li>AI에 게시판 글을 붙여 넣고 "결정이 필요한 것만 뽑아줘"라고 요청</li></ul>
+      <div class="note">실제 게시판 구성 확인 후 보완합니다.</div>
+    </div>
+  </details>
+
+  <details class="card" id="p4">
+    <summary><span class="no">4</span>AI 비서 사용법, 좋아요/나빠요<span class="tm">15분</span></summary>
+    <div class="body">
+      <h4>잘 묻는 4가지 요소</h4>
+      <div class="tbl"><table>
+        <tr><th>요소</th><th>예시</th></tr>
+        <tr><td>역할·목적</td><td>"임원 보고용으로"</td></tr>
+        <tr><td>자료·범위</td><td>"지난달 게시판 공지 중"</td></tr>
+        <tr><td>형식</td><td>"표 1개, 5줄 이내"</td></tr>
+        <tr><td>기준</td><td>"결정이 필요한 것 우선"</td></tr>
+      </table></div>
+      <h4>좋아요/나빠요 기능</h4>
+      <ul><li>답변이 도움이 되었는지 표시하는 평가 기능</li><li>나빠요를 눌렀을 때 이유를 남기면 개선 자료가 됨</li><li>평가가 쌓일수록 답변 품질을 점검하기 쉬움</li></ul>
+      <div class="note">포털 AI 비서의 좋아요/나빠요 동작 방식은 화면 확인 후 정확히 보완합니다.</div>
+    </div>
+  </details>
+
+  <details class="card" id="p5">
+    <summary><span class="no">5</span>클로드 코드 소개<span class="tm">10분</span></summary>
+    <div class="body">
+      <h4>무엇인가</h4>
+      <p>채팅처럼 대화하지만, 내 PC의 파일을 읽고 문서를 만들고 명령까지 실행하는 AI 작업 도구입니다. 터미널, 개발도구(IDE), 데스크톱 앱, 웹에서 쓸 수 있습니다.</p>
+      <div class="tbl"><table>
+        <tr><th>구분</th><th>클로드 채팅</th><th>클로드 코드</th></tr>
+        <tr><td>결과물</td><td>대화로 답변</td><td>파일로 직접 저장</td></tr>
+        <tr><td>PC 파일</td><td>업로드한 것만</td><td>연결한 폴더 전체</td></tr>
+        <tr><td>반복 작업</td><td>매번 요청</td><td>예약 작업, 자동 실행</td></tr>
+        <tr><td>규칙 기억</td><td>대화 안에서</td><td>설정 파일에 고정</td></tr>
+      </table></div>
+      <div class="tip">데스크톱 앱에 로그인하면 Code 탭에서 바로 시작할 수 있습니다 (유료 플랜 필요).</div>
+    </div>
+  </details>
+
+  <details class="card" id="p6">
+    <summary><span class="no">6</span>에이전트 설정·사용법<span class="tm">15분</span></summary>
+    <div class="body">
+      <h4>에이전트와 서브에이전트</h4>
+      <div class="tbl"><table>
+        <tr><th>구분</th><th>에이전트(메인)</th><th>서브에이전트</th></tr>
+        <tr><td>역할</td><td>대화하며 전체 지휘</td><td>맡은 한 가지 작업만 수행</td></tr>
+        <tr><td>맥락</td><td>전체 대화를 앎</td><td>새로 시작, 지시문만 앎</td></tr>
+        <tr><td>결과</td><td>사용자와 직접 소통</td><td>요약만 메인에게 보고</td></tr>
+      </table></div>
+      <h4>만드는 법</h4>
+      <p>말로 시키면 파일을 대신 만들어 줍니다. 직접 만들 때는 아래 파일 1개면 충분합니다.</p>
+      <div class="code-head"><span>예시: 문서 검토 에이전트</span><button type="button" class="btn" id="btnCopy">코드 복사</button></div>
+<pre id="agentCode">---
+name: doc-reviewer
+description: 문서의 오탈자, 숫자 불일치, 버전 표기 누락을 점검. 문서 작성 후 사용.
+tools: Read, Grep, Glob
+model: sonnet
+---
+
+당신은 문서 검토 담당입니다. 오류를 우선순위별로
+(필수 수정 / 권장 수정 / 제안) 정리하고 수정 예시를 함께 제시하세요.</pre>
+      <h4>저장 위치와 호출</h4>
+      <ul><li>내 전체 프로젝트: ~/.claude/agents/ , 현재 프로젝트만: .claude/agents/</li><li>호출: "doc-reviewer로 이 보고서 검토해줘" 또는 @ 멘션</li><li>여러 에이전트에게 동시에 조사를 맡기는 병렬 작업 가능</li></ul>
+    </div>
+  </details>
+
+  <details class="card" id="p7">
+    <summary><span class="no">7</span>하네스 소개<span class="tm">10분</span></summary>
+    <div class="body">
+      <h4>하네스란</h4>
+      <p>AI가 안전하고 일관되게 일하도록 감싸는 규칙·도구·권한의 틀입니다. 말로 부탁하는 수준을 넘어 "항상 지키게" 만드는 장치입니다.</p>
+      <div class="tbl"><table>
+        <tr><th>구성 요소</th><th>역할</th></tr>
+        <tr><td>CLAUDE.md</td><td>매번 자동으로 읽는 우리 회사 규칙 문서</td></tr>
+        <tr><td>Skills</td><td>반복 업무를 /명령어로 패키징</td></tr>
+        <tr><td>Hooks</td><td>파일 저장·실행 전후에 검사 스크립트 자동 실행</td></tr>
+        <tr><td>Subagents</td><td>역할별 보조 에이전트</td></tr>
+        <tr><td>MCP·커넥터</td><td>메일·일정·Drive 등 외부 도구 연결</td></tr>
+        <tr><td>권한 모드</td><td>승인 후 실행(Manual)부터 자동 실행까지 단계 조절</td></tr>
+      </table></div>
+      <div class="tip">예: "문서에는 항상 버전번호와 담당부서를 표기"를 CLAUDE.md에 한 번 적어 두면 모든 문서에 적용됩니다.</div>
+    </div>
+  </details>
+
+  <details class="card" id="p8">
+    <summary><span class="no">8</span>예시 시연<span class="tm">15분</span></summary>
+    <div class="body">
+      <div class="tbl"><table>
+        <tr><th>#</th><th>시나리오</th><th>시연 문장</th></tr>
+        <tr><td>1</td><td>메일 정리</td><td>"오늘 받은 메일 중 회신이 필요한 것을 정리해줘"</td></tr>
+        <tr><td>2</td><td>일정 확인</td><td>"이번 주 일정 중 겹치는 것을 알려줘"</td></tr>
+        <tr><td>3</td><td>보고서 초안</td><td>"회의 내용으로 보고서 초안을 만들어줘"</td></tr>
+        <tr><td>4</td><td>문서 점검</td><td>"문서 검토 에이전트로 오탈자와 숫자를 점검해줘"</td></tr>
+      </table></div>
+      <h4>폰으로 지시하기</h4>
+      <p>사무실 PC에서 앱을 켜 두고 폰의 Claude 앱으로 작업을 지시하고 승인할 수 있습니다 (Dispatch는 Pro/Max 플랜, Remote Control은 관리자 설정 필요).</p>
+      <div class="note">음성 지시는 사전 테스트 후 시연합니다. 발송·수정·삭제는 승인 후 실행하는 설정을 권장합니다.</div>
+    </div>
+  </details>
+
+  <details class="card" id="p9">
+    <summary><span class="no">9</span>토의: 그룹 전체 조직도 재구성<span class="tm">20분</span></summary>
+    <div class="body">
+      <h4>진행 방식</h4>
+      <p>발표가 아닌 임원 토의입니다. AI는 초안과 비교표를 빠르게 만드는 도구로 활용합니다.</p>
+      <h4>논의 질문</h4>
+      <ul><li>현재 조직도에서 업무가 겹치거나 비어 있는 곳은 어디인가</li><li>계열사 공통 기능과 개별 기능을 어떻게 나눌 것인가</li><li>결재선과 시스템(ERP) 권한을 조직도와 어떻게 맞출 것인가</li><li>개편 시기와 단계는 어떻게 잡을 것인가</li></ul>
+      <h4>AI 활용 흐름</h4>
+      <div class="tbl"><table>
+        <tr><th>단계</th><th>내용</th></tr>
+        <tr><td>1</td><td>현황 정리 (조직·업무 범위)</td></tr>
+        <tr><td>2</td><td>재구성안 2~3개 초안</td></tr>
+        <tr><td>3</td><td>안별 장단점 비교표</td></tr>
+        <tr><td>4</td><td>임원 결정 후 상세안 작성</td></tr>
+      </table></div>
+      <div class="note">조직도에는 인사 정보가 포함됩니다. 이 자료에는 개인 이름을 넣지 않았으며, 실제 조직도 작업 시에는 대외비 표기와 접근 제한을 적용합니다.</div>
+    </div>
+  </details>
+
+  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v1.1</span></div>
+
+</div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var VERSION = 'v1.1';
+  document.getElementById('verBadge').textContent = VERSION;
+  document.getElementById('verFoot').textContent = VERSION;
+
+
+  document.getElementById('verGate').textContent = VERSION;
+  var gate = document.getElementById('gate');
+  var gateErr = document.getElementById('gateErr');
+  var gatePw = document.getElementById('gatePw');
+  var PW_HASH = '9c1f48dd8ce5f04a8f54974dba16b8306c0d3154c54c84b53d4098a8d50e85b9';
+  function openGate(){ gate.classList.add('hide'); }
+  function sha256Hex(str){
+    var data = new TextEncoder().encode(str);
+    return crypto.subtle.digest('SHA-256', data).then(function(buf){
+      return Array.prototype.map.call(new Uint8Array(buf), function(b){ return ('0' + b.toString(16)).slice(-2); }).join('');
+    });
+  }
+  try{ if(sessionStorage.getItem('ws_ok') === '1'){ openGate(); } }catch(e){}
+  document.getElementById('gateForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!(window.crypto && crypto.subtle)){ gateErr.textContent = '보안 연결(https)에서 열어 주세요'; return; }
+    sha256Hex('insys-ws:' + gatePw.value).then(function(h){
+      if(h === PW_HASH){
+        try{ sessionStorage.setItem('ws_ok', '1'); }catch(e){}
+        gateErr.textContent = ''; openGate();
+      } else {
+        gateErr.textContent = '비밀번호가 맞지 않습니다'; gatePw.value = ''; gatePw.focus();
+      }
+    });
+  });
+
+  var body = document.body;
+  var bM = document.getElementById('btnMobile');
+  var bP = document.getElementById('btnPc');
+  function setView(mode){
+    if(mode === 'pc'){ body.classList.add('pc'); body.classList.remove('mobile'); bP.classList.add('on'); bM.classList.remove('on'); }
+    else { body.classList.add('mobile'); body.classList.remove('pc'); bM.classList.add('on'); bP.classList.remove('on'); }
+  }
+  bM.addEventListener('click', function(){ setView('mobile'); });
+  bP.addEventListener('click', function(){ setView('pc'); });
+
+  var all = document.getElementById('btnAll');
+  var opened = false;
+  all.addEventListener('click', function(){
+    opened = !opened;
+    var list = document.querySelectorAll('details.card');
+    for(var i=0;i<list.length;i++){ list[i].open = opened; }
+    all.textContent = opened ? '전체 접기' : '전체 펼치기';
+  });
+
+  var toast = document.getElementById('toast');
+  function showToast(msg){
+    toast.textContent = msg; toast.classList.add('show');
+    setTimeout(function(){ toast.classList.remove('show'); }, 1500);
+  }
+  document.getElementById('btnCopy').addEventListener('click', function(){
+    var text = document.getElementById('agentCode').textContent;
+    function fallback(){
+      try{
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast(ok ? '복사되었습니다' : '복사 실패: 직접 선택해 주세요');
+      }catch(e){ showToast('복사 실패: 직접 선택해 주세요'); }
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ showToast('복사되었습니다'); }, fallback);
+    } else { fallback(); }
+  });
+
+  var links = document.querySelectorAll('.toc a');
+  for(var i=0;i<links.length;i++){
+    links[i].addEventListener('click', function(e){
+      var id = this.getAttribute('href').slice(1);
+      var el = document.getElementById(id);
+      if(el){ el.open = true; }
+    });
+  }
+})();
+</script>
+</body>
+</html>
