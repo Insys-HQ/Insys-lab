@@ -111,7 +111,7 @@ a{color:#1e4f9a}
     <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
     <button type="submit" class="go" id="gateBtn">확인</button>
     <div class="gate-err" id="gateErr" role="alert"></div>
-    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.3</span></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.4</span></div>
   </form>
 </div>
 
@@ -125,7 +125,7 @@ a{color:#1e4f9a}
         <button type="button" id="btnPc">PC</button>
       </div>
       <button type="button" class="btn" id="btnAll">전체 펼치기</button>
-      <span class="ver" id="verBadge">v1.3</span>
+      <span class="ver" id="verBadge">v1.4</span>
     </div>
   </div>
 </div>
@@ -176,13 +176,15 @@ a{color:#1e4f9a}
   </details>
 
   <details class="card" id="p3" data-min="10">
-    <summary><label class="ck"><input type="checkbox" class="sel" data-p="3" checked aria-label="3번 포함"></label><span class="no">3</span>WIKI·게시판 활용<span class="tm">10분</span></summary>
+    <summary><label class="ck"><input type="checkbox" class="sel" data-p="3" checked aria-label="3번 포함"></label><span class="no">3</span>WIKI: ERP 따라하기<span class="tm">10분</span></summary>
     <div class="body">
-      <h4>WIKI</h4>
-      <ul><li>규정, 업무 매뉴얼, 자주 묻는 질문을 검색해서 찾기</li><li>문서 작성자가 최신본으로 관리하는 방식</li></ul>
-      <h4>게시판 요약</h4>
-      <ul><li>공지가 많을 때 핵심만 요약해서 확인</li><li>AI에 게시판 글을 붙여 넣고 "결정이 필요한 것만 뽑아줘"라고 요청</li></ul>
-      <div class="note">실제 게시판 구성 확인 후 보완합니다.</div>
+      <h4>목적</h4>
+      <ul><li>WIKI의 "ERP 따라하기" 문서를 보면서 ERP 업무를 직접 따라 해보는 방법 소개</li><li>교육 자료를 따로 찾지 않고 포털 안에서 바로 확인</li></ul>
+      <h4>활용 순서</h4>
+      <ul><li>포털 → WIKI에서 "ERP 따라하기" 검색 또는 목차 선택</li><li>문서의 단계 순서대로 ERP 화면을 열어 같이 진행</li><li>막히는 단계는 AI 비서에 문서 내용과 함께 질문</li></ul>
+      <h4>임원 활용 포인트</h4>
+      <ul><li>결재·조회 등 자주 쓰는 업무를 한 번 따라 해보고 직원에게 안내</li><li>내용이 틀리거나 빠진 부분은 WIKI에 바로 보완 요청</li></ul>
+      <div class="note">실제 WIKI 문서의 목차와 화면을 확인 후 보완합니다.</div>
     </div>
   </details>
 
@@ -299,7 +301,7 @@ model: sonnet
     </div>
   </details>
 
-  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v1.3</span></div>
+  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v1.4</span></div>
 
 </div></div>
 </div>
@@ -308,7 +310,7 @@ model: sonnet
 
 <script>
 (function(){
-  var VERSION = 'v1.3';
+  var VERSION = 'v1.4';
   document.getElementById('verBadge').textContent = VERSION;
   document.getElementById('verFoot').textContent = VERSION;
 
