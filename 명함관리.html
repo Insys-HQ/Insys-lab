@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>인시스 명함관리 v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1f3a5f;--ink:#1f2937;--sub:#374151;--line:#d5dce6;--bg:#f2f5f9;--card:#fff;--pri:#1f3a5f;--priLight:#e3ecf7;--warn:#9a3412;--warnBg:#fdeede;--ok:#14532d;--okBg:#e1f3e8}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+@media (min-width:768px){html{font-size:16px}}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);line-height:1.45;font-size:1rem}
+button,input,textarea,select{font-family:inherit;font-size:1rem;color:var(--ink)}
+.nav{background:var(--navy);color:#fff;width:100%}
+.nav-inner{max-width:1100px;margin:0 auto;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.nav h1{font-size:1.1rem;font-weight:700;color:#fff}
+.nav .ver{font-size:.8rem;background:#fff;color:var(--navy);border-radius:10px;padding:1px 8px;margin-left:6px;font-weight:700}
+.nav-r{display:flex;gap:6px;align-items:center}
+.seg{display:inline-flex;border:1px solid #fff;border-radius:8px;overflow:hidden}
+.seg button{border:0;background:transparent;color:#fff;padding:4px 10px;cursor:pointer;font-size:.85rem}
+.seg button.on{background:#fff;color:var(--navy);font-weight:700}
+.btn-out{border:1px solid #fff;background:transparent;color:#fff;border-radius:8px;padding:4px 10px;cursor:pointer;font-size:.85rem}
+.wrap{margin:0 auto;padding:8px 16px;width:100%}
+.wrap.mobile{max-width:430px}
+.wrap.pc{max-width:1100px}
+.conf{background:var(--warnBg);color:var(--warn);border:1px solid #e9c9a8;border-radius:8px;padding:4px 10px;font-size:.85rem;font-weight:500;margin-bottom:8px}
+.tabs{display:flex;gap:6px;margin-bottom:8px}
+.wrap.pc .tabs{display:none}
+.tabs button{flex:1;padding:8px;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;font-weight:500;color:var(--sub)}
+.tabs button.on{background:var(--pri);color:#fff;border-color:var(--pri);font-weight:700}
+.grid{display:block}
+@media (min-width:768px){.wrap.pc .grid{display:grid;grid-template-columns:420px 1fr;gap:12px;align-items:start}}
+.wrap.mobile .panel{display:none}
+.wrap.mobile .panel.active{display:block}
+.wrap.pc .panel{display:block;margin-bottom:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.card h2{font-size:1.05rem;color:var(--navy);margin-bottom:6px;font-weight:700}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:2px dashed #9db3cf;background:var(--priLight);border-radius:10px;padding:10px;cursor:pointer;text-align:center;color:var(--navy);font-weight:500}
+.preview{width:100%;border-radius:8px;border:1px solid var(--line);margin-top:6px;display:none}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.btn{border:1px solid var(--pri);background:var(--pri);color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:700;flex:1;min-width:90px}
+.btn.ghost{background:#fff;color:var(--pri)}
+.btn.danger{background:#fff;color:#9f1239;border-color:#9f1239}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.status{margin-top:6px;padding:4px 10px;border-radius:8px;font-size:.9rem;display:none}
+.status.ok{display:block;background:var(--okBg);color:var(--ok)}
+.status.err{display:block;background:#fde8e8;color:#7f1d1d}
+.status.info{display:block;background:var(--priLight);color:var(--navy)}
+.bar{height:6px;background:#dbe4f0;border-radius:4px;overflow:hidden;margin-top:4px;display:none}
+.bar i{display:block;height:100%;width:0;background:var(--pri)}
+.f{display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px}
+.f.two{grid-template-columns:1fr 1fr}
+label{display:block;font-size:.85rem;color:var(--sub);font-weight:500;margin-bottom:2px}
+input[type=text],input[type=email],input[type=tel],input[type=search],textarea{width:100%;border:1px solid #b8c4d4;border-radius:8px;padding:7px 10px;background:#fff}
+textarea{resize:vertical;min-height:52px}
+input:focus,textarea:focus{outline:2px solid #7fa3d1;border-color:#7fa3d1}
+.search{margin-bottom:6px}
+.count{font-size:.85rem;color:var(--sub);margin-bottom:4px}
+.list{display:grid;grid-template-columns:1fr;gap:6px}
+@media (min-width:768px){.wrap.pc .list{grid-template-columns:1fr 1fr}}
+.item{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer;display:flex;gap:8px;align-items:center}
+.item:hover{border-color:#7fa3d1;background:#f7faff}
+.item img{width:64px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--line);flex:none;background:#eee}
+.item .nm{font-weight:700;color:var(--navy)}
+.item .tt{font-size:.85rem;color:var(--sub)}
+.item .ph{font-size:.85rem;color:var(--ink)}
+.empty{text-align:center;color:var(--sub);padding:12px}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:flex-end;justify-content:center;z-index:50}
+.modal.show{display:flex}
+@media (min-width:768px){.modal{align-items:center}}
+.sheet{background:#fff;width:100%;max-width:520px;max-height:92vh;overflow:auto;border-radius:14px 14px 0 0;padding:12px 14px}
+@media (min-width:768px){.sheet{border-radius:14px}}
+.sheet h3{color:var(--navy);font-size:1.1rem}
+.sheet img.big{width:100%;border-radius:8px;border:1px solid var(--line);margin:6px 0}
+.kv{display:grid;grid-template-columns:70px 1fr;gap:2px 8px;font-size:.95rem;margin:6px 0}
+.kv b{color:var(--sub);font-weight:500}
+.kv a{color:#1d4ed8;word-break:break-all}
+.login{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
+.lbox{background:#fff;border-radius:14px;padding:16px;width:100%;max-width:320px;text-align:center}
+.lbox h2{color:var(--navy);font-size:1.15rem}
+.lbox p{color:var(--sub);font-size:.9rem;margin:4px 0 8px}
+.dots{display:flex;justify-content:center;gap:10px;margin:8px 0}
+.dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--navy);display:block}
+.dots i.on{background:var(--navy)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.pad button{padding:10px 0;border:1px solid var(--line);background:#f4f7fb;border-radius:10px;font-size:1.2rem;font-weight:700;cursor:pointer;color:var(--navy)}
+.pad button:active{background:var(--priLight)}
+.lerr{color:#7f1d1d;font-size:.9rem;min-height:1.2em;margin-top:6px}
+.foot{max-width:1100px;margin:0 auto;padding:8px 16px 16px;font-size:.8rem;color:var(--sub);text-align:center}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#1f2937;color:#fff;padding:8px 14px;border-radius:20px;font-size:.9rem;display:none;z-index:200}
+</style>
+</head>
+<body>
+
+<div class="login" id="login">
+  <div class="lbox">
+    <h2>인시스 명함관리</h2>
+    <p>비밀번호 4자리를 입력하세요</p>
+    <div class="dots" id="dots"><i></i><i></i><i></i><i></i></div>
+    <div class="pad" id="pad">
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+      <button data-k="C">지움</button><button data-k="0">0</button><button data-k="B">⌫</button>
+    </div>
+    <div class="lerr" id="lerr"></div>
+  </div>
+</div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <h1>📇 인시스 명함관리<span class="ver" id="verTop"></span></h1>
+    <div class="nav-r">
+      <div class="seg" id="viewSeg"><button data-v="mobile" class="on">모바일</button><button data-v="pc">PC</button></div>
+      <button class="btn-out" id="btnLogout">로그아웃</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap mobile" id="wrap">
+  <div class="conf">대외비 아님 · 로그인 사용자 전용 (개인정보 포함, 외부 공유 주의)</div>
+  <div class="tabs" id="tabs">
+    <button data-t="reg" class="on">📷 명함 등록</button>
+    <button data-t="list">📋 명함 목록 (<span id="cntTab">0</span>)</button>
+  </div>
+  <div class="grid">
+    <section class="panel active" id="p-reg">
+      <div class="card">
+        <h2>1. 명함 사진 입력</h2>
+        <label class="drop" for="file">📷 사진 촬영 또는 앨범에서 선택<small>선택하면 글자를 자동 인식합니다</small></label>
+        <input type="file" id="file" accept="image/*" style="display:none">
+        <img class="preview" id="preview" alt="명함 미리보기">
+        <div class="bar" id="bar"><i id="barI"></i></div>
+        <div class="status" id="ocrSt"></div>
+      </div>
+      <div class="card" style="margin-top:8px">
+        <h2>2. 정보 확인·수정</h2>
+        <div class="f two">
+          <div><label>이름</label><input type="text" id="f_name"></div>
+          <div><label>직책/직급</label><input type="text" id="f_title"></div>
+        </div>
+        <div class="f two">
+          <div><label>회사</label><input type="text" id="f_company"></div>
+          <div><label>부서</label><input type="text" id="f_dept"></div>
+        </div>
+        <div class="f two">
+          <div><label>휴대폰</label><input type="tel" id="f_mobile"></div>
+          <div><label>전화</label><input type="tel" id="f_tel"></div>
+        </div>
+        <div class="f two">
+          <div><label>팩스</label><input type="tel" id="f_fax"></div>
+          <div><label>이메일</label><input type="email" id="f_email"></div>
+        </div>
+        <div class="f">
+          <div><label>주소</label><input type="text" id="f_address"></div>
+          <div><label>홈페이지</label><input type="text" id="f_web"></div>
+          <div><label>메모</label><textarea id="f_memo"></textarea></div>
+        </div>
+        <div class="row">
+          <button class="btn" id="btnSave">💾 저장</button>
+          <button class="btn ghost" id="btnReset">초기화</button>
+        </div>
+        <div class="status" id="saveSt"></div>
+      </div>
+    </section>
+    <section class="panel" id="p-list">
+      <div class="card">
+        <h2>명함 목록</h2>
+        <input type="search" class="search" id="q" placeholder="이름·회사·전화·이메일 검색">
+        <div class="count">총 <b id="cnt">0</b>건</div>
+        <div class="list" id="list"></div>
+        <div class="row"><button class="btn ghost" id="btnCsv">📥 전체 CSV 내보내기</button></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="foot">담당부서: 인시스 AI혁신 연구개발실 · <span id="verFoot"></span> · 작성자 ys.kim@in-sys.co.kr</div>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, doc, addDoc, setDoc, deleteDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const VERSION = 'v1.0';
+const PIN = '0215';
+const COL = 'namecards';
+const app = initializeApp({
+  apiKey: "AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",
+  authDomain: "insys-work.firebaseapp.com",
+  projectId: "insys-work",
+  storageBucket: "insys-work.firebasestorage.app",
+  messagingSenderId: "225275784859",
+  appId: "1:225275784859:web:bd12815c6dc47c0c49e03e"
+});
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const FIELDS = ['name','title','company','dept','mobile','tel','fax','email','address','web','memo'];
+$('verTop').textContent = VERSION;
+$('verFoot').textContent = '인시스 명함관리 ' + VERSION;
+
+let cards = [];
+let curImg = '';
+let editId = null;
+let unsub = null;
+const deepId = new URLSearchParams(location.search).get('card');
+
+function toast(m){ const t=$('toast'); t.textContent=m; t.style.display='block'; clearTimeout(toast.t); toast.t=setTimeout(()=>t.style.display='none',2200); }
+function setSt(id, cls, msg){ const e=$(id); e.className='status '+cls; e.textContent=msg; }
+
+/* ---------- 로그인 (PIN) ---------- */
+let pin = '';
+function drawDots(){ [...$('dots').children].forEach((d,i)=>d.classList.toggle('on', i<pin.length)); }
+$('pad').addEventListener('click', async e => {
+  const k = e.target.closest('button'); if(!k) return;
+  const v = k.dataset.k; $('lerr').textContent='';
+  if(v==='C') pin=''; else if(v==='B') pin=pin.slice(0,-1); else if(pin.length<4) pin+=v;
+  drawDots();
+  if(pin.length===4){
+    if(pin===PIN){
+      try{
+        $('lerr').textContent='접속 중...';
+        sessionStorage.setItem('cardAuth','1');
+        await signInAnonymously(auth);
+        if(auth.currentUser){ $('login').style.display='none'; startListen(); }
+        $('lerr').textContent='';
+      }catch(err){
+        sessionStorage.removeItem('cardAuth');
+        console.error(err);
+        $('lerr').textContent = 'Firebase 로그인 실패: ' + (err.code||err.message) + ' (익명 로그인 사용 설정 필요)';
+        pin=''; drawDots();
+      }
+    }else{
+      $('lerr').textContent='비밀번호가 틀렸습니다';
+      pin=''; setTimeout(drawDots,150);
+    }
+  }
+});
+document.addEventListener('keydown', e => {
+  if($('login').style.display==='none') return;
+  if(/^[0-9]$/.test(e.key)) document.querySelector('#pad [data-k="'+e.key+'"]').click();
+  else if(e.key==='Backspace') document.querySelector('#pad [data-k="B"]').click();
+});
+
+onAuthStateChanged(auth, user => {
+  if(user && sessionStorage.getItem('cardAuth')==='1'){
+    $('login').style.display='none';
+    startListen();
+  }else{
+    $('login').style.display='flex';
+    if(unsub){ unsub(); unsub=null; }
+  }
+});
+$('btnLogout').onclick = async () => { sessionStorage.removeItem('cardAuth'); pin=''; drawDots(); try{ await signOut(auth);}catch(e){} };
+
+/* ---------- Firestore 실시간 ---------- */
+let deepDone = false;
+function startListen(){
+  if(unsub) return;
+  unsub = onSnapshot(collection(db, COL), snap => {
+    cards = snap.docs.map(d => ({id:d.id, ...d.data()}));
+    cards.sort((a,b) => ((b.createdAt&&b.createdAt.seconds)||0) - ((a.createdAt&&a.createdAt.seconds)||0));
+    renderList();
+    if(deepId && !deepDone){ const c = cards.find(x=>x.id===deepId); if(c){ deepDone=true; openDetail(c.id); switchTab('list'); } }
+  }, err => {
+    console.error(err);
+    toast('데이터 읽기 실패: ' + (err.code||err.message));
+  });
+}
+
+/* ---------- 화면 전환 ---------- */
+function switchTab(t){
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on', b.dataset.t===t));
+  $('p-reg').classList.toggle('active', t==='reg');
+  $('p-list').classList.toggle('active', t==='list');
+}
+$('tabs').addEventListener('click', e => { const b=e.target.closest('button'); if(b) switchTab(b.dataset.t); });
+$('viewSeg').addEventListener('click', e => {
+  const b=e.target.closest('button'); if(!b) return;
+  const v=b.dataset.v; $('wrap').className='wrap '+v;
+  document.querySelectorAll('#viewSeg button').forEach(x=>x.classList.toggle('on', x===b));
+});
+
+/* ---------- 이미지 + OCR ---------- */
+function loadImage(file){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file); const img = new Image();
+    img.onload = () => res(img); img.onerror = rej; img.src = url;
+  });
+}
+function scaled(img, max, q){
+  const r = Math.min(1, max/Math.max(img.width, img.height));
+  const c = document.createElement('canvas'); c.width=Math.round(img.width*r); c.height=Math.round(img.height*r);
+  c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+  return c;
+}
+$('file').addEventListener('change', async e => {
+  const f = e.target.files[0]; if(!f) return;
+  try{
+    const img = await loadImage(f);
+    curImg = scaled(img, 900).toDataURL('image/jpeg', 0.72);
+    const pv = $('preview'); pv.src = curImg; pv.style.display='block';
+    await runOcr(scaled(img, 1600));
+  }catch(err){
+    console.error(err); setSt('ocrSt','err','이미지를 읽지 못했습니다. 다른 사진으로 시도하세요.');
+  }
+  e.target.value='';
+});
+async function runOcr(canvas){
+  if(typeof Tesseract === 'undefined'){ setSt('ocrSt','err','OCR 엔진을 불러오지 못했습니다. 직접 입력해 주세요.'); return; }
+  setSt('ocrSt','info','글자 인식 중... (처음에는 언어 데이터 다운로드로 20~40초 걸릴 수 있습니다)');
+  $('bar').style.display='block'; $('barI').style.width='0';
+  try{
+    const r = await Tesseract.recognize(canvas, 'kor+eng', { logger: m => { if(m.status==='recognizing text') $('barI').style.width=Math.round(m.progress*100)+'%'; } });
+    const parsed = parseCard(r.data.text || '');
+    FIELDS.forEach(k => { if(parsed[k]) $('f_'+k).value = parsed[k]; });
+    setSt('ocrSt','ok','인식 완료. 아래 내용을 확인·수정한 뒤 저장하세요.');
+  }catch(err){
+    console.error(err); setSt('ocrSt','err','인식 실패. 직접 입력해 주세요.');
+  }
+  $('bar').style.display='none';
+}
+
+function parseCard(text){
+  const out = {}; const used = new Set();
+  const lines = text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  const mark = i => used.add(i);
+  const digits = s => { const d=s.replace(/\D/g,''); const a=d.startsWith('02')?2:3; const rest=d.slice(a); if(rest.length<7) return d; return d.slice(0,a)+'-'+rest.slice(0,rest.length-4)+'-'+rest.slice(-4); };
+  lines.forEach((l,i) => {
+    const em = l.match(/[A-Za-z0-9._%+-]+\s*@\s*[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
+    if(em && !out.email){ out.email = em[0].replace(/\s+/g,'').toLowerCase(); mark(i); }
+  });
+  lines.forEach((l,i) => {
+    const w = l.match(/(https?:\/\/)?www\.[A-Za-z0-9.-]+\.[A-Za-z]{2,}[^\s]*/i);
+    if(w && !out.web){ out.web = w[0].toLowerCase(); mark(i); }
+  });
+  lines.forEach((l,i) => {
+    if(/fax|팩스|^F\b|^F[.:]/i.test(l) && !out.fax){ const m=l.match(/0\d{1,2}[\s\-.)]*\d{3,4}[\s\-.]*\d{4}/); if(m){ out.fax=digits(m[0]); mark(i);} return; }
+    const mob = l.match(/01[016789][\s\-.]*\d{3,4}[\s\-.]*\d{4}/);
+    if(mob && !out.mobile && /mobile|mob|휴대|핸드폰|H\.?P|M[.:]|^M\b/i.test(l) || (mob && !out.mobile && !/tel|전화|fax|팩스/i.test(l))){ out.mobile=digits(mob[0]); mark(i); return; }
+    if(/tel|전화|T[.:]|^T\b/i.test(l) && !out.tel){ const m=l.match(/0\d{1,2}[\s\-.)]*\d{3,4}[\s\-.]*\d{4}/); if(m){ out.tel=digits(m[0]); mark(i);} }
+  });
+  const titleRe = /(대표|사장|부사장|전무|상무|이사|본부장|실장|부장|차장|과장|대리|사원|팀장|파트장|주임|책임|선임|수석|프로|Manager|Engineer|Director|President|CEO|CTO|Sales|Account|Specialist|Leader|Head)/i;
+  const compRe = /(주식회사|\(주\)|㈜|Corp|Inc|Co\.|Ltd|Limited|코리아|Korea|그룹|Group|Company)/i;
+  const addrRe = /(서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주).*(시|구|군|로|길|동|읍|면)|\d+\s*(층|호)|(로|길)\s*\d+/;
+  lines.forEach((l,i) => {
+    if(used.has(i)) return;
+    if(!out.address && addrRe.test(l)){ out.address=l; mark(i); return; }
+  });
+  lines.forEach((l,i) => {
+    if(used.has(i)) return;
+    const compact = l.replace(/\s+/g,'');
+    if(!out.name){
+      const m = compact.match(/^([가-힣]{2,4})(대표|사장|부사장|전무|상무|이사|본부장|실장|부장|차장|과장|대리|사원|팀장|프로|책임|선임|수석)?$/);
+      if(m){ out.name=m[1]; if(m[2] && !out.title) out.title=m[2]; mark(i); return; }
+    }
+  });
+  lines.forEach((l,i) => {
+    if(used.has(i)) return;
+    if(titleRe.test(l) && l.length<40){ out.title = out.title ? (out.title===l ? l : l+' / '+out.title) : l; mark(i); return; }
+  });
+  lines.forEach((l,i) => {
+    if(used.has(i)) return;
+    if(!out.company && compRe.test(l) && l.length<40){ out.company=l; mark(i); return; }
+  });
+  if(!out.name){
+    const en = lines.find((l,i)=>!used.has(i) && /^[A-Z][a-z]+(\s[A-Z][a-z]+){1,2}$/.test(l));
+    if(en) out.name=en;
+  }
+  if(!out.company && out.email){
+    const d = out.email.split('@')[1]; if(d) out.company = d.split('.')[0].toUpperCase();
+  }
+  return out;
+}
+
+/* ---------- 저장/초기화 ---------- */
+function getForm(){ const o={}; FIELDS.forEach(k=>o[k]=$('f_'+k).value.trim()); return o; }
+function setForm(o){ FIELDS.forEach(k=>$('f_'+k).value=(o&&o[k])||''); }
+function resetForm(){
+  setForm({}); curImg=''; editId=null;
+  $('preview').style.display='none'; $('preview').src=''; $('ocrSt').className='status'; $('saveSt').className='status';
+  $('btnSave').textContent='💾 저장';
+}
+$('btnReset').onclick = resetForm;
+$('btnSave').onclick = async () => {
+  const d = getForm();
+  if(!d.name && !d.company){ setSt('saveSt','err','이름 또는 회사를 입력하세요.'); return; }
+  $('btnSave').disabled = true;
+  try{
+    const data = { ...d, img: curImg || '', updatedAt: serverTimestamp() };
+    if(editId){ await setDoc(doc(db, COL, editId), data, { merge:true }); setSt('saveSt','ok','수정되었습니다.'); }
+    else { data.createdAt = serverTimestamp(); await addDoc(collection(db, COL), data); setSt('saveSt','ok','저장되었습니다.'); }
+    toast('저장 완료');
+    setTimeout(() => { resetForm(); switchTab('list'); }, 600);
+  }catch(err){
+    console.error(err);
+    setSt('saveSt','err','저장 실패: ' + (err.code||err.message) + (String(err.code).includes('permission') ? ' (Firestore 규칙에 namecards 추가 필요)' : ''));
+  }
+  $('btnSave').disabled = false;
+};
+
+/* ---------- 목록/검색 ---------- */
+function renderList(){
+  const q = $('q').value.trim().toLowerCase();
+  const rows = cards.filter(c => !q || FIELDS.some(k => String(c[k]||'').toLowerCase().includes(q)));
+  $('cnt').textContent = rows.length; $('cntTab').textContent = cards.length;
+  $('list').innerHTML = rows.length ? rows.map(c => `
+    <div class="item" data-id="${esc(c.id)}">
+      ${c.img ? `<img src="${esc(c.img)}" alt="">` : `<img alt="" style="visibility:hidden">`}
+      <div style="min-width:0">
+        <div class="nm">${esc(c.name||'(이름없음)')} <span class="tt">${esc(c.title||'')}</span></div>
+        <div class="tt">${esc(c.company||'')} ${esc(c.dept||'')}</div>
+        <div class="ph">${esc(c.mobile||c.tel||'')}</div>
+      </div>
+    </div>`).join('') : '<div class="empty">등록된 명함이 없습니다.</div>';
+}
+$('q').addEventListener('input', renderList);
+$('list').addEventListener('click', e => { const it=e.target.closest('.item'); if(it) openDetail(it.dataset.id); });
+
+/* ---------- 상세/공유 ---------- */
+function shareText(c){
+  return [c.name+(c.title?' '+c.title:''), c.company+(c.dept?' '+c.dept:''), c.mobile&&'휴대폰 '+c.mobile, c.tel&&'전화 '+c.tel, c.fax&&'팩스 '+c.fax, c.email, c.address, c.web].filter(Boolean).join('\n');
+}
+function vcard(c){
+  const v = ['BEGIN:VCARD','VERSION:3.0','FN:'+(c.name||''),'N:'+(c.name||'')+';;;;'];
+  if(c.company) v.push('ORG:'+c.company+(c.dept?';'+c.dept:''));
+  if(c.title) v.push('TITLE:'+c.title);
+  if(c.mobile) v.push('TEL;TYPE=CELL:'+c.mobile);
+  if(c.tel) v.push('TEL;TYPE=WORK:'+c.tel);
+  if(c.fax) v.push('TEL;TYPE=FAX:'+c.fax);
+  if(c.email) v.push('EMAIL:'+c.email);
+  if(c.address) v.push('ADR;TYPE=WORK:;;'+c.address+';;;;');
+  if(c.web) v.push('URL:'+c.web);
+  if(c.memo) v.push('NOTE:'+c.memo.replace(/\n/g,' '));
+  v.push('END:VCARD'); return v.join('\r\n');
+}
+function download(name, text, type){
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; document.body.appendChild(a); a.click(); a.remove();
+}
+function openDetail(id){
+  const c = cards.find(x=>x.id===id); if(!c) return;
+  const kv = (k,v,link) => v ? `<b>${k}</b><span>${link?`<a href="${esc(link)}">${esc(v)}</a>`:esc(v)}</span>` : '';
+  const web = c.web ? (/^https?:/i.test(c.web)?c.web:'https://'+c.web) : '';
+  $('sheet').innerHTML = `
+    <h3>${esc(c.name||'(이름없음)')} <small style="font-weight:400;color:#374151">${esc(c.title||'')}</small></h3>
+    ${c.img?`<img class="big" src="${esc(c.img)}" alt="명함">`:''}
+    <div class="kv">
+      ${kv('회사',c.company)}${kv('부서',c.dept)}
+      ${kv('휴대폰',c.mobile,c.mobile?'tel:'+c.mobile:'')}${kv('전화',c.tel,c.tel?'tel:'+c.tel:'')}${kv('팩스',c.fax)}
+      ${kv('이메일',c.email,c.email?'mailto:'+c.email:'')}${kv('주소',c.address)}${kv('홈페이지',c.web,web)}${kv('메모',c.memo)}
+    </div>
+    <div class="row">
+      <button class="btn" data-a="share">📤 공유</button>
+      <button class="btn ghost" data-a="vcf">📇 연락처(vCard)</button>
+      <button class="btn ghost" data-a="link">🔗 링크복사</button>
+    </div>
+    <div class="row">
+      <button class="btn ghost" data-a="edit">✏️ 수정</button>
+      <button class="btn danger" data-a="del">🗑 삭제</button>
+      <button class="btn ghost" data-a="close">닫기</button>
+    </div>`;
+  $('sheet').dataset.id = id;
+  $('modal').classList.add('show');
+}
+$('modal').addEventListener('click', async e => {
+  if(e.target===$('modal')){ $('modal').classList.remove('show'); return; }
+  const b = e.target.closest('button[data-a]'); if(!b) return;
+  const id = $('sheet').dataset.id; const c = cards.find(x=>x.id===id); const a = b.dataset.a;
+  if(a==='close') $('modal').classList.remove('show');
+  else if(a==='share'){
+    const t = shareText(c);
+    if(navigator.share){ try{ await navigator.share({title:(c.name||'명함'), text:t}); }catch(e){} }
+    else { try{ await navigator.clipboard.writeText(t); toast('명함 정보가 복사되었습니다'); }catch(e){ toast('복사 실패'); } }
+  }
+  else if(a==='vcf'){ download((c.name||'card')+'.vcf', vcard(c), 'text/vcard;charset=utf-8'); }
+  else if(a==='link'){
+    const url = location.origin + location.pathname + '?card=' + id;
+    try{ await navigator.clipboard.writeText(url); toast('링크가 복사되었습니다 (로그인 필요)'); }catch(e){ toast('복사 실패'); }
+  }
+  else if(a==='edit'){
+    setForm(c); curImg = c.img||''; editId = id;
+    if(curImg){ $('preview').src=curImg; $('preview').style.display='block'; }
+    $('btnSave').textContent='💾 수정 저장';
+    $('modal').classList.remove('show'); switchTab('reg'); window.scrollTo({top:0,behavior:'smooth'});
+  }
+  else if(a==='del'){
+    if(!confirm((c.name||'이 명함')+' 명함을 삭제할까요?')) return;
+    try{ await deleteDoc(doc(db, COL, id)); $('modal').classList.remove('show'); toast('삭제되었습니다'); }
+    catch(err){ console.error(err); toast('삭제 실패: '+(err.code||err.message)); }
+  }
+});
+
+/* ---------- CSV ---------- */
+$('btnCsv').onclick = () => {
+  if(!cards.length){ toast('내보낼 명함이 없습니다'); return; }
+  const head = ['이름','직책','회사','부서','휴대폰','전화','팩스','이메일','주소','홈페이지','메모'];
+  const keys = ['name','title','company','dept','mobile','tel','fax','email','address','web','memo'];
+  const q = v => '"'+String(v||'').replace(/"/g,'""')+'"';
+  const csv = '﻿' + [head.map(q).join(',')].concat(cards.map(c=>keys.map(k=>q(c[k])).join(','))).join('\r\n');
+  download('명함목록.csv', csv, 'text/csv;charset=utf-8');
+};
+</script>
+</body>
+</html>
