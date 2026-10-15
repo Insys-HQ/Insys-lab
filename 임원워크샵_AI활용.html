@@ -54,6 +54,10 @@ body.pc .frame{max-width:1100px}
 .ck{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 .ck input{width:18px;height:18px;accent-color:#1e3a5f;cursor:pointer}
 .sumrow td{background:#e8eef6;color:#1e3a5f;font-weight:700}
+.sumbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#e8eef6;border:1px solid #b8c6d9;border-radius:12px;padding:8px 12px;margin:8px 0}
+.sumtxt{display:flex;flex-direction:column;flex:1 1 180px;color:#1e3a5f}
+.sumtxt span{color:#374151;font-size:0.875rem}
+.sumtot{color:#1e3a5f;font-weight:900;font-size:1.25rem}
 .ctl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
 .ctl button{background:#ffffff;color:#1e3a5f;border:1px solid #b8c6d9;border-radius:8px;padding:4px 10px;font-size:0.875rem;font-family:inherit;cursor:pointer}
 .ctl span{color:#374151;font-size:0.875rem}
@@ -107,7 +111,7 @@ a{color:#1e4f9a}
     <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
     <button type="submit" class="go" id="gateBtn">확인</button>
     <div class="gate-err" id="gateErr" role="alert"></div>
-    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.2</span></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.3</span></div>
   </form>
 </div>
 
@@ -121,7 +125,7 @@ a{color:#1e4f9a}
         <button type="button" id="btnPc">PC</button>
       </div>
       <button type="button" class="btn" id="btnAll">전체 펼치기</button>
-      <span class="ver" id="verBadge">v1.2</span>
+      <span class="ver" id="verBadge">v1.3</span>
     </div>
   </div>
 </div>
@@ -137,30 +141,13 @@ a{color:#1e4f9a}
     </div>
   </div>
 
-  <details class="card" open id="agenda">
-    <summary><span class="no">◎</span>진행 순서</summary>
-    <div class="body">
-      <div class="tbl"><table>
-        <tr><th>선택 #</th><th>파트</th><th>시간</th></tr>
-        <tr data-p="1" data-min="10"><td><label class="ck"><input type="checkbox" class="sel" data-p="1" checked aria-label="1번 포함">1</label></td><td>포털 소개</td><td>10분</td></tr>
-        <tr data-p="2" data-min="15"><td><label class="ck"><input type="checkbox" class="sel" data-p="2" checked aria-label="2번 포함">2</label></td><td>ERP 즐겨찾기·숨은 기능</td><td>15분</td></tr>
-        <tr data-p="3" data-min="10"><td><label class="ck"><input type="checkbox" class="sel" data-p="3" checked aria-label="3번 포함">3</label></td><td>WIKI·게시판 활용</td><td>10분</td></tr>
-        <tr data-p="4" data-min="15"><td><label class="ck"><input type="checkbox" class="sel" data-p="4" checked aria-label="4번 포함">4</label></td><td>AI 비서 사용법, 좋아요/나빠요</td><td>15분</td></tr>
-        <tr data-p="5" data-min="10"><td><label class="ck"><input type="checkbox" class="sel" data-p="5" checked aria-label="5번 포함">5</label></td><td>클로드 코드 소개</td><td>10분</td></tr>
-        <tr data-p="6" data-min="15"><td><label class="ck"><input type="checkbox" class="sel" data-p="6" checked aria-label="6번 포함">6</label></td><td>에이전트 설정·사용법</td><td>15분</td></tr>
-        <tr data-p="7" data-min="10"><td><label class="ck"><input type="checkbox" class="sel" data-p="7" checked aria-label="7번 포함">7</label></td><td>하네스 소개</td><td>10분</td></tr>
-        <tr data-p="8" data-min="15"><td><label class="ck"><input type="checkbox" class="sel" data-p="8" checked aria-label="8번 포함">8</label></td><td>예시 시연</td><td>15분</td></tr>
-        <tr data-p="9" data-min="20"><td><label class="ck"><input type="checkbox" class="sel" data-p="9" checked aria-label="9번 포함">9</label></td><td>토의: 그룹 전체 조직도 재구성</td><td>20분</td></tr>
-      <tr class="sumrow"><td colspan="2" id="sumLabel">선택 합계</td><td id="sumTime">120분</td></tr>
-      </table></div>
-      <div class="ctl"><button type="button" id="selAll">전체 선택</button><button type="button" id="selNone">전체 해제</button><span id="sumNote"></span></div>
-      <div class="toc" style="margin-top:6px">
-        <a href="#p1">1</a><a href="#p2">2</a><a href="#p3">3</a><a href="#p4">4</a><a href="#p5">5</a><a href="#p6">6</a><a href="#p7">7</a><a href="#p8">8</a><a href="#p9">9</a>
-      </div>
-    </div>
-  </details>
+  <div class="sumbar" id="agenda">
+    <div class="sumtxt"><b>이번에 진행할 파트를 체크하세요</b><span id="sumNote">9개 파트 · 120분 (2시간)</span></div>
+    <div class="sumtot"><span id="sumTime">120분</span></div>
+    <div class="ctl"><button type="button" id="selAll">전체 선택</button><button type="button" id="selNone">전체 해제</button></div>
+  </div>
 
-  <details class="card" id="p1">
+  <details class="card" id="p1" data-min="10">
     <summary><label class="ck"><input type="checkbox" class="sel" data-p="1" checked aria-label="1번 포함"></label><span class="no">1</span>포털 소개<span class="tm">10분</span></summary>
     <div class="body">
       <h4>목적</h4>
@@ -172,7 +159,7 @@ a{color:#1e4f9a}
     </div>
   </details>
 
-  <details class="card" id="p2">
+  <details class="card" id="p2" data-min="15">
     <summary><label class="ck"><input type="checkbox" class="sel" data-p="2" checked aria-label="2번 포함"></label><span class="no">2</span>ERP 즐겨찾기·숨은 기능<span class="tm">15분</span></summary>
     <div class="body">
       <h4>즐겨찾기 활용</h4>
@@ -188,7 +175,7 @@ a{color:#1e4f9a}
     </div>
   </details>
 
-  <details class="card" id="p3">
+  <details class="card" id="p3" data-min="10">
     <summary><label class="ck"><input type="checkbox" class="sel" data-p="3" checked aria-label="3번 포함"></label><span class="no">3</span>WIKI·게시판 활용<span class="tm">10분</span></summary>
     <div class="body">
       <h4>WIKI</h4>
@@ -199,7 +186,7 @@ a{color:#1e4f9a}
     </div>
   </details>
 
-  <details class="card" id="p4">
+  <details class="card" id="p4" data-min="15">
     <summary><label class="ck"><input type="checkbox" class="sel" data-p="4" checked aria-label="4번 포함"></label><span class="no">4</span>AI 비서 사용법, 좋아요/나빠요<span class="tm">15분</span></summary>
     <div class="body">
       <h4>잘 묻는 4가지 요소</h4>
@@ -216,7 +203,7 @@ a{color:#1e4f9a}
     </div>
   </details>
 
-  <details class="card" id="p5">
+  <details class="card" id="p5" data-min="10">
     <summary><label class="ck"><input type="checkbox" class="sel" data-p="5" checked aria-label="5번 포함"></label><span class="no">5</span>클로드 코드 소개<span class="tm">10분</span></summary>
     <div class="body">
       <h4>무엇인가</h4>
@@ -232,7 +219,7 @@ a{color:#1e4f9a}
     </div>
   </details>
 
-  <details class="card" id="p6">
+  <details class="card" id="p6" data-min="15">
     <summary><label class="ck"><input type="checkbox" class="sel" data-p="6" checked aria-label="6번 포함"></label><span class="no">6</span>에이전트 설정·사용법<span class="tm">15분</span></summary>
     <div class="body">
       <h4>에이전트와 서브에이전트</h4>
@@ -259,7 +246,7 @@ model: sonnet
     </div>
   </details>
 
-  <details class="card" id="p7">
+  <details class="card" id="p7" data-min="10">
     <summary><label class="ck"><input type="checkbox" class="sel" data-p="7" checked aria-label="7번 포함"></label><span class="no">7</span>하네스 소개<span class="tm">10분</span></summary>
     <div class="body">
       <h4>하네스란</h4>
@@ -277,7 +264,7 @@ model: sonnet
     </div>
   </details>
 
-  <details class="card" id="p8">
+  <details class="card" id="p8" data-min="15">
     <summary><label class="ck"><input type="checkbox" class="sel" data-p="8" checked aria-label="8번 포함"></label><span class="no">8</span>예시 시연<span class="tm">15분</span></summary>
     <div class="body">
       <div class="tbl"><table>
@@ -293,7 +280,7 @@ model: sonnet
     </div>
   </details>
 
-  <details class="card" id="p9">
+  <details class="card" id="p9" data-min="20">
     <summary><label class="ck"><input type="checkbox" class="sel" data-p="9" checked aria-label="9번 포함"></label><span class="no">9</span>토의: 그룹 전체 조직도 재구성<span class="tm">20분</span></summary>
     <div class="body">
       <h4>진행 방식</h4>
@@ -312,7 +299,7 @@ model: sonnet
     </div>
   </details>
 
-  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v1.2</span></div>
+  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v1.3</span></div>
 
 </div></div>
 </div>
@@ -321,7 +308,7 @@ model: sonnet
 
 <script>
 (function(){
-  var VERSION = 'v1.2';
+  var VERSION = 'v1.3';
   document.getElementById('verBadge').textContent = VERSION;
   document.getElementById('verFoot').textContent = VERSION;
 
@@ -398,13 +385,11 @@ model: sonnet
   var STORE = 'ws_sel_v12';
   function calc(){
     var total = 0, cnt = 0;
-    var rows = document.querySelectorAll('tr[data-p]');
-    for(var i=0;i<rows.length;i++){
-      var p = rows[i].getAttribute('data-p');
-      var on = document.querySelector('#agenda input.sel[data-p="'+p+'"]').checked;
-      rows[i].classList.toggle('off', !on);
-      document.getElementById('p'+p).classList.toggle('off', !on);
-      if(on){ total += parseInt(rows[i].getAttribute('data-min'),10); cnt++; }
+    for(var i=1;i<=9;i++){
+      var card = document.getElementById('p'+i);
+      var on = card.querySelector('input.sel').checked;
+      card.classList.toggle('off', !on);
+      if(on){ total += parseInt(card.getAttribute('data-min'),10); cnt++; }
     }
     var h = Math.floor(total/60), m = total%60;
     var hm = total >= 60 ? ' (' + h + '시간' + (m ? ' ' + m + '분' : '') + ')' : '';
@@ -416,7 +401,7 @@ model: sonnet
   }
   function saveSel(){
     try{
-      var a = []; var l = document.querySelectorAll('#agenda input.sel');
+      var a = []; var l = document.querySelectorAll('details.card input.sel');
       for(var i=0;i<l.length;i++){ a.push(l[i].checked ? 1 : 0); }
       localStorage.setItem(STORE, a.join(''));
     }catch(e){}
