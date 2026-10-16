@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="robots" content="noindex, nofollow">
-<title>면접 평가서 v1.0 | 인시스 AI혁신 연구개발실</title>
+<title>면접 평가서 v1.1 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -140,6 +140,14 @@ textarea.ta{width:100%;min-height:64px;padding:6px 8px;border:1px solid #b9c5d4;
 
     <div class="card" id="stCard"><div class="status" id="boot">Firebase 연결 중...</div></div>
 
+    <div class="card" id="regCard" hidden>
+      <h2>지원자 자료 등록</h2>
+      <p class="q-p">지원자 자료(JSON)를 붙여넣고 [등록]을 누르면 Firebase에만 저장됩니다. GitHub에는 저장되지 않습니다.</p>
+      <textarea class="ta" id="regJson" placeholder='{"name":"...","position":"...","tags":[],"strengths":[],"checks":[],"links":[],"ind":[["P1","질문","평가 포인트"]]}'></textarea>
+      <div class="btns noprint"><button class="btn" id="btnReg" type="button">등록</button></div>
+      <div class="status" id="regSt"></div>
+    </div>
+
     <!-- 삭제 확인 화면 (#verify) -->
     <div class="card" id="verifyCard" hidden>
       <h2>데이터 삭제 확인</h2>
@@ -256,7 +264,7 @@ textarea.ta{width:100%;min-height:64px;padding:6px 8px;border:1px solid #b9c5d4;
 <script>
 (function(){
 'use strict';
-var VERSION='v1.0';
+var VERSION='v1.1';
 var GATE_HASH='c8fee275c283170bbac1048791c5d751fcbb1e06c48a7ba574232e0702095e3a';
 var CASE_ID='c2610-01';
 var COL='interview_records';
@@ -459,7 +467,7 @@ function vRow(label,ok,text){
   return '<div class="vr"><div class="vl">'+esc(label)+'</div><div class="vv '+(ok===true?'ok':ok===false?'bad':'wait')+'">'+esc(text)+'</div></div>';
 }
 function showVerify(){
-  $('formBox').hidden=true;$('verifyCard').hidden=false;$('stCard').hidden=true;
+  $('regCard').hidden=true;$('formBox').hidden=true;$('verifyCard').hidden=false;$('stCard').hidden=true;
   $('lnkGh').href='https://github.com/'+GH_REPO+'/blob/main/'+PAGE_FILE;
   runVerify();
 }
@@ -523,12 +531,29 @@ function loadCase(){
   setBoot('지원자 자료를 불러오는 중...');
   fdb.collection(COL).doc(CASE_ID).get().then(function(s){
     if(!s.exists){
-      $('formBox').hidden=true;$('verifyCard').hidden=true;
+      $('formBox').hidden=true;$('verifyCard').hidden=true;$('regCard').hidden=false;
       setBoot('등록된 지원자 자료가 없습니다 (미등록 또는 삭제 완료). 삭제 여부는 <a href="#verify">삭제 확인</a>에서 확인하세요.',true);
       return;
     }
-    caseData=s.data();renderCase();showForm();
+    caseData=s.data();$('regCard').hidden=true;renderCase();showForm();
   }).catch(function(e){setBoot('자료 조회 실패: '+(e&&e.code?e.code:e.message)+' (Firestore 보안 규칙·로그인 확인 필요)');});
+}
+
+/* ---------- 지원자 자료 등록 ---------- */
+function registerCase(){
+  var st=$('regSt');
+  if(!fdb){st.textContent='Firebase에 연결되지 않았습니다.';return;}
+  var o;
+  try{o=JSON.parse($('regJson').value);}catch(e){st.textContent='JSON 형식이 올바르지 않습니다.';return;}
+  if(!o||typeof o.name!=='string'||!o.name||!Array.isArray(o.ind)){st.textContent='name(문자열)과 ind(배열) 항목이 필요합니다.';return;}
+  var d={name:String(o.name),position:String(o.position||''),tags:(o.tags||[]).map(String),strengths:(o.strengths||[]).map(String),
+    checks:(o.checks||[]).map(String),links:(o.links||[]).filter(function(l){return l&&/^https:\/\//.test(l.url||'');}).map(function(l){return {label:String(l.label||'링크'),url:String(l.url)};}),
+    ind:o.ind.map(function(q){return [String(q[0]),String(q[1]),String(q[2]||'')];}),
+    registeredAt:firebase.firestore.FieldValue.serverTimestamp(),version:VERSION};
+  st.textContent='등록 중...';
+  fdb.collection(COL).doc(CASE_ID).set(d).then(function(){
+    $('regJson').value='';st.textContent='';loadCase();
+  }).catch(function(e){st.textContent='등록 실패: '+(e&&e.code?e.code:e.message)+' (보안 규칙·로그인 확인)';});
 }
 
 /* ---------- 로그인·Firebase ---------- */
@@ -601,6 +626,7 @@ function init(){
   $('btnCert').addEventListener('click',openCert);
   $('btnReset').addEventListener('click',resetAll);
   $('btnDel').addEventListener('click',deleteAll);
+  $('btnReg').addEventListener('click',registerCase);
   $('btnReVerify').addEventListener('click',runVerify);
   $('cPrint').addEventListener('click',printCert);
   $('cClose').addEventListener('click',function(){$('certWrap').style.display='none';});
