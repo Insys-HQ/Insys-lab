@@ -116,7 +116,7 @@ a{color:#1e4f9a}
     <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
     <button type="submit" class="go" id="gateBtn">확인</button>
     <div class="gate-err" id="gateErr" role="alert"></div>
-    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.8</span></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.9</span></div>
   </form>
 </div>
 
@@ -130,7 +130,7 @@ a{color:#1e4f9a}
         <button type="button" id="btnPc" class="on">PC</button>
       </div>
       <button type="button" class="btn" id="btnAll">전체 펼치기</button>
-      <span class="ver" id="verBadge">v1.8</span>
+      <span class="ver" id="verBadge">v1.9</span>
     </div>
   </div>
 </div>
@@ -140,15 +140,15 @@ a{color:#1e4f9a}
 
   <div class="cover">
     <h1>포털·ERP 활용과<br>AI 업무혁신 워크샵</h1>
-    <p>ERP 숨은 기능, WIKI, AI 비서, 클로드 코드, 에이전트·하네스, 그룹 조직도 재구성 토의</p>
+    <p>ERP 숨은 기능, WIKI, AI 비서, 개선요청 따라하기, 비전 2030, 그룹 조직도 재구성 토의</p>
     <div class="chips">
-      <span class="chip" id="chipTime">약 120분</span><span class="chip" id="chipCnt">9개 파트</span><span class="chip">2026년 10월</span><span class="chip">담당: 인시스 AI혁신 연구개발실</span>
+      <span class="chip" id="chipTime">약 125분</span><span class="chip" id="chipCnt">8개 파트</span><span class="chip">2026년 10월</span><span class="chip">담당: 인시스 AI혁신 연구개발실</span>
     </div>
   </div>
 
   <div class="sumbar" id="agenda">
-    <div class="sumtxt"><b>이번에 진행할 파트를 체크하세요</b><span id="sumNote">9개 파트 · 120분 (2시간)</span></div>
-    <div class="sumtot"><span id="sumTime">120분</span></div>
+    <div class="sumtxt"><b>이번에 진행할 파트를 체크하세요</b><span id="sumNote">8개 파트 · 125분 (2시간 5분)</span></div>
+    <div class="sumtot"><span id="sumTime">125분</span></div>
     <div class="ctl"><button type="button" id="selAll">전체 선택</button><button type="button" id="selNone">전체 해제</button></div>
   </div>
 
@@ -218,71 +218,44 @@ a{color:#1e4f9a}
   </details>
 
   <details class="card" id="p5" data-min="10">
-    <summary><label class="ck"><input type="checkbox" class="sel" data-p="5" checked aria-label="5번 포함"></label><span class="no">5</span>클로드 코드 소개<span class="tm">10분</span></summary>
+    <summary><label class="ck"><input type="checkbox" class="sel" data-p="5" checked aria-label="5번 포함"></label><span class="no">5</span>개선요청 따라하기<span class="tm">10분</span></summary>
     <div class="body">
-      <p class="plink"><a class="yt" href="https://www.youtube.com/watch?v=C6xlOsQFyOQ" target="_blank" rel="noopener">▶ 클로드 코드 시작 가이드 영상</a> <a class="yt2" href="https://docs.claude.com/en/docs/claude-code/overview" target="_blank" rel="noopener">공식 소개 ↗</a><span class="ytnote">유튜브 검색 결과 기준 추천 영상</span></p>
-      <h4>무엇인가</h4>
-      <p>채팅처럼 대화하지만, 내 PC의 파일을 읽고 문서를 만들고 명령까지 실행하는 AI 작업 도구입니다. 터미널, 개발도구(IDE), 데스크톱 앱, 웹에서 쓸 수 있습니다.</p>
+      <p class="plink"><a href="https://insys-erp.teulai.com/portal/home" target="_blank" rel="noopener">Insys 포털 열기 ↗</a></p>
+      <h4>목적</h4>
+      <ul><li>불편한 점·추가했으면 하는 기능을 포털에서 직접 접수하고 처리 결과까지 확인</li><li>임원이 한 건 직접 등록해 보면 현장 직원에게 안내하기 쉬움</li></ul>
+      <h4>화면 구성</h4>
       <div class="tbl"><table>
-        <tr><th>구분</th><th>클로드 채팅</th><th>클로드 코드</th></tr>
-        <tr><td>결과물</td><td>대화로 답변</td><td>파일로 직접 저장</td></tr>
-        <tr><td>PC 파일</td><td>업로드한 것만</td><td>연결한 폴더 전체</td></tr>
-        <tr><td>반복 작업</td><td>매번 요청</td><td>예약 작업, 자동 실행</td></tr>
-        <tr><td>규칙 기억</td><td>대화 안에서</td><td>설정 파일에 고정</td></tr>
+        <tr><th>구분</th><th>내용</th></tr>
+        <tr><td>목록 / 통계</td><td>상단 탭으로 요청 목록과 통계를 전환</td></tr>
+        <tr><td>상태 필터</td><td>전체 · 접수 · 완료 · 보류 건수를 한눈에 확인</td></tr>
+        <tr><td>검색·정렬</td><td>제목·등록자·요청자·유형으로 검색, 요청일 기준 정렬</td></tr>
+        <tr><td>신규 요청</td><td>우측 상단 "+ 신규 요청" 버튼</td></tr>
+        <tr><td>상세 화면</td><td>내용, 발생 화면, 첨부, 운영자 회신을 한 곳에서 확인</td></tr>
       </table></div>
-      <div class="tip">데스크톱 앱에 로그인하면 Code 탭에서 바로 시작할 수 있습니다 (유료 플랜 필요).</div>
+      <h4>따라하기 5단계</h4>
+      <div class="tbl"><table>
+        <tr><th>단계</th><th>할 일</th></tr>
+        <tr><td>1</td><td>포털에서 개선요청 현황 화면 열기</td></tr>
+        <tr><td>2</td><td>"+ 신규 요청" 누르기</td></tr>
+        <tr><td>3</td><td>유형(개선요청·오류·문의) 선택, 제목과 내용 입력</td></tr>
+        <tr><td>4</td><td>불편한 화면을 캡처해 Ctrl+V로 붙여넣기 (파일 첨부도 가능)</td></tr>
+        <tr><td>5</td><td>접수 후 운영자 회신 확인 (접수 → 완료 / 보류)</td></tr>
+      </table></div>
+      <h4>잘 쓰는 요령</h4>
+      <ul><li>어느 화면에서 생긴 일인지(발생 화면)와 원하는 모습을 함께 적기</li><li>캡처 한 장이면 처리 속도가 빨라짐</li><li>하나의 요청에는 하나의 주제만 담기</li></ul>
+      <h4>현황 (2026. 10. 16 화면 기준)</h4>
+      <div class="tbl"><table>
+        <tr><th>전체</th><th>접수</th><th>완료</th><th>보류</th><th>완료율</th></tr>
+        <tr><td>249건</td><td>2건</td><td>242건</td><td>5건</td><td>약 97%</td></tr>
+      </table></div>
+      <h4>접수된 요청 사례</h4>
+      <ul><li>메일에서 같은 이름의 직원을 직위·부서로 구분해서 보이게 해 달라</li><li>외근 시 사용할 차량 선택 기능</li><li>결재 양식 추가 요청</li><li>WIKI 표에서 셀 병합이 안 되는 문제</li></ul>
+      <div class="note">시연할 때는 "테스트" 요청을 한 건 등록해 접수부터 회신 확인까지 보여줍니다. 개인 이름과 메일 주소는 이 자료에 넣지 않았습니다.</div>
     </div>
   </details>
 
   <details class="card" id="p6" data-min="15">
-    <summary><label class="ck"><input type="checkbox" class="sel" data-p="6" checked aria-label="6번 포함"></label><span class="no">6</span>에이전트 설정·사용법<span class="tm">15분</span></summary>
-    <div class="body">
-      <p class="plink"><a class="yt" href="https://www.youtube.com/watch?v=2eqPBLgVH0U" target="_blank" rel="noopener">▶ 스킬·서브에이전트·커맨드 개념 영상</a><span class="ytnote">유튜브 검색 결과 기준 추천 영상</span></p>
-      <h4>에이전트와 서브에이전트</h4>
-      <div class="tbl"><table>
-        <tr><th>구분</th><th>에이전트(메인)</th><th>서브에이전트</th></tr>
-        <tr><td>역할</td><td>대화하며 전체 지휘</td><td>맡은 한 가지 작업만 수행</td></tr>
-        <tr><td>맥락</td><td>전체 대화를 앎</td><td>새로 시작, 지시문만 앎</td></tr>
-        <tr><td>결과</td><td>사용자와 직접 소통</td><td>요약만 메인에게 보고</td></tr>
-      </table></div>
-      <h4>만드는 법</h4>
-      <p>말로 시키면 파일을 대신 만들어 줍니다. 직접 만들 때는 아래 파일 1개면 충분합니다.</p>
-      <div class="code-head"><span>예시: 문서 검토 에이전트</span><button type="button" class="btn" id="btnCopy">코드 복사</button></div>
-<pre id="agentCode">---
-name: doc-reviewer
-description: 문서의 오탈자, 숫자 불일치, 버전 표기 누락을 점검. 문서 작성 후 사용.
-tools: Read, Grep, Glob
-model: sonnet
----
-
-당신은 문서 검토 담당입니다. 오류를 우선순위별로
-(필수 수정 / 권장 수정 / 제안) 정리하고 수정 예시를 함께 제시하세요.</pre>
-      <h4>저장 위치와 호출</h4>
-      <ul><li>내 전체 프로젝트: ~/.claude/agents/ , 현재 프로젝트만: .claude/agents/</li><li>호출: "doc-reviewer로 이 보고서 검토해줘" 또는 @ 멘션</li><li>여러 에이전트에게 동시에 조사를 맡기는 병렬 작업 가능</li></ul>
-    </div>
-  </details>
-
-  <details class="card" id="p7" data-min="10">
-    <summary><label class="ck"><input type="checkbox" class="sel" data-p="7" checked aria-label="7번 포함"></label><span class="no">7</span>하네스 소개<span class="tm">10분</span></summary>
-    <div class="body">
-      <p class="plink"><a class="yt" href="https://www.youtube.com/watch?v=2n8eg8eLWhQ" target="_blank" rel="noopener">▶ 15분 하네스 엔지니어링 입문 영상</a><span class="ytnote">유튜브 검색 결과 기준 추천 영상</span></p>
-      <h4>하네스란</h4>
-      <p>AI가 안전하고 일관되게 일하도록 감싸는 규칙·도구·권한의 틀입니다. 말로 부탁하는 수준을 넘어 "항상 지키게" 만드는 장치입니다.</p>
-      <div class="tbl"><table>
-        <tr><th>구성 요소</th><th>역할</th></tr>
-        <tr><td>CLAUDE.md</td><td>매번 자동으로 읽는 우리 회사 규칙 문서</td></tr>
-        <tr><td>Skills</td><td>반복 업무를 /명령어로 패키징</td></tr>
-        <tr><td>Hooks</td><td>파일 저장·실행 전후에 검사 스크립트 자동 실행</td></tr>
-        <tr><td>Subagents</td><td>역할별 보조 에이전트</td></tr>
-        <tr><td>MCP·커넥터</td><td>메일·일정·Drive 등 외부 도구 연결</td></tr>
-        <tr><td>권한 모드</td><td>승인 후 실행(Manual)부터 자동 실행까지 단계 조절</td></tr>
-      </table></div>
-      <div class="tip">예: "문서에는 항상 버전번호와 담당부서를 표기"를 CLAUDE.md에 한 번 적어 두면 모든 문서에 적용됩니다.</div>
-    </div>
-  </details>
-
-  <details class="card" id="p8" data-min="15">
-    <summary><label class="ck"><input type="checkbox" class="sel" data-p="8" checked aria-label="8번 포함"></label><span class="no">8</span>예시 시연<span class="tm">15분</span></summary>
+    <summary><label class="ck"><input type="checkbox" class="sel" data-p="6" checked aria-label="6번 포함"></label><span class="no">6</span>AI 업무 활용 시연<span class="tm">15분</span></summary>
     <div class="body">
       <p class="plink"><a href="https://insys-erp.teulai.com/portal/home" target="_blank" rel="noopener">Insys 포털 열기 ↗</a></p>
       <div class="tbl"><table>
@@ -290,22 +263,74 @@ model: sonnet
         <tr><td>1</td><td>메일 정리</td><td>"오늘 받은 메일 중 회신이 필요한 것을 정리해줘"</td></tr>
         <tr><td>2</td><td>일정 확인</td><td>"이번 주 일정 중 겹치는 것을 알려줘"</td></tr>
         <tr><td>3</td><td>보고서 초안</td><td>"회의 내용으로 보고서 초안을 만들어줘"</td></tr>
-        <tr><td>4</td><td>문서 점검</td><td>"문서 검토 에이전트로 오탈자와 숫자를 점검해줘"</td></tr>
+        <tr><td>4</td><td>문서 점검</td><td>"이 문서의 오탈자와 숫자를 점검해줘"</td></tr>
       </table></div>
       <h4>폰으로 지시하기</h4>
-      <p>사무실 PC에서 앱을 켜 두고 폰의 Claude 앱으로 작업을 지시하고 승인할 수 있습니다 (Dispatch는 Pro/Max 플랜, Remote Control은 관리자 설정 필요).</p>
+      <p>사무실 PC에서 AI 앱을 켜 두고 폰으로 작업을 지시하고 승인하는 방식입니다. 별도 설정이 필요해 사전 테스트 후 안내합니다.</p>
       <div class="note">음성 지시는 사전 테스트 후 시연합니다. 발송·수정·삭제는 승인 후 실행하는 설정을 권장합니다.</div>
     </div>
   </details>
 
-  <details class="card" id="p9" data-min="20">
-    <summary><label class="ck"><input type="checkbox" class="sel" data-p="9" checked aria-label="9번 포함"></label><span class="no">9</span>토의: 그룹 전체 조직도 재구성<span class="tm">20분</span></summary>
+  <details class="card" id="p7" data-min="20">
+    <summary><label class="ck"><input type="checkbox" class="sel" data-p="7" checked aria-label="7번 포함"></label><span class="no">7</span>비전 2030: 인시스 문제점과 나아갈 방향 토의<span class="tm">20분</span></summary>
+    <div class="body">
+      <p class="plink"><a href="https://insys-erp.teulai.com/portal/home" target="_blank" rel="noopener">Insys 포털 열기 ↗</a></p>
+      <h4>진행 방식</h4>
+      <p>발표가 아닌 임원 토의입니다. 아래 내용은 토의를 시작하기 위한 초안(가설)이며, 현장 의견으로 고치고 확정합니다.</p>
+      <h4>1. 현재 인시스의 문제점 (토의용 가설)</h4>
+      <div class="tbl"><table>
+        <tr><th>영역</th><th>현재 모습</th><th>토의 질문</th></tr>
+        <tr><td>조직·역할</td><td>경영지원 인력이 계열사에 나뉘어 파견되어 있고, 계열사별 승인선이 달라 업무 총괄이 복잡</td><td>그룹 공통으로 맡을 일과 계열사가 맡을 일은?</td></tr>
+        <tr><td>시스템·승인</td><td>통합 ERP를 도입 중이나 계열사 대표 승인과 총괄 승인이 엇갈려 절차가 꼬이는 구간이 있음</td><td>결재선을 어떻게 단순화할 것인가</td></tr>
+        <tr><td>인재·채용</td><td>별도 인사팀 없이 담당자 개인에게 채용이 몰려 있고, 창원 지역 연구·개발 인력 충원이 어려움</td><td>채용과 육성을 누가 어떤 체계로 맡을 것인가</td></tr>
+        <tr><td>정보·보안</td><td>권한과 개인정보 관리 기준이 정비 중이며 계열사별 수준 차이가 있을 수 있음</td><td>그룹 공통 기준과 책임자는?</td></tr>
+        <tr><td>경영 정보</td><td>계열사별 손익·현황을 한 곳에서 보는 체계가 아직 완성되지 않음</td><td>월 단위로 꼭 봐야 할 지표는?</td></tr>
+        <tr><td>업무 방식</td><td>메일·문서 중심의 반복 업무가 많아 자동화 여지가 큼</td><td>먼저 자동화할 업무 3가지는?</td></tr>
+      </table></div>
+      <h4>2. 나아갈 방향 (비전 2030 틀)</h4>
+      <div class="tbl"><table>
+        <tr><th>축</th><th>방향</th></tr>
+        <tr><td>하나의 인시스</td><td>그룹 공통 조직·기준·결재선으로 계열사 간 중복과 공백 정리</td></tr>
+        <tr><td>데이터로 경영</td><td>통합 ERP와 월 손익 통합으로 판단 근거를 한 곳에 모으기</td></tr>
+        <tr><td>사람과 AI의 협업</td><td>포털 AI 비서와 자동화로 반복 업무를 줄이고 사람은 판단·관계에 집중</td></tr>
+        <tr><td>인재와 역량</td><td>채용·교육·보상 체계를 갖추고 핵심 인력이 오래 근무하는 구조</td></tr>
+        <tr><td>기술 사업화</td><td>검사기·로봇제어·업무자동화 등 사내 개발 역량을 사업과 연결</td></tr>
+      </table></div>
+      <h4>3. 2030 목표 (토의 후 기재)</h4>
+      <div class="tbl"><table>
+        <tr><th>구분</th><th>2026 현재</th><th>2030 목표</th><th>담당</th></tr>
+        <tr><td>조직·인력</td><td></td><td></td><td></td></tr>
+        <tr><td>경영·수익</td><td></td><td></td><td></td></tr>
+        <tr><td>시스템·자동화</td><td></td><td></td><td></td></tr>
+        <tr><td>인재·문화</td><td></td><td></td><td></td></tr>
+      </table></div>
+      <h4>시간 배분 (20분)</h4>
+      <div class="tbl"><table>
+        <tr><th>단계</th><th>내용</th><th>시간</th></tr>
+        <tr><td>1</td><td>문제점 공감: 가장 큰 문제 2~3개 고르기</td><td>7분</td></tr>
+        <tr><td>2</td><td>방향 선택: 5개 축 중 우선순위 정하기</td><td>8분</td></tr>
+        <tr><td>3</td><td>정리: 오늘 합의한 3가지와 담당·기한</td><td>5분</td></tr>
+      </table></div>
+      <div class="note">숫자 목표(매출·인원·수익성 등)는 임원 토의로 정합니다. 이 자료에서 임의로 제시하지 않았습니다.</div>
+    </div>
+  </details>
+
+  <details class="card" id="p8" data-min="30">
+    <summary><label class="ck"><input type="checkbox" class="sel" data-p="8" checked aria-label="8번 포함"></label><span class="no">8</span>토의: 그룹 전체 조직도 재구성<span class="tm">30분</span></summary>
     <div class="body">
       <p class="plink"><a href="https://insys-erp.teulai.com/portal/home" target="_blank" rel="noopener">Insys 포털 열기 ↗</a></p>
       <h4>진행 방식</h4>
       <p>발표가 아닌 임원 토의입니다. AI는 초안과 비교표를 빠르게 만드는 도구로 활용합니다.</p>
       <h4>논의 질문</h4>
       <ul><li>현재 조직도에서 업무가 겹치거나 비어 있는 곳은 어디인가</li><li>계열사 공통 기능과 개별 기능을 어떻게 나눌 것인가</li><li>결재선과 시스템(ERP) 권한을 조직도와 어떻게 맞출 것인가</li><li>개편 시기와 단계는 어떻게 잡을 것인가</li></ul>
+      <h4>시간 배분 (30분)</h4>
+      <div class="tbl"><table>
+        <tr><th>단계</th><th>내용</th><th>시간</th></tr>
+        <tr><td>1</td><td>비전 2030 방향 확인 후 현황 공유</td><td>5분</td></tr>
+        <tr><td>2</td><td>겹침·공백 등 쟁점 논의</td><td>10분</td></tr>
+        <tr><td>3</td><td>재구성안 비교와 의견 수렴</td><td>10분</td></tr>
+        <tr><td>4</td><td>결정 사항과 후속 일정 정리</td><td>5분</td></tr>
+      </table></div>
       <h4>AI 활용 흐름</h4>
       <div class="tbl"><table>
         <tr><th>단계</th><th>내용</th></tr>
@@ -318,7 +343,7 @@ model: sonnet
     </div>
   </details>
 
-  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v1.8</span></div>
+  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v1.9</span></div>
 
 </div></div>
 </div>
@@ -327,7 +352,7 @@ model: sonnet
 
 <script>
 (function(){
-  var VERSION = 'v1.8';
+  var VERSION = 'v1.9';
   document.getElementById('verBadge').textContent = VERSION;
   document.getElementById('verFoot').textContent = VERSION;
 
@@ -382,29 +407,13 @@ model: sonnet
     toast.textContent = msg; toast.classList.add('show');
     setTimeout(function(){ toast.classList.remove('show'); }, 1500);
   }
-  document.getElementById('btnCopy').addEventListener('click', function(){
-    var text = document.getElementById('agentCode').textContent;
-    function fallback(){
-      try{
-        var ta = document.createElement('textarea');
-        ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
-        document.body.appendChild(ta); ta.select();
-        var ok = document.execCommand('copy');
-        document.body.removeChild(ta);
-        showToast(ok ? '복사되었습니다' : '복사 실패: 직접 선택해 주세요');
-      }catch(e){ showToast('복사 실패: 직접 선택해 주세요'); }
-    }
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(function(){ showToast('복사되었습니다'); }, fallback);
-    } else { fallback(); }
-  });
 
 
   var sels = document.querySelectorAll('input.sel');
-  var STORE = 'ws_sel_v12';
+  var STORE = 'ws_sel_v19';
   function calc(){
     var total = 0, cnt = 0;
-    for(var i=1;i<=9;i++){
+    for(var i=1;i<=8;i++){
       var card = document.getElementById('p'+i);
       var on = card.querySelector('input.sel').checked;
       card.classList.toggle('off', !on);
@@ -435,11 +444,11 @@ model: sonnet
   }
   var lbls = document.querySelectorAll('summary label.ck');
   for(var q=0;q<lbls.length;q++){ lbls[q].addEventListener('click', function(e){ e.stopPropagation(); }); }
-  document.getElementById('selAll').addEventListener('click', function(){ for(var i=1;i<=9;i++){ setP(i,true); } calc(); saveSel(); });
-  document.getElementById('selNone').addEventListener('click', function(){ for(var i=1;i<=9;i++){ setP(i,false); } calc(); saveSel(); });
+  document.getElementById('selAll').addEventListener('click', function(){ for(var i=1;i<=8;i++){ setP(i,true); } calc(); saveSel(); });
+  document.getElementById('selNone').addEventListener('click', function(){ for(var i=1;i<=8;i++){ setP(i,false); } calc(); saveSel(); });
   try{
     var sv = localStorage.getItem(STORE);
-    if(sv && sv.length === 9){ for(var j=0;j<9;j++){ setP(j+1, sv.charAt(j) === '1'); } }
+    if(sv && sv.length === 8){ for(var j=0;j<8;j++){ setP(j+1, sv.charAt(j) === '1'); } }
   }catch(e){}
   calc();
 
