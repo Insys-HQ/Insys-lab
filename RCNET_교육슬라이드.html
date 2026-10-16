@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* RCNET_교육슬라이드.html v1.1 (2026-10-16) */
+/* RCNET_교육슬라이드.html v1.2 (2026-10-16) */
 :root{--navy:#1e3a5f;--navy2:#2c5282;--ink:#1f2937;--mut:#475569;--bg:#f3f6fa;--card:#ffffff;--line:#cbd5e1;
 --blue:#1d4ed8;--blueBg:#e0ebff;--warnBg:#fff4d6;--warn:#7a4b00;--badBg:#fde2e2;--bad:#8a1c1c;--okBg:#dcf5e4;--ok:#14532d;--red:#b91c1c}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -104,7 +104,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
 <body>
 <div id="stage">
  <div id="hdr"><div class="t">RC-NET WIRES-X 교육 <small>대한적십자사 서울특별시지사 재난대응봉사회 · HL0FRC / NDRT</small></div>
-  <div class="v"><b class="app-version">v1.1</b></div></div>
+  <div class="v"><b class="app-version">v1.2</b></div></div>
  <nav id="menu" aria-label="목차"></nav>
  <main id="view">
 
@@ -113,7 +113,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
  <div class="tag">WIRES-X · RC-NET 하이브리드 무선망</div>
  <h1>RC-NET 운용 교육</h1>
  <div class="sub">YAESU 등록 → 소프트웨어 설치 → PDN 설정 → 룸 접속·교신까지</div>
- <div class="meta">대한적십자사 서울특별시지사 재난대응봉사회<br>2026-10-16 · <span class="app-version">v1.1</span><br>
+ <div class="meta">대한적십자사 서울특별시지사 재난대응봉사회<br>2026-10-16 · <span class="app-version">v1.2</span><br>
  이동 : 좌측 목차 클릭 · 키보드 ← → · Home / End</div>
 </section>
 
@@ -146,7 +146,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
     <li>HRI-200 장비 + CT-174 케이블 + FTM-510D + PC</li>
     <li><b>Room 개설 가능</b> (Room Host)</li>
     <li>HRI200 드라이버 추가 설치 필요</li>
-    <li>켤 때 <span class="kb">GM</span>+<span class="kb">DG3</span> 누른 채 전원 ON</li></ul></div>
+    <li>켤 때 <span class="kb">GM</span>+<span class="kb">DX</span> 동시에 누른 채 전원 ON</li></ul></div>
    <div class="card"><h3>📱 PDN 방식 (봉사원·이동국)</h3><ul class="b">
     <li>FTM-510D + <b>SCU-58</b> 케이블 + 노트북 (HRI-200 불필요)</li>
     <li>Room 개설 불가 · <b>Room 접속·교신 가능</b></li>
@@ -208,7 +208,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
   <div class="cols c2">
    <div class="card"><h3>📻 FTM-510DR/DE (노드국)</h3>
     <ol class="st"><li><span class="kb">GM</span> 버튼 누름 → 파란 "GM" 화면</li>
-     <li>FUNC 노브로 <b>61 RADIO ID</b> 선택<em>59=DP-ID LIST · 60=RANGE RINGER · 62=LOG LIST</em></li>
+     <li>FUNC 노브로 <b>61 RADIO ID</b> 선택<em>실기 확인 번호 61 (GM 매뉴얼은 62로 표기) — 펌웨어별로 번호가 다르니 항목명 RADIO ID로 찾으세요</em></li>
      <li>FUNC 노브 누름 → 화면 하단에 5자리 표시</li></ol></div>
    <div class="card"><h3>📱 FT5DR/DE (봉사원 핸디)</h3>
     <ol class="st"><li><span class="kb">F MENU</span> 길게 누름</li>
@@ -226,17 +226,20 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
 <section class="slide" data-ch="B 사전 준비" data-t="기종별 Radio ID 확인표" id="s6">
  <div class="chp">B 사전 준비</div><h1>기종별 Radio ID 확인 방법</h1>
  <div class="body">
-  <table class="t"><tr><th style="width:250px">기종</th><th>확인 방법</th></tr>
-   <tr><td class="k">FTM-400 / 400XDR</td><td>DISP(SETUP) 길게 → GM 터치 → 3 RADIO ID CHECK</td></tr>
-   <tr><td class="k">FTM-300DR/DE</td><td>F(SETUP) 길게 → GM 선택 → 3 RADIO ID CHECK</td></tr>
-   <tr><td class="k">FTM-200DR/DE</td><td>F MENU 길게 → DIAL로 59 RADIO ID</td></tr>
+  <table class="t"><tr><th style="width:270px">기종</th><th>확인 방법 (제조사 매뉴얼 기준)</th></tr>
+   <tr><td class="k">FTM-400DR/DE</td><td>DISP(SETUP) 길게 → GM → 2 RADIO ID (400DR 매뉴얼)</td></tr>
+   <tr><td class="k">FTM-400XDR/XDE</td><td>DISP(SETUP) 길게 → GM → 3 RADIO ID CHECK <b>(실기 확인 필요)</b></td></tr>
+   <tr><td class="k">FTM-300DR/DE</td><td>F(SETUP) 길게 → GM → 3 RADIO ID CHECK</td></tr>
+   <tr><td class="k">FTM-200DR/DE</td><td>F MENU 길게 → 59 RADIO ID</td></tr>
    <tr><td class="k">FTM-100DR/DE</td><td>DISP(SETUP) 길게 → 6 GM → 4 RADIO ID CHECK</td></tr>
-   <tr><td class="k">FTM-310DR/DE</td><td>F(BACK) 길게 → 63 RADIO ID</td></tr>
+   <tr><td class="k">FTM-310DR/DE</td><td>F(BACK) 길게 → GM 목록의 RADIO ID CHECK <b>(번호 실기 확인)</b></td></tr>
    <tr><td class="k">FTM-3200DR/DE</td><td>MHz(SETUP) 1초 길게 → 31 RADIO ID</td></tr>
-   <tr><td class="k">FT3DR · FT2DR</td><td>DISP 길게 → GM 터치 → 2 RADIO ID CHECK</td></tr>
+   <tr><td class="k">FT3DR/DE</td><td>DISP 길게(Set Mode) → GM → RADIO ID 항목 <b>(실기 확인)</b></td></tr>
+   <tr><td class="k">FT2DR/DE</td><td>GM 설정 목록의 1 RADIO ID (GM 매뉴얼)</td></tr>
+   <tr><td class="k">FT1DR/DE</td><td>GM 설정 목록의 3 RADIO ID CHECK</td></tr>
    <tr><td class="k">FT-70DR/DE</td><td>F 길게(Set Mode) → 43 RAD ID</td></tr>
   </table>
-  <div class="box warn">FTM-500DR · FT1DR은 항목 번호가 미확인 — <b>실기 확인 필요</b>. 위 절차는 설명서 기준이며 펌웨어에 따라 번호가 다를 수 있습니다. FT1DR · FT-70DR · FTM-3200DR은 PDN(노드) 기능 지원 여부를 YAESU에 먼저 확인하세요.</div>
+  <div class="box warn">FTM-500DR은 번호를 매뉴얼에서 확인하지 못했습니다(GM Edition 매뉴얼 참조 → 실기 확인). 항목 번호는 펌웨어·판본에 따라 다를 수 있으니 <b>RADIO ID 이름</b>으로 찾으세요. FTM-3200DR·FT1DR·FT-70DR은 PDN(노드) 운용 설명이 없습니다.</div>
  </div>
 </section>
 
@@ -260,7 +263,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
    <div style="display:flex;flex-direction:column;gap:12px">
     <div class="box info">연결 후 <b>장치관리자</b>에 <code>Prolific USB-to-Serial Comm Port (COMx)</code>가 보이는지 확인</div>
     <div class="box warn">노트북 오디오 잭이 1개(마이크+스피커 겸용)면 <b>Y 분배(TRRS) 케이블</b> 필요</div>
-    <div class="box bad">FT5D·FT3D는 SCU-57/55를 씁니다. 케이블 종류를 혼동하지 마세요.</div>
+    <div class="box warn">FT5D·FT3D·FT2D는 SCU-57(또는 SCU-39) 키트를 씁니다. ※ YAESU PDN 매뉴얼(2022판) 기종표에는 FTM-510D가 없고, <b>FTM-510D + SCU-58</b>은 현장 운용 기준입니다.</div>
    </div>
   </div>
  </div>
@@ -414,8 +417,8 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
   </div>
   <div class="cols c2">
    <table class="t"><tr><th>HRI-200 단자</th><th>용도</th></tr>
-    <tr><td class="k">RADIO 1</td><td>FTM-510D 연결 (CT-174, 10핀) ✅ 사용</td></tr>
-    <tr><td class="k">RADIO 2</td><td>2번째 트랜시버용 (미사용)</td></tr>
+    <tr><td class="k">RADIO 1</td><td>FTM-510D 연결 (CT-174, 10핀) ✅ 사용<br>※ FM 아날로그는 6핀(CT-175)</td></tr>
+    <tr><td class="k">RADIO 2</td><td>2번째 트랜시버용 (미사용) · 단자 규격은 HRI-200 매뉴얼 참조</td></tr>
     <tr><td class="k">MONITOR</td><td>모니터 스피커 보조 (미사용)</td></tr>
     <tr><td class="k">USB Type-B</td><td>PC 연결 ✅ 사용</td></tr></table>
    <div style="display:flex;flex-direction:column;gap:12px">
@@ -451,7 +454,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
    <div class="card"><h3>켜는 순서</h3><ol class="st">
     <li>USB·CT-174 연결 확인, FTM-510D OFF(5초 대기)</li>
     <li>WIRES-X 실행 → COM port <b>6:USB 직렬 장치(COM6)</b></li>
-    <li><span class="kb">GM</span>+<span class="kb">DG3</span> 누른 채 전원 ON<em>글자가 뜰 때까지 계속 누름</em></li>
+    <li><span class="kb">GM</span>+<span class="kb">DX</span> 동시에 누른 채 전원 ON (약 2초)<em>매뉴얼 기준. 기존 현장 가이드는 [GM]+[DG3]로 기재 → 실기 확인</em></li>
     <li>화면 "HRI-200 · 145.620 · DN" → <b>ONLINE</b> 확인</li></ol></div>
    <div class="card"><h3>끄는 순서</h3><ol class="st">
     <li>Room 비활성화<em>Connect → Room Open → Active 해제 → Activation</em></li>
@@ -490,10 +493,10 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
   <div class="cols c2">
    <div class="card"><h3>주파수·모드</h3><ol class="st">
     <li>A-밴드(상단) 활성 확인</li><li>DIAL로 <code>145.620 MHz</code></li>
-    <li>MODE 버튼 → <b>DN</b>(권장) 또는 AMS</li><li>화면 상단 DN/AMS 표시 확인</li></ol></div>
+    <li>[MODE] 터치 → <b>DN</b>(권장) 또는 AMS</li><li>화면 상단 DN/AMS 표시 확인</li></ol></div>
    <div class="card"><h3>DG-ID 설정</h3><ol class="st">
     <li><span class="kb">F MENU</span> 길게</li><li>WIRES-X → <b>5 DG-ID</b></li>
-    <li>DIAL로 <b>AUTO</b> → BACK 저장<em>AUTO = 노드 DG-ID에 자동 맞춤</em></li></ol></div>
+    <li>DIAL로 <b>노드와 같은 번호</b> 선택 → BACK 저장<em>매뉴얼: 노드국과 같은 DG-ID로 설정 (본 망은 00 · 00은 모든 ID 신호 수신)</em></li></ol></div>
   </div>
   <div class="box warn">FM 모드에서는 WIRES-X <b>디지털 룸 접속 불가</b>(DTMF만 가능). 반드시 DN 또는 AMS로 설정하세요.</div>
  </div>
@@ -505,7 +508,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
   <div class="box warn">DS0ARC 노드(145.620MHz)의 <b>전파 수신 범위 안</b>에서, DS0ARC가 ONLINE일 때만 접속됩니다.</div>
   <div class="cols c3">
    <div class="card"><h3>① Search &amp; Direct</h3><ol class="st">
-    <li>GM/X <b>1~2초 길게</b> → X 고정</li><li>SEARCH &amp; DIRECT 터치</li>
+    <li>GM/X <b>1초 이상 길게</b> → 노드 발견 시 X 점등</li><li>SEARCH &amp; DIRECT 터치</li>
     <li>룸 ID <code>48182</code> 입력</li><li>RCNet-Disaster 터치 → PTT</li></ol></div>
    <div class="card"><h3>② 즐겨찾기 (C1~C5)</h3><ol class="st">
     <li>접속 상태에서 룸명 터치 → <b>ADD</b></li><li>카테고리(예: C1) 저장</li>
@@ -532,7 +535,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
     <tr><td>B-밴드에서 무반응</td><td>A-밴드로 전환</td></tr>
     <tr><td>소리 안 들림</td><td>볼륨↑ · 스퀠치↓</td></tr></table>
   </div>
-  <div class="box bad">FT5D에는 10핀 Mini-DIN 포트가 없어 <b>HRI-200에 연결할 수 없습니다.</b> 무전기 단독 접속만 사용하세요.</div>
+  <div class="box info">FT5D는 HRI-200에 연결하지 않고 <b>무전기 단독</b>(RF)으로 노드에 접속해 사용합니다.</div>
  </div>
 </section>
 
@@ -561,9 +564,9 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
   <ol class="st">
    <li>핸디 설정 : <code>145.620 MHz</code> · 모드 FM · CTCSS/TONE 없음</li>
    <li>노드 <b>ONLINE(IPv4)</b> 확인</li>
-   <li><b>PTT를 누른 채</b> 키패드로 <code>#55555</code> 입력 → 마지막 5 후 1~2초 유지 후 해제</li>
+   <li><b>PTT를 누른 채</b> 키패드로 <code>#</code> + 룸/노드 ID 5자리 입력 (예 <code>#48182</code>) → 마지막 숫자 후 1~2초 유지 후 해제</li>
    <li>핸디 스피커에서 <b>"삐~" 접속 완료 톤</b> 확인 → RCNet-Disaster 접속</li>
-   <li>PTT로 교신 · 종료는 PTT 누른 채 <code>*</code> 입력</li>
+   <li>PTT로 교신 · 종료는 PTT 누른 채 <code>#99999</code> 입력</li>
   </ol>
   <div class="box warn">노드 응답이 없으면 : PTT를 너무 빨리 뗐는지, 주파수가 정확히 145.620MHz인지, FM 모드인지 확인하세요.</div>
  </div>
@@ -574,17 +577,18 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
  <div class="body">
   <div class="cols c3">
    <div class="card"><h3>🔵 ICOM · IC-V86 / IC-T10</h3><ol class="st">
-    <li>사전 설정 : Set Mode → DTMF TX → <b>MAN</b><em>기본 AUTO면 직접 입력 불가</em></li>
-    <li>PTT 누른 채 # 5 5 5 5 5</li><li>마지막 후 1~2초 유지</li></ol></div>
-   <div class="card"><h3>🟡 YAESU · FT-60R / 65R / VX-6R</h3><ol class="st">
-    <li>별도 설정 불필요</li><li>PTT 누른 채 # 5 5 5 5 5</li><li>마지막 후 PTT 유지 → 해제</li></ol></div>
-   <div class="card"><h3>🔴 Baofeng · UV-5R / 82 / K5</h3><ol class="st">
-    <li>사전 설정 : MENU → <b>16 DTMFST → OFF</b><em>안 하면 마이크 음이 섞임</em></li>
-    <li>PTT 누른 채 # 5 5 5 5 5</li><li>UV-82는 상단 PTT 사용</li></ol></div>
+    <li>사전 설정 : Set mode의 <b>DTMF TX key</b> 항목에서 수동 송출 방식 선택<em>옵션 표기는 모델별로 다름 → 설명서·실기 확인</em></li>
+    <li>PTT 누른 채 # + 5자리</li><li>마지막 후 1~2초 유지</li></ol></div>
+   <div class="card"><h3>🟡 YAESU · FT-65R / FT-60R / VX-6R</h3><ol class="st">
+    <li>FT-65R : Set Mode <b>12 DTMF SET</b> → MANUAL (기본값)<em>FT-60R·VX-6R은 설명서 DTMF 장 확인</em></li>
+    <li>PTT 누른 채 # + 5자리</li><li>마지막 후 PTT 유지 → 해제</li></ol></div>
+   <div class="card"><h3>🔴 Baofeng · UV-5R / UV-82</h3><ol class="st">
+    <li>사전 설정 : MENU → <b>16 DTMFST → OFF</b><em>사이드톤이 마이크로 들어가 DTMF를 왜곡할 수 있음</em></li>
+    <li>PTT 누른 채 # + 5자리</li><li>UV-K5는 메뉴 번호가 펌웨어별로 달라 확인 필요</li></ol></div>
   </div>
   <table class="t"><tr><th>증상</th><th>원인</th><th>해결</th></tr>
    <tr><td>노드 응답 없음</td><td>PTT 너무 빨리 해제 / 주파수 불일치</td><td>마지막 키 후 1~2초 유지 · 145.620 확인</td></tr>
-   <tr><td>톤 안 나감 / 잡음</td><td>FM 모드 아님 · Baofeng DTMFST=ON · ICOM AUTO</td><td>FM 선택 · 16 OFF · DTMF TX=MAN</td></tr></table>
+   <tr><td>톤 안 나감 / 잡음</td><td>FM 모드 아님 · Baofeng DTMFST=ON · ICOM 송출 방식</td><td>FM 선택 · DTMFST OFF · ICOM DTMF TX key 설정</td></tr></table>
  </div>
 </section>
 
@@ -633,12 +637,12 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
  <div class="chp">H 운용 전략</div><h1>DTMF 원격 제어 명령어</h1>
  <div class="body">
   <div class="cols c3">
-   <div class="card"><div class="big"><code>#55555</code></div><p>RCNet-Disaster 룸 자동 접속</p></div>
-   <div class="card"><div class="big"><code>#66666</code></div><p>노드 상태 조회</p></div>
+   <div class="card"><div class="big"><code>#48182</code></div><p>RCNet-Disaster 룸 접속 (# + 룸 ID)</p></div>
+   <div class="card"><div class="big"><code>#38182</code></div><p>DS0ARC 노드 접속 (# + 노드 ID)</p></div>
    <div class="card"><div class="big"><code>#99999</code></div><p>접속 해제</p></div>
-   <div class="card"><div class="big"><code>*</code></div><p>접속 해제 단축</p></div>
-   <div class="card"><div class="big"><code>38182</code></div><p>DS0ARC 노드 직접 접속</p></div>
-   <div class="card"><div class="big"><code>48182</code></div><p>RCNet-Disaster 룸</p></div>
+   <div class="card"><div class="big"><code>#55555</code></div><p>현장 운용값 · 매뉴얼 미확인</p></div>
+   <div class="card"><div class="big"><code>#66666</code></div><p>노드 상태 조회 · 매뉴얼 미확인</p></div>
+   <div class="card"><div class="big"><code>*</code></div><p>해제 단축 · 매뉴얼 미확인</p></div>
   </div>
   <div class="box warn">PTT를 누른 채 DTMF 톤 전송이 끝날 때까지 유지하고, <b>마지막 키 후 1~2초</b> 더 유지한 뒤 해제하세요.</div>
   <h2>자주 쓰는 룸 ID</h2>
@@ -695,13 +699,37 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
  </div>
 </section>
 
+<section class="slide" data-ch="I 현황·링크" data-t="매뉴얼 대조 결과" id="s31">
+ <div class="chp">I 현황·링크</div><h1>제조사 매뉴얼 대조 결과 (v1.2)</h1>
+ <div class="body">
+  <div class="cols c3">
+   <div class="card"><h3>✅ 매뉴얼 일치</h3><ul class="b">
+    <li>FTM-510D : DX 길게=WIRES-X 시작, GM 길게=DG-ID, FUNC 길게=Setup</li>
+    <li>FTM-300/200/100/3200 · FT-70DR · FT1DR Radio ID 경로</li>
+    <li>PDN은 Room 개설 불가</li><li>해제 #99999 · PC 사양</li><li>UV-5R/82 DTMFST OFF</li></ul></div>
+   <div class="card"><h3>✏️ 정정함</h3><ul class="b">
+    <li>FT5D DG-ID : AUTO → 노드와 같은 번호</li>
+    <li>HRI-200 켜기 : [GM]+[DX]로 표기</li>
+    <li>접속 DTMF : # + 5자리</li>
+    <li>ICOM·YAESU DTMF 설정 표기</li>
+    <li>FT5D 케이블 : SCU-57 또는 SCU-39</li></ul></div>
+   <div class="card"><h3>⚠ 실기 확인 필요</h3><ul class="b">
+    <li>FTM-500DR · FTM-310DR · FTM-400XDR Radio ID 번호</li>
+    <li>FT5DR·FT3DR Radio ID 경로</li>
+    <li>FTM-510D의 GM 항목 번호(61/62)</li>
+    <li>#55555 · #66666 · Unlimited TOT 등 현장값</li></ul></div>
+  </div>
+  <div class="box info">일부 매뉴얼은 본문 전체를 읽지 못했습니다. 실기 확인 표시가 있는 항목은 사용 전 실제 화면으로 확인하세요.</div>
+ </div>
+</section>
+
  </main>
  <div id="bar"></div>
- <div id="ftr"><div>대한적십자사 서울특별시지사 재난대응봉사회 · <span class="app-version">v1.1</span> · 2026-10-16</div>
+ <div id="ftr"><div>대한적십자사 서울특별시지사 재난대응봉사회 · <span class="app-version">v1.2</span> · 2026-10-16</div>
   <div class="nav"><button id="prev">◀ 이전</button><span id="pg">1 / 1</span><button id="next">다음 ▶</button></div></div>
 </div>
 <script>
-var APP_VERSION='v1.1', APP_DATE='2026-10-16';
+var APP_VERSION='v1.2', APP_DATE='2026-10-16';
 (function(){
   var stage=document.getElementById('stage');
   function fit(){var s=Math.min(innerWidth/1920,innerHeight/1080);
