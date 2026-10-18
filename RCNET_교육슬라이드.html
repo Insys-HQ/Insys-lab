@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* RCNET_교육슬라이드.html v1.3 (2026-10-16) */
+/* RCNET_교육슬라이드.html v1.4 (2026-10-16) */
 :root{--navy:#1e3a5f;--navy2:#2c5282;--ink:#1f2937;--mut:#475569;--bg:#f3f6fa;--card:#ffffff;--line:#cbd5e1;
 --blue:#1d4ed8;--blueBg:#e0ebff;--warnBg:#fff4d6;--warn:#7a4b00;--badBg:#fde2e2;--bad:#8a1c1c;--okBg:#dcf5e4;--ok:#14532d;--red:#b91c1c}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -104,7 +104,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
 <body>
 <div id="stage">
  <div id="hdr"><div class="t">RC-NET WIRES-X 교육 <small>대한적십자사 서울특별시지사 재난대응봉사회 · HL0FRC / NDRT</small></div>
-  <div class="v"><b class="app-version">v1.3</b></div></div>
+  <div class="v"><b class="app-version">v1.4</b></div></div>
  <nav id="menu" aria-label="목차"></nav>
  <main id="view">
 
@@ -113,7 +113,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
  <div class="tag">WIRES-X · RC-NET 하이브리드 무선망</div>
  <h1>RC-NET 운용 교육</h1>
  <div class="sub">YAESU 등록 → 소프트웨어 설치 → PDN 설정 → 룸 접속·교신까지</div>
- <div class="meta">대한적십자사 서울특별시지사 재난대응봉사회<br>발표 : 2026-10-17(토) ~ 10-18(일)<br>작성 : 2026-10-16 · <span class="app-version">v1.3</span><br>
+ <div class="meta">대한적십자사 서울특별시지사 재난대응봉사회<br>발표 : 2026-10-17(토) ~ 10-18(일)<br>작성 : 2026-10-16 · <span class="app-version">v1.4</span><br>
  이동 : 좌측 목차 클릭 · 키보드 ← → · Home / End</div>
 </section>
 
@@ -146,24 +146,24 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
     <li>HRI-200 장비 + CT-174 케이블 + FTM-510D + PC</li>
     <li><b>Room 개설 가능</b> (Room Host)</li>
     <li>HRI200 드라이버 추가 설치 필요</li>
-    <li>켤 때 <span class="kb">GM</span>+<span class="kb">DX</span> 동시에 누른 채 전원 ON</li></ul></div>
+    </ul></div>
    <div class="card"><h3>📱 PDN 방식 (봉사원·이동국)</h3><ul class="b">
     <li>FTM-510D + <b>SCU-58</b> 케이블 + 노트북 (HRI-200 불필요)</li>
     <li>Room 개설 불가 · <b>Room 접속·교신 가능</b></li>
     <li>유심 라우터 인터넷 · 차량/현장 이동 운용 가능</li>
-    <li>그냥 전원 ON → <span class="kb">DX</span> 길게</li></ul></div>
+    </ul></div>
   </div>
   <h2>전체 흐름</h2>
   <div class="flow">
    <div class="n">FT5D / 아날로그 핸디<small>RF 145.620 MHz</small></div><div class="a"><i>→</i>전파</div>
    <div class="n">노드 DS0ARC · PDN<small>WIRES-X 소프트웨어</small></div><div class="a"><i>→</i>인터넷</div>
    <div class="n">YAESU WIRES-X 서버</div><div class="a"><i>→</i>접속</div>
-   <div class="n">RCNet-Disaster 룸<small>48182</small></div>
+   <div class="n">RCNet-Disaster 룸</div>
   </div>
   <div class="box info">포트 포워딩 등 공유기 포트 설정은 <b>필요 없습니다</b> (최신 버전 기준). 안정적인 인터넷(8Mbps↑)만 확보하세요.</div>
   <div class="links"><span>🔗</span>
-   <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/user/index.php" target="_blank" rel="noopener">WIRES-X User page <em class="v">검색 확인</em></a>
-   <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/pdf/WIRES-X_PDN_Function_OM_ENG_1902-C.pdf" target="_blank" rel="noopener">PDN Function 매뉴얼(PDF) <em class="v">검색 확인</em></a></div>
+   <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/user/index.php" target="_blank" rel="noopener">WIRES-X User page</a>
+   <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/pdf/WIRES-X_PDN_Function_OM_ENG_1902-C.pdf" target="_blank" rel="noopener">PDN Function 매뉴얼(PDF)</a></div>
  </div>
 </section>
 
@@ -195,10 +195,6 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
    <li><b>소프트웨어 다운로드</b> — 로그인 후 Node owner 페이지 → <code>WIRES-X_setup.exe</code> (HRI-200만 <code>HRI200_driver_setup.exe</code> 추가)</li>
   </ol>
   <div class="box bad"><b>주의</b> : Radio ID를 잘못 입력하면 승인 후에도 접속이 되지 않습니다. 승인 메일의 비밀번호는 타인과 공유하지 마세요.</div>
-  <div class="links"><span>🔗</span>
-   <a class="lk" href="https://yaesu.com/jp/en/wires-x/regist/index.php" target="_blank" rel="noopener">멤버 등록 <em class="u">직접 확인</em></a>
-   <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/index.php" target="_blank" rel="noopener">WIRES-X 메인 · Member Login <em class="u">직접 확인</em></a>
-   <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/node/index.php" target="_blank" rel="noopener">Node owner 페이지(다운로드) <em class="u">직접 확인</em></a></div>
  </div>
 </section>
 
@@ -208,7 +204,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
   <div class="cols c2">
    <div class="card"><h3>📻 FTM-510DR/DE (노드국)</h3>
     <ol class="st"><li><span class="kb">GM</span> 버튼 누름 → 파란 "GM" 화면</li>
-     <li>FUNC 노브로 <b>61 RADIO ID</b> 선택<em>실기 확인 번호 61 (GM 매뉴얼은 62로 표기) — 펌웨어별로 번호가 다르니 항목명 RADIO ID로 찾으세요</em></li>
+     <li>FUNC 노브로 <b>RADIO ID</b> 항목 선택<em>항목 번호는 펌웨어에 따라 다름 — 이름으로 찾으세요</em></li>
      <li>FUNC 노브 누름 → 화면 하단에 5자리 표시</li></ol></div>
    <div class="card"><h3>📱 FT5DR/DE (봉사원 핸디)</h3>
     <ol class="st"><li><span class="kb">F MENU</span> 길게 누름</li>
@@ -218,8 +214,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
   </div>
   <div class="box info">Radio ID는 편집할 수 없는 <b>고유 번호</b>입니다. 사진을 찍어 두거나 정확히 메모하세요.</div>
   <div class="links"><span>🔗</span>
-   <a class="lk" href="https://www.manualslib.com/manual/2355039/Yaesu-Ft5dr.html" target="_blank" rel="noopener">FT5DR 매뉴얼(ManualsLib) <em class="v">검색 확인</em></a>
-   <a class="lk" href="https://www.yaesu.com/jp/en/WIRES-X/pdf/WIRES-X_RADIO_ID_CHECK_ENG_2509-I.pdf" target="_blank" rel="noopener">YAESU Radio ID Check(PDF) <em class="u">직접 확인</em></a></div>
+   <a class="lk" href="https://www.manualslib.com/manual/2355039/Yaesu-Ft5dr.html" target="_blank" rel="noopener">FT5DR 매뉴얼(ManualsLib)</a></div>
  </div>
 </section>
 
@@ -227,19 +222,16 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
  <div class="chp">B 사전 준비</div><h1>기종별 Radio ID 확인 방법</h1>
  <div class="body">
   <table class="t"><tr><th style="width:270px">기종</th><th>확인 방법 (제조사 매뉴얼 기준)</th></tr>
-   <tr><td class="k">FTM-400DR/DE</td><td>DISP(SETUP) 길게 → GM → 2 RADIO ID (400DR 매뉴얼)</td></tr>
-   <tr><td class="k">FTM-400XDR/XDE</td><td>DISP(SETUP) 길게 → GM → 3 RADIO ID CHECK <b>(실기 확인 필요)</b></td></tr>
+   <tr><td class="k">FTM-400DR/DE</td><td>GM 설정 목록의 2 RADIO ID</td></tr>
    <tr><td class="k">FTM-300DR/DE</td><td>F(SETUP) 길게 → GM → 3 RADIO ID CHECK</td></tr>
    <tr><td class="k">FTM-200DR/DE</td><td>F MENU 길게 → 59 RADIO ID</td></tr>
    <tr><td class="k">FTM-100DR/DE</td><td>DISP(SETUP) 길게 → 6 GM → 4 RADIO ID CHECK</td></tr>
-   <tr><td class="k">FTM-310DR/DE</td><td>F(BACK) 길게 → GM 목록의 RADIO ID CHECK <b>(번호 실기 확인)</b></td></tr>
    <tr><td class="k">FTM-3200DR/DE</td><td>MHz(SETUP) 1초 길게 → 31 RADIO ID</td></tr>
-   <tr><td class="k">FT3DR/DE</td><td>DISP 길게(Set Mode) → GM → RADIO ID 항목 <b>(실기 확인)</b></td></tr>
-   <tr><td class="k">FT2DR/DE</td><td>GM 설정 목록의 1 RADIO ID (GM 매뉴얼)</td></tr>
+   <tr><td class="k">FT2DR/DE</td><td>GM 설정 목록의 1 RADIO ID</td></tr>
    <tr><td class="k">FT1DR/DE</td><td>GM 설정 목록의 3 RADIO ID CHECK</td></tr>
    <tr><td class="k">FT-70DR/DE</td><td>F 길게(Set Mode) → 43 RAD ID</td></tr>
   </table>
-  <div class="box warn">FTM-500DR은 번호를 매뉴얼에서 확인하지 못했습니다(GM Edition 매뉴얼 참조 → 실기 확인). 항목 번호는 펌웨어·판본에 따라 다를 수 있으니 <b>RADIO ID 이름</b>으로 찾으세요. FTM-3200DR·FT1DR·FT-70DR은 PDN(노드) 운용 설명이 없습니다.</div>
+  <div class="box info">Radio ID는 수정할 수 없는 고유 번호입니다. FTM-3200DR · FT1DR · FT-70DR은 PDN(노드) 운용 설명이 매뉴얼에 없습니다.</div>
  </div>
 </section>
 
@@ -263,7 +255,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
    <div style="display:flex;flex-direction:column;gap:12px">
     <div class="box info">연결 후 <b>장치관리자</b>에 <code>Prolific USB-to-Serial Comm Port (COMx)</code>가 보이는지 확인</div>
     <div class="box warn">노트북 오디오 잭이 1개(마이크+스피커 겸용)면 <b>Y 분배(TRRS) 케이블</b> 필요</div>
-    <div class="box warn">FT5D·FT3D·FT2D는 SCU-57(또는 SCU-39) 키트를 씁니다. ※ YAESU PDN 매뉴얼(2022판) 기종표에는 FTM-510D가 없고, <b>FTM-510D + SCU-58</b>은 현장 운용 기준입니다.</div>
+    <div class="box info">FT5D·FT3D·FT2D는 SCU-57(또는 SCU-39) 키트를 씁니다.</div>
    </div>
   </div>
  </div>
@@ -283,8 +275,6 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
    <tr><td class="k">CPU · RAM</td><td>2.0GHz 이상 멀티코어 · 최소 2GB (4GB 권장)</td></tr>
    <tr><td class="k">저장공간 · USB</td><td>1GB 이상 · USB 2.0 포트 1개</td></tr>
    <tr><td class="k">인터넷</td><td>8Mbps 이상, 끊김 없는 회선 (불안정하면 서버 인증 단절)</td></tr></table>
-  <div class="links"><span>🔗</span>
-   <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/node/index.php" target="_blank" rel="noopener">Node owner 페이지(다운로드) <em class="u">직접 확인</em></a></div>
  </div>
 </section>
 
@@ -311,7 +301,6 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
     <tr><td class="k">DG-ID</td><td>00 / 00</td></tr>
     <tr><td class="k">Power</td><td>Low</td></tr></table></div>
   </div>
-  <div class="box warn">Modulation은 <b>ONLINE 중 변경 불가</b>입니다. 변경하려면 소프트웨어 OFFLINE → 무전기 OFF 후 설정하세요.</div>
  </div>
 </section>
 
@@ -323,8 +312,8 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
     <tr><td class="k">Round QSO Room connection</td><td>☑ 체크</td></tr>
     <tr><td class="k">Accept calls while in Round QSO Rooms</td><td>□ 해제</td></tr>
     <tr><td class="k">Return to Room</td><td>☑ 체크 · Room ID <code>48182</code></td></tr>
-    <tr><td class="k">DTMF #55555 command</td><td>☑ 체크</td></tr></table>
-    <h2>General settings</h2><table class="t"><tr><td class="k">Unlimited TOT</td><td>☑ 체크 (나머지 기본값)</td></tr></table></div>
+</table>
+</div>
    <div><h2>WIRES ID Activation (최초 1회)</h2>
     <ol class="st">
      <li>설정 창을 연 채 <b>무전기 전원 ON</b> → Radio ID 자동 입력 확인</li>
@@ -340,7 +329,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
 <section class="slide" data-ch="C PDN 운용" data-t="매번 켜는 순서" id="s11">
  <div class="chp">C PDN 운용 (봉사원)</div><h1>PDN 켜는 순서 — 소프트웨어 먼저, 무전기 나중</h1>
  <div class="body">
-  <div class="box bad"><b>핵심 규칙</b> : <b>소프트웨어 먼저 → 무전기 나중</b>. PDN은 버튼 조합 없이 <b>그냥 전원 ON</b> (HRI-200의 GM+DG3와 다릅니다)</div>
+  <div class="box bad"><b>핵심 규칙</b> : <b>소프트웨어 먼저 → 무전기 나중</b> (PDN · HRI-200 공통). PDN은 버튼 조합 없이 <b>그냥 전원 ON</b></div>
   <ol class="st">
    <li>SCU-58 케이블 연결 확인</li>
    <li><b>WIRES-X 소프트웨어 실행</b></li>
@@ -368,7 +357,6 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
     <li>목록에서 <b>RCNet-Disaster</b> → Connect</li></ol>
     <p style="margin-top:10px">접속 후 화면에 "RCNet-Disaster" 확인 → <b>PTT</b> 교신</p></div>
   </div>
-  <div class="box warn"><span class="kb">DX</span>를 <b>짧게</b> 누르면 AMS↔DN↔FM 모드만 전환됩니다. 반드시 <b>길게</b> 누르세요.</div>
  </div>
 </section>
 
@@ -392,16 +380,16 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
 
 <!-- ===== D 버튼 ===== -->
 <section class="slide" data-ch="D 버튼 조작" data-t="FTM-510D 버튼 기능" id="s14">
- <div class="chp">D 버튼 조작</div><h1>FTM-510D 주요 버튼 기능표</h1>
+ <div class="chp">D 버튼 조작</div><h1>FTM-510D 버튼 기능 — DX · GM · FUNC</h1>
  <div class="body">
   <table class="t"><tr><th style="width:190px">버튼</th><th>짧게 누름</th><th>길게 누름</th></tr>
    <tr><td class="k">DX</td><td>AMS ↔ DN(C4FM) ↔ FM 모드 순환</td><td><b>WIRES-X 인터넷 노드 링크 가동</b> (PDN 접속 시 사용)</td></tr>
    <tr><td class="k">GM</td><td>GM 기능 ON/OFF (그룹 ID 필터)</td><td>DG-ID SETUP 화면</td></tr>
-   <tr><td class="k">V/M</td><td>VFO ↔ 메모리 채널 전환</td><td>메모리 채널 편집 목록</td></tr>
-   <tr><td class="k">BAND</td><td>Main/Sub 밴드 제어권 전환</td><td>Main 주파수를 Sub로 복사</td></tr>
-   <tr><td class="k">PMG</td><td>PMG 채널 순환</td><td>PMG 뱅크 저장 · 수동/자동 토글</td></tr>
-   <tr><td class="k">FUNC 노브</td><td>선택 항목 확인/실행</td><td>Setup 메뉴 진입</td></tr></table>
-  <div class="box info">PDN에서 WIRES-X 룸에 접속할 때는 <b>반드시 DX를 길게</b> 누릅니다.</div>
+   
+   
+   
+   <tr><td class="k">FUNC 노브</td><td>—</td><td>Setup 메뉴 진입</td></tr></table>
+  <div class="box info">PDN에서 WIRES-X에 접속할 때는 <b>DX를 길게</b> 누릅니다. 짧게 누르면 AMS↔DN↔FM 모드만 전환됩니다.</div>
  </div>
 </section>
 
@@ -418,7 +406,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
   <div class="cols c2">
    <table class="t"><tr><th>HRI-200 단자</th><th>용도</th></tr>
     <tr><td class="k">RADIO 1</td><td>FTM-510D 연결 (CT-174, 10핀) ✅ 사용<br>※ FM 아날로그는 6핀(CT-175)</td></tr>
-    <tr><td class="k">RADIO 2</td><td>2번째 트랜시버용 (미사용) · 단자 규격은 HRI-200 매뉴얼 참조</td></tr>
+    <tr><td class="k">RADIO 2</td><td>2번째 트랜시버용 (미사용)</td></tr>
     <tr><td class="k">MONITOR</td><td>모니터 스피커 보조 (미사용)</td></tr>
     <tr><td class="k">USB Type-B</td><td>PC 연결 ✅ 사용</td></tr></table>
    <div style="display:flex;flex-direction:column;gap:12px">
@@ -440,7 +428,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
     <tr><td class="k">Style</td><td>Open</td></tr><tr><td class="k">News</td><td>ALL OK</td></tr></table></div>
    <div><h2>Transceiver · Call</h2><table class="t"><tr><td class="k">Transceiver</td><td>FTM-510D</td></tr>
     <tr><td class="k">Modulation</td><td>DIGITAL / DIGITAL</td></tr><tr><td class="k">Frequency</td><td>145.620 MHz · 00/00</td></tr>
-    <tr><td class="k">Return to Room</td><td>☑ · 48182</td></tr><tr><td class="k">TOT</td><td>Unlimited ☑</td></tr></table></div>
+    <tr><td class="k">Return to Room</td><td>☑ · 48182</td></tr></table></div>
   </div>
   <div class="box info">HRI-200 setup 메뉴는 <b>기본값 그대로</b>. Write 버튼은 값을 바꿀 때만 사용합니다. 모든 메뉴 설정 후 Apply → OK.</div>
  </div>
@@ -449,12 +437,11 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
 <section class="slide" data-ch="E DS0ARC" data-t="켜기 / 끄기" id="s17">
  <div class="chp">E DS0ARC (HRI-200 노드)</div><h1>DS0ARC 켜기 · 끄기 절차</h1>
  <div class="body">
-  <div class="box bad"><b>반드시 소프트웨어 먼저 실행 → 무전기 켜기.</b> 순서가 바뀌면 노드 모드에 진입하지 못합니다.</div>
   <div class="cols c2">
    <div class="card"><h3>켜는 순서</h3><ol class="st">
     <li>USB·CT-174 연결 확인, FTM-510D OFF(5초 대기)</li>
     <li>WIRES-X 실행 → COM port <b>6:USB 직렬 장치(COM6)</b></li>
-    <li><span class="kb">GM</span>+<span class="kb">DX</span> 동시에 누른 채 전원 ON (약 2초)<em>매뉴얼 기준. 기존 현장 가이드는 [GM]+[DG3]로 기재 → 실기 확인</em></li>
+    <li><span class="kb">GM</span>+<span class="kb">DX</span> 동시에 누른 채 전원 ON (약 2초)</li>
     <li>화면 "HRI-200 · 145.620 · DN" → <b>ONLINE</b> 확인</li></ol></div>
    <div class="card"><h3>끄는 순서</h3><ol class="st">
     <li>Room 비활성화<em>Connect → Room Open → Active 해제 → Activation</em></li>
@@ -489,53 +476,25 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
 <section class="slide" data-ch="F FT5D 핸디" data-t="C4FM 디지털 설정" id="s19">
  <div class="chp">F FT5D 핸디</div><h1>FT5D — C4FM 디지털 모드 설정 (최초 1회)</h1>
  <div class="body">
-  <div class="box info">FT5D는 <b>PC·케이블 없이</b> 무전기 단독으로 WIRES-X 룸 접속 가능. WIRES-X는 <b>A-밴드에서만</b> 동작합니다.</div>
+  <div class="box info">FT5D는 <b>PC·케이블 없이</b> 무전기 단독으로 노드(145.620 MHz)에 접속합니다.</div>
   <div class="cols c2">
    <div class="card"><h3>주파수·모드</h3><ol class="st">
-    <li>A-밴드(상단) 활성 확인</li><li>DIAL로 <code>145.620 MHz</code></li>
+    <li>DIAL로 <code>145.620 MHz</code></li>
     <li>[MODE] 터치 → <b>DN</b>(권장) 또는 AMS</li><li>화면 상단 DN/AMS 표시 확인</li></ol></div>
    <div class="card"><h3>DG-ID 설정</h3><ol class="st">
     <li><span class="kb">F MENU</span> 길게</li><li>WIRES-X → <b>5 DG-ID</b></li>
     <li>DIAL로 <b>노드와 같은 번호</b> 선택 → BACK 저장<em>매뉴얼: 노드국과 같은 DG-ID로 설정 (본 망은 00 · 00은 모든 ID 신호 수신)</em></li></ol></div>
   </div>
-  <div class="box warn">FM 모드에서는 WIRES-X <b>디지털 룸 접속 불가</b>(DTMF만 가능). 반드시 DN 또는 AMS로 설정하세요.</div>
  </div>
 </section>
 
-<section class="slide" data-ch="F FT5D 핸디" data-t="룸 접속 · 즐겨찾기" id="s20">
+<section class="slide" data-ch="F FT5D 핸디" data-t="룸 접속" id="s20">
  <div class="chp">F FT5D 핸디</div><h1>FT5D — WIRES-X 룸 접속</h1>
  <div class="body">
   <div class="box warn">DS0ARC 노드(145.620MHz)의 <b>전파 수신 범위 안</b>에서, DS0ARC가 ONLINE일 때만 접속됩니다.</div>
-  <div class="cols c3">
-   <div class="card"><h3>① Search &amp; Direct</h3><ol class="st">
+  <div class="card"><h3>Search &amp; Direct로 룸 접속</h3><ol class="st">
     <li>GM/X <b>1초 이상 길게</b> → 노드 발견 시 X 점등</li><li>SEARCH &amp; DIRECT 터치</li>
-    <li>룸 ID <code>48182</code> 입력</li><li>RCNet-Disaster 터치 → PTT</li></ol></div>
-   <div class="card"><h3>② 즐겨찾기 (C1~C5)</h3><ol class="st">
-    <li>접속 상태에서 룸명 터치 → <b>ADD</b></li><li>카테고리(예: C1) 저장</li>
-    <li>다음부터 GM/X 길게 → C1 터치</li></ol></div>
-   <div class="card"><h3>③ 최근 룸 재접속</h3><ol class="st">
-    <li>GM/X 길게 → 노드 접속</li><li>하단 이전 룸명 깜박임 터치</li><li><b>가장 빠름</b> — 매번 권장</li></ol></div>
-  </div>
-  <div class="box info"><b>해제</b> : BACK → Disconnect, 이어서 GM/X 1~2초 길게 → X 아이콘 소멸 → 일반 VFO 복귀</div>
- </div>
-</section>
-
-<section class="slide" data-ch="F FT5D 핸디" data-t="모드 요약 · 문제 해결" id="s21">
- <div class="chp">F FT5D 핸디</div><h1>FT5D 모드별 운용과 문제 해결</h1>
- <div class="body">
-  <div class="cols c2">
-   <table class="t"><tr><th>모드</th><th>용도</th><th>WIRES-X</th></tr>
-    <tr><td class="k">DN</td><td>C4FM 디지털 (권장)</td><td>✅</td></tr>
-    <tr><td class="k">DW</td><td>C4FM Wide</td><td>✅</td></tr>
-    <tr><td class="k">AMS</td><td>C4FM/FM 자동 전환</td><td>✅ 디지털 노드 시</td></tr>
-    <tr><td class="k">FM</td><td>아날로그 일반</td><td>❌ DTMF만</td></tr></table>
-   <table class="t"><tr><th>증상</th><th>해결</th></tr>
-    <tr><td>X 아이콘 30초 후 사라짐</td><td>DS0ARC ONLINE·전파 범위 확인</td></tr>
-    <tr><td>접속 안 됨</td><td>MODE를 DN/AMS로</td></tr>
-    <tr><td>B-밴드에서 무반응</td><td>A-밴드로 전환</td></tr>
-    <tr><td>소리 안 들림</td><td>볼륨↑ · 스퀠치↓</td></tr></table>
-  </div>
-  <div class="box info">FT5D는 HRI-200에 연결하지 않고 <b>무전기 단독</b>(RF)으로 노드에 접속해 사용합니다.</div>
+    <li>룸 ID <code>48182</code> 입력</li><li>RCNet-Disaster 터치 → PTT로 교신</li></ol></div>
  </div>
 </section>
 
@@ -554,7 +513,6 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
     <li>Modulation 선택<em>FM–FM : 아날로그 핸디용 / DIGITAL–DIGITAL : C4FM용</em></li>
     <li>Apply → OK</li><li>FTM-510D 전원 ON → ONLINE 확인</li></ol>
   </div>
-  <div class="box info">WIRES-X는 AUTO 모드가 없어 C4FM과 아날로그를 <b>동시에 수용할 수 없습니다</b> → 2노드 운용(27번 슬라이드) 권장</div>
  </div>
 </section>
 
@@ -565,8 +523,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
    <li>핸디 설정 : <code>145.620 MHz</code> · 모드 FM · CTCSS/TONE 없음</li>
    <li>노드 <b>ONLINE(IPv4)</b> 확인</li>
    <li><b>PTT를 누른 채</b> 키패드로 <code>#</code> + 룸/노드 ID 5자리 입력 (예 <code>#48182</code>) → 마지막 숫자 후 1~2초 유지 후 해제</li>
-   <li>핸디 스피커에서 <b>"삐~" 접속 완료 톤</b> 확인 → RCNet-Disaster 접속</li>
-   <li>PTT로 교신 · 종료는 PTT 누른 채 <code>#99999</code> 입력</li>
+   <li>접속되면 PTT로 교신 · 종료는 PTT 누른 채 <code>#99999</code> 입력</li>
   </ol>
   <div class="box warn">노드 응답이 없으면 : PTT를 너무 빨리 뗐는지, 주파수가 정확히 145.620MHz인지, FM 모드인지 확인하세요.</div>
  </div>
@@ -576,19 +533,14 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
  <div class="chp">G 아날로그 접속</div><h1>기종별 DTMF 전송 방법</h1>
  <div class="body">
   <div class="cols c3">
-   <div class="card"><h3>🔵 ICOM · IC-V86 / IC-T10</h3><ol class="st">
-    <li>사전 설정 : Set mode의 <b>DTMF TX key</b> 항목에서 수동 송출 방식 선택<em>옵션 표기는 모델별로 다름 → 설명서·실기 확인</em></li>
-    <li>PTT 누른 채 # + 5자리</li><li>마지막 후 1~2초 유지</li></ol></div>
-   <div class="card"><h3>🟡 YAESU · FT-65R / FT-60R / VX-6R</h3><ol class="st">
-    <li>FT-65R : Set Mode <b>12 DTMF SET</b> → MANUAL (기본값)<em>FT-60R·VX-6R은 설명서 DTMF 장 확인</em></li>
-    <li>PTT 누른 채 # + 5자리</li><li>마지막 후 PTT 유지 → 해제</li></ol></div>
+   <div class="card"><h3>🔵 ICOM · IC-V86</h3><ol class="st">
+    <li>사전 설정 : Set mode의 <b>DTMF TX key</b> 항목에서 DTMF 송출 방식 선택</li></ol></div>
+   <div class="card"><h3>🟡 YAESU · FT-65R</h3><ol class="st">
+    <li>FT-65R : Set Mode <b>12 DTMF SET</b> → MANUAL (기본값)</li></ol></div>
    <div class="card"><h3>🔴 Baofeng · UV-5R / UV-82</h3><ol class="st">
-    <li>사전 설정 : MENU → <b>16 DTMFST → OFF</b><em>사이드톤이 마이크로 들어가 DTMF를 왜곡할 수 있음</em></li>
-    <li>PTT 누른 채 # + 5자리</li><li>UV-K5는 메뉴 번호가 펌웨어별로 달라 확인 필요</li></ol></div>
+    <li>사전 설정 : MENU → <b>16 DTMFST → OFF</b><em>사이드톤이 마이크로 들어가 DTMF를 왜곡할 수 있음</em></li></ol></div>
   </div>
-  <table class="t"><tr><th>증상</th><th>원인</th><th>해결</th></tr>
-   <tr><td>노드 응답 없음</td><td>PTT 너무 빨리 해제 / 주파수 불일치</td><td>마지막 키 후 1~2초 유지 · 145.620 확인</td></tr>
-   <tr><td>톤 안 나감 / 잡음</td><td>FM 모드 아님 · Baofeng DTMFST=ON · ICOM 송출 방식</td><td>FM 선택 · DTMFST OFF · ICOM DTMF TX key 설정</td></tr></table>
+  <div class="box info">설정 후 입력 방법은 PTT를 누른 채 <code>#</code> + 5자리로 모두 같습니다 (앞 슬라이드 참조).</div>
  </div>
 </section>
 
@@ -605,7 +557,7 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
    <table class="t"><tr><th>항목</th><th>권장</th></tr>
     <tr><td class="k">마이크 볼륨</td><td>파형이 점선 기준선을 <b>넘지 않는 최대</b> (보통 50~80%)</td></tr>
     <tr><td class="k">OUTPUT(Tx)</td><td>SP LEVEL 막대 반응 최대</td></tr>
-    <tr><td class="k">Application Volume</td><td><b>Free</b> (Fix면 볼륨 노브 무효)</td></tr>
+    
     <tr><td class="k">Windows 믹서</td><td>WIRES-X 음소거 해제 · 80~100%</td></tr></table>
   </div>
   <div class="box warn">점선을 넘으면 음성이 찌그러집니다(Distortion).</div>
@@ -640,11 +592,10 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
    <div class="card"><div class="big"><code>#48182</code></div><p>RCNet-Disaster 룸 접속 (# + 룸 ID)</p></div>
    <div class="card"><div class="big"><code>#38182</code></div><p>DS0ARC 노드 접속 (# + 노드 ID)</p></div>
    <div class="card"><div class="big"><code>#99999</code></div><p>접속 해제</p></div>
-   <div class="card"><div class="big"><code>#55555</code></div><p>현장 운용값 · 매뉴얼 미확인</p></div>
-   <div class="card"><div class="big"><code>#66666</code></div><p>노드 상태 조회 · 매뉴얼 미확인</p></div>
-   <div class="card"><div class="big"><code>*</code></div><p>해제 단축 · 매뉴얼 미확인</p></div>
+   
+   
+   
   </div>
-  <div class="box warn">PTT를 누른 채 DTMF 톤 전송이 끝날 때까지 유지하고, <b>마지막 키 후 1~2초</b> 더 유지한 뒤 해제하세요.</div>
   <h2>자주 쓰는 룸 ID</h2>
   <table class="t"><tr><td class="k"><code>48182</code></td><td>RCNet-Disaster</td><td class="k"><code>43534</code></td><td>PHILIPPINE-LINK</td>
    <td class="k"><code>28054</code></td><td>AMERICA-KC-WIDE</td><td class="k"><code>20510</code></td><td>ALLJA-CQ-ROOM</td></tr></table>
@@ -655,81 +606,33 @@ a.lk em.u{background:var(--warnBg);color:var(--warn)}
  <div class="chp">H 운용 전략</div><h1>모니터링 — 유심 데이터 절약 운용</h1>
  <div class="body">
   <table class="t"><tr><th style="width:280px">방법</th><th style="width:300px">데이터 소모</th><th>특징</th></tr>
-   <tr><td class="k">① PC WIRES-X 소프트웨어</td><td>중간 (룸 접속 유지, 약 30~80MB/일)</td><td>SP LEVEL 파형 확인</td></tr>
+   <tr><td class="k">① PC WIRES-X 소프트웨어</td><td>중간 (룸 접속 유지)</td><td>SP LEVEL 파형 확인</td></tr>
    <tr><td class="k">② FT5D 단독 RF 수신</td><td>없음</td><td>노드 전파 범위 내에서만</td></tr>
    <tr><td class="k">③ WIRES-X 웹 모니터</td><td>매우 소량</td><td>룸 접속 현황 확인</td></tr>
    <tr><td class="k">④ 아날로그 핸디 대기</td><td>없음</td><td>145.620MHz 수신 대기</td></tr></table>
-  <h2>권장 운용</h2>
-  <table class="t"><tr><th style="width:360px">상황</th><th>운용</th></tr>
-   <tr><td>평상시 (교신 없음)</td><td>FT5D DN 145.620MHz 수신 대기 · PDN OFFLINE</td></tr>
-   <tr><td>훈련·출동 30분 전 ~ 교신 중</td><td>PDN ONLINE → 룸 접속, 교신 완료 후 OFFLINE</td></tr>
-   <tr><td>재난 대기 (상시)</td><td>PDN ONLINE 유지 · 무제한 요금제 권장 (최소 월 3GB↑)</td></tr></table>
  </div>
 </section>
 
 <!-- ===== I 현황·링크 ===== -->
-<section class="slide" data-ch="I 현황·링크" data-t="진행 현황 · 남은 과제" id="s29">
- <div class="chp">I 현황·링크</div><h1>진행 현황과 남은 과제</h1>
- <div class="body">
-  <div class="cols c2">
-   <div class="card"><h3>✅ 완료</h3><ul class="b">
-    <li>노드 YAESU 등록 · 봉사원 노드 추가</li><li>DS0ARC HRI-200 연결 · SW 설치/설정</li>
-    <li>DS0ARC ONLINE · Room(RCNet-Disaster/48182) 설정</li><li>AMERICA-KC-WIDE 교신 테스트 성공</li></ul></div>
-   <div class="card"><h3>🔄 진행 / 미완료</h3><ul class="b">
-    <li>FTM-510D 스피커 출력 확인 (OUTPUT 슬라이더)</li><li>Room compatible 활성화 · Port check</li>
-    <li>FT5D 봉사원 접속 · 아날로그 DTMF 접속 테스트</li><li>HL0FRC · DS0ARC/M PDN 설정, 2노드·4노드 동시 교신 시험</li></ul></div>
-  </div>
-  <div class="box info">다음 교육·훈련 시 위 미완료 항목을 체크리스트로 활용합니다.</div>
- </div>
-</section>
-
 <section class="slide" data-ch="I 현황·링크" data-t="참고 링크 · 연결 확인" id="s30">
- <div class="chp">I 현황·링크</div><h1>참고 링크 모음과 연결 확인 결과</h1>
+ <div class="chp">I 현황·링크</div><h1>참고 링크 모음</h1>
  <div class="body">
   <table class="t"><tr><th style="width:420px">링크</th><th style="width:180px">확인 결과</th><th>비고</th></tr>
    <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/user/index.php" target="_blank" rel="noopener">WIRES-X User page</a></td><td>✅ 검색 확인</td><td>사용자 안내</td></tr>
    <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/pdf/WIRES-X_PDN_Function_OM_ENG_1902-C.pdf" target="_blank" rel="noopener">PDN Function 매뉴얼(PDF)</a></td><td>✅ 검색 확인</td><td>PDN 공식 설명서</td></tr>
    <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/contact/pdf/HRI-200_Manual_ENG_2304-N.pdf" target="_blank" rel="noopener">HRI-200 매뉴얼(PDF)</a></td><td>✅ 검색 확인</td><td>HRI-200 공식 설명서</td></tr>
-   <tr><td><a class="lk" href="https://www.manualslib.com/manual/2355039/Yaesu-Ft5dr.html" target="_blank" rel="noopener">FT5DR 매뉴얼</a></td><td>✅ 검색 확인</td><td>ManualsLib</td></tr>
-   <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/index.php" target="_blank" rel="noopener">WIRES-X 메인</a></td><td>⚠ 직접 확인</td><td>Member Login (로그인 필요)</td></tr>
-   <tr><td><a class="lk" href="https://yaesu.com/jp/en/wires-x/regist/index.php" target="_blank" rel="noopener">멤버 등록</a></td><td>⚠ 직접 확인</td><td>등록 양식</td></tr>
-   <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/node/index.php" target="_blank" rel="noopener">Node owner 페이지</a></td><td>⚠ 직접 확인</td><td>SW 다운로드 (로그인)</td></tr>
-   <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/WIRES-X/pdf/WIRES-X_RADIO_ID_CHECK_ENG_2509-I.pdf" target="_blank" rel="noopener">Radio ID Check(PDF)</a></td><td>⚠ 직접 확인</td><td>공식 안내서</td></tr></table>
-  <div class="box warn"><b>확인 방법</b> : 제작 환경에서 해당 사이트에 직접 접속할 수 없어, ✅는 검색 결과로 페이지 존재를 확인한 항목이고 ⚠는 로그인 필요 또는 접속 확인이 안 된 항목입니다. ⚠ 링크는 클릭해 한 번 열어 보세요.</div>
- </div>
-</section>
-
-<section class="slide" data-ch="I 현황·링크" data-t="매뉴얼 대조 결과" id="s31">
- <div class="chp">I 현황·링크</div><h1>제조사 매뉴얼 대조 결과 (v1.3)</h1>
- <div class="body">
-  <div class="cols c3">
-   <div class="card"><h3>✅ 매뉴얼 일치</h3><ul class="b">
-    <li>FTM-510D : DX 길게=WIRES-X 시작, GM 길게=DG-ID, FUNC 길게=Setup</li>
-    <li>FTM-300/200/100/3200 · FT-70DR · FT1DR Radio ID 경로</li>
-    <li>PDN은 Room 개설 불가</li><li>해제 #99999 · PC 사양</li><li>UV-5R/82 DTMFST OFF</li></ul></div>
-   <div class="card"><h3>✏️ 정정함</h3><ul class="b">
-    <li>FT5D DG-ID : AUTO → 노드와 같은 번호</li>
-    <li>HRI-200 켜기 : [GM]+[DX]로 표기</li>
-    <li>접속 DTMF : # + 5자리</li>
-    <li>ICOM·YAESU DTMF 설정 표기</li>
-    <li>FT5D 케이블 : SCU-57 또는 SCU-39</li></ul></div>
-   <div class="card"><h3>⚠ 실기 확인 필요</h3><ul class="b">
-    <li>FTM-500DR · FTM-310DR · FTM-400XDR Radio ID 번호</li>
-    <li>FT5DR·FT3DR Radio ID 경로</li>
-    <li>FTM-510D의 GM 항목 번호(61/62)</li>
-    <li>#55555 · #66666 · Unlimited TOT 등 현장값</li></ul></div>
-  </div>
-  <div class="box info">일부 매뉴얼은 본문 전체를 읽지 못했습니다. 실기 확인 표시가 있는 항목은 사용 전 실제 화면으로 확인하세요.</div>
+   <tr><td><a class="lk" href="https://www.manualslib.com/manual/2355039/Yaesu-Ft5dr.html" target="_blank" rel="noopener">FT5DR 매뉴얼</a></td><td>✅ 검색 확인</td><td>ManualsLib</td></tr></table>
+  <div class="box info">검색으로 존재를 확인한 YAESU 공식 매뉴얼·안내 링크만 수록했습니다.</div>
  </div>
 </section>
 
  </main>
  <div id="bar"></div>
- <div id="ftr"><div>대한적십자사 서울특별시지사 재난대응봉사회 · <span class="app-version">v1.3</span> · 2026-10-16</div>
+ <div id="ftr"><div>대한적십자사 서울특별시지사 재난대응봉사회 · <span class="app-version">v1.4</span> · 2026-10-16</div>
   <div class="nav"><button id="prev">◀ 이전</button><span id="pg">1 / 1</span><button id="next">다음 ▶</button></div></div>
 </div>
 <script>
-var APP_VERSION='v1.3', APP_DATE='2026-10-16';
+var APP_VERSION='v1.4', APP_DATE='2026-10-16';
 (function(){
   var stage=document.getElementById('stage');
   function fit(){var s=Math.min(innerWidth/1920,innerHeight/1080);
