@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>RC-NET FM 노드 운용 교육</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* RCNET_FM노드_운용교육.html v1.0 (2026-10-19) */
+:root{--navy:#1e3a5f;--navy2:#2c5282;--ink:#1f2937;--mut:#475569;--bg:#f3f6fa;--card:#ffffff;--line:#cbd5e1;
+--blue:#1d4ed8;--blueBg:#e0ebff;--warnBg:#fff4d6;--warn:#7a4b00;--badBg:#fde2e2;--bad:#8a1c1c;--okBg:#dcf5e4;--ok:#14532d;--red:#b91c1c}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#0f1b2d;font-family:'Noto Sans KR',sans-serif;color:var(--ink)}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;background:var(--bg);display:grid;
+grid-template-columns:400px 1fr;grid-template-rows:84px 1fr 64px;overflow:hidden}
+/* header */
+#hdr{grid-column:1/3;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 40px}
+#hdr .t{font-size:34px;font-weight:700;letter-spacing:-.5px}
+#hdr .t small{font-size:22px;font-weight:400;color:#cfe0f5;margin-left:18px}
+#hdr .v{font-size:22px;color:#dbe7f6}
+#hdr .v b{color:#fff}
+/* menu */
+#menu{background:#e8eef6;border-right:2px solid var(--line);overflow-y:auto;padding:14px 0}
+.mc{display:block;width:100%;text-align:left;border:0;background:none;font:inherit;font-size:24px;font-weight:700;color:var(--navy);
+padding:11px 22px;cursor:pointer;border-left:6px solid transparent}
+.mc:hover{background:#dbe5f2}
+.mc.on{background:var(--navy);color:#fff;border-left-color:#f59e0b}
+.mc .n{display:inline-block;width:34px;color:var(--blue);font-weight:900}
+.mc.on .n{color:#fcd34d}
+.ms{display:none}
+.ms.open{display:block;padding:4px 0 8px}
+.mi{display:block;width:100%;text-align:left;border:0;background:none;font:inherit;font-size:22px;color:var(--ink);
+padding:7px 22px 7px 62px;cursor:pointer;line-height:1.3}
+.mi:hover{background:#d6e2f2}
+.mi.on{background:#fff;color:var(--blue);font-weight:700;border-left:6px solid var(--blue);padding-left:56px}
+/* slide */
+#view{position:relative;overflow:hidden}
+.slide{display:none;position:absolute;inset:0;padding:28px 48px 20px;overflow:hidden}
+.slide.on{display:flex;flex-direction:column;animation:fi .18s ease}
+@keyframes fi{from{opacity:.2}to{opacity:1}}
+.chp{font-size:22px;font-weight:700;color:var(--blue);margin-bottom:2px}
+h1{font-size:50px;font-weight:900;color:var(--navy);line-height:1.2;margin-bottom:14px;padding:8px 20px;border:3px solid var(--navy);border-radius:12px;background:#fff;align-self:flex-start;max-width:100%}
+h2{font-size:34px;font-weight:700;color:var(--navy);margin:10px 0 8px;padding-left:14px;border-left:8px solid var(--blue)}
+p,li{font-size:26px;line-height:1.45}
+.body{flex:none;display:flex;flex-direction:column;gap:12px}
+.cols{display:grid;gap:20px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:1fr 1fr 1fr}.c12{grid-template-columns:5fr 6fr}.c21{grid-template-columns:6fr 5fr}
+.card{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:16px 22px}
+.card h3{font-size:28px;color:var(--navy);margin-bottom:6px}
+.card p,.card li{font-size:24px}
+ul.b{padding-left:30px}ul.b li{margin:3px 0}
+ol.st{list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:9px}
+ol.st>li{counter-increment:s;position:relative;padding-left:58px;font-size:26px;line-height:1.38}
+ol.st>li::before{content:counter(s);position:absolute;left:0;top:1px;width:42px;height:42px;border-radius:50%;background:var(--navy);color:#fff;
+font-weight:700;font-size:24px;text-align:center;line-height:42px}
+ol.st em{display:block;font-style:normal;font-size:22px;color:var(--mut)}
+table.t{border-collapse:collapse;width:100%;background:#fff}
+table.t th{background:#dbe7f6;color:var(--navy);font-size:24px;text-align:left;padding:8px 14px;border:1.5px solid var(--line)}
+table.t td{font-size:24px;padding:7px 14px;border:1.5px solid var(--line);line-height:1.35;vertical-align:top}
+table.t tr:nth-child(even) td{background:#f8fafc}
+td.k{font-weight:700;color:var(--navy);white-space:nowrap}
+.box{border-radius:12px;padding:12px 20px;font-size:24px;line-height:1.4;border:2px solid}
+.box b{font-weight:700}
+.info{background:var(--blueBg);border-color:#93b4f5;color:#0f2a6b}
+.warn{background:var(--warnBg);border-color:#f2c75c;color:var(--warn)}
+.bad{background:var(--badBg);border-color:#ef9a9a;color:var(--bad)}
+.ok{background:var(--okBg);border-color:#86d3a0;color:var(--ok)}
+code,.m{font-family:'Noto Sans KR',monospace;background:#e8eef6;color:#0f2a6b;padding:1px 9px;border-radius:6px;font-weight:700;font-size:.92em}
+.flow{display:flex;align-items:stretch;gap:0;flex-wrap:nowrap}
+.flow .n{flex:1;background:#fff;border:2px solid var(--navy);border-radius:12px;padding:12px 10px;text-align:center;font-size:24px;font-weight:700;color:var(--navy);display:flex;align-items:center;justify-content:center;flex-direction:column;line-height:1.3}
+.flow .n small{font-size:20px;font-weight:400;color:var(--mut);margin-top:4px}
+.flow .a{width:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:20px;color:var(--blue);font-weight:700;text-align:center;line-height:1.15}
+.flow .a i{font-style:normal;font-size:34px}
+.links{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:auto;padding-top:8px}
+.links>span{font-size:22px;font-weight:700;color:var(--navy)}
+a.lk{display:inline-flex;align-items:center;gap:8px;font-size:22px;color:var(--blue);background:#fff;border:2px solid #93b4f5;border-radius:999px;padding:5px 16px;text-decoration:none;font-weight:500}
+a.lk:hover{background:var(--blueBg)}
+a.lk em{font-style:normal;font-size:20px;font-weight:700;padding:1px 9px;border-radius:999px}
+a.lk em.v{background:var(--okBg);color:var(--ok)}
+a.lk em.u{background:var(--warnBg);color:var(--warn)}
+a.lk em.l{background:var(--warnBg);color:var(--warn)}
+.lock{display:flex;gap:12px;align-items:flex-start}
+.big{font-size:30px;font-weight:700;color:var(--navy)}
+.kb{display:inline-block;background:#fff;border:2px solid var(--navy);border-radius:8px;padding:0 12px;font-weight:700;color:var(--navy);font-size:.92em}
+/* cover */
+.cover{justify-content:center;align-items:flex-start;background:linear-gradient(135deg,#fff 0%,#e6eef9 100%)}
+.cover .tag{font-size:28px;color:var(--blue);font-weight:700;margin-bottom:10px}
+.cover h1{font-size:76px;border:4px solid var(--navy);padding:18px 34px;margin-bottom:22px}
+.cover .sub{font-size:34px;color:var(--ink);margin-bottom:34px;line-height:1.5}
+.cover .meta{font-size:26px;color:var(--mut);line-height:1.7}
+/* footer */
+#ftr{grid-column:1/3;background:#fff;border-top:2px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:22px;color:var(--mut)}
+#ftr .nav{display:flex;align-items:center;gap:14px}
+#ftr button{font:inherit;font-size:24px;font-weight:700;color:#fff;background:var(--navy);border:0;border-radius:10px;padding:8px 26px;cursor:pointer}
+#ftr button:disabled{background:#9aa9bd;cursor:default}
+#ftr button:hover:not(:disabled){background:var(--navy2)}
+#pg{font-weight:700;color:var(--navy);min-width:110px;text-align:center;font-size:24px}
+#bar{position:absolute;left:0;bottom:64px;height:5px;background:#f59e0b;width:0;transition:width .2s}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div id="hdr"><div class="t">RC-NET FM 노드 운용 <small>대한적십자사 서울특별시지사 재난대응봉사회 · HL0FRC / NDRT</small></div>
+  <div class="v"><b class="app-version">v1.0</b></div></div>
+ <nav id="menu" aria-label="목차"></nav>
+ <main id="view">
+
+<section class="slide cover" data-ch="시작" data-t="표지" id="s0">
+ <div class="tag">WIRES-X · RC-NET 하이브리드 무선망</div>
+ <h1>RC-NET FM 노드 운용 교육</h1>
+ <div class="sub">HRI-200 노드 · PDN(FM) 설치·설정 → FT5 · 아날로그 무전기 교신</div>
+ <div class="meta">대한적십자사 서울특별시지사 재난대응봉사회<br>의결 : 2026-10-18 · 작성 : 2026-10-19 · <span class="app-version">v1.0</span><br>
+ 이동 : 좌측 목차 클릭 · 키보드 ← → · Home / End</div>
+</section>
+
+<section class="slide" data-ch="시작" data-t="의결 사항과 구성" id="s1">
+ <div class="chp">시작</div><h1>2026-10-18 의결 — HRI-200 3개소 + FM 운용</h1>
+ <div class="body">
+  <div class="box info"><b>의결 내용</b> : DS0ARC 외에 <b>DS0ARC/M(대응차)</b>와 <b>HL0FRC(서울지사 무선국, 마장동)</b>에도 HRI-200을 설치한다. 인근 아날로그 무선국의 FM 신호를 받아 <b>DS0ARC 룸에 연결된 모든 무선국이 아날로그 무전기로 연결</b>되도록 한다.</div>
+  <div class="flow">
+   <div class="n">FT5 · 아날로그 무전기<small>FM</small></div><div class="a"><i>→</i>RF</div>
+   <div class="n">HRI-200 노드<small>DS0ARC · DS0ARC/M · HL0FRC</small></div><div class="a"><i>→</i>인터넷</div>
+   <div class="n">DS0ARC 룸<small>RCNet-Disaster · 48182</small></div><div class="a"><i>←</i>인터넷</div>
+   <div class="n">봉사원 PDN<small>Portable HRI(FM)</small></div>
+  </div>
+  <table class="t"><tr><th style="width:230px">구분</th><th style="width:330px">대상</th><th>역할</th></tr>
+   <tr><td class="k">HRI-200 노드</td><td>DS0ARC · DS0ARC/M · HL0FRC</td><td>인근 FM 무선국을 받아 룸에 연결 (룸 개설은 DS0ARC)</td></tr>
+   <tr><td class="k">PDN 무선국 (FM 모드)</td><td>봉사원 개인 무선국</td><td>Portable HRI 모드로 룸 접속 · 교신</td></tr>
+   <tr><td class="k">이용 무전기</td><td>FT5 · 아날로그 무전기</td><td>FM으로 노드에 접속해 교신</td></tr></table>
+  <div class="box ok">읽는 순서 : <b>A 공통 설정</b>(한 번만) → <b>B HRI-200</b> 또는 <b>C PDN</b> 중 해당 설정 → <b>D 교신 방법</b></div>
+ </div>
+</section>
+
+<section class="slide" data-ch="A 공통 설정" data-t="YAESU 등록 · 로그인" id="s2">
+ <div class="chp">A 공통 설정</div><h1>A-1 YAESU 멤버 등록과 로그인 (최초 1회)</h1>
+ <div class="body">
+  <ol class="st">
+   <li><b>Radio ID 확인</b> — HRI-200은 본체 뒷면 S/N, PDN은 무전기에서 직접<em>영문 대소문자 정확히 구별</em></li>
+   <li><b>멤버 등록</b> — 이메일 → 메일 URL → 약관 동의 → 콜사인·Radio ID·City(SEOUL/Seoul/Korea) 입력</li>
+   <li><b>승인 메일 수신</b> (2~3 영업일) — <b>User ID · Password · Node ID · Room ID</b>(5자리)를 보관</li>
+   <li><b>로그인</b> — WIRES-X 사이트 우측 상단 Member Login</li>
+  </ol>
+<div class="box warn">🔒 <b>로그인 필요</b> : YAESU 멤버 로그인이 필요한 페이지입니다. 로그인하지 않으면 해당 화면으로 연결되지 않고 로그인 화면이 나옵니다. 먼저 <b>WIRES-X 사이트 → Member Login</b>으로 로그인한 뒤 링크를 다시 누르세요.</div>
+  <div class="links"><span>🔗</span> <a class="lk" href="https://yaesu.com/jp/en/wires-x/regist/index.php" target="_blank" rel="noopener">멤버 등록 <em class="l">🔒 로그인 필요</em></a> <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/index.php" target="_blank" rel="noopener">WIRES-X 메인 · Member Login <em class="l">🔒 로그인 필요</em></a></div>
+ </div>
+</section>
+
+<section class="slide" data-ch="A 공통 설정" data-t="소프트웨어 설치" id="s3">
+ <div class="chp">A 공통 설정</div><h1>A-2 WIRES-X 소프트웨어 설치</h1>
+ <div class="body">
+  <ol class="st">
+   <li>로그인 후 <b>Node owner 페이지</b> → Download에서 <code>WIRES-X_setup.exe</code> 받기</li>
+   <li><b>HRI-200 노드만</b> : <code>HRI200_driver_setup.exe</code>를 <b>먼저</b> 설치 (설치 전에는 USB를 연결하지 않음)</li>
+   <li>설치 후 <b>PC 재시작</b> → 바탕화면 WIRES-X 아이콘으로 최초 실행</li>
+   <li>Windows 방화벽 경고 → <b>액세스 허용</b> (개인 + 공용 모두 체크)</li>
+  </ol>
+  <table class="t"><tr><th style="width:160px">항목</th><th>권장 사양</th></tr>
+   <tr><td class="k">사양</td><td>HRI-200 · PDN 매뉴얼의 PC 요구사항 참조 (링크)</td></tr></table>
+<div class="box warn">🔒 <b>로그인 필요</b> : YAESU 멤버 로그인이 필요한 페이지입니다. 로그인하지 않으면 해당 화면으로 연결되지 않고 로그인 화면이 나옵니다. 먼저 <b>WIRES-X 사이트 → Member Login</b>으로 로그인한 뒤 링크를 다시 누르세요.</div>
+  <div class="links"><span>🔗</span> <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/node/index.php" target="_blank" rel="noopener">Node owner 페이지 (다운로드) <em class="l">🔒 로그인 필요</em></a></div>
+ </div>
+</section>
+
+<section class="slide" data-ch="A 공통 설정" data-t="공통 입력값" id="s4">
+ <div class="chp">A 공통 설정</div><h1>A-3 노드 식별 정보 — 모든 노드 공통 입력</h1>
+ <div class="body">
+  <div class="box info">메뉴 <b>File → Settings</b> → 좌측 메뉴 → 항목 입력 → <b>Apply</b> → 모두 끝나면 <b>OK</b>. 최초 1회 <b>ID Entry</b>로 등록합니다 (Radio ID는 무전기를 켜면 자동 입력).</div>
+  <div class="cols c2">
+   <table class="t"><tr><th>항목</th><th>입력값</th></tr>
+    <tr><td class="k">Serial/Radio ID</td><td>HRI-200 : 본체 S/N · PDN : 무전기 Radio ID</td></tr>
+    <tr><td class="k">DTMF ID</td><td>승인 메일의 Node ID (Room ID)</td></tr>
+    <tr><td class="k">CallSign · User ID</td><td>해당 무선국 콜사인</td></tr>
+    <tr><td class="k">Comment</td><td>Korean Red Cross Seoul NDRT</td></tr>
+    <tr><td class="k">City/State/Country</td><td>SEOUL / Seoul / Korea</td></tr>
+    <tr><td class="k">Confidential ID</td><td>□ 체크 해제</td></tr></table>
+   <div style="display:flex;flex-direction:column;gap:12px">
+    <div class="card"><h3>ID Entry 절차</h3><ol class="st">
+     <li>무전기 연결·ON → Radio ID 자동 입력 확인</li>
+     <li>DTMF ID Node · Room 입력, 나머지 입력</li>
+     <li><b>ID Entry</b> 클릭 → 완료 메시지 → OK</li></ol></div>
+    <div class="box warn">노드별로 다른 값은 <b>Radio ID와 DTMF ID</b>뿐입니다. 이후 단원은 이 값을 반복하지 않습니다.</div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="slide" data-ch="A 공통 설정" data-t="오디오 레벨 조정" id="s5">
+ <div class="chp">A 공통 설정</div><h1>A-4 오디오 레벨 조정 (HRI-200 · PDN 공통, 최초 1회)</h1>
+ <div class="body">
+  <div class="box bad">반드시 <b>룸 미접속(No Connection)</b> 대기 상태에서만 조정합니다.</div>
+  <div class="cols c2">
+   <ol class="st">
+    <li>무전기 볼륨 노브를 <b>50%</b>로 고정</li>
+    <li><b>View → Audio adjustment</b> → Graph select <b>Start</b></li>
+    <li><b>Sound Property</b> → Recording → 마이크 → Properties → <b>Levels</b></li>
+    <li>무전기로 DTMF "1"을 누른 채 송신 → 파형 확인하며 마이크 슬라이더 조정</li></ol>
+   <table class="t"><tr><th>항목</th><th>권장</th></tr>
+    <tr><td class="k">마이크 입력</td><td>파형이 점선 기준선을 <b>넘지 않는 최대치</b></td></tr>
+    <tr><td class="k">OUTPUT(Tx)</td><td>SP LEVEL 막대 반응 최대</td></tr>
+    <tr><td class="k">Windows 믹서</td><td>OS Volume Mixer에서 WIRES-X 음소거 해제</td></tr></table>
+  </div>
+  <div class="box warn">점선을 넘으면 음성이 찌그러집니다(Distortion).</div>
+ </div>
+</section>
+
+<section class="slide" data-ch="B HRI-200 노드" data-t="연결 · 설치" id="s6">
+ <div class="chp">B HRI-200 노드</div><h1>B-1 HRI-200 연결과 설치</h1>
+ <div class="body">
+  <div class="flow">
+   <div class="n">PC</div><div class="a"><i>→</i>USB A↔B</div>
+   <div class="n">HRI-200</div><div class="a"><i>→</i>CT-174</div>
+   <div class="n">FTM-510D<small>RADIO 1</small></div><div class="a"><i>→</i>PL-259</div>
+   <div class="n">안테나<small>50Ω 동축</small></div>
+  </div>
+  <div class="cols c2">
+   <table class="t"><tr><th>HRI-200 단자</th><th>용도</th></tr>
+    <tr><td class="k">RADIO 1</td><td>무전기 연결 (10핀 CT-174 · FM 6핀은 CT-175)</td></tr>
+    <tr><td class="k">USB Type-B</td><td>PC 연결 (데이터·전원)</td></tr>
+    <tr><td class="k">MONITOR</td><td>모니터 스피커 보조 출력</td></tr></table>
+   <div class="card"><h3>설치 순서</h3><ol class="st">
+    <li><b>HRI-200 드라이버 먼저</b> → WIRES-X 설치 (A-2)</li>
+    <li>PC 재시작 → USB 연결 → 소프트웨어 실행</li>
+    <li>COM port setting에서 HRI-200 포트 선택</li></ol></div>
+  </div>
+  <div class="box info">DS0ARC · DS0ARC/M · HL0FRC 모두 같은 구성입니다. 무전기는 설치 중 <b>전원 OFF</b>를 유지합니다.</div>
+  <div class="links"><span>🔗</span> <a class="lk" href="https://www.manualslib.com/manual/896221/Yaesu-Wires-X-Hri-200.html" target="_blank" rel="noopener">HRI-200 매뉴얼</a> <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/contact/pdf/HRI-200_Manual_ENG_2304-N.pdf" target="_blank" rel="noopener">HRI-200 매뉴얼(PDF)</a></div>
+ </div>
+</section>
+
+<section class="slide" data-ch="B HRI-200 노드" data-t="HRI-200 설정값" id="s7">
+ <div class="chp">B HRI-200 노드</div><h1>B-2 HRI-200 노드 설정값 (FM 운용)</h1>
+ <div class="body">
+  <div class="cols c2">
+   <div><h2>Transceiver</h2><table class="t"><tr><th>항목</th><th>값</th></tr>
+    <tr><td class="k">Transceiver</td><td>FTM-510D</td></tr>
+    <tr><td class="k">Modulation</td><td><b>RX:FM – TX:FM</b></td></tr>
+    <tr><td class="k">Frequency</td><td>배정된 운용 주파수</td></tr>
+    <tr><td class="k">Analog SQL</td><td>NoTone</td></tr></table>
+    <h2>HRI-200 setup</h2><table class="t"><tr><td class="k">모든 항목</td><td>기본값 그대로</td></tr></table></div>
+   <div><h2>Call · General settings</h2><table class="t"><tr><th>항목</th><th>값</th></tr>
+    <tr><td class="k">Round QSO Room connection</td><td>☑ 체크</td></tr>
+    <tr><td class="k">Return to Room</td><td>☑ · Room ID <code>48182</code></td></tr>
+    <tr><td class="k">DTMF #55555 command</td><td>☑ 체크</td></tr>
+    <tr><td class="k">DTMF #66666 · DTMF * Disconnect</td><td>필요 시 ☑ (General settings)</td></tr></table>
+    <h2>룸 개설 (DS0ARC만)</h2><table class="t">
+    <tr><td class="k">DTMF ID · Room ID</td><td><code>48182</code> · DS0ARC-ROOM2</td></tr>
+    <tr><td class="k">Room Name</td><td>RCNet-Disaster</td></tr>
+    <tr><td class="k">Style · News</td><td>Open · ALL OK</td></tr></table></div>
+  </div>
+  <div class="box warn">Modulation은 <b>ONLINE 중 변경 불가</b> — 소프트웨어 OFFLINE → File → Exit → 무전기 OFF → 재실행 후 변경합니다. 식별 정보는 A-3 값을 입력합니다.</div>
+ </div>
+</section>
+
+<section class="slide" data-ch="B HRI-200 노드" data-t="켜기 · 끄기 · 룸 연결" id="s8">
+ <div class="chp">B HRI-200 노드</div><h1>B-3 켜기 · 끄기 · 룸 연결</h1>
+ <div class="body">
+  <div class="box bad"><b>소프트웨어 먼저 → 무전기 나중</b></div>
+  <div class="cols c2">
+   <div class="card"><h3>켜는 순서</h3><ol class="st">
+    <li>연결 확인, 무전기 OFF</li>
+    <li>WIRES-X 실행 → COM port 선택 → OK</li>
+    <li><span class="kb">GM</span>+<span class="kb">DX</span> 동시에 누른 채 전원 ON (약 2초) → "HRI-200" 표시</li>
+    <li>소프트웨어 <b>ONLINE</b> 확인</li>
+    <li><b>DS0ARC만</b> : Connect → Room Open → Room Active ☑ → <b>Room Activation</b></li></ol></div>
+   <div class="card"><h3>끄는 순서</h3><ol class="st">
+    <li>(DS0ARC) Room Active 해제 → Room Activation</li>
+    <li>무전기 전원 OFF</li>
+    <li>File → <b>Exit</b></li></ol></div>
+  </div>
+  <div class="box info"><b>룸 연결</b> : DS0ARC/M · HL0FRC는 룸을 열지 않습니다. 인근 아날로그 무전기가 <code>#55555</code>를 보내면 노드가 Return to Room에 지정된 룸(<code>48182</code>)에 연결됩니다.</div>
+  <div class="links"><span>🔗</span> <a class="lk" href="https://www.manualslib.com/manual/896221/Yaesu-Wires-X-Hri-200.html?page=103" target="_blank" rel="noopener">HRI-200 DTMF 명령 목록</a></div>
+ </div>
+</section>
+
+<section class="slide" data-ch="C PDN FM 모드" data-t="PDN과 Portable HRI" id="s9">
+ <div class="chp">C PDN FM 모드</div><h1>C-1 봉사원 PDN의 FM 운용 = Portable HRI 모드</h1>
+ <div class="body">
+  <table class="t"><tr><th style="width:250px">구분</th><th>Portable Digital Node (PDN)</th><th>Portable HRI 모드</th></tr>
+   <tr><td class="k">교신 방식</td><td>C4FM 디지털만</td><td><b>C4FM + 아날로그 FM</b></td></tr>
+   <tr><td class="k">아날로그 노드 접속</td><td>불가</td><td>이 모드가 필요</td></tr>
+   <tr><td class="k">오디오 케이블</td><td>불필요</td><td>필요 (PC 3.5Φ 마이크·스피커 단자)</td></tr>
+   <tr><td class="k">Room 개설</td><td>불가</td><td>불가 (룸 접속·교신만)</td></tr></table>
+  <div class="cols c2">
+   <div class="card"><h3>Access Point</h3><p>무전기를 로컬 기지국으로 사용 — 인근 무선국이 RF로 접속해 인터넷으로 연결됩니다.</p></div>
+   <div class="card"><h3>Direct Operation</h3><p>무전기는 전파를 송수신하지 않고, 인터넷 교신만 합니다 (PC 오디오 사용).</p></div>
+  </div>
+  <div class="box info">봉사원 PDN을 FM으로 운용할 때는 <b>Portable HRI 모드</b>로 설치·시작합니다. (매뉴얼 : 아날로그 노드 접속에는 Portable HRI 모드 필요)</div>
+  <div class="links"><span>🔗</span> <a class="lk" href="https://www.rrvarc.org/wp-content/uploads/2022/11/WIRES-X_PDN_Function_OM_ENG_2205-I-min.pdf" target="_blank" rel="noopener">PDN 매뉴얼 2205-I</a> <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/pdf/WIRES-X_PDN_Function_OM_ENG_1902-C.pdf" target="_blank" rel="noopener">PDN 매뉴얼 1902-C</a></div>
+ </div>
+</section>
+
+<section class="slide" data-ch="C PDN FM 모드" data-t="장비 · 케이블" id="s10">
+ <div class="chp">C PDN FM 모드</div><h1>C-2 PDN(Portable HRI) 장비와 케이블</h1>
+ <div class="body">
+  <table class="t"><tr><th style="width:310px">무전기</th><th>Portable HRI 모드 케이블</th></tr>
+   <tr><td class="k">FTM-400 · FTM-300 · FTM-200 · FTM-100</td><td><b>SCU-58</b> 또는 SCU-40 키트 (SCU-56/20 + 오디오 케이블)</td></tr>
+   <tr><td class="k">FT5 · FT3 · FT2</td><td>SCU-57 또는 SCU-39 키트 (CT-44 어댑터 + 오디오 케이블 2개)</td></tr></table>
+  <div class="cols c2">
+   <div class="card"><h3>PC 조건</h3><ul class="b"><li>3.5Φ <b>스피커 단자</b> · <b>마이크 단자</b></li><li>단자가 1개뿐이면 <b>변환(Y) 케이블</b></li></ul></div>
+   <div class="card"><h3>연결 (FTM 계열)</h3><ul class="b"><li>SCU-58 USB → 노트북</li><li>오디오 케이블 → PC 마이크·스피커 단자</li><li>케이블 USB 드라이버는 연결 <b>전에</b> 설치</li></ul></div>
+  </div>
+  <div class="box warn">매뉴얼 기종표에는 FTM-510D가 없습니다. FTM-510D는 현장에서 FTM 계열과 같은 SCU-58 구성으로 운용합니다.</div>
+  <div class="links"><span>🔗</span> <a class="lk" href="https://www.rrvarc.org/wp-content/uploads/2022/11/WIRES-X_PDN_Function_OM_ENG_2205-I-min.pdf" target="_blank" rel="noopener">PDN 매뉴얼 2205-I</a></div>
+ </div>
+</section>
+
+<section class="slide" data-ch="C PDN FM 모드" data-t="시작 · 종료" id="s11">
+ <div class="chp">C PDN FM 모드</div><h1>C-3 Portable HRI 모드 시작과 종료</h1>
+ <div class="body">
+  <ol class="st">
+   <li>WIRES-X 소프트웨어 실행 → <b>Portable HRI 모드</b> 선택, COM 포트 <code>Prolific USB-to-Serial Comm Port (COMx)</code> 선택</li>
+   <li>무전기 시작키 + 전원 ON — <b>FTM-400/300/200/100 : <span class="kb">DX</span>+<span class="kb">GM</span></b></li>
+   <li><span class="kb">A/B</span> 키로 <b>Access Point</b>(주파수 표시) 또는 <b>Direct</b>("DIRECT" 표시) 선택<em>FTM-400은 B-Band DIAL 노브</em></li>
+   <li>최초 1회 : Node ID · Room ID 입력 → <b>ID Entry</b> → OK (A-3)</li>
+   <li>Access Point는 Transceiver 창에서 Frequency · DG-ID 등 설정</li>
+  </ol>
+  <div class="cols c2">
+   <div class="card"><h3>접속 해제</h3><p>소프트웨어 <b>Connect → Disconnect</b></p></div>
+   <div class="card"><h3>종료</h3><p>시작키 조작을 다시 해서 일반 모드로 → 소프트웨어 <b>File → Exit</b></p></div>
+  </div>
+  <div class="links"><span>🔗</span> <a class="lk" href="https://www.rrvarc.org/wp-content/uploads/2022/11/WIRES-X_PDN_Function_OM_ENG_2205-I-min.pdf" target="_blank" rel="noopener">PDN 매뉴얼 2205-I</a></div>
+ </div>
+</section>
+
+<section class="slide" data-ch="D 교신 방법" data-t="아날로그 무전기 교신" id="s12">
+ <div class="chp">D 교신 방법</div><h1>D-1 아날로그 무전기로 교신하기</h1>
+ <div class="body">
+  <ol class="st">
+   <li>무전기를 <b>FM</b>, 노드 주파수로 설정 (CTCSS/TONE 없음)</li>
+   <li><b>PTT를 누른 채</b> <code>#</code> + 5자리 ID 입력 — 룸 <code>#48182</code> · 또는 노드에 설정된 룸에 <code>#55555</code></li>
+   <li>PTT를 놓고 <b>약 10초 수신 대기</b> → 소리가 들리면 접속 (접속 화면은 나타나지 않음)</li>
+   <li>PTT로 교신</li>
+   <li>종료 : PTT를 누른 채 <code>#99999</code></li>
+  </ol>
+  <table class="t"><tr><th style="width:170px">DTMF</th><th>동작</th><th style="width:420px">노드 쪽 설정</th></tr>
+   <tr><td class="k"><code>#</code>+5자리</td><td>해당 룸/노드에 접속</td><td>—</td></tr>
+   <tr><td class="k"><code>#55555</code></td><td>지정한 룸(Return to Room)에 접속</td><td>Call settings의 DTMF #55555 ☑</td></tr>
+   <tr><td class="k"><code>#66666</code></td><td>노드 상태 음성 안내</td><td>General settings의 DTMF #66666 ☑</td></tr>
+   <tr><td class="k"><code>#99999</code> · <code>*</code></td><td>접속 해제</td><td>*는 DTMF * Disconnect ☑</td></tr></table>
+  <div class="links"><span>🔗</span> <a class="lk" href="https://www.manualslib.com/manual/896221/Yaesu-Wires-X-Hri-200.html?page=103" target="_blank" rel="noopener">HRI-200 DTMF 명령 목록</a></div>
+ </div>
+</section>
+
+<section class="slide" data-ch="D 교신 방법" data-t="기종별 DTMF 사전 설정" id="s13">
+ <div class="chp">D 교신 방법</div><h1>D-2 기종별 DTMF 사전 설정</h1>
+ <div class="body">
+  <div class="cols c3">
+   <div class="card"><h3>🔵 ICOM · IC-V86</h3><ol class="st"><li>Set mode의 <b>DTMF TX key</b> 항목에서 DTMF 송출 방식 선택</li></ol></div>
+   <div class="card"><h3>🟡 YAESU · FT-65R</h3><ol class="st"><li>Set Mode <b>12 DTMF SET</b> → MANUAL (기본값)</li></ol></div>
+   <div class="card"><h3>🔴 Baofeng · UV-5R / UV-82</h3><ol class="st"><li>MENU → <b>16 DTMFST → OFF</b><em>사이드톤이 마이크로 들어가 DTMF를 왜곡할 수 있음</em></li></ol></div>
+  </div>
+  <div class="box info">설정 후 입력 방법은 모두 같습니다 — <b>PTT를 누른 채 <code>#</code> + 5자리</b> (D-1).</div>
+ </div>
+</section>
+
+<section class="slide" data-ch="D 교신 방법" data-t="FT5 교신" id="s14">
+ <div class="chp">D 교신 방법</div><h1>D-3 FT5로 교신하기</h1>
+ <div class="body">
+  <div class="cols c2">
+   <div class="card"><h3>FM 모드 — HRI-200 · PDN(FM) 노드</h3><ol class="st">
+    <li><b>A-밴드</b>를 노드 주파수로 맞춤 (WIRES-X는 A-밴드 전용)</li>
+    <li><b>[MODE]</b> 터치 → 아날로그 FM</li>
+    <li>PTT를 누른 채 <b>[DTMF]</b> 터치 → <code>#</code> + 5자리 입력</li>
+    <li>PTT를 놓고 약 10초 대기 → 소리 확인 (접속 화면 없음)</li>
+    <li>해제 : PTT + [DTMF] → <code>#99999</code></li></ol></div>
+   <div class="card"><h3>C4FM(DN) — 디지털 노드</h3><ol class="st">
+    <li>DG-ID를 노드와 같은 번호로 설정</li>
+    <li><b>GM/X</b> 길게 → 노드 발견 시 X 점등</li>
+    <li><b>SEARCH &amp; DIRECT</b> → <b>[ID]</b>로 5자리 입력</li>
+    <li>해제 : 매뉴얼의 해제 절차 참조</li></ol></div>
+  </div>
+  <div class="box warn">C4FM 해제 키 조작 등 세부 버튼은 FT5DR 매뉴얼 링크의 해당 장을 확인하세요.</div>
+  <div class="links"><span>🔗</span> <a class="lk" href="https://manualmachine.com/yaesu/ft5dr/26753954-wires-x-manual/" target="_blank" rel="noopener">FT5DR WIRES-X 매뉴얼</a> <a class="lk" href="https://www.manualslib.com/manual/2355039/Yaesu-Ft5dr.html" target="_blank" rel="noopener">FT5DR 매뉴얼(ManualsLib)</a></div>
+ </div>
+</section>
+
+<section class="slide" data-ch="E 자료 · 링크" data-t="링크 모음" id="s15">
+ <div class="chp">E 자료 · 링크</div><h1>E-1 자료와 링크</h1>
+ <div class="body">
+  <table class="t"><tr><th style="width:420px">자료</th><th style="width:210px">접속</th><th>내용</th></tr>
+   <tr><td><a class="lk" href="https://www.manualslib.com/manual/896221/Yaesu-Wires-X-Hri-200.html" target="_blank" rel="noopener">HRI-200 매뉴얼</a></td><td>바로 열림</td><td>설치·연결·DTMF 명령</td></tr>
+   <tr><td><a class="lk" href="https://www.rrvarc.org/wp-content/uploads/2022/11/WIRES-X_PDN_Function_OM_ENG_2205-I-min.pdf" target="_blank" rel="noopener">PDN 매뉴얼 2205-I</a></td><td>바로 열림</td><td>Portable HRI 모드</td></tr>
+   <tr><td><a class="lk" href="https://manualmachine.com/yaesu/ft5dr/26753954-wires-x-manual/" target="_blank" rel="noopener">FT5DR WIRES-X 매뉴얼</a></td><td>바로 열림</td><td>FT5 교신 방법</td></tr>
+   <tr><td><a class="lk" href="https://yaesu.com/jp/en/wires-x/regist/index.php" target="_blank" rel="noopener">멤버 등록</a></td><td>🔒 로그인 필요</td><td>등록 양식</td></tr>
+   <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/index.php" target="_blank" rel="noopener">WIRES-X 메인 · Member Login</a></td><td>🔒 로그인 필요</td><td>멤버 로그인</td></tr>
+   <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/node/index.php" target="_blank" rel="noopener">Node owner 페이지</a></td><td>🔒 로그인 필요</td><td>소프트웨어 다운로드</td></tr></table>
+<div class="box warn">🔒 <b>로그인 필요</b> : YAESU 멤버 로그인이 필요한 페이지입니다. 로그인하지 않으면 해당 화면으로 연결되지 않고 로그인 화면이 나옵니다. 먼저 <b>WIRES-X 사이트 → Member Login</b>으로 로그인한 뒤 링크를 다시 누르세요.</div>
+ </div>
+</section>
+
+ </main>
+ <div id="bar"></div>
+ <div id="ftr"><div>대한적십자사 서울특별시지사 재난대응봉사회 · <span class="app-version">v1.0</span> · 2026-10-19</div>
+  <div class="nav"><button id="prev">◀ 이전</button><span id="pg">1 / 1</span><button id="next">다음 ▶</button></div></div>
+</div>
+<script>
+var APP_VERSION='v1.0', APP_DATE='2026-10-19';
+(function(){
+  var stage=document.getElementById('stage');
+  function fit(){var s=Math.min(innerWidth/1920,innerHeight/1080);
+    stage.style.transform='scale('+s+')';
+    stage.style.left=((innerWidth-1920*s)/2)+'px';stage.style.top=((innerHeight-1080*s)/2)+'px';}
+  addEventListener('resize',fit);fit();
+  document.querySelectorAll('.app-version').forEach(function(e){e.textContent=APP_VERSION;});
+  var slides=[].slice.call(document.querySelectorAll('.slide')),cur=-1;
+  var chapters=[],menu=document.getElementById('menu');
+  slides.forEach(function(s,i){var c=s.dataset.ch;var g=chapters.filter(function(x){return x.name===c})[0];
+    if(!g){g={name:c,items:[]};chapters.push(g);} g.items.push(i);});
+  chapters.forEach(function(g,gi){
+    var b=document.createElement('button');b.className='mc';b.type='button';
+    var m=g.name.match(/^([A-I])\s+(.*)$/);
+    b.innerHTML=m?'<span class="n">'+m[1]+'</span>'+m[2]:'<span class="n">★</span>'+g.name;
+    b.onclick=function(){go(g.items[0]);};g.btn=b;menu.appendChild(b);
+    var ul=document.createElement('div');ul.className='ms';
+    g.items.forEach(function(i){var t=document.createElement('button');t.type='button';t.className='mi';
+      t.textContent=(i+1)+'. '+slides[i].dataset.t;t.onclick=function(){go(i);};slides[i]._mi=t;ul.appendChild(t);});
+    g.ul=ul;menu.appendChild(ul);
+  });
+  /* 슬라이드 내용이 화면 높이를 채우도록 확대(최대 1.4배), 넘치면 축소 방지 */
+  function autoFit(s){var b=s.querySelector('.body');if(!b)return;
+    var z=1.4;for(;z>1.001;z-=0.05){b.style.zoom=z;if(s.scrollHeight<=s.clientHeight+1&&s.scrollWidth<=s.clientWidth+1)break;}
+    b.style.zoom=Math.max(1,z);}
+  function go(i,noHash){
+    if(i<0||i>=slides.length)return;
+    if(cur>=0){slides[cur].classList.remove('on');slides[cur]._mi.classList.remove('on');}
+    cur=i;slides[i].classList.add('on');slides[i]._mi.classList.add('on');
+    chapters.forEach(function(g){var on=g.items.indexOf(i)>=0;g.btn.classList.toggle('on',on);g.ul.classList.toggle('open',on);});
+    slides[i]._mi.scrollIntoView({block:'nearest'});
+    autoFit(slides[i]);
+    document.getElementById('pg').textContent=(i+1)+' / '+slides.length;
+    document.getElementById('prev').disabled=i===0;document.getElementById('next').disabled=i===slides.length-1;
+    document.getElementById('bar').style.width=((i+1)/slides.length*100)+'%';
+    if(!noHash){try{history.replaceState(null,'','#'+slides[i].id);}catch(e){location.hash=slides[i].id;}}
+  }
+  document.getElementById('prev').onclick=function(){go(cur-1)};
+  document.getElementById('next').onclick=function(){go(cur+1)};
+  addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(cur+1);}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(cur-1);}
+    else if(e.key==='Home'){go(0);}else if(e.key==='End'){go(slides.length-1);}});
+  function fromHash(){var id=location.hash.replace('#','');var i=slides.findIndex(function(s){return s.id===id});go(i>=0?i:0,true);}
+  addEventListener('hashchange',fromHash);fromHash();
+})();
+</script>
+</body>
+</html>
