@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="robots" content="noindex, nofollow">
-<title>면접 평가서 v1.0 | 인시스 AI혁신 연구개발실</title>
+<title>면접 평가서 v1.1 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -256,7 +256,7 @@ textarea.ta{width:100%;min-height:64px;padding:6px 8px;border:1px solid #b9c5d4;
 <script>
 (function(){
 'use strict';
-var VERSION='v1.0';
+var VERSION='v1.1';
 var GATE_HASH='c8fee275c283170bbac1048791c5d751fcbb1e06c48a7ba574232e0702095e3a';
 var CASE_ID='c2610-02';
 var COL='interview_records';
@@ -349,6 +349,7 @@ var CASE={
   ]
  ]
 };
+var OPEN=[['O1','회사까지 출퇴근 방법과 편도 소요 시간을 말씀해 주세요.','교통수단, 편도 소요 시간, 장기 근무 가능성']];
 var IND=[];
 var caseData=CASE;
 var fdb=null;
@@ -369,8 +370,14 @@ function qHtml(q){
   return '<div class="q"><div class="q-t"><b>'+esc(id)+'</b>'+esc(q[1])+'</div><div class="q-p">평가 포인트: '+esc(q[2])+'</div>'+
     '<div class="q-row"><div class="sc" id="sc_'+esc(id)+'">'+btns+'</div><textarea class="memo" id="m_'+esc(id)+'" data-m="'+esc(id)+'" placeholder="메모" rows="1"></textarea></div></div>';
 }
+function qMemoHtml(q){
+  var id=q[0];
+  return '<div class="q"><div class="q-t"><b>'+esc(id)+'</b>'+esc(q[1])+'</div><div class="q-p">확인 포인트: '+esc(q[2])+'</div>'+
+    '<div class="q-row"><textarea class="memo" id="m_'+esc(id)+'" data-m="'+esc(id)+'" placeholder="출퇴근 방법·소요 시간 메모" rows="2"></textarea></div></div>';
+}
 function renderQ(){
-  var h='';
+  var h='<div class="sec-h"><span>0. 도입 질문</span><small>채점 제외 / 메모</small></div>';
+  OPEN.forEach(function(q){h+=qMemoHtml(q);});
   CATS.forEach(function(c){
     h+='<div class="sec-h"><span>'+c.id+'. '+esc(c.name)+'</span><small>'+c.w+'점 / '+c.qs.length+'문항</small></div>';
     c.qs.forEach(function(q){h+=qHtml(q);});
