@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>임원 워크숍 일정표</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f5f9; --card:#ffffff; --line:#d5dce8;
+  --text:#1f2937; --navy:#1e3a5f; --navy2:#2c5282;
+  --pastel:#e6edf8; --pastel2:#eef3fa; --warn-bg:#fff6e0; --warn:#7a4b00;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;font-size:0.875rem}
+@media (min-width:768px){body{font-size:1rem}}
+
+/* header / nav : 배경 전체폭, 내부는 컨테이너 폭 */
+.nav{position:sticky;top:0;z-index:10;background:var(--navy);width:100%}
+.nav-inner{max-width:1100px;margin:0 auto;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.nav-title{color:#ffffff;font-weight:700;font-size:0.95rem}
+.nav-title small{font-weight:400;opacity:.9;margin-left:6px}
+.ctrl{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid #9fb3d1;border-radius:8px;overflow:hidden}
+.seg button{background:#e6edf8;color:#1e3a5f;border:0;padding:5px 12px;font-family:inherit;font-size:0.875rem;font-weight:500;cursor:pointer}
+.seg button.on{background:#ffffff;color:#1e3a5f;font-weight:700;box-shadow:inset 0 -3px 0 #2c5282}
+.btn{background:#e6edf8;color:#1e3a5f;border:1px solid #9fb3d1;border-radius:8px;padding:5px 12px;font-family:inherit;font-size:0.875rem;font-weight:500;cursor:pointer}
+.btn:hover{background:#ffffff}
+.ver{background:#ffffff;color:#1e3a5f;border-radius:8px;padding:3px 10px;font-weight:700;font-size:0.875rem}
+
+/* 화면 폭 (모바일 기본) */
+.stage{width:100%;padding:8px 0}
+.frame{margin:0 auto;max-width:430px;width:100%}
+body.pc .frame{max-width:1100px}
+.wrap{padding:0 12px}
+
+.cover{background:var(--pastel);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px}
+.cover h1{color:var(--navy);font-size:1.35rem;font-weight:900;line-height:1.35}
+.cover p{color:var(--text);margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:#ffffff;color:#1e3a5f;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:0.875rem;font-weight:500}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.card>summary{list-style:none;cursor:pointer;padding:10px 12px;display:flex;align-items:center;gap:8px;background:var(--pastel2);color:var(--navy);font-weight:700}
+.card>summary::-webkit-details-marker{display:none}
+.card>summary .no{background:var(--navy);color:#ffffff;border-radius:6px;min-width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:0.875rem}
+.card>summary .tm{margin-left:auto;color:#374151;font-weight:500;font-size:0.875rem}
+.ck{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.ck input{width:18px;height:18px;accent-color:#1e3a5f;cursor:pointer}
+.sumrow td{background:#e8eef6;color:#1e3a5f;font-weight:700}
+.sumbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#e8eef6;border:1px solid #b8c6d9;border-radius:12px;padding:8px 12px;margin:8px 0}
+.sumtxt{display:flex;flex-direction:column;flex:1 1 180px;color:#1e3a5f}
+.sumtxt span{color:#374151;font-size:0.875rem}
+.sumtot{color:#1e3a5f;font-weight:900;font-size:1.25rem}
+.plink{margin:0 0 6px}
+.plink a{display:inline-block;background:#1e3a5f;color:#ffffff;text-decoration:none;border-radius:8px;padding:4px 12px;font-size:0.875rem;font-weight:500}
+.plink a.yt{background:#7f1d1d}
+.plink a.yt2{background:#ffffff;color:#1e3a5f;border:1px solid #b8c6d9;margin-left:4px}
+.ytnote{color:#374151;font-size:0.875rem;margin-left:8px}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
+.ctl button{background:#ffffff;color:#1e3a5f;border:1px solid #b8c6d9;border-radius:8px;padding:4px 10px;font-size:0.875rem;font-family:inherit;cursor:pointer}
+.ctl span{color:#374151;font-size:0.875rem}
+tr.off td{color:#6b7280;text-decoration:line-through;background:#f3f4f6}
+details.card.off>summary{background:#eceff3;color:#6b7280}
+details.card.off>summary .no{background:#9ca3af}
+details.card.off>summary .tm{text-decoration:line-through}
+.card>summary::after{content:"▾";color:var(--navy2);margin-left:8px}
+.card[open]>summary::after{content:"▴"}
+.body{padding:10px 12px}
+.body h4{color:var(--navy);margin:8px 0 4px;font-size:0.95rem}
+.body h4:first-child{margin-top:0}
+.body ul{padding-left:18px}
+.body li{margin:2px 0}
+.body p{margin:4px 0}
+
+table{width:100%;border-collapse:collapse;margin:4px 0;font-size:0.875rem}
+th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+th{background:var(--pastel);color:#1e3a5f;font-weight:700}
+.tbl{overflow-x:auto}
+
+.note{background:var(--warn-bg);color:var(--warn);border:1px solid #f0d9a0;border-radius:8px;padding:6px 10px;margin:6px 0;font-size:0.875rem}
+.tip{background:#e9f3ec;color:#14532d;border:1px solid #bfdcc8;border-radius:8px;padding:6px 10px;margin:6px 0;font-size:0.875rem}
+pre{background:#f1f4f9;color:#1f2937;border:1px solid var(--line);border-radius:8px;padding:8px 10px;overflow-x:auto;font-size:0.875rem;line-height:1.5;white-space:pre}
+.code-head{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.code-head span{font-weight:700;color:var(--navy);font-size:0.875rem}
+a{color:#1e4f9a}
+.foot{text-align:center;color:#374151;font-size:0.875rem;padding:8px 12px 16px}
+.toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#1e3a5f;color:#ffffff;padding:6px 14px;border-radius:8px;font-size:0.875rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+.toc a{display:inline-block;margin:2px 6px 2px 0;text-decoration:none;background:#ffffff;border:1px solid var(--line);border-radius:6px;padding:1px 8px;color:#1e3a5f;font-size:0.875rem}
+
+/* 로그인 화면 */
+.gate{position:fixed;inset:0;z-index:100;background:#1e3a5f;display:flex;align-items:center;justify-content:center;padding:12px}
+.gate.hide{display:none}
+.gate-box{background:#ffffff;color:#1f2937;border-radius:12px;padding:16px;width:100%;max-width:340px;text-align:center}
+.gate-box h2{color:#1e3a5f;font-size:1.1rem;margin-bottom:4px}
+.gate-box p{font-size:0.875rem;margin-bottom:8px}
+.gate-box input{width:100%;padding:8px 10px;border:1px solid #9fb3d1;border-radius:8px;font-family:inherit;font-size:1rem;text-align:center;letter-spacing:6px;color:#1f2937;background:#ffffff}
+.gate-box .go{width:100%;margin-top:8px;padding:8px;border:0;border-radius:8px;background:#1e3a5f;color:#ffffff;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer}
+.gate-err{color:#9b1c1c;font-size:0.875rem;min-height:1.3em;margin-top:6px}
+.gate-ver{color:#374151;font-size:0.875rem;margin-top:6px}
+/* v2.0 음성 입력·토의 녹음 */
+.sync{font-size:0.875rem;padding:3px 10px;border-radius:8px;background:#e6edf8;color:#1e3a5f;font-weight:500}
+.sync.ok{background:#e9f3ec;color:#14532d}
+.sync.warn{background:#fff6e0;color:#7a4b00}
+a.btn{text-decoration:none;display:inline-block}
+.vf{display:flex;gap:4px;align-items:flex-start}
+.fld{flex:1;min-width:0;width:100%;border:1px solid #b8c6d9;border-radius:8px;padding:5px 8px;font-family:inherit;font-size:inherit;color:#1f2937;background:#ffffff;resize:vertical;min-height:38px;line-height:1.5}
+.mic{flex:0 0 auto;border:1px solid #b8c6d9;background:#ffffff;color:#1e3a5f;border-radius:8px;width:38px;height:38px;font-size:1.1rem;cursor:pointer;line-height:1}
+.mic.on{background:#9b1c1c;color:#ffffff;border-color:#9b1c1c;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.65}}
+.interim{color:#4b5563;font-size:0.875rem;min-height:1.2em}
+.hint{color:#374151;font-size:0.875rem}
+.recbox{margin:6px 0}
+details.rec{border:1px solid var(--line);border-radius:10px;background:#fbfcfe;overflow:hidden}
+details.rec>summary{list-style:none;cursor:pointer;padding:8px 10px;display:flex;align-items:center;gap:8px;background:#eef3fa;color:var(--navy);font-weight:700}
+details.rec>summary::-webkit-details-marker{display:none}
+details.rec>summary::after{content:"▾";margin-left:6px;color:var(--navy2)}
+details.rec[open]>summary::after{content:"▴"}
+.rs{margin-left:auto;font-weight:500;font-size:0.875rem;color:#4b5563}
+.rs.live{color:#9b1c1c;font-weight:700}
+.rs.done{color:#14532d;font-weight:700}
+.recbody{padding:8px 10px}
+.rbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.rb{border:1px solid #b8c6d9;background:#ffffff;color:#1e3a5f;border-radius:8px;padding:6px 12px;font-family:inherit;font-size:0.875rem;font-weight:500;cursor:pointer}
+.rb.go{background:#1e3a5f;color:#ffffff;border-color:#1e3a5f}
+.rb.stop{background:#9b1c1c;color:#ffffff;border-color:#9b1c1c}
+.rb:disabled{opacity:.45;cursor:not-allowed}
+.lb{display:block;color:var(--navy);font-weight:700;font-size:0.875rem;margin:6px 0 2px}
+.rtx{width:100%;border:1px solid #b8c6d9;border-radius:8px;padding:6px 8px;font-family:inherit;font-size:inherit;color:#1f2937;background:#ffffff;resize:vertical;line-height:1.5}
+.warnbar{display:none;background:#fff6e0;color:#7a4b00;border:1px solid #f0d9a0;border-radius:8px;padding:6px 10px;margin:8px 0;font-size:0.875rem}
+
+/* 일정표 전용 */
+.day{margin-bottom:8px}
+.day>summary .dt{font-weight:900}
+.today{display:none;background:#9b1c1c;color:#ffffff;border-radius:999px;padding:0 8px;font-size:0.875rem;font-weight:700}
+.day.is-today .today{display:inline-block}
+.day.is-today{border-color:#2c5282;box-shadow:0 0 0 2px #c9d8ee}
+.tl{display:grid;grid-template-columns:92px 1fr;gap:4px 8px}
+.tl .t{color:#1e3a5f;font-weight:700;font-size:0.875rem;padding-top:1px}
+.tl .d{min-width:0}
+.tl .ws{grid-column:1 / -1;background:#eef3fa;border:1px solid #b8c6d9;border-left:4px solid #1e3a5f;border-radius:8px;padding:6px 10px}
+.tl .ws b{color:#1e3a5f}
+.lks{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.lk{display:inline-block;background:#1e3a5f;color:#ffffff;text-decoration:none;border-radius:8px;padding:6px 12px;font-size:0.875rem;font-weight:500}
+.lk.alt{background:#ffffff;color:#1e3a5f;border:1px solid #9fb3d1}
+.sub{color:#1e3a5f;font-weight:700;margin:8px 0 2px}
+.prep{background:#f3f5f9;border:1px dashed #b8c6d9;border-radius:8px;padding:6px 10px;margin-top:8px;font-size:0.875rem;color:#1f2937}
+.prep b{color:#1e3a5f}
+.grid2{display:grid;grid-template-columns:1fr;gap:8px}
+body.pc .grid2{grid-template-columns:1fr 1fr}
+.box{background:#ffffff;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.box h3{color:#1e3a5f;font-size:0.95rem;margin-bottom:2px}
+.big{font-weight:900;color:#1e3a5f}
+.glance a{color:#1e4f9a;text-decoration:none;font-weight:700}
+.team{border-left:4px solid #9fb3d1;padding-left:8px;margin:6px 0}
+.conf{color:#9b1c1c;font-weight:700}
+</style>
+</head>
+<body class="mobile">
+
+<div class="gate" id="gate">
+  <form class="gate-box" id="gateForm" autocomplete="off">
+    <h2>임원 워크숍 일정표</h2>
+    <p>비밀번호를 입력하세요</p>
+    <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
+    <button type="submit" class="go" id="gateBtn">확인</button>
+    <div class="gate-err" id="gateErr" role="alert"></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v2.0</span></div>
+  </form>
+</div>
+
+<div class="nav">
+  <div class="nav-inner">
+    <div class="nav-title">임원 워크숍 일정표<small>인시스 AI혁신 연구개발실</small></div>
+    <div class="ctrl">
+      <div class="seg" role="group" aria-label="화면 선택">
+        <button type="button" id="btnMobile" class="on">모바일</button>
+        <button type="button" id="btnPc">PC</button>
+      </div>
+      <a class="btn" href="임원워크샵_AI활용.html">워크샵 자료</a>
+      <a class="btn" href="임원워크샵_회의록.html">회의록</a>
+      <span class="ver" id="verBadge">v2.0</span>
+    </div>
+  </div>
+</div>
+
+<div class="stage"><div class="frame"><div class="wrap">
+
+  <div class="cover">
+    <h1>2026 인시스 그룹 임원 역량 강화 워크숍 및 세부 투어</h1>
+    <p>2026. 10. 22(목) ~ 10. 26(월) · 3박 5일 (기내 1박 포함)</p>
+    <div class="chips">
+      <span class="chip">에어부산 왕복</span><span class="chip">워크숍 1·2부</span><span class="chip conf">대외비 · 임원 전용</span><span class="chip">담당: 인시스 AI혁신 연구개발실</span>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="box">
+      <h3>집결지 (출발·최종 복귀)</h3>
+      <p><b>창원 올림픽공원 공영주차장</b></p>
+      <p class="big">10/22(목) 17:30 집결 완료</p>
+      <p>시간을 꼭 지켜 주세요. 카풀 인원 탑승 확인 후 김해공항으로 이동합니다.</p>
+    </div>
+    <div class="box">
+      <h3>이용 항공편 (에어부산)</h3>
+      <p><b>출국 BX711</b><br>부산 김해 10/22 21:10 출발 → 세부 막탄 10/23 00:35 도착</p>
+      <p style="margin-top:4px"><b>귀국 BX656</b><br>세부 막탄 10/26 01:40 출발 → 부산 김해 10/26 07:00 도착</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:8px">
+    <div class="body glance">
+      <h4>한눈에 보기</h4>
+      <div class="tbl"><table>
+        <tr><th>일자</th><th>구분</th><th>주요 일정</th></tr>
+        <tr><td><a href="#d1">10/22(목)</a></td><td>1일차</td><td>창원 집결 → 김해공항 → 출국</td></tr>
+        <tr><td><a href="#d2">10/23(금)</a></td><td>2일차</td><td>다이빙·스노클링 투어, <b>워크숍 1부</b>, 웰컴 만찬</td></tr>
+        <tr><td><a href="#d3">10/24(토)</a></td><td>3일차</td><td>골드호핑 투어, <b>워크숍 2부</b>, 해변 만찬·마사지</td></tr>
+        <tr><td><a href="#d4">10/25(일)</a></td><td>4일차</td><td>골프 1팀 / 시내투어 1팀, 굿바이 만찬, 공항 이동</td></tr>
+        <tr><td><a href="#d5">10/26(월)</a></td><td>5일차</td><td>세부 출발 → 김해 도착 → 창원 복귀·해산</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <details class="card day" id="d1" data-date="2026-10-22" open>
+    <summary><span class="no">1</span><span class="dt">10/22(목)</span> 창원 집결 및 출국<span class="today">오늘</span></summary>
+    <div class="body">
+      <div class="tl">
+        <div class="t">17:30</div><div class="d"><b>창원 올림픽공원 공영주차장 집결</b><br>차량별 카풀 인원 탑승 확인 후 김해공항 이동</div>
+        <div class="t">18:30~19:40</div><div class="d">김해공항 국제선 청사 도착, 에어부산 카운터 수속(BX711), 수하물·골프백 위탁, 보안·출국 심사</div>
+        <div class="t">21:10</div><div class="d"><b>에어부산 BX711 김해공항 출발</b><br>비행시간 약 4시간 25분</div>
+      </div>
+      <div class="prep"><b>준비·비고</b> 시간 엄수, 카풀 편성 · 여권, E-티켓, 이트레블(eTravel) QR</div>
+    </div>
+  </details>
+
+  <details class="card day" id="d2" data-date="2026-10-23">
+    <summary><span class="no">2</span><span class="dt">10/23(금)</span> 세부 입국·다이빙 투어·워크숍 1부<span class="today">오늘</span></summary>
+    <div class="body">
+      <div class="tl">
+        <div class="t">00:35~02:30</div><div class="d">막탄-세부 국제공항 T2 도착, 입국 심사 및 세관 통과(eTravel QR 스캔), 리조트 체크인 및 휴식</div>
+        <div class="t">10:30~15:30</div><div class="d"><b>Fatima 단독 방카 다이빙 투어</b><br>초보 체험다이빙 강습, 청정 포인트 스노클링, 선상 중식</div>
+        <div class="t">16:00~16:45</div><div class="d">리조트 복귀, 샤워 및 워크숍 회의실 정비</div>
+        <div class="ws"><b>16:45~18:00 · 임원 워크숍 1부</b> — 시스템·AI 실무 활용 (총 75분)
+          <div class="lks"><a class="lk" href="임원워크샵_AI활용.html">📄 워크샵 자료 열기</a></div>
+        </div>
+        <div class="t">18:30~21:00</div><div class="d">막탄 현지 맛집 이동 및 1일차 웰컴 저녁 만찬</div>
+      </div>
+      <div class="prep"><b>준비·비고</b> Fatima 단독 방카 진행 · 워크숍용 개인 기기(노트북/태블릿) 지참</div>
+    </div>
+  </details>
+
+  <details class="card day" id="d3" data-date="2026-10-24">
+    <summary><span class="no">3</span><span class="dt">10/24(토)</span> 골드호핑 투어·워크숍 2부<span class="today">오늘</span></summary>
+    <div class="body">
+      <div class="tl">
+        <div class="t">08:30~09:30</div><div class="d">리조트 조식 후 호핑 전용 차량 탑승</div>
+        <div class="t">10:00~16:00</div><div class="d"><b>골드호핑 투어</b> (골드호핑 대표 찬조 진행)<br>해상 국립공원 스노클링, 선상 바비큐 및 이벤트</div>
+        <div class="t">16:30~17:00</div><div class="d">리조트 복귀, 환복 및 워크숍 회의실 정비</div>
+        <div class="ws"><b>17:00~18:00 · 임원 워크숍 2부</b> — 전략 및 그룹 조직도 재구성 토의 (총 60분)
+          <div class="lks">
+            <a class="lk" href="임원워크샵_AI활용.html#p7">📄 워크샵 자료 열기</a>
+            <a class="lk alt" href="임원워크샵_AI활용.html#p7">🎙 토의 녹음·기록</a>
+            <a class="lk alt" href="임원워크샵_회의록.html">📝 회의록 만들기</a>
+          </div>
+        </div>
+        <div class="t">18:30~22:00</div><div class="d">해변 레스토랑 저녁 만찬, 피로 회복 전신 마사지 및 자유 시간</div>
+      </div>
+      <div class="prep"><b>준비·비고</b> 골드호핑 대표 찬조 진행 · 토의 내용은 녹음 후 회의록으로 정리됩니다</div>
+    </div>
+  </details>
+
+  <details class="card day" id="d4" data-date="2026-10-25">
+    <summary><span class="no">4</span><span class="dt">10/25(일)</span> 팀별 일정·굿바이 만찬<span class="today">오늘</span></summary>
+    <div class="body">
+      <div class="team">
+        <div class="sub">골프 1팀 · 막탄 에어베이스 GC 18홀</div>
+        <div class="tl">
+          <div class="t">06:30</div><div class="d">클럽하우스 이동 (15~20분 소요)</div>
+          <div class="t">07:30~12:30</div><div class="d">18홀 라운딩<br>주말 요금 1인 필수 3,880P (2인승 전동카트 별도 1,200P)<br><b>카라 티셔츠 필수(청바지 불가), 페소 현금 결제 전용</b></div>
+        </div>
+      </div>
+      <div class="team">
+        <div class="sub">시내투어 1팀 · 세부 시티 명소 &amp; 쇼핑</div>
+        <div class="tl">
+          <div class="t">09:30</div><div class="d">전용 차량 이동</div>
+          <div class="t">도착 후</div><div class="d">산 페드로 요새, 마젤란 십자가 관람 및 쇼핑몰(SM 시사이드/아얄라몰) 탐방</div>
+          <div class="t">17:00</div><div class="d">막탄 복귀</div>
+        </div>
+      </div>
+      <div class="team">
+        <div class="sub">전체 팀 합류 및 귀국 수속</div>
+        <div class="tl">
+          <div class="t">18:00~20:00</div><div class="d">두 팀 합류 후 <b>최종 굿바이 만찬</b> (칠리크랩 및 씨푸드 특식)</div>
+          <div class="t">20:30~22:30</div><div class="d">공항 인근 스파 이동 (마사지 90분 &amp; 출국 전 샤워 완료, 최종 짐 정리)</div>
+          <div class="t">22:30</div><div class="d">막탄-세부 국제공항 T2 이동 및 카운터 체크인 대기</div>
+        </div>
+      </div>
+      <div class="prep"><b>준비·비고</b> 골프: 카라 티셔츠, 페소 현금 필수 · 시내투어: 산 페드로 요새, 아얄라몰 · 22:30 공항 T2 카운터 대기</div>
+    </div>
+  </details>
+
+  <details class="card day" id="d5" data-date="2026-10-26">
+    <summary><span class="no">5</span><span class="dt">10/26(월)</span> 귀국 및 창원 복귀<span class="today">오늘</span></summary>
+    <div class="body">
+      <div class="tl">
+        <div class="t">01:40</div><div class="d"><b>에어부산 BX656 막탄-세부 공항 출발</b> (기내 1박)</div>
+        <div class="t">07:00</div><div class="d">부산 김해국제공항 도착, 입국 심사 및 수하물 수령</div>
+        <div class="t">08:00~08:50</div><div class="d">카풀 차량 탑승 후 <b>창원 올림픽공원 공영주차장 복귀 및 최종 해산</b></div>
+      </div>
+      <div class="prep"><b>준비·비고</b> 기내 1박 · 입국 수속 후 최종 해산</div>
+    </div>
+  </details>
+
+  <div class="card">
+    <div class="body">
+      <h4>참가 임원 필독 사항</h4>
+      <ol style="padding-left:20px">
+        <li><b>필수 지참물</b>: 여권(유효기간 6개월 이상), E-티켓 사본, eTravel QR 코드 캡처본, 워크숍용 개인 기기(노트북/태블릿)</li>
+        <li><b>워크숍 자료</b>: 세션별 <a href="임원워크샵_AI활용.html">워크샵 자료</a> 링크를 눌러 웹 교안을 확인하세요.</li>
+        <li><b>골프장 주의사항</b>: 카라 없는 티셔츠·청바지 착용 시 입장 불가, 결제는 페소 현금만 가능</li>
+        <li><b>수하물 한도</b>: 에어부산 무료 위탁 수하물 1인당 15kg (골프백 포함 무게)</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="foot"><span class="conf">대외비 · 임원 전용</span><br>인시스 AI혁신 연구개발실 · 임원 워크숍 일정표 · <span id="verFoot">v2.0</span></div>
+
+</div></div></div>
+
+<script>
+(function(){
+  var VERSION = 'v2.0';
+  document.getElementById('verBadge').textContent = VERSION;
+  document.getElementById('verFoot').textContent = VERSION;
+  document.getElementById('verGate').textContent = VERSION;
+    var gate = document.getElementById('gate');
+  var gateErr = document.getElementById('gateErr');
+  var gatePw = document.getElementById('gatePw');
+  var PW_HASH = '9c1f48dd8ce5f04a8f54974dba16b8306c0d3154c54c84b53d4098a8d50e85b9';
+  function openGate(){ gate.classList.add('hide'); }
+  function sha256Hex(str){
+    var data = new TextEncoder().encode(str);
+    return crypto.subtle.digest('SHA-256', data).then(function(buf){
+      return Array.prototype.map.call(new Uint8Array(buf), function(b){ return ('0' + b.toString(16)).slice(-2); }).join('');
+    });
+  }
+  try{ if(sessionStorage.getItem('ws_ok') === '1'){ openGate(); } }catch(e){}
+  document.getElementById('gateForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!(window.crypto && crypto.subtle)){ gateErr.textContent = '보안 연결(https)에서 열어 주세요'; return; }
+    sha256Hex('insys-ws:' + gatePw.value).then(function(h){
+      if(h === PW_HASH){
+        try{ sessionStorage.setItem('ws_ok', '1'); }catch(e){}
+        gateErr.textContent = ''; openGate();
+      } else {
+        gateErr.textContent = '비밀번호가 맞지 않습니다'; gatePw.value = ''; gatePw.focus();
+      }
+    });
+  });
+  var body = document.body, bM = document.getElementById('btnMobile'), bP = document.getElementById('btnPc');
+  function setView(mode){
+    if(mode === 'pc'){ body.classList.add('pc'); body.classList.remove('mobile'); bP.classList.add('on'); bM.classList.remove('on'); }
+    else { body.classList.add('mobile'); body.classList.remove('pc'); bM.classList.add('on'); bP.classList.remove('on'); }
+  }
+  bM.addEventListener('click', function(){ setView('mobile'); });
+  bP.addEventListener('click', function(){ setView('pc'); });
+
+  /* 오늘 날짜 일정 강조 (기기 날짜 기준) */
+  var d = new Date(), pad = function(n){ return (n < 10 ? '0' : '') + n; };
+  var today = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  var days = document.querySelectorAll('details.day'), hit = null;
+  for(var i = 0; i < days.length; i++){
+    if(days[i].getAttribute('data-date') === today){ days[i].classList.add('is-today'); hit = days[i]; }
+  }
+  if(hit){ for(var j = 0; j < days.length; j++){ days[j].open = (days[j] === hit); } }
+  var links = document.querySelectorAll('.glance a');
+  for(var k = 0; k < links.length; k++){
+    links[k].addEventListener('click', function(){ var el = document.getElementById(this.getAttribute('href').slice(1)); if(el){ el.open = true; } });
+  }
+})();
+</script>
+</body>
+</html>

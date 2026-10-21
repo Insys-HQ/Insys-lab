@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>임원 워크숍 회의록</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f3f5f9; --card:#ffffff; --line:#d5dce8;
+  --text:#1f2937; --navy:#1e3a5f; --navy2:#2c5282;
+  --pastel:#e6edf8; --pastel2:#eef3fa; --warn-bg:#fff6e0; --warn:#7a4b00;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;font-size:0.875rem}
+@media (min-width:768px){body{font-size:1rem}}
+
+/* header / nav : 배경 전체폭, 내부는 컨테이너 폭 */
+.nav{position:sticky;top:0;z-index:10;background:var(--navy);width:100%}
+.nav-inner{max-width:1100px;margin:0 auto;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.nav-title{color:#ffffff;font-weight:700;font-size:0.95rem}
+.nav-title small{font-weight:400;opacity:.9;margin-left:6px}
+.ctrl{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid #9fb3d1;border-radius:8px;overflow:hidden}
+.seg button{background:#e6edf8;color:#1e3a5f;border:0;padding:5px 12px;font-family:inherit;font-size:0.875rem;font-weight:500;cursor:pointer}
+.seg button.on{background:#ffffff;color:#1e3a5f;font-weight:700;box-shadow:inset 0 -3px 0 #2c5282}
+.btn{background:#e6edf8;color:#1e3a5f;border:1px solid #9fb3d1;border-radius:8px;padding:5px 12px;font-family:inherit;font-size:0.875rem;font-weight:500;cursor:pointer}
+.btn:hover{background:#ffffff}
+.ver{background:#ffffff;color:#1e3a5f;border-radius:8px;padding:3px 10px;font-weight:700;font-size:0.875rem}
+
+/* 화면 폭 (모바일 기본) */
+.stage{width:100%;padding:8px 0}
+.frame{margin:0 auto;max-width:430px;width:100%}
+body.pc .frame{max-width:1100px}
+.wrap{padding:0 12px}
+
+.cover{background:var(--pastel);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px}
+.cover h1{color:var(--navy);font-size:1.35rem;font-weight:900;line-height:1.35}
+.cover p{color:var(--text);margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:#ffffff;color:#1e3a5f;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:0.875rem;font-weight:500}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.card>summary{list-style:none;cursor:pointer;padding:10px 12px;display:flex;align-items:center;gap:8px;background:var(--pastel2);color:var(--navy);font-weight:700}
+.card>summary::-webkit-details-marker{display:none}
+.card>summary .no{background:var(--navy);color:#ffffff;border-radius:6px;min-width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:0.875rem}
+.card>summary .tm{margin-left:auto;color:#374151;font-weight:500;font-size:0.875rem}
+.ck{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.ck input{width:18px;height:18px;accent-color:#1e3a5f;cursor:pointer}
+.sumrow td{background:#e8eef6;color:#1e3a5f;font-weight:700}
+.sumbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#e8eef6;border:1px solid #b8c6d9;border-radius:12px;padding:8px 12px;margin:8px 0}
+.sumtxt{display:flex;flex-direction:column;flex:1 1 180px;color:#1e3a5f}
+.sumtxt span{color:#374151;font-size:0.875rem}
+.sumtot{color:#1e3a5f;font-weight:900;font-size:1.25rem}
+.plink{margin:0 0 6px}
+.plink a{display:inline-block;background:#1e3a5f;color:#ffffff;text-decoration:none;border-radius:8px;padding:4px 12px;font-size:0.875rem;font-weight:500}
+.plink a.yt{background:#7f1d1d}
+.plink a.yt2{background:#ffffff;color:#1e3a5f;border:1px solid #b8c6d9;margin-left:4px}
+.ytnote{color:#374151;font-size:0.875rem;margin-left:8px}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
+.ctl button{background:#ffffff;color:#1e3a5f;border:1px solid #b8c6d9;border-radius:8px;padding:4px 10px;font-size:0.875rem;font-family:inherit;cursor:pointer}
+.ctl span{color:#374151;font-size:0.875rem}
+tr.off td{color:#6b7280;text-decoration:line-through;background:#f3f4f6}
+details.card.off>summary{background:#eceff3;color:#6b7280}
+details.card.off>summary .no{background:#9ca3af}
+details.card.off>summary .tm{text-decoration:line-through}
+.card>summary::after{content:"▾";color:var(--navy2);margin-left:8px}
+.card[open]>summary::after{content:"▴"}
+.body{padding:10px 12px}
+.body h4{color:var(--navy);margin:8px 0 4px;font-size:0.95rem}
+.body h4:first-child{margin-top:0}
+.body ul{padding-left:18px}
+.body li{margin:2px 0}
+.body p{margin:4px 0}
+
+table{width:100%;border-collapse:collapse;margin:4px 0;font-size:0.875rem}
+th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+th{background:var(--pastel);color:#1e3a5f;font-weight:700}
+.tbl{overflow-x:auto}
+
+.note{background:var(--warn-bg);color:var(--warn);border:1px solid #f0d9a0;border-radius:8px;padding:6px 10px;margin:6px 0;font-size:0.875rem}
+.tip{background:#e9f3ec;color:#14532d;border:1px solid #bfdcc8;border-radius:8px;padding:6px 10px;margin:6px 0;font-size:0.875rem}
+pre{background:#f1f4f9;color:#1f2937;border:1px solid var(--line);border-radius:8px;padding:8px 10px;overflow-x:auto;font-size:0.875rem;line-height:1.5;white-space:pre}
+.code-head{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.code-head span{font-weight:700;color:var(--navy);font-size:0.875rem}
+a{color:#1e4f9a}
+.foot{text-align:center;color:#374151;font-size:0.875rem;padding:8px 12px 16px}
+.toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#1e3a5f;color:#ffffff;padding:6px 14px;border-radius:8px;font-size:0.875rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+.toc a{display:inline-block;margin:2px 6px 2px 0;text-decoration:none;background:#ffffff;border:1px solid var(--line);border-radius:6px;padding:1px 8px;color:#1e3a5f;font-size:0.875rem}
+
+/* 로그인 화면 */
+.gate{position:fixed;inset:0;z-index:100;background:#1e3a5f;display:flex;align-items:center;justify-content:center;padding:12px}
+.gate.hide{display:none}
+.gate-box{background:#ffffff;color:#1f2937;border-radius:12px;padding:16px;width:100%;max-width:340px;text-align:center}
+.gate-box h2{color:#1e3a5f;font-size:1.1rem;margin-bottom:4px}
+.gate-box p{font-size:0.875rem;margin-bottom:8px}
+.gate-box input{width:100%;padding:8px 10px;border:1px solid #9fb3d1;border-radius:8px;font-family:inherit;font-size:1rem;text-align:center;letter-spacing:6px;color:#1f2937;background:#ffffff}
+.gate-box .go{width:100%;margin-top:8px;padding:8px;border:0;border-radius:8px;background:#1e3a5f;color:#ffffff;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer}
+.gate-err{color:#9b1c1c;font-size:0.875rem;min-height:1.3em;margin-top:6px}
+.gate-ver{color:#374151;font-size:0.875rem;margin-top:6px}
+/* v2.0 음성 입력·토의 녹음 */
+.sync{font-size:0.875rem;padding:3px 10px;border-radius:8px;background:#e6edf8;color:#1e3a5f;font-weight:500}
+.sync.ok{background:#e9f3ec;color:#14532d}
+.sync.warn{background:#fff6e0;color:#7a4b00}
+a.btn{text-decoration:none;display:inline-block}
+.vf{display:flex;gap:4px;align-items:flex-start}
+.fld{flex:1;min-width:0;width:100%;border:1px solid #b8c6d9;border-radius:8px;padding:5px 8px;font-family:inherit;font-size:inherit;color:#1f2937;background:#ffffff;resize:vertical;min-height:38px;line-height:1.5}
+.mic{flex:0 0 auto;border:1px solid #b8c6d9;background:#ffffff;color:#1e3a5f;border-radius:8px;width:38px;height:38px;font-size:1.1rem;cursor:pointer;line-height:1}
+.mic.on{background:#9b1c1c;color:#ffffff;border-color:#9b1c1c;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.65}}
+.interim{color:#4b5563;font-size:0.875rem;min-height:1.2em}
+.hint{color:#374151;font-size:0.875rem}
+.recbox{margin:6px 0}
+details.rec{border:1px solid var(--line);border-radius:10px;background:#fbfcfe;overflow:hidden}
+details.rec>summary{list-style:none;cursor:pointer;padding:8px 10px;display:flex;align-items:center;gap:8px;background:#eef3fa;color:var(--navy);font-weight:700}
+details.rec>summary::-webkit-details-marker{display:none}
+details.rec>summary::after{content:"▾";margin-left:6px;color:var(--navy2)}
+details.rec[open]>summary::after{content:"▴"}
+.rs{margin-left:auto;font-weight:500;font-size:0.875rem;color:#4b5563}
+.rs.live{color:#9b1c1c;font-weight:700}
+.rs.done{color:#14532d;font-weight:700}
+.recbody{padding:8px 10px}
+.rbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.rb{border:1px solid #b8c6d9;background:#ffffff;color:#1e3a5f;border-radius:8px;padding:6px 12px;font-family:inherit;font-size:0.875rem;font-weight:500;cursor:pointer}
+.rb.go{background:#1e3a5f;color:#ffffff;border-color:#1e3a5f}
+.rb.stop{background:#9b1c1c;color:#ffffff;border-color:#9b1c1c}
+.rb:disabled{opacity:.45;cursor:not-allowed}
+.lb{display:block;color:var(--navy);font-weight:700;font-size:0.875rem;margin:6px 0 2px}
+.rtx{width:100%;border:1px solid #b8c6d9;border-radius:8px;padding:6px 8px;font-family:inherit;font-size:inherit;color:#1f2937;background:#ffffff;resize:vertical;line-height:1.5}
+.warnbar{display:none;background:#fff6e0;color:#7a4b00;border:1px solid #f0d9a0;border-radius:8px;padding:6px 10px;margin:8px 0;font-size:0.875rem}
+
+/* 회의록 전용 */
+.fm{display:grid;grid-template-columns:1fr;gap:6px}
+body.pc .fm{grid-template-columns:1fr 1fr}
+.fm label,.lbl{display:block;color:#1e3a5f;font-weight:700;font-size:0.875rem;margin-bottom:2px}
+.in,.ta{width:100%;border:1px solid #b8c6d9;border-radius:8px;padding:6px 8px;font-family:inherit;font-size:inherit;color:#1f2937;background:#ffffff;line-height:1.5}
+.ta{resize:vertical;min-height:64px}
+.full{grid-column:1 / -1}
+.sec{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:6px 0;background:#fbfcfe}
+.sec h4{margin:0 0 4px}
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}
+.pb{border:1px solid #b8c6d9;background:#ffffff;color:#1e3a5f;border-radius:8px;padding:6px 12px;font-family:inherit;font-size:0.875rem;font-weight:500;cursor:pointer}
+.pb.pri{background:#1e3a5f;color:#ffffff;border-color:#1e3a5f}
+.pb.arm{background:#9b1c1c;color:#ffffff;border-color:#9b1c1c}
+.sync{font-size:0.875rem;padding:3px 10px;border-radius:8px;background:#e6edf8;color:#1e3a5f;font-weight:500}
+.sync.ok{background:#e9f3ec;color:#14532d}
+.sync.warn{background:#fff6e0;color:#7a4b00}
+a.btn{text-decoration:none;display:inline-block}
+.conf{color:#9b1c1c;font-weight:700}
+.docwrap{background:#e9edf3;border:1px solid var(--line);border-radius:10px;padding:8px;overflow-x:auto}
+.doc{background:#ffffff;color:#1f2937;max-width:820px;margin:0 auto;padding:16px 18px;border:1px solid #d5dce8;line-height:1.6}
+.doc h1{color:#1e3a5f;font-size:1.3rem;text-align:center;margin-bottom:4px}
+.doc h2{color:#1e3a5f;font-size:1.05rem;margin:12px 0 4px;border-bottom:2px solid #1e3a5f;padding-bottom:2px}
+.doc h3{color:#1e3a5f;font-size:1rem;margin:8px 0 2px}
+.doc h5{color:#374151;font-size:0.95rem;margin:4px 0 0}
+.doc .cf{text-align:center;color:#9b1c1c;font-weight:700;font-size:0.875rem}
+.doc ul{padding-left:20px;margin:2px 0}
+.doc table{width:100%;border-collapse:collapse;margin:4px 0;font-size:0.875rem}
+.doc th,.doc td{border:1px solid #b8c6d9;padding:4px 8px;text-align:left;vertical-align:top}
+.doc th{background:#e6edf8;color:#1e3a5f}
+.doc .none{color:#6b7280}
+.doc .ft{margin-top:12px;color:#4b5563;font-size:0.875rem;text-align:right}
+@media print{
+  body{background:#ffffff}
+  .gate,.nav,.noprint,.foot,.toast{display:none !important}
+  .stage,.frame,.wrap{max-width:none !important;padding:0 !important;margin:0 !important}
+  .card{border:0 !important}
+  .card>summary{display:none}
+  .card:not(.printcard){display:none !important}
+  .docwrap{border:0;background:#ffffff;padding:0}
+  .doc{border:0;padding:0;max-width:none}
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body class="mobile">
+
+<div class="gate" id="gate">
+  <form class="gate-box" id="gateForm" autocomplete="off">
+    <h2>임원 워크숍 회의록</h2>
+    <p>비밀번호를 입력하세요</p>
+    <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
+    <button type="submit" class="go" id="gateBtn">확인</button>
+    <div class="gate-err" id="gateErr" role="alert"></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.0</span></div>
+  </form>
+</div>
+
+<div class="nav">
+  <div class="nav-inner">
+    <div class="nav-title">임원 워크숍 회의록<small>인시스 AI혁신 연구개발실</small></div>
+    <div class="ctrl">
+      <div class="seg" role="group" aria-label="화면 선택">
+        <button type="button" id="btnMobile" class="on">모바일</button>
+        <button type="button" id="btnPc">PC</button>
+      </div>
+      <a class="btn" href="임원워크샵_일정표.html">일정표</a>
+      <a class="btn" href="임원워크샵_AI활용.html#p7">워크샵 자료</a>
+      <span class="sync" id="syncSt">저장: 확인 중</span>
+      <span class="ver" id="verBadge">v1.0</span>
+    </div>
+  </div>
+</div>
+
+<div class="stage"><div class="frame"><div class="wrap">
+
+  <div class="cover noprint">
+    <h1>임원 워크숍 회의록</h1>
+    <p>워크샵 자료에서 녹음·저장한 토의 내용을 불러와 정리하고, 고친 뒤 회의록으로 확정합니다.</p>
+    <div class="chips"><span class="chip conf">대외비 · 임원 전용</span><span class="chip">자동 정리는 키워드 기준 초안입니다</span></div>
+  </div>
+
+  <details class="card noprint" open>
+    <summary><span class="no">1</span>기록 불러오기<span class="tm" id="loadInfo">-</span></summary>
+    <div class="body">
+      <p>워크샵 자료(7·8부)에서 저장한 토의 기록과 입력값을 Firebase에서 불러옵니다.</p>
+      <div class="bar"><button type="button" class="pb pri" id="bLoad">다시 불러오기</button><a class="pb" style="text-decoration:none" href="임원워크샵_AI활용.html#p7">워크샵 자료에서 녹음하기</a></div>
+    </div>
+  </details>
+
+  <details class="card noprint" open>
+    <summary><span class="no">2</span>기본 정보</summary>
+    <div class="body">
+      <div class="fm">
+        <div class="full"><label for="i_name">회의명</label><input class="in" id="i_name" data-k="info.name"></div>
+        <div><label for="i_date">일시</label><input class="in" id="i_date" data-k="info.date"></div>
+        <div><label for="i_place">장소</label><input class="in" id="i_place" data-k="info.place"></div>
+        <div class="full"><label for="i_people">참석자 (필요한 경우에만 기재)</label><textarea class="ta" id="i_people" data-k="info.people" rows="2"></textarea></div>
+      </div>
+    </div>
+  </details>
+
+  <details class="card noprint" open>
+    <summary><span class="no">3</span>안건별 정리 (자동 정리 → 수정)</summary>
+    <div class="body">
+      <p>저장된 토의 기록에서 <b>논의 내용 · 결정·합의 · 후속 조치</b>를 나눠 초안을 만듭니다. 결정·후속은 "결정, 합의, 하기로, 담당, 까지, 검토" 같은 말이 들어간 문장을 골라낸 것이니 꼭 확인하고 고쳐 주세요.</p>
+      <div class="bar"><button type="button" class="pb pri" id="bAuto">자동 정리</button><span class="hint" id="autoNote"></span></div>
+      <div id="secs"></div>
+    </div>
+  </details>
+
+  <details class="card noprint" open>
+    <summary><span class="no">4</span>기록표 (워크샵 자료에서 입력한 값)</summary>
+    <div class="body"><div id="tabs"></div></div>
+  </details>
+
+  <details class="card printcard" open>
+    <summary><span class="no">5</span>회의록 확정</summary>
+    <div class="body">
+      <div class="bar noprint">
+        <button type="button" class="pb pri" id="bPrev">회의록 만들기</button>
+        <button type="button" class="pb" id="bSave">Firebase 저장</button>
+        <button type="button" class="pb" id="bDl">HTML 내려받기</button>
+        <button type="button" class="pb" id="bPrint">인쇄 / PDF</button>
+      </div>
+      <div class="docwrap"><div class="doc" id="doc"><p class="none">"회의록 만들기"를 누르면 여기에 완성본이 표시됩니다.</p></div></div>
+    </div>
+  </details>
+
+  <div class="foot"><span class="conf">대외비 · 임원 전용</span><br>인시스 AI혁신 연구개발실 · 임원 워크숍 회의록 · <span id="verFoot">v1.0</span></div>
+
+</div></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── 공통 저장소: Firebase(Firestore) + 이 기기 보조 저장 ── */
+var WS = (function(){
+  var COLL = 'workshop2026';
+  var CFG = {apiKey:"AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",authDomain:"insys-work.firebaseapp.com",projectId:"insys-work",storageBucket:"insys-work.firebasestorage.app",messagingSenderId:"225275784859",appId:"1:225275784859:web:bd12815c6dc47c0c49e03e"};
+  var db = null, ok = false;
+  var api = { onStatus: function(){} };
+  function p(n){ return (n < 10 ? '0' : '') + n; }
+  function fmt(d){ return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()); }
+  function lsGet(id){ try{ var s = localStorage.getItem('ws26:' + id); return s ? JSON.parse(s) : null; }catch(e){ return null; } }
+  function lsSet(id, o){ try{ localStorage.setItem('ws26:' + id, JSON.stringify(o)); }catch(e){} }
+  function status(good, msg){ try{ api.onStatus(good, msg); }catch(e){} }
+  api.fmt = fmt;
+  api.init = function(){
+    try{
+      if(!window.firebase) throw new Error('SDK 로드 실패');
+      if(!firebase.apps.length) firebase.initializeApp(CFG);
+      db = firebase.firestore(); ok = true;
+    }catch(e){ ok = false; console.warn('Firebase 초기화 실패:', e.message); status(false, '이 기기에만 저장 (Firebase 미연결)'); }
+    return ok;
+  };
+  api.save = function(id, obj, merge, ver){
+    var now = fmt(new Date());
+    var rec = {}; for(var k in obj){ rec[k] = obj[k]; }
+    rec.updatedAt = now; rec.version = ver;
+    var prev = lsGet(id) || {}, m = {};
+    if(merge){ for(var a in prev){ m[a] = prev[a]; } for(var b in rec){ m[b] = rec[b]; } } else { m = rec; }
+    lsSet(id, m);
+    if(!ok){ status(false, '이 기기에만 저장됨 (Firebase 미연결)'); return Promise.resolve(false); }
+    return db.collection(COLL).doc(id).set(rec, { merge: !!merge }).then(function(){
+      status(true, 'Firebase 저장됨 ' + now.slice(11, 16)); return true;
+    }).catch(function(e){
+      console.warn('저장 실패:', (e && e.message) || e);
+      status(false, '이 기기에만 저장됨 (Firebase 저장 실패)'); return false;
+    });
+  };
+  api.loadAll = function(ids){
+    var out = {};
+    ids.forEach(function(id){ var l = lsGet(id); if(l){ out[id] = l; } });
+    function take(id, s){ var l = out[id]; if(!l || (s.updatedAt || '') >= (l.updatedAt || '')){ out[id] = s; } }
+    if(!ok){ status(false, '이 기기 저장본 표시 (Firebase 미연결)'); return Promise.resolve(out); }
+    return db.collection(COLL).get().then(function(snap){
+      snap.forEach(function(d){ take(d.id, d.data()); });
+      status(true, 'Firebase 불러옴'); return out;
+    }).catch(function(e){
+      console.warn('목록 불러오기 실패, 문서별 시도:', (e && e.message) || e);
+      return Promise.all(ids.map(function(id){
+        return db.collection(COLL).doc(id).get().then(function(d){ if(d.exists){ take(id, d.data()); } });
+      })).then(function(){ status(true, 'Firebase 불러옴'); return out; }).catch(function(e2){
+        console.warn('불러오기 실패:', (e2 && e2.message) || e2);
+        status(false, 'Firebase 불러오기 실패 — 이 기기 저장본 표시'); return out;
+      });
+    });
+  };
+  return api;
+})();
+
+</script>
+<script>
+(function(){
+  var VERSION = 'v1.0';
+  document.getElementById('verBadge').textContent = VERSION;
+  document.getElementById('verFoot').textContent = VERSION;
+  document.getElementById('verGate').textContent = VERSION;
+    var gate = document.getElementById('gate');
+  var gateErr = document.getElementById('gateErr');
+  var gatePw = document.getElementById('gatePw');
+  var PW_HASH = '9c1f48dd8ce5f04a8f54974dba16b8306c0d3154c54c84b53d4098a8d50e85b9';
+  function openGate(){ gate.classList.add('hide'); }
+  function sha256Hex(str){
+    var data = new TextEncoder().encode(str);
+    return crypto.subtle.digest('SHA-256', data).then(function(buf){
+      return Array.prototype.map.call(new Uint8Array(buf), function(b){ return ('0' + b.toString(16)).slice(-2); }).join('');
+    });
+  }
+  try{ if(sessionStorage.getItem('ws_ok') === '1'){ openGate(); } }catch(e){}
+  document.getElementById('gateForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!(window.crypto && crypto.subtle)){ gateErr.textContent = '보안 연결(https)에서 열어 주세요'; return; }
+    sha256Hex('insys-ws:' + gatePw.value).then(function(h){
+      if(h === PW_HASH){
+        try{ sessionStorage.setItem('ws_ok', '1'); }catch(e){}
+        gateErr.textContent = ''; openGate();
+      } else {
+        gateErr.textContent = '비밀번호가 맞지 않습니다'; gatePw.value = ''; gatePw.focus();
+      }
+    });
+  });
+  var body = document.body, bM = document.getElementById('btnMobile'), bP = document.getElementById('btnPc');
+  function setView(mode){
+    if(mode === 'pc'){ body.classList.add('pc'); body.classList.remove('mobile'); bP.classList.add('on'); bM.classList.remove('on'); }
+    else { body.classList.add('mobile'); body.classList.remove('pc'); bM.classList.add('on'); bP.classList.remove('on'); }
+  }
+  bM.addEventListener('click', function(){ setView('mobile'); });
+  bP.addEventListener('click', function(){ setView('pc'); });
+
+  var toastEl = document.getElementById('toast');
+  function toast(m){ toastEl.textContent = m; toastEl.classList.add('show'); setTimeout(function(){ toastEl.classList.remove('show'); }, 2200); }
+  WS.onStatus = function(good, msg){ var e = document.getElementById('syncSt'); e.textContent = msg; e.className = 'sync ' + (good ? 'ok' : 'warn'); };
+  WS.init();
+
+  var AG = [
+    { id: 'rec_7_1', title: '비전 2030 · 1단계 문제점 공감' },
+    { id: 'rec_7_2', title: '비전 2030 · 2단계 방향 선택' },
+    { id: 'rec_7_3', title: '비전 2030 · 3단계 정리' },
+    { id: 'rec_8_1', title: '조직도 재구성 · 1단계 방향 확인과 현황' },
+    { id: 'rec_8_2', title: '조직도 재구성 · 2단계 쟁점 논의' },
+    { id: 'rec_8_3', title: '조직도 재구성 · 3단계 안 비교' },
+    { id: 'rec_8_4', title: '조직도 재구성 · 4단계 결정과 후속' }
+  ];
+  var GOALS = [['g1', '조직·인력'], ['g2', '경영·수익'], ['g3', '시스템·자동화'], ['g4', '인재·문화']];
+  var DEC_RE = /(결정|확정|합의|동의|채택|하기로|로 한다|로 함|하겠습니다|추진하겠|진행하겠)/;
+  var ACT_RE = /(담당|까지|기한|이번 주|다음 주|다음달|내일|검토|요청|확인 후|작성|준비|공유|보고|예정)/;
+  var M = null, REC = {}, FIELDS = {};
+
+  function esc(s){ return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function lineList(t){
+    return String(t || '').split('\n').map(function(l){ return l.replace(/^\s*(?:[-•*]\s+|\d{1,2}[.)]\s+)/, '').trim(); }).filter(Boolean);
+  }
+  function sentences(text){
+    var out = [];
+    lineList(text).forEach(function(l){
+      var m = l.match(/[^.!?。]+[.!?。]?/g) || [l];
+      m.forEach(function(s){ s = s.trim(); if(s.length > 1){ out.push(s); } });
+    });
+    return out;
+  }
+  function bullets(arr){ return arr.map(function(l){ return '- ' + l; }).join('\n'); }
+  function defaults(){
+    return {
+      info: { name: '2026 인시스 그룹 임원 워크숍 2부 — 비전 2030 및 그룹 조직도 재구성 토의', date: '2026. 10. 24(토) 17:00~18:00', place: '세부 막탄 리조트 워크숍 회의실', people: '' },
+      sec: {}, fields: {}
+    };
+  }
+  function setPath(o, path, v){ var p = path.split('.'); for(var i = 0; i < p.length - 1; i++){ o = o[p[i]] = o[p[i]] || {}; } o[p[p.length - 1]] = v; }
+  function getPath(o, path){ var p = path.split('.'); for(var i = 0; i < p.length; i++){ if(o == null){ return ''; } o = o[p[i]]; } return o == null ? '' : o; }
+
+  function autoOrganize(){
+    var n = 0;
+    AG.forEach(function(a){
+      var t = (REC[a.id] && REC[a.id].text) || '';
+      var ss = sentences(t);
+      var dec = ss.filter(function(s){ return DEC_RE.test(s); });
+      var act = ss.filter(function(s){ return ACT_RE.test(s); });
+      M.sec[a.id] = { disc: bullets(ss), dec: bullets(dec), act: bullets(act) };
+      if(ss.length){ n++; }
+    });
+    M.fields = {};
+    for(var k in FIELDS){ if(typeof FIELDS[k] === 'string' && k !== 'version' && k !== 'updatedAt'){ M.fields[k] = FIELDS[k]; } }
+    return n;
+  }
+
+  function fld(label, key, kind, val){
+    if(kind === 'ta'){ return '<div class="full"><label>' + esc(label) + '</label><textarea class="ta" data-k="' + key + '" rows="4">' + esc(val) + '</textarea></div>'; }
+    return '';
+  }
+  function render(){
+    var h = '';
+    AG.forEach(function(a){
+      var s = M.sec[a.id] || { disc: '', dec: '', act: '' };
+      h += '<div class="sec"><h4>' + esc(a.title) + '</h4>' +
+        '<label class="lbl">논의 내용</label><textarea class="ta" data-k="sec.' + a.id + '.disc" rows="4">' + esc(s.disc) + '</textarea>' +
+        '<label class="lbl">결정·합의</label><textarea class="ta" data-k="sec.' + a.id + '.dec" rows="2">' + esc(s.dec) + '</textarea>' +
+        '<label class="lbl">후속 조치</label><textarea class="ta" data-k="sec.' + a.id + '.act" rows="2">' + esc(s.act) + '</textarea></div>';
+    });
+    document.getElementById('secs').innerHTML = h;
+    var t = '<h4>2030 목표</h4><div class="tbl"><table><tr><th>구분</th><th>2026 현재</th><th>2030 목표</th><th>담당</th></tr>';
+    GOALS.forEach(function(g){
+      t += '<tr><td>' + g[1] + '</td>' + ['n', 't', 'o'].map(function(c){ return '<td><textarea class="ta" style="min-height:44px" data-k="fields.' + g[0] + c + '" rows="2">' + esc(M.fields[g[0] + c]) + '</textarea></td>'; }).join('') + '</tr>';
+    });
+    t += '</table></div><h4>오늘 합의한 3가지</h4><div class="tbl"><table><tr><th>#</th><th>합의 내용</th><th>담당</th><th>기한</th></tr>';
+    [1, 2, 3].forEach(function(i){
+      t += '<tr><td>' + i + '</td>' + ['c', 'o', 'd'].map(function(c){ return '<td><textarea class="ta" style="min-height:44px" data-k="fields.a' + i + c + '" rows="2">' + esc(M.fields['a' + i + c]) + '</textarea></td>'; }).join('') + '</tr>';
+    });
+    t += '</table></div><h4>결정·보류·다음 일정</h4><div class="tbl"><table>';
+    [['d_dec', '결정 사항'], ['d_hold', '보류 사항'], ['d_next', '다음 일정']].forEach(function(r){
+      t += '<tr><td>' + r[1] + '</td><td><textarea class="ta" style="min-height:44px" data-k="fields.' + r[0] + '" rows="2">' + esc(M.fields[r[0]]) + '</textarea></td></tr>';
+    });
+    t += '</table></div>';
+    document.getElementById('tabs').innerHTML = t;
+    [].forEach.call(document.querySelectorAll('[data-k^="info."]'), function(el){ el.value = getPath(M, el.getAttribute('data-k')); });
+  }
+  function gather(){
+    [].forEach.call(document.querySelectorAll('[data-k]'), function(el){ setPath(M, el.getAttribute('data-k'), el.value); });
+  }
+
+  function ul(text){
+    var l = lineList(text);
+    return l.length ? '<ul>' + l.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '<p class="none">(기록 없음)</p>';
+  }
+  function cell(v){ var t = String(v || '').trim(); return t ? esc(t).replace(/\n/g, '<br>') : '<span class="none">-</span>'; }
+  function buildDoc(){
+    gather();
+    var i = M.info, f = M.fields, d = '';
+    d += '<div class="cf">대외비 · 임원 전용</div><h1>' + esc(i.name || '임원 워크숍 회의록') + '</h1>';
+    d += '<table><tr><th style="width:90px">일시</th><td>' + cell(i.date) + '</td></tr><tr><th>장소</th><td>' + cell(i.place) + '</td></tr><tr><th>참석자</th><td>' + cell(i.people) + '</td></tr><tr><th>작성</th><td>인시스 AI혁신 연구개발실</td></tr></table>';
+    d += '<h2>1. 안건별 논의</h2>';
+    var allDec = [];
+    AG.forEach(function(a){
+      var s = M.sec[a.id] || {};
+      if(!lineList(s.disc).length && !lineList(s.dec).length && !lineList(s.act).length){ return; }
+      d += '<h3>' + esc(a.title) + '</h3><h5>논의 내용</h5>' + ul(s.disc);
+      if(lineList(s.dec).length){ d += '<h5>결정·합의</h5>' + ul(s.dec); lineList(s.dec).forEach(function(x){ allDec.push(x); }); }
+      if(lineList(s.act).length){ d += '<h5>후속 조치</h5>' + ul(s.act); }
+    });
+    if(d.indexOf('<h3>') < 0){ d += '<p class="none">(저장된 토의 기록이 없습니다)</p>'; }
+    d += '<h2>2. 결정·합의 사항 종합</h2>' + (allDec.length ? '<ul>' + allDec.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '<p class="none">(기록 없음)</p>');
+    d += '<h2>3. 2030 목표</h2><table><tr><th>구분</th><th>2026 현재</th><th>2030 목표</th><th>담당</th></tr>';
+    GOALS.forEach(function(g){ d += '<tr><td>' + g[1] + '</td><td>' + cell(f[g[0] + 'n']) + '</td><td>' + cell(f[g[0] + 't']) + '</td><td>' + cell(f[g[0] + 'o']) + '</td></tr>'; });
+    d += '</table><h2>4. 오늘 합의한 3가지</h2><table><tr><th style="width:30px">#</th><th>합의 내용</th><th>담당</th><th>기한</th></tr>';
+    [1, 2, 3].forEach(function(n){ d += '<tr><td>' + n + '</td><td>' + cell(f['a' + n + 'c']) + '</td><td>' + cell(f['a' + n + 'o']) + '</td><td>' + cell(f['a' + n + 'd']) + '</td></tr>'; });
+    d += '</table><h2>5. 결정·보류·다음 일정</h2><table><tr><th style="width:90px">결정 사항</th><td>' + cell(f.d_dec) + '</td></tr><tr><th>보류 사항</th><td>' + cell(f.d_hold) + '</td></tr><tr><th>다음 일정</th><td>' + cell(f.d_next) + '</td></tr></table>';
+    d += '<div class="ft">인시스 AI혁신 연구개발실 · 회의록 ' + VERSION + ' · 작성 ' + WS.fmt(new Date()).slice(0, 16) + '</div>';
+    return d;
+  }
+
+  function loadAll(first){
+    var ids = ['fields', 'minutes']; AG.forEach(function(a){ ids.push(a.id); });
+    return WS.loadAll(ids).then(function(map){
+      REC = map; FIELDS = map.fields || {};
+      var n = 0; AG.forEach(function(a){ if(map[a.id] && (map[a.id].text || '').trim()){ n++; } });
+      document.getElementById('loadInfo').textContent = '토의 기록 ' + n + '/' + AG.length + '건' + (map.fields ? ' · 입력값 있음' : '');
+      if(first && map.minutes && map.minutes.M){
+        M = map.minutes.M; M.info = M.info || defaults().info; M.sec = M.sec || {}; M.fields = M.fields || {};
+        document.getElementById('autoNote').textContent = '저장된 회의록을 불러왔습니다 (' + (map.minutes.updatedAt || '') + ')';
+        render();
+      } else if(first){
+        M = defaults(); var c = autoOrganize(); render();
+        document.getElementById('autoNote').textContent = c ? ('토의 기록 ' + c + '건을 자동 정리했습니다') : '저장된 토의 기록이 아직 없습니다';
+      } else {
+        toast('다시 불러왔습니다. 안건별 내용을 바꾸려면 "자동 정리"를 누르세요');
+        gather(); M.fields = M.fields || {};
+        for(var k in FIELDS){ if(typeof FIELDS[k] === 'string' && k !== 'version' && k !== 'updatedAt' && !M.fields[k]){ M.fields[k] = FIELDS[k]; } }
+        render();
+      }
+    });
+  }
+
+  var armed = false, armT = null, bAuto = document.getElementById('bAuto');
+  bAuto.addEventListener('click', function(){
+    gather();
+    var edited = false;
+    for(var id in M.sec){ var s = M.sec[id]; if(s && ((s.disc || '').trim() || (s.dec || '').trim() || (s.act || '').trim())){ edited = true; } }
+    if(edited && !armed){
+      armed = true; bAuto.textContent = '한 번 더 누르면 다시 정리 (고친 내용 사라짐)'; bAuto.classList.add('arm');
+      armT = setTimeout(function(){ armed = false; bAuto.textContent = '자동 정리'; bAuto.classList.remove('arm'); }, 4000); return;
+    }
+    clearTimeout(armT); armed = false; bAuto.textContent = '자동 정리'; bAuto.classList.remove('arm');
+    var c = autoOrganize(); render();
+    document.getElementById('autoNote').textContent = c ? ('토의 기록 ' + c + '건을 자동 정리했습니다') : '저장된 토의 기록이 없습니다';
+    toast('자동 정리했습니다. 내용을 확인하고 고쳐 주세요');
+  });
+  document.getElementById('bLoad').addEventListener('click', function(){ loadAll(false); });
+  document.getElementById('bPrev').addEventListener('click', function(){
+    document.getElementById('doc').innerHTML = buildDoc();
+    document.getElementById('doc').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  document.getElementById('bSave').addEventListener('click', function(){
+    var h = buildDoc(); document.getElementById('doc').innerHTML = h;
+    WS.save('minutes', { M: M, html: h }, false, VERSION).then(function(ok){ toast(ok ? '회의록을 Firebase에 저장했습니다' : '이 기기에만 저장했습니다 (Firebase 실패)'); });
+  });
+  document.getElementById('bDl').addEventListener('click', function(){
+    var h = buildDoc(); document.getElementById('doc').innerHTML = h;
+    var css = 'body{font-family:"Noto Sans KR","Malgun Gothic",sans-serif;color:#1f2937;margin:0;padding:16px;line-height:1.6;font-size:15px}.doc{max-width:820px;margin:0 auto}h1{color:#1e3a5f;font-size:1.3rem;text-align:center}h2{color:#1e3a5f;font-size:1.05rem;border-bottom:2px solid #1e3a5f;padding-bottom:2px;margin-top:14px}h3{color:#1e3a5f;font-size:1rem}h5{color:#374151;margin:4px 0 0}.cf{text-align:center;color:#9b1c1c;font-weight:700}table{width:100%;border-collapse:collapse;margin:4px 0}th,td{border:1px solid #b8c6d9;padding:4px 8px;text-align:left;vertical-align:top}th{background:#e6edf8;color:#1e3a5f}.none{color:#6b7280}.ft{margin-top:12px;color:#4b5563;text-align:right}';
+    var full = '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>임원 워크숍 회의록</title><style>' + css + '</style></head><body><div class="doc">' + h + '</div></body></html>';
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([full], { type: 'text/html;charset=utf-8' }));
+    a.download = '임원워크샵_회의록_' + WS.fmt(new Date()).slice(0, 10).replace(/-/g, '') + '.html';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+    toast('회의록 HTML을 내려받았습니다');
+  });
+  document.getElementById('bPrint').addEventListener('click', function(){
+    document.getElementById('doc').innerHTML = buildDoc();
+    window.print();
+  });
+
+  M = defaults(); render();
+  loadAll(true);
+})();
+</script>
+</body>
+</html>

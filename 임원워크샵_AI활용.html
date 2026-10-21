@@ -105,7 +105,39 @@ a{color:#1e4f9a}
 .gate-box .go{width:100%;margin-top:8px;padding:8px;border:0;border-radius:8px;background:#1e3a5f;color:#ffffff;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer}
 .gate-err{color:#9b1c1c;font-size:0.875rem;min-height:1.3em;margin-top:6px}
 .gate-ver{color:#374151;font-size:0.875rem;margin-top:6px}
+/* v2.0 음성 입력·토의 녹음 */
+.sync{font-size:0.875rem;padding:3px 10px;border-radius:8px;background:#e6edf8;color:#1e3a5f;font-weight:500}
+.sync.ok{background:#e9f3ec;color:#14532d}
+.sync.warn{background:#fff6e0;color:#7a4b00}
+a.btn{text-decoration:none;display:inline-block}
+.vf{display:flex;gap:4px;align-items:flex-start}
+.fld{flex:1;min-width:0;width:100%;border:1px solid #b8c6d9;border-radius:8px;padding:5px 8px;font-family:inherit;font-size:inherit;color:#1f2937;background:#ffffff;resize:vertical;min-height:38px;line-height:1.5}
+.mic{flex:0 0 auto;border:1px solid #b8c6d9;background:#ffffff;color:#1e3a5f;border-radius:8px;width:38px;height:38px;font-size:1.1rem;cursor:pointer;line-height:1}
+.mic.on{background:#9b1c1c;color:#ffffff;border-color:#9b1c1c;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.65}}
+.interim{color:#4b5563;font-size:0.875rem;min-height:1.2em}
+.hint{color:#374151;font-size:0.875rem}
+.recbox{margin:6px 0}
+details.rec{border:1px solid var(--line);border-radius:10px;background:#fbfcfe;overflow:hidden}
+details.rec>summary{list-style:none;cursor:pointer;padding:8px 10px;display:flex;align-items:center;gap:8px;background:#eef3fa;color:var(--navy);font-weight:700}
+details.rec>summary::-webkit-details-marker{display:none}
+details.rec>summary::after{content:"▾";margin-left:6px;color:var(--navy2)}
+details.rec[open]>summary::after{content:"▴"}
+.rs{margin-left:auto;font-weight:500;font-size:0.875rem;color:#4b5563}
+.rs.live{color:#9b1c1c;font-weight:700}
+.rs.done{color:#14532d;font-weight:700}
+.recbody{padding:8px 10px}
+.rbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.rb{border:1px solid #b8c6d9;background:#ffffff;color:#1e3a5f;border-radius:8px;padding:6px 12px;font-family:inherit;font-size:0.875rem;font-weight:500;cursor:pointer}
+.rb.go{background:#1e3a5f;color:#ffffff;border-color:#1e3a5f}
+.rb.stop{background:#9b1c1c;color:#ffffff;border-color:#9b1c1c}
+.rb:disabled{opacity:.45;cursor:not-allowed}
+.lb{display:block;color:var(--navy);font-weight:700;font-size:0.875rem;margin:6px 0 2px}
+.rtx{width:100%;border:1px solid #b8c6d9;border-radius:8px;padding:6px 8px;font-family:inherit;font-size:inherit;color:#1f2937;background:#ffffff;resize:vertical;line-height:1.5}
+.warnbar{display:none;background:#fff6e0;color:#7a4b00;border:1px solid #f0d9a0;border-radius:8px;padding:6px 10px;margin:8px 0;font-size:0.875rem}
 </style>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 </head>
 <body class="pc">
 
@@ -116,7 +148,7 @@ a{color:#1e4f9a}
     <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
     <button type="submit" class="go" id="gateBtn">확인</button>
     <div class="gate-err" id="gateErr" role="alert"></div>
-    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.9</span></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v2.0</span></div>
   </form>
 </div>
 
@@ -130,7 +162,8 @@ a{color:#1e4f9a}
         <button type="button" id="btnPc" class="on">PC</button>
       </div>
       <button type="button" class="btn" id="btnAll">전체 펼치기</button>
-      <span class="ver" id="verBadge">v1.9</span>
+      <a class="btn" href="임원워크샵_일정표.html">일정표</a><a class="btn" href="임원워크샵_회의록.html">회의록</a><span class="sync" id="syncSt">저장: 확인 중</span>
+      <span class="ver" id="verBadge">v2.0</span>
     </div>
   </div>
 </div>
@@ -145,6 +178,8 @@ a{color:#1e4f9a}
       <span class="chip" id="chipTime">약 125분</span><span class="chip" id="chipCnt">8개 파트</span><span class="chip">2026년 10월</span><span class="chip">담당: 인시스 AI혁신 연구개발실</span>
     </div>
   </div>
+
+  <div class="warnbar" id="noVoice">이 브라우저는 음성 입력을 지원하지 않습니다. 휴대폰·PC의 Chrome 또는 Safari로 열어 주세요 (카카오톡 등 앱 안의 브라우저는 불가). 직접 입력은 가능합니다.</div>
 
   <div class="sumbar" id="agenda">
     <div class="sumtxt"><b>이번에 진행할 파트를 체크하세요</b><span id="sumNote">8개 파트 · 125분 (2시간 5분)</span></div>
@@ -299,10 +334,10 @@ a{color:#1e4f9a}
       <h4>3. 2030 목표 (토의 후 기재)</h4>
       <div class="tbl"><table>
         <tr><th>구분</th><th>2026 현재</th><th>2030 목표</th><th>담당</th></tr>
-        <tr><td>조직·인력</td><td></td><td></td><td></td></tr>
-        <tr><td>경영·수익</td><td></td><td></td><td></td></tr>
-        <tr><td>시스템·자동화</td><td></td><td></td><td></td></tr>
-        <tr><td>인재·문화</td><td></td><td></td><td></td></tr>
+        <tr><td>조직·인력</td><td><div class="vf"><textarea class="fld" data-f="g1n" rows="2" aria-label="조직·인력 2026 현재"></textarea><button type="button" class="mic" aria-label="조직·인력 2026 현재 음성 입력" aria-pressed="false">🎙</button></div></td><td><div class="vf"><textarea class="fld" data-f="g1t" rows="2" aria-label="조직·인력 2030 목표"></textarea><button type="button" class="mic" aria-label="조직·인력 2030 목표 음성 입력" aria-pressed="false">🎙</button></div></td><td><div class="vf"><textarea class="fld" data-f="g1o" rows="2" aria-label="조직·인력 담당"></textarea><button type="button" class="mic" aria-label="조직·인력 담당 음성 입력" aria-pressed="false">🎙</button></div></td></tr>
+        <tr><td>경영·수익</td><td><div class="vf"><textarea class="fld" data-f="g2n" rows="2" aria-label="경영·수익 2026 현재"></textarea><button type="button" class="mic" aria-label="경영·수익 2026 현재 음성 입력" aria-pressed="false">🎙</button></div></td><td><div class="vf"><textarea class="fld" data-f="g2t" rows="2" aria-label="경영·수익 2030 목표"></textarea><button type="button" class="mic" aria-label="경영·수익 2030 목표 음성 입력" aria-pressed="false">🎙</button></div></td><td><div class="vf"><textarea class="fld" data-f="g2o" rows="2" aria-label="경영·수익 담당"></textarea><button type="button" class="mic" aria-label="경영·수익 담당 음성 입력" aria-pressed="false">🎙</button></div></td></tr>
+        <tr><td>시스템·자동화</td><td><div class="vf"><textarea class="fld" data-f="g3n" rows="2" aria-label="시스템·자동화 2026 현재"></textarea><button type="button" class="mic" aria-label="시스템·자동화 2026 현재 음성 입력" aria-pressed="false">🎙</button></div></td><td><div class="vf"><textarea class="fld" data-f="g3t" rows="2" aria-label="시스템·자동화 2030 목표"></textarea><button type="button" class="mic" aria-label="시스템·자동화 2030 목표 음성 입력" aria-pressed="false">🎙</button></div></td><td><div class="vf"><textarea class="fld" data-f="g3o" rows="2" aria-label="시스템·자동화 담당"></textarea><button type="button" class="mic" aria-label="시스템·자동화 담당 음성 입력" aria-pressed="false">🎙</button></div></td></tr>
+        <tr><td>인재·문화</td><td><div class="vf"><textarea class="fld" data-f="g4n" rows="2" aria-label="인재·문화 2026 현재"></textarea><button type="button" class="mic" aria-label="인재·문화 2026 현재 음성 입력" aria-pressed="false">🎙</button></div></td><td><div class="vf"><textarea class="fld" data-f="g4t" rows="2" aria-label="인재·문화 2030 목표"></textarea><button type="button" class="mic" aria-label="인재·문화 2030 목표 음성 입력" aria-pressed="false">🎙</button></div></td><td><div class="vf"><textarea class="fld" data-f="g4o" rows="2" aria-label="인재·문화 담당"></textarea><button type="button" class="mic" aria-label="인재·문화 담당 음성 입력" aria-pressed="false">🎙</button></div></td></tr>
       </table></div>
       <h4>시간 배분 (20분)</h4>
       <div class="tbl"><table>
@@ -311,6 +346,19 @@ a{color:#1e4f9a}
         <tr><td>2</td><td>방향 선택: 5개 축 중 우선순위 정하기</td><td>8분</td></tr>
         <tr><td>3</td><td>정리: 오늘 합의한 3가지와 담당·기한</td><td>5분</td></tr>
       </table></div>
+      <h4>오늘 합의한 3가지 (토의 후 기재)</h4>
+      <p class="hint">칸을 누르고 🎙를 누르면 말한 내용이 바로 입력됩니다. 직접 쓰거나 고칠 수도 있습니다.</p>
+      <div class="tbl"><table>
+        <tr><th>#</th><th>합의 내용</th><th>담당</th><th>기한</th></tr>
+        <tr><td>1</td><td><div class="vf"><textarea class="fld" data-f="a1c" rows="2" aria-label="합의 1 내용"></textarea><button type="button" class="mic" aria-label="합의 1 내용 음성 입력" aria-pressed="false">🎙</button></div></td><td><div class="vf"><textarea class="fld" data-f="a1o" rows="2" aria-label="합의 1 담당"></textarea><button type="button" class="mic" aria-label="합의 1 담당 음성 입력" aria-pressed="false">🎙</button></div></td><td><div class="vf"><textarea class="fld" data-f="a1d" rows="2" aria-label="합의 1 기한"></textarea><button type="button" class="mic" aria-label="합의 1 기한 음성 입력" aria-pressed="false">🎙</button></div></td></tr>
+        <tr><td>2</td><td><div class="vf"><textarea class="fld" data-f="a2c" rows="2" aria-label="합의 2 내용"></textarea><button type="button" class="mic" aria-label="합의 2 내용 음성 입력" aria-pressed="false">🎙</button></div></td><td><div class="vf"><textarea class="fld" data-f="a2o" rows="2" aria-label="합의 2 담당"></textarea><button type="button" class="mic" aria-label="합의 2 담당 음성 입력" aria-pressed="false">🎙</button></div></td><td><div class="vf"><textarea class="fld" data-f="a2d" rows="2" aria-label="합의 2 기한"></textarea><button type="button" class="mic" aria-label="합의 2 기한 음성 입력" aria-pressed="false">🎙</button></div></td></tr>
+        <tr><td>3</td><td><div class="vf"><textarea class="fld" data-f="a3c" rows="2" aria-label="합의 3 내용"></textarea><button type="button" class="mic" aria-label="합의 3 내용 음성 입력" aria-pressed="false">🎙</button></div></td><td><div class="vf"><textarea class="fld" data-f="a3o" rows="2" aria-label="합의 3 담당"></textarea><button type="button" class="mic" aria-label="합의 3 담당 음성 입력" aria-pressed="false">🎙</button></div></td><td><div class="vf"><textarea class="fld" data-f="a3d" rows="2" aria-label="합의 3 기한"></textarea><button type="button" class="mic" aria-label="합의 3 기한 음성 입력" aria-pressed="false">🎙</button></div></td></tr>
+      </table></div>
+      <h4>토의 녹음·기록</h4>
+      <p class="hint">단계마다 🎙 녹음 시작 → 정지 → 텍스트 변환 → 내용 수정 → 저장 순서입니다. 저장된 기록은 <a href="임원워크샵_회의록.html">회의록</a>에서 자동 정리됩니다. 음성 파일은 저장하지 않고 글자만 저장합니다.</p>
+      <div class="recbox" data-id="rec_7_1" data-part="7" data-title="1단계 문제점 공감 (7분)"></div>
+      <div class="recbox" data-id="rec_7_2" data-part="7" data-title="2단계 방향 선택 (8분)"></div>
+      <div class="recbox" data-id="rec_7_3" data-part="7" data-title="3단계 정리 (5분)"></div>
       <div class="note">숫자 목표(매출·인원·수익성 등)는 임원 토의로 정합니다. 이 자료에서 임의로 제시하지 않았습니다.</div>
     </div>
   </details>
@@ -331,6 +379,19 @@ a{color:#1e4f9a}
         <tr><td>3</td><td>재구성안 비교와 의견 수렴</td><td>10분</td></tr>
         <tr><td>4</td><td>결정 사항과 후속 일정 정리</td><td>5분</td></tr>
       </table></div>
+      <h4>토의 녹음·기록</h4>
+      <p class="hint">단계마다 🎙 녹음 시작 → 정지 → 텍스트 변환 → 내용 수정 → 저장 순서입니다. 저장된 기록은 <a href="임원워크샵_회의록.html">회의록</a>에서 자동 정리됩니다.</p>
+      <div class="recbox" data-id="rec_8_1" data-part="8" data-title="1단계 방향 확인과 현황 (5분)"></div>
+      <div class="recbox" data-id="rec_8_2" data-part="8" data-title="2단계 쟁점 논의 (10분)"></div>
+      <div class="recbox" data-id="rec_8_3" data-part="8" data-title="3단계 안 비교 (10분)"></div>
+      <div class="recbox" data-id="rec_8_4" data-part="8" data-title="4단계 결정과 후속 (5분)"></div>
+      <h4>결정·보류·다음 일정 (토의 후 기재)</h4>
+      <div class="tbl"><table>
+        <tr><th>구분</th><th>내용</th></tr>
+        <tr><td>결정 사항</td><td><div class="vf"><textarea class="fld" data-f="d_dec" rows="2" aria-label="결정 사항"></textarea><button type="button" class="mic" aria-label="결정 사항 음성 입력" aria-pressed="false">🎙</button></div></td></tr>
+        <tr><td>보류 사항</td><td><div class="vf"><textarea class="fld" data-f="d_hold" rows="2" aria-label="보류 사항"></textarea><button type="button" class="mic" aria-label="보류 사항 음성 입력" aria-pressed="false">🎙</button></div></td></tr>
+        <tr><td>다음 일정</td><td><div class="vf"><textarea class="fld" data-f="d_next" rows="2" aria-label="다음 일정"></textarea><button type="button" class="mic" aria-label="다음 일정 음성 입력" aria-pressed="false">🎙</button></div></td></tr>
+      </table></div>
       <h4>AI 활용 흐름</h4>
       <div class="tbl"><table>
         <tr><th>단계</th><th>내용</th></tr>
@@ -343,7 +404,7 @@ a{color:#1e4f9a}
     </div>
   </details>
 
-  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v1.9</span></div>
+  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v2.0</span></div>
 
 </div></div>
 </div>
@@ -352,7 +413,7 @@ a{color:#1e4f9a}
 
 <script>
 (function(){
-  var VERSION = 'v1.9';
+  var VERSION = 'v2.0';
   document.getElementById('verBadge').textContent = VERSION;
   document.getElementById('verFoot').textContent = VERSION;
 
@@ -459,6 +520,198 @@ a{color:#1e4f9a}
       var el = document.getElementById(id);
       if(el){ el.open = true; }
     });
+  }
+})();
+</script>
+<script>
+/* ── 공통 저장소: Firebase(Firestore) + 이 기기 보조 저장 ── */
+var WS = (function(){
+  var COLL = 'workshop2026';
+  var CFG = {apiKey:"AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",authDomain:"insys-work.firebaseapp.com",projectId:"insys-work",storageBucket:"insys-work.firebasestorage.app",messagingSenderId:"225275784859",appId:"1:225275784859:web:bd12815c6dc47c0c49e03e"};
+  var db = null, ok = false;
+  var api = { onStatus: function(){} };
+  function p(n){ return (n < 10 ? '0' : '') + n; }
+  function fmt(d){ return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()); }
+  function lsGet(id){ try{ var s = localStorage.getItem('ws26:' + id); return s ? JSON.parse(s) : null; }catch(e){ return null; } }
+  function lsSet(id, o){ try{ localStorage.setItem('ws26:' + id, JSON.stringify(o)); }catch(e){} }
+  function status(good, msg){ try{ api.onStatus(good, msg); }catch(e){} }
+  api.fmt = fmt;
+  api.init = function(){
+    try{
+      if(!window.firebase) throw new Error('SDK 로드 실패');
+      if(!firebase.apps.length) firebase.initializeApp(CFG);
+      db = firebase.firestore(); ok = true;
+    }catch(e){ ok = false; console.warn('Firebase 초기화 실패:', e.message); status(false, '이 기기에만 저장 (Firebase 미연결)'); }
+    return ok;
+  };
+  api.save = function(id, obj, merge, ver){
+    var now = fmt(new Date());
+    var rec = {}; for(var k in obj){ rec[k] = obj[k]; }
+    rec.updatedAt = now; rec.version = ver;
+    var prev = lsGet(id) || {}, m = {};
+    if(merge){ for(var a in prev){ m[a] = prev[a]; } for(var b in rec){ m[b] = rec[b]; } } else { m = rec; }
+    lsSet(id, m);
+    if(!ok){ status(false, '이 기기에만 저장됨 (Firebase 미연결)'); return Promise.resolve(false); }
+    return db.collection(COLL).doc(id).set(rec, { merge: !!merge }).then(function(){
+      status(true, 'Firebase 저장됨 ' + now.slice(11, 16)); return true;
+    }).catch(function(e){
+      console.warn('저장 실패:', (e && e.message) || e);
+      status(false, '이 기기에만 저장됨 (Firebase 저장 실패)'); return false;
+    });
+  };
+  api.loadAll = function(ids){
+    var out = {};
+    ids.forEach(function(id){ var l = lsGet(id); if(l){ out[id] = l; } });
+    function take(id, s){ var l = out[id]; if(!l || (s.updatedAt || '') >= (l.updatedAt || '')){ out[id] = s; } }
+    if(!ok){ status(false, '이 기기 저장본 표시 (Firebase 미연결)'); return Promise.resolve(out); }
+    return db.collection(COLL).get().then(function(snap){
+      snap.forEach(function(d){ take(d.id, d.data()); });
+      status(true, 'Firebase 불러옴'); return out;
+    }).catch(function(e){
+      console.warn('목록 불러오기 실패, 문서별 시도:', (e && e.message) || e);
+      return Promise.all(ids.map(function(id){
+        return db.collection(COLL).doc(id).get().then(function(d){ if(d.exists){ take(id, d.data()); } });
+      })).then(function(){ status(true, 'Firebase 불러옴'); return out; }).catch(function(e2){
+        console.warn('불러오기 실패:', (e2 && e2.message) || e2);
+        status(false, 'Firebase 불러오기 실패 — 이 기기 저장본 표시'); return out;
+      });
+    });
+  };
+  return api;
+})();
+
+</script>
+<script>
+/* ── 워크샵 자료: 음성 입력·토의 녹음·Firebase 저장 (v2.0 추가) ── */
+(function(){
+  var WSV = document.getElementById('verBadge').textContent;
+  var toastEl = document.getElementById('toast');
+  function toast(m){ toastEl.textContent = m; toastEl.classList.add('show'); setTimeout(function(){ toastEl.classList.remove('show'); }, 2200); }
+  WS.onStatus = function(good, msg){ var e = document.getElementById('syncSt'); if(e){ e.textContent = msg; e.className = 'sync ' + (good ? 'ok' : 'warn'); } };
+  WS.init();
+
+  /* 음성 인식 (브라우저 내장 기능 사용, 한국어) */
+  var Voice = (function(){
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition, cur = null;
+    function stop(){ if(cur){ cur.want = false; try{ cur.r.stop(); }catch(e){} } }
+    function start(h){
+      if(!SR){ h.onError('이 브라우저는 음성 인식을 지원하지 않습니다. Chrome 또는 Safari로 열어 주세요 (카카오톡 등 앱 안의 브라우저는 안 됩니다).'); return false; }
+      stop();
+      var r = new SR(); r.lang = 'ko-KR'; r.continuous = true; r.interimResults = true;
+      var s = { r: r, want: true }; cur = s;
+      r.onresult = function(e){
+        var im = '';
+        for(var i = e.resultIndex; i < e.results.length; i++){
+          var t = e.results[i][0].transcript;
+          if(e.results[i].isFinal){ t = t.trim(); if(t){ h.onFinal(t); } } else { im += t; }
+        }
+        h.onInterim(im);
+      };
+      r.onerror = function(e){
+        if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){ s.want = false; h.onError('마이크 권한이 필요합니다. 주소창의 마이크 아이콘에서 허용해 주세요.'); }
+        else if(e.error === 'audio-capture'){ s.want = false; h.onError('마이크를 찾을 수 없습니다.'); }
+        else if(e.error === 'network'){ s.want = false; h.onError('음성 인식 서버에 연결할 수 없습니다. 인터넷 연결을 확인해 주세요.'); }
+      };
+      r.onend = function(){
+        if(s.want){ try{ r.start(); return; }catch(e){} }
+        if(cur === s){ cur = null; }
+        h.onInterim(''); h.onState(false);
+      };
+      try{ r.start(); h.onState(true); return true; }catch(e){ cur = null; h.onError('음성 인식을 시작하지 못했습니다.'); return false; }
+    }
+    return { start: start, stop: stop, supported: !!SR };
+  })();
+
+  if(!Voice.supported){
+    var nb = document.getElementById('noVoice'); if(nb){ nb.style.display = 'block'; }
+  }
+
+  /* 입력칸 (표의 빈칸) — 🎙 누르면 말한 내용이 바로 입력됨 */
+  var fieldEls = [].slice.call(document.querySelectorAll('.fld'));
+  var fT = null;
+  function collectFields(){ var o = {}; fieldEls.forEach(function(t){ o[t.getAttribute('data-f')] = t.value; }); return o; }
+  function queueFields(){ clearTimeout(fT); fT = setTimeout(function(){ WS.save('fields', collectFields(), true, WSV); }, 900); }
+  fieldEls.forEach(function(t){ t.addEventListener('input', queueFields); });
+  [].forEach.call(document.querySelectorAll('.vf'), function(vf){
+    var ta = vf.querySelector('.fld'), btn = vf.querySelector('.mic');
+    var it = document.createElement('div'); it.className = 'interim'; vf.parentNode.appendChild(it);
+    btn.addEventListener('click', function(){
+      if(btn.classList.contains('on')){ Voice.stop(); return; }
+      Voice.start({
+        onFinal: function(t){ ta.value = (ta.value ? ta.value + ' ' : '') + t; queueFields(); },
+        onInterim: function(t){ it.textContent = t ? ('… ' + t) : ''; },
+        onState: function(on){ btn.classList.toggle('on', on); btn.textContent = on ? '⏹' : '🎙'; btn.setAttribute('aria-pressed', on ? 'true' : 'false'); },
+        onError: toast
+      });
+    });
+  });
+
+  /* 토의 녹음 패널 */
+  var recs = {};
+  [].forEach.call(document.querySelectorAll('.recbox'), function(box){
+    var id = box.getAttribute('data-id'), title = box.getAttribute('data-title'), part = box.getAttribute('data-part');
+    box.innerHTML =
+      '<details class="rec"><summary><span class="rt">' + title + '</span><span class="rs" data-r="st">미기록</span></summary>' +
+      '<div class="recbody"><div class="rbar">' +
+      '<button type="button" class="rb go" data-r="start">🎙 녹음 시작</button>' +
+      '<button type="button" class="rb stop" data-r="stop" disabled>⏹ 정지</button>' +
+      '<button type="button" class="rb" data-r="conv">텍스트 변환</button>' +
+      '<button type="button" class="rb" data-r="save">저장</button></div>' +
+      '<div class="interim" data-r="int"></div>' +
+      '<label class="lb">① 음성 인식 원문 (녹음 중 자동 입력)</label><textarea class="rtx" data-r="raw" rows="3"></textarea>' +
+      '<label class="lb">② 정리 텍스트 (변환 후 고쳐 쓰세요)</label><textarea class="rtx" data-r="text" rows="5"></textarea>' +
+      '</div></details>';
+    function q(k){ return box.querySelector('[data-r="' + k + '"]'); }
+    var raw = q('raw'), text = q('text'), st = q('st'), it = q('int'), bStart = q('start'), bStop = q('stop'), recording = false, aT = null;
+    function label(){
+      if(recording){ st.textContent = '● 녹음 중'; st.className = 'rs live'; }
+      else if(text.value.trim() || raw.value.trim()){ st.textContent = '기록됨 ' + (text.value.trim().length + raw.value.trim().length) + '자'; st.className = 'rs done'; }
+      else { st.textContent = '미기록'; st.className = 'rs'; }
+    }
+    function doSave(quiet){
+      return WS.save(id, { id: id, part: part, title: title, raw: raw.value, text: text.value }, false, WSV).then(function(ok){
+        if(!quiet){ toast(ok ? 'Firebase에 저장했습니다' : '이 기기에만 저장했습니다 (Firebase 실패)'); }
+      });
+    }
+    function queue(){ clearTimeout(aT); aT = setTimeout(function(){ doSave(true); }, 1200); }
+    function convert(){
+      var lines = raw.value.split('\n').map(function(l){ return l.replace(/\s+/g, ' ').trim(); }).filter(Boolean).map(function(l){ return /[.!?。…]$/.test(l) ? l : l + '.'; });
+      if(!lines.length){ toast('변환할 음성 원문이 없습니다'); return; }
+      text.value = (text.value.trim() ? text.value.replace(/\s+$/, '') + '\n' : '') + lines.join('\n');
+      raw.value = '';
+      label(); doSave(false); toast('텍스트로 변환했습니다. 내용을 고쳐 주세요');
+    }
+    bStart.addEventListener('click', function(){
+      Voice.start({
+        onFinal: function(t){ raw.value = (raw.value && !/\n$/.test(raw.value) ? raw.value + '\n' : raw.value) + t; },
+        onInterim: function(t){ it.textContent = t ? ('… ' + t) : ''; },
+        onState: function(on){ recording = on; bStart.disabled = on; bStop.disabled = !on; label(); if(!on){ queue(); } },
+        onError: toast
+      });
+    });
+    bStop.addEventListener('click', function(){ Voice.stop(); });
+    q('conv').addEventListener('click', function(){ if(recording){ Voice.stop(); } setTimeout(convert, recording ? 400 : 0); });
+    q('save').addEventListener('click', function(){ doSave(false); });
+    text.addEventListener('input', queue); raw.addEventListener('input', queue);
+    recs[id] = { raw: raw, text: text, label: label };
+  });
+
+  /* 저장된 내용 불러오기 */
+  var ids = ['fields']; for(var k in recs){ ids.push(k); }
+  WS.loadAll(ids).then(function(map){
+    var f = map.fields || {};
+    fieldEls.forEach(function(t){ var v = f[t.getAttribute('data-f')]; if(typeof v === 'string' && v){ t.value = v; } });
+    for(var id in recs){ var d = map[id]; if(d){ recs[id].raw.value = d.raw || ''; recs[id].text.value = d.text || ''; recs[id].label(); } }
+  });
+})();
+
+</script>
+<script>
+(function(){
+  var h = location.hash;
+  if(h && /^#p[1-8]$/.test(h)){
+    var d = document.querySelector(h);
+    if(d){ d.open = true; setTimeout(function(){ d.scrollIntoView(); }, 400); }
   }
 })();
 </script>
