@@ -105,7 +105,7 @@ a{color:#1e4f9a}
 .gate-box .go{width:100%;margin-top:8px;padding:8px;border:0;border-radius:8px;background:#1e3a5f;color:#ffffff;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer}
 .gate-err{color:#9b1c1c;font-size:0.875rem;min-height:1.3em;margin-top:6px}
 .gate-ver{color:#374151;font-size:0.875rem;margin-top:6px}
-/* v2.5 음성 입력·토의 녹음 */
+/* v2.6 음성 입력·토의 녹음 */
 .sync{font-size:0.875rem;padding:3px 10px;border-radius:8px;background:#e6edf8;color:#1e3a5f;font-weight:500}
 .sync.ok{background:#e9f3ec;color:#14532d}
 .sync.warn{background:#fff6e0;color:#7a4b00}
@@ -148,7 +148,7 @@ details.rec[open]>summary::after{content:"▴"}
     <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
     <button type="submit" class="go" id="gateBtn">확인</button>
     <div class="gate-err" id="gateErr" role="alert"></div>
-    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v2.5</span></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v2.6</span></div>
   </form>
 </div>
 
@@ -163,7 +163,7 @@ details.rec[open]>summary::after{content:"▴"}
       </div>
       <button type="button" class="btn" id="btnAll">전체 펼치기</button>
       <a class="btn" href="임원워크샵_일정표.html">일정표</a><a class="btn" href="임원워크샵_회의록.html">회의록</a><span class="sync" id="syncSt">저장: 확인 중</span>
-      <span class="ver" id="verBadge">v2.5</span>
+      <span class="ver" id="verBadge">v2.6</span>
     </div>
   </div>
 </div>
@@ -213,6 +213,14 @@ details.rec[open]>summary::after{content:"▴"}
     <summary><label class="ck"><input type="checkbox" class="sel" data-p="2" checked aria-label="2번 포함"></label><span class="no">2</span>ERP 즐겨찾기·숨은 기능<span class="tm">15분</span></summary>
     <div class="body">
       <p class="plink"><a href="https://insys-erp.teulai.com/portal/home" target="_blank" rel="noopener">Insys 포털 열기 ↗</a></p>
+      <h4>상단 검색으로 기능 바로 찾기</h4>
+      <div class="tbl"><table>
+        <tr><th>단계</th><th>할 일</th></tr>
+        <tr><td>1</td><td>화면 <b>중앙 상단의 검색창</b>을 누릅니다</td></tr>
+        <tr><td>2</td><td>찾는 기능 이름을 입력합니다 (예: 휴가, 경비, 결재)</td></tr>
+        <tr><td>3</td><td>검색 결과에 나타난 <b>링크</b>를 누르면 해당 화면으로 바로 이동합니다</td></tr>
+      </table></div>
+      <ul><li>메뉴를 여러 단계 열어 기능을 찾는 번거로움 없이 한 번에 이동</li><li>메뉴 위치를 몰라도 기능 이름만 알면 접근 가능</li><li>자주 가는 화면은 즐겨찾기에, 가끔 쓰는 화면은 검색으로 구분하면 편리</li></ul>
       <h4>즐겨찾기 활용</h4>
       <ul><li>자주 쓰는 화면을 즐겨찾기에 등록해 클릭 수 줄이기</li><li>임원이 매일 보는 화면 3~5개를 우선 등록</li></ul>
       <h4>내 환경설정 활용</h4>
@@ -429,7 +437,7 @@ details.rec[open]>summary::after{content:"▴"}
     </div>
   </details>
 
-  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v2.5</span></div>
+  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v2.6</span></div>
 
 </div></div>
 </div>
@@ -438,7 +446,7 @@ details.rec[open]>summary::after{content:"▴"}
 
 <script>
 (function(){
-  var VERSION = 'v2.5';
+  var VERSION = 'v2.6';
   document.getElementById('verBadge').textContent = VERSION;
   document.getElementById('verFoot').textContent = VERSION;
 
@@ -607,7 +615,7 @@ var WS = (function(){
 
 </script>
 <script>
-/* ── 워크샵 자료: 음성 입력·토의 녹음·Firebase 저장 (v2.5 추가) ── */
+/* ── 워크샵 자료: 음성 입력·토의 녹음·Firebase 저장 (v2.6 추가) ── */
 (function(){
   var WSV = document.getElementById('verBadge').textContent;
   var toastEl = document.getElementById('toast');
