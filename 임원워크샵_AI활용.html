@@ -105,7 +105,7 @@ a{color:#1e4f9a}
 .gate-box .go{width:100%;margin-top:8px;padding:8px;border:0;border-radius:8px;background:#1e3a5f;color:#ffffff;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer}
 .gate-err{color:#9b1c1c;font-size:0.875rem;min-height:1.3em;margin-top:6px}
 .gate-ver{color:#374151;font-size:0.875rem;margin-top:6px}
-/* v2.0 음성 입력·토의 녹음 */
+/* v2.1 음성 입력·토의 녹음 */
 .sync{font-size:0.875rem;padding:3px 10px;border-radius:8px;background:#e6edf8;color:#1e3a5f;font-weight:500}
 .sync.ok{background:#e9f3ec;color:#14532d}
 .sync.warn{background:#fff6e0;color:#7a4b00}
@@ -148,7 +148,7 @@ details.rec[open]>summary::after{content:"▴"}
     <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
     <button type="submit" class="go" id="gateBtn">확인</button>
     <div class="gate-err" id="gateErr" role="alert"></div>
-    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v2.0</span></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v2.1</span></div>
   </form>
 </div>
 
@@ -163,7 +163,7 @@ details.rec[open]>summary::after{content:"▴"}
       </div>
       <button type="button" class="btn" id="btnAll">전체 펼치기</button>
       <a class="btn" href="임원워크샵_일정표.html">일정표</a><a class="btn" href="임원워크샵_회의록.html">회의록</a><span class="sync" id="syncSt">저장: 확인 중</span>
-      <span class="ver" id="verBadge">v2.0</span>
+      <span class="ver" id="verBadge">v2.1</span>
     </div>
   </div>
 </div>
@@ -205,6 +205,16 @@ details.rec[open]>summary::after{content:"▴"}
       <p class="plink"><a href="https://insys-erp.teulai.com/portal/home" target="_blank" rel="noopener">Insys 포털 열기 ↗</a></p>
       <h4>즐겨찾기 활용</h4>
       <ul><li>자주 쓰는 화면을 즐겨찾기에 등록해 클릭 수 줄이기</li><li>임원이 매일 보는 화면 3~5개를 우선 등록</li></ul>
+      <h4>내 환경설정 사용해보기</h4>
+      <div class="tbl"><table>
+        <tr><th>단계</th><th>할 일</th></tr>
+        <tr><td>1</td><td>ERP 개인 화면에서 <b>내 이름</b> 오른쪽의 <b>설정 버튼</b>(톱니바퀴)을 누릅니다</td></tr>
+        <tr><td>2</td><td>열린 메뉴에서 <b>환경설정</b>을 선택합니다</td></tr>
+        <tr><td>3</td><td>환경설정 화면의 항목을 하나씩 살펴보고, 내게 맞게 바꿔 사용해 봅니다</td></tr>
+        <tr><td>4</td><td>변경한 뒤 화면이 어떻게 달라지는지 확인합니다</td></tr>
+      </table></div>
+      <ul><li>자주 쓰는 화면을 즐겨찾기에 등록한 뒤 환경설정에서 내 화면 구성을 함께 맞추면 좋습니다</li></ul>
+      <div class="note">환경설정에 있는 실제 항목명(예: 화면 구성, 알림 등)은 ERP 화면 확인 후 보완합니다. 시연은 강사 PC 화면으로 진행합니다.</div>
       <h4>숨은 기능 소개 항목</h4>
       <div class="tbl"><table>
         <tr><th>구분</th><th>내용</th></tr>
@@ -404,7 +414,7 @@ details.rec[open]>summary::after{content:"▴"}
     </div>
   </details>
 
-  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v2.0</span></div>
+  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v2.1</span></div>
 
 </div></div>
 </div>
@@ -413,7 +423,7 @@ details.rec[open]>summary::after{content:"▴"}
 
 <script>
 (function(){
-  var VERSION = 'v2.0';
+  var VERSION = 'v2.1';
   document.getElementById('verBadge').textContent = VERSION;
   document.getElementById('verFoot').textContent = VERSION;
 
@@ -582,7 +592,7 @@ var WS = (function(){
 
 </script>
 <script>
-/* ── 워크샵 자료: 음성 입력·토의 녹음·Firebase 저장 (v2.0 추가) ── */
+/* ── 워크샵 자료: 음성 입력·토의 녹음·Firebase 저장 (v2.1 추가) ── */
 (function(){
   var WSV = document.getElementById('verBadge').textContent;
   var toastEl = document.getElementById('toast');
