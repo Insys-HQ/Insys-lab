@@ -191,7 +191,7 @@ a.btn{text-decoration:none;display:inline-block}
     <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
     <button type="submit" class="go" id="gateBtn">확인</button>
     <div class="gate-err" id="gateErr" role="alert"></div>
-    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.1</span></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.2</span></div>
   </form>
 </div>
 
@@ -205,8 +205,8 @@ a.btn{text-decoration:none;display:inline-block}
       </div>
       <a class="btn" href="임원워크샵_일정표.html">일정표</a>
       <a class="btn" href="임원워크샵_AI활용.html#p7">워크샵 자료</a>
-      <span class="sync" id="syncSt">저장: 확인 중</span>
-      <span class="ver" id="verBadge">v1.1</span>
+      <button type="button" class="btn" id="saveAll">💾 저장</button><span class="sync" id="syncSt">저장: 확인 중</span>
+      <span class="ver" id="verBadge">v1.2</span>
     </div>
   </div>
 </div>
@@ -266,7 +266,7 @@ a.btn{text-decoration:none;display:inline-block}
     </div>
   </details>
 
-  <div class="foot"><span class="conf">대외비 · 임원 전용</span><br>인시스 AI혁신 연구개발실 · 임원 워크숍 회의록 · <span id="verFoot">v1.1</span></div>
+  <div class="foot"><span class="conf">대외비 · 임원 전용</span><br>인시스 AI혁신 연구개발실 · 임원 워크숍 회의록 · <span id="verFoot">v1.2</span></div>
 
 </div></div></div>
 
@@ -310,6 +310,8 @@ var WS = (function(){
       status(false, '이 기기에만 저장됨 (Firebase 저장 실패' + ec(e) + ')'); return false;
     });
   };
+  api.cache = function(id, obj){ var prev = lsGet(id) || {}, m = {}; for(var a in prev){ m[a] = prev[a]; } for(var b in obj){ m[b] = obj[b]; } lsSet(id, m); };
+  api.local = function(id){ return lsGet(id); };
   api.loadAll = function(ids){
     var out = {};
     ids.forEach(function(id){ var l = lsGet(id); if(l){ out[id] = l; } });
@@ -334,7 +336,7 @@ var WS = (function(){
 </script>
 <script>
 (function(){
-  var VERSION = 'v1.1';
+  var VERSION = 'v1.2';
   document.getElementById('verBadge').textContent = VERSION;
   document.getElementById('verFoot').textContent = VERSION;
   document.getElementById('verGate').textContent = VERSION;
@@ -459,6 +461,13 @@ var WS = (function(){
   function gather(){
     [].forEach.call(document.querySelectorAll('[data-k]'), function(el){ setPath(M, el.getAttribute('data-k'), el.value); });
   }
+  /* 입력 즉시 이 기기 보관 + 잠시 후 Firebase 자동 저장 */
+  var aT = null;
+  function autoSave(){ if(!M){ return; } gather(); WS.cache('minutes', { M: M }); clearTimeout(aT); aT = setTimeout(function(){ WS.save('minutes', { M: M }, true, VERSION); }, 700); }
+  document.addEventListener('input', function(e){ var t = e.target; if(t && t.getAttribute && t.getAttribute('data-k')){ autoSave(); } });
+  function flushNow(){ if(!M){ return; } gather(); WS.cache('minutes', { M: M }); WS.save('minutes', { M: M }, true, VERSION); }
+  window.addEventListener('pagehide', flushNow);
+  document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden'){ flushNow(); } });
 
   function ul(text){
     var l = lineList(text);
@@ -530,6 +539,10 @@ var WS = (function(){
   document.getElementById('bPrev').addEventListener('click', function(){
     document.getElementById('doc').innerHTML = buildDoc();
     document.getElementById('doc').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  document.getElementById('saveAll').addEventListener('click', function(){
+    if(!M){ return; } gather();
+    WS.save('minutes', { M: M }, true, VERSION).then(function(ok){ toast(ok ? '저장했습니다 (Firebase)' : '이 기기에 저장했습니다 (Firebase 연결 확인 필요)'); });
   });
   document.getElementById('bSave').addEventListener('click', function(){
     var h = buildDoc(); document.getElementById('doc').innerHTML = h;
