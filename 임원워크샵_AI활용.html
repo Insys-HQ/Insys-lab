@@ -105,7 +105,7 @@ a{color:#1e4f9a}
 .gate-box .go{width:100%;margin-top:8px;padding:8px;border:0;border-radius:8px;background:#1e3a5f;color:#ffffff;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer}
 .gate-err{color:#9b1c1c;font-size:0.875rem;min-height:1.3em;margin-top:6px}
 .gate-ver{color:#374151;font-size:0.875rem;margin-top:6px}
-/* v2.8 음성 입력·토의 녹음 */
+/* v2.9 음성 입력·토의 녹음 */
 .sync{font-size:0.875rem;padding:3px 10px;border-radius:8px;background:#e6edf8;color:#1e3a5f;font-weight:500}
 .sync.ok{background:#e9f3ec;color:#14532d}
 .sync.warn{background:#fff6e0;color:#7a4b00}
@@ -149,7 +149,7 @@ details.rec[open]>summary::after{content:"▴"}
     <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
     <button type="submit" class="go" id="gateBtn">확인</button>
     <div class="gate-err" id="gateErr" role="alert"></div>
-    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v2.8</span></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v2.9</span></div>
   </form>
 </div>
 
@@ -163,8 +163,8 @@ details.rec[open]>summary::after{content:"▴"}
         <button type="button" id="btnPc" class="on">PC</button>
       </div>
       <button type="button" class="btn" id="btnAll">전체 펼치기</button>
-      <a class="btn" href="임원워크샵_일정표.html">일정표</a><a class="btn" href="임원워크샵_회의록.html">회의록</a><span class="sync" id="syncSt">저장: 확인 중</span>
-      <span class="ver" id="verBadge">v2.8</span>
+      <a class="btn" href="임원워크샵_일정표.html">일정표</a><a class="btn" href="임원워크샵_회의록.html">회의록</a><button type="button" class="btn" id="saveAll">💾 저장</button><span class="sync" id="syncSt">저장: 확인 중</span>
+      <span class="ver" id="verBadge">v2.9</span>
     </div>
   </div>
 </div>
@@ -439,7 +439,7 @@ details.rec[open]>summary::after{content:"▴"}
     </div>
   </details>
 
-  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v2.8</span></div>
+  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v2.9</span></div>
 
 </div></div>
 </div>
@@ -448,7 +448,7 @@ details.rec[open]>summary::after{content:"▴"}
 
 <script>
 (function(){
-  var VERSION = 'v2.8';
+  var VERSION = 'v2.9';
   document.getElementById('verBadge').textContent = VERSION;
   document.getElementById('verFoot').textContent = VERSION;
 
@@ -596,6 +596,8 @@ var WS = (function(){
       status(false, '이 기기에만 저장됨 (Firebase 저장 실패' + ec(e) + ')'); return false;
     });
   };
+  api.cache = function(id, obj){ var prev = lsGet(id) || {}, m = {}; for(var a in prev){ m[a] = prev[a]; } for(var b in obj){ m[b] = obj[b]; } lsSet(id, m); };
+  api.local = function(id){ return lsGet(id); };
   api.loadAll = function(ids){
     var out = {};
     ids.forEach(function(id){ var l = lsGet(id); if(l){ out[id] = l; } });
@@ -619,7 +621,7 @@ var WS = (function(){
 
 </script>
 <script>
-/* ── 워크샵 자료: 음성 입력·토의 녹음·Firebase 저장 (v2.8 추가) ── */
+/* ── 워크샵 자료: 음성 입력·토의 녹음·Firebase 저장 (v2.9 추가) ── */
 (function(){
   var WSV = document.getElementById('verBadge').textContent;
   var toastEl = document.getElementById('toast');
@@ -681,7 +683,8 @@ var WS = (function(){
   var fieldEls = [].slice.call(document.querySelectorAll('.fld'));
   var fT = null;
   function collectFields(){ var o = {}; fieldEls.forEach(function(t){ o[t.getAttribute('data-f')] = t.value; }); return o; }
-  function queueFields(){ clearTimeout(fT); fT = setTimeout(function(){ WS.save('fields', collectFields(), true, WSV); }, 900); }
+  function flushFields(){ clearTimeout(fT); return WS.save('fields', collectFields(), true, WSV); }
+  function queueFields(){ WS.cache('fields', collectFields()); clearTimeout(fT); fT = setTimeout(flushFields, 600); }
   fieldEls.forEach(function(t){ t.addEventListener('input', queueFields); });
   [].forEach.call(document.querySelectorAll('.vf'), function(vf){
     var ta = vf.querySelector('.fld'), btn = vf.querySelector('.mic');
@@ -722,6 +725,7 @@ var WS = (function(){
     function doSave(quiet){
       return WS.save(id, { id: id, part: part, title: title, raw: raw.value, text: text.value }, false, WSV).then(function(ok){
         if(!quiet){ toast(ok ? 'Firebase에 저장했습니다' : '이 기기에만 저장했습니다 (Firebase 실패)'); }
+        return ok;
       });
     }
     function queue(){ clearTimeout(aT); aT = setTimeout(function(){ doSave(true); }, 1200); }
@@ -744,16 +748,30 @@ var WS = (function(){
     q('conv').addEventListener('click', function(){ if(recording){ Voice.stop(); } setTimeout(convert, recording ? 400 : 0); });
     q('save').addEventListener('click', function(){ doSave(false); });
     text.addEventListener('input', queue); raw.addEventListener('input', queue);
-    recs[id] = { raw: raw, text: text, label: label };
+    recs[id] = { raw: raw, text: text, label: label, save: doSave, flush: function(){ WS.cache(id, { id: id, part: part, title: title, raw: raw.value, text: text.value }); } };
   });
 
   /* 저장된 내용 불러오기 */
   var ids = ['fields']; for(var k in recs){ ids.push(k); }
-  WS.loadAll(ids).then(function(map){
+  function applyMap(map){
     var f = map.fields || {};
-    fieldEls.forEach(function(t){ var v = f[t.getAttribute('data-f')]; if(typeof v === 'string' && v){ t.value = v; } });
-    for(var id in recs){ var d = map[id]; if(d){ recs[id].raw.value = d.raw || ''; recs[id].text.value = d.text || ''; recs[id].label(); } }
-  });
+    fieldEls.forEach(function(t){ var v = f[t.getAttribute('data-f')]; if(typeof v === 'string' && v && !t.value){ t.value = v; } });
+    for(var id in recs){ var d = map[id]; if(d && !recs[id].raw.value && !recs[id].text.value){ recs[id].raw.value = d.raw || ''; recs[id].text.value = d.text || ''; recs[id].label(); } }
+  }
+  var lm = {}; ids.forEach(function(i){ var l = WS.local(i); if(l){ lm[i] = l; } }); applyMap(lm);
+  WS.loadAll(ids).then(applyMap);
+  /* 저장 버튼·창 닫힘/새로고침 직전 저장 */
+  function saveEverything(quiet){
+    var any = false, ps = [];
+    var fv = collectFields(); for(var fk in fv){ if(fv[fk]){ any = true; } }
+    if(any){ ps.push(flushFields()); }
+    for(var k2 in recs){ if(recs[k2].raw.value.trim() || recs[k2].text.value.trim()){ ps.push(recs[k2].save(true)); } }
+    return Promise.all(ps).then(function(r2){ if(!quiet){ toast(r2.every(function(x){ return x !== false; }) ? '저장했습니다 (Firebase)' : '이 기기에 저장했습니다 (Firebase 연결 확인 필요)'); } });
+  }
+  document.getElementById('saveAll').addEventListener('click', function(){ saveEverything(false); });
+  function flushLocal(){ WS.cache('fields', collectFields()); for(var k3 in recs){ recs[k3].flush(); } }
+  window.addEventListener('pagehide', function(){ flushLocal(); saveEverything(true); });
+  document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'hidden'){ flushLocal(); saveEverything(true); } });
 })();
 
 </script>
