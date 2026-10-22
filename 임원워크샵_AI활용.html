@@ -105,7 +105,7 @@ a{color:#1e4f9a}
 .gate-box .go{width:100%;margin-top:8px;padding:8px;border:0;border-radius:8px;background:#1e3a5f;color:#ffffff;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer}
 .gate-err{color:#9b1c1c;font-size:0.875rem;min-height:1.3em;margin-top:6px}
 .gate-ver{color:#374151;font-size:0.875rem;margin-top:6px}
-/* v2.6 음성 입력·토의 녹음 */
+/* v2.7 음성 입력·토의 녹음 */
 .sync{font-size:0.875rem;padding:3px 10px;border-radius:8px;background:#e6edf8;color:#1e3a5f;font-weight:500}
 .sync.ok{background:#e9f3ec;color:#14532d}
 .sync.warn{background:#fff6e0;color:#7a4b00}
@@ -148,7 +148,7 @@ details.rec[open]>summary::after{content:"▴"}
     <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
     <button type="submit" class="go" id="gateBtn">확인</button>
     <div class="gate-err" id="gateErr" role="alert"></div>
-    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v2.6</span></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v2.7</span></div>
   </form>
 </div>
 
@@ -163,7 +163,7 @@ details.rec[open]>summary::after{content:"▴"}
       </div>
       <button type="button" class="btn" id="btnAll">전체 펼치기</button>
       <a class="btn" href="임원워크샵_일정표.html">일정표</a><a class="btn" href="임원워크샵_회의록.html">회의록</a><span class="sync" id="syncSt">저장: 확인 중</span>
-      <span class="ver" id="verBadge">v2.6</span>
+      <span class="ver" id="verBadge">v2.7</span>
     </div>
   </div>
 </div>
@@ -238,6 +238,7 @@ details.rec[open]>summary::after{content:"▴"}
         <tr><td>조회·검색</td><td>조건 저장, 빠른 검색 등</td></tr>
         <tr><td>승인·결재</td><td>결재 현황 확인 방법</td></tr>
         <tr><td>출력·다운로드</td><td>엑셀·PDF 내보내기</td></tr>
+        <tr><td>공사현장</td><td>현장별 진행 현황과 관련 자료 확인 (상단 검색창에 "공사현장" 입력)</td></tr>
       </table></div>
     </div>
   </details>
@@ -437,7 +438,7 @@ details.rec[open]>summary::after{content:"▴"}
     </div>
   </details>
 
-  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v2.6</span></div>
+  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v2.7</span></div>
 
 </div></div>
 </div>
@@ -446,7 +447,7 @@ details.rec[open]>summary::after{content:"▴"}
 
 <script>
 (function(){
-  var VERSION = 'v2.6';
+  var VERSION = 'v2.7';
   document.getElementById('verBadge').textContent = VERSION;
   document.getElementById('verFoot').textContent = VERSION;
 
@@ -615,7 +616,7 @@ var WS = (function(){
 
 </script>
 <script>
-/* ── 워크샵 자료: 음성 입력·토의 녹음·Firebase 저장 (v2.6 추가) ── */
+/* ── 워크샵 자료: 음성 입력·토의 녹음·Firebase 저장 (v2.7 추가) ── */
 (function(){
   var WSV = document.getElementById('verBadge').textContent;
   var toastEl = document.getElementById('toast');
