@@ -180,6 +180,7 @@ a.btn{text-decoration:none;display:inline-block}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 </head>
 <body class="mobile">
 
@@ -190,7 +191,7 @@ a.btn{text-decoration:none;display:inline-block}
     <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
     <button type="submit" class="go" id="gateBtn">확인</button>
     <div class="gate-err" id="gateErr" role="alert"></div>
-    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.0</span></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v1.1</span></div>
   </form>
 </div>
 
@@ -205,7 +206,7 @@ a.btn{text-decoration:none;display:inline-block}
       <a class="btn" href="임원워크샵_일정표.html">일정표</a>
       <a class="btn" href="임원워크샵_AI활용.html#p7">워크샵 자료</a>
       <span class="sync" id="syncSt">저장: 확인 중</span>
-      <span class="ver" id="verBadge">v1.0</span>
+      <span class="ver" id="verBadge">v1.1</span>
     </div>
   </div>
 </div>
@@ -265,7 +266,7 @@ a.btn{text-decoration:none;display:inline-block}
     </div>
   </details>
 
-  <div class="foot"><span class="conf">대외비 · 임원 전용</span><br>인시스 AI혁신 연구개발실 · 임원 워크숍 회의록 · <span id="verFoot">v1.0</span></div>
+  <div class="foot"><span class="conf">대외비 · 임원 전용</span><br>인시스 AI혁신 연구개발실 · 임원 워크숍 회의록 · <span id="verFoot">v1.1</span></div>
 
 </div></div></div>
 
@@ -276,7 +277,8 @@ a.btn{text-decoration:none;display:inline-block}
 var WS = (function(){
   var COLL = 'workshop2026';
   var CFG = {apiKey:"AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",authDomain:"insys-work.firebaseapp.com",projectId:"insys-work",storageBucket:"insys-work.firebasestorage.app",messagingSenderId:"225275784859",appId:"1:225275784859:web:bd12815c6dc47c0c49e03e"};
-  var db = null, ok = false;
+  var db = null, ok = false, authP = Promise.resolve();
+  function ec(e){ return e && e.code ? ' [' + e.code + ']' : ''; }
   var api = { onStatus: function(){} };
   function p(n){ return (n < 10 ? '0' : '') + n; }
   function fmt(d){ return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()); }
@@ -289,6 +291,7 @@ var WS = (function(){
       if(!window.firebase) throw new Error('SDK 로드 실패');
       if(!firebase.apps.length) firebase.initializeApp(CFG);
       db = firebase.firestore(); ok = true;
+      try{ authP = firebase.auth().signInAnonymously().catch(function(e){ console.warn('익명 로그인 생략:', (e && e.code) || e); }); }catch(e2){ authP = Promise.resolve(); }
     }catch(e){ ok = false; console.warn('Firebase 초기화 실패:', e.message); status(false, '이 기기에만 저장 (Firebase 미연결)'); }
     return ok;
   };
@@ -300,11 +303,11 @@ var WS = (function(){
     if(merge){ for(var a in prev){ m[a] = prev[a]; } for(var b in rec){ m[b] = rec[b]; } } else { m = rec; }
     lsSet(id, m);
     if(!ok){ status(false, '이 기기에만 저장됨 (Firebase 미연결)'); return Promise.resolve(false); }
-    return db.collection(COLL).doc(id).set(rec, { merge: !!merge }).then(function(){
+    return authP.then(function(){ return db.collection(COLL).doc(id).set(rec, { merge: !!merge }); }).then(function(){
       status(true, 'Firebase 저장됨 ' + now.slice(11, 16)); return true;
     }).catch(function(e){
       console.warn('저장 실패:', (e && e.message) || e);
-      status(false, '이 기기에만 저장됨 (Firebase 저장 실패)'); return false;
+      status(false, '이 기기에만 저장됨 (Firebase 저장 실패' + ec(e) + ')'); return false;
     });
   };
   api.loadAll = function(ids){
@@ -312,7 +315,7 @@ var WS = (function(){
     ids.forEach(function(id){ var l = lsGet(id); if(l){ out[id] = l; } });
     function take(id, s){ var l = out[id]; if(!l || (s.updatedAt || '') >= (l.updatedAt || '')){ out[id] = s; } }
     if(!ok){ status(false, '이 기기 저장본 표시 (Firebase 미연결)'); return Promise.resolve(out); }
-    return db.collection(COLL).get().then(function(snap){
+    return authP.then(function(){ return db.collection(COLL).get(); }).then(function(snap){
       snap.forEach(function(d){ take(d.id, d.data()); });
       status(true, 'Firebase 불러옴'); return out;
     }).catch(function(e){
@@ -321,7 +324,7 @@ var WS = (function(){
         return db.collection(COLL).doc(id).get().then(function(d){ if(d.exists){ take(id, d.data()); } });
       })).then(function(){ status(true, 'Firebase 불러옴'); return out; }).catch(function(e2){
         console.warn('불러오기 실패:', (e2 && e2.message) || e2);
-        status(false, 'Firebase 불러오기 실패 — 이 기기 저장본 표시'); return out;
+        status(false, 'Firebase 불러오기 실패' + ec(e2) + ' — 이 기기 저장본 표시'); return out;
       });
     });
   };
@@ -331,7 +334,7 @@ var WS = (function(){
 </script>
 <script>
 (function(){
-  var VERSION = 'v1.0';
+  var VERSION = 'v1.1';
   document.getElementById('verBadge').textContent = VERSION;
   document.getElementById('verFoot').textContent = VERSION;
   document.getElementById('verGate').textContent = VERSION;

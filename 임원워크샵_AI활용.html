@@ -105,7 +105,7 @@ a{color:#1e4f9a}
 .gate-box .go{width:100%;margin-top:8px;padding:8px;border:0;border-radius:8px;background:#1e3a5f;color:#ffffff;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer}
 .gate-err{color:#9b1c1c;font-size:0.875rem;min-height:1.3em;margin-top:6px}
 .gate-ver{color:#374151;font-size:0.875rem;margin-top:6px}
-/* v2.7 음성 입력·토의 녹음 */
+/* v2.8 음성 입력·토의 녹음 */
 .sync{font-size:0.875rem;padding:3px 10px;border-radius:8px;background:#e6edf8;color:#1e3a5f;font-weight:500}
 .sync.ok{background:#e9f3ec;color:#14532d}
 .sync.warn{background:#fff6e0;color:#7a4b00}
@@ -138,6 +138,7 @@ details.rec[open]>summary::after{content:"▴"}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 </head>
 <body class="pc">
 
@@ -148,7 +149,7 @@ details.rec[open]>summary::after{content:"▴"}
     <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
     <button type="submit" class="go" id="gateBtn">확인</button>
     <div class="gate-err" id="gateErr" role="alert"></div>
-    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v2.7</span></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v2.8</span></div>
   </form>
 </div>
 
@@ -163,7 +164,7 @@ details.rec[open]>summary::after{content:"▴"}
       </div>
       <button type="button" class="btn" id="btnAll">전체 펼치기</button>
       <a class="btn" href="임원워크샵_일정표.html">일정표</a><a class="btn" href="임원워크샵_회의록.html">회의록</a><span class="sync" id="syncSt">저장: 확인 중</span>
-      <span class="ver" id="verBadge">v2.7</span>
+      <span class="ver" id="verBadge">v2.8</span>
     </div>
   </div>
 </div>
@@ -438,7 +439,7 @@ details.rec[open]>summary::after{content:"▴"}
     </div>
   </details>
 
-  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v2.7</span></div>
+  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v2.8</span></div>
 
 </div></div>
 </div>
@@ -447,7 +448,7 @@ details.rec[open]>summary::after{content:"▴"}
 
 <script>
 (function(){
-  var VERSION = 'v2.7';
+  var VERSION = 'v2.8';
   document.getElementById('verBadge').textContent = VERSION;
   document.getElementById('verFoot').textContent = VERSION;
 
@@ -562,7 +563,8 @@ details.rec[open]>summary::after{content:"▴"}
 var WS = (function(){
   var COLL = 'workshop2026';
   var CFG = {apiKey:"AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",authDomain:"insys-work.firebaseapp.com",projectId:"insys-work",storageBucket:"insys-work.firebasestorage.app",messagingSenderId:"225275784859",appId:"1:225275784859:web:bd12815c6dc47c0c49e03e"};
-  var db = null, ok = false;
+  var db = null, ok = false, authP = Promise.resolve();
+  function ec(e){ return e && e.code ? ' [' + e.code + ']' : ''; }
   var api = { onStatus: function(){} };
   function p(n){ return (n < 10 ? '0' : '') + n; }
   function fmt(d){ return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()); }
@@ -575,6 +577,7 @@ var WS = (function(){
       if(!window.firebase) throw new Error('SDK 로드 실패');
       if(!firebase.apps.length) firebase.initializeApp(CFG);
       db = firebase.firestore(); ok = true;
+      try{ authP = firebase.auth().signInAnonymously().catch(function(e){ console.warn('익명 로그인 생략:', (e && e.code) || e); }); }catch(e2){ authP = Promise.resolve(); }
     }catch(e){ ok = false; console.warn('Firebase 초기화 실패:', e.message); status(false, '이 기기에만 저장 (Firebase 미연결)'); }
     return ok;
   };
@@ -586,11 +589,11 @@ var WS = (function(){
     if(merge){ for(var a in prev){ m[a] = prev[a]; } for(var b in rec){ m[b] = rec[b]; } } else { m = rec; }
     lsSet(id, m);
     if(!ok){ status(false, '이 기기에만 저장됨 (Firebase 미연결)'); return Promise.resolve(false); }
-    return db.collection(COLL).doc(id).set(rec, { merge: !!merge }).then(function(){
+    return authP.then(function(){ return db.collection(COLL).doc(id).set(rec, { merge: !!merge }); }).then(function(){
       status(true, 'Firebase 저장됨 ' + now.slice(11, 16)); return true;
     }).catch(function(e){
       console.warn('저장 실패:', (e && e.message) || e);
-      status(false, '이 기기에만 저장됨 (Firebase 저장 실패)'); return false;
+      status(false, '이 기기에만 저장됨 (Firebase 저장 실패' + ec(e) + ')'); return false;
     });
   };
   api.loadAll = function(ids){
@@ -598,7 +601,7 @@ var WS = (function(){
     ids.forEach(function(id){ var l = lsGet(id); if(l){ out[id] = l; } });
     function take(id, s){ var l = out[id]; if(!l || (s.updatedAt || '') >= (l.updatedAt || '')){ out[id] = s; } }
     if(!ok){ status(false, '이 기기 저장본 표시 (Firebase 미연결)'); return Promise.resolve(out); }
-    return db.collection(COLL).get().then(function(snap){
+    return authP.then(function(){ return db.collection(COLL).get(); }).then(function(snap){
       snap.forEach(function(d){ take(d.id, d.data()); });
       status(true, 'Firebase 불러옴'); return out;
     }).catch(function(e){
@@ -607,7 +610,7 @@ var WS = (function(){
         return db.collection(COLL).doc(id).get().then(function(d){ if(d.exists){ take(id, d.data()); } });
       })).then(function(){ status(true, 'Firebase 불러옴'); return out; }).catch(function(e2){
         console.warn('불러오기 실패:', (e2 && e2.message) || e2);
-        status(false, 'Firebase 불러오기 실패 — 이 기기 저장본 표시'); return out;
+        status(false, 'Firebase 불러오기 실패' + ec(e2) + ' — 이 기기 저장본 표시'); return out;
       });
     });
   };
@@ -616,7 +619,7 @@ var WS = (function(){
 
 </script>
 <script>
-/* ── 워크샵 자료: 음성 입력·토의 녹음·Firebase 저장 (v2.7 추가) ── */
+/* ── 워크샵 자료: 음성 입력·토의 녹음·Firebase 저장 (v2.8 추가) ── */
 (function(){
   var WSV = document.getElementById('verBadge').textContent;
   var toastEl = document.getElementById('toast');
@@ -628,7 +631,7 @@ var WS = (function(){
   var Voice = (function(){
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition, cur = null;
     function stop(){ if(cur){ cur.want = false; try{ cur.r.stop(); }catch(e){} } }
-    function start(h){
+    function startReal(h){
       if(!SR){ h.onError('이 브라우저는 음성 인식을 지원하지 않습니다. Chrome 또는 Safari로 열어 주세요 (카카오톡 등 앱 안의 브라우저는 안 됩니다).'); return false; }
       stop();
       var r = new SR(); r.lang = 'ko-KR'; r.continuous = true; r.interimResults = true;
@@ -652,6 +655,20 @@ var WS = (function(){
         h.onInterim(''); h.onState(false);
       };
       try{ r.start(); h.onState(true); return true; }catch(e){ cur = null; h.onError('음성 인식을 시작하지 못했습니다.'); return false; }
+    }
+    function ensureMic(cb){
+      var md = navigator.mediaDevices;
+      if(!md || !md.getUserMedia){ cb(true); return; }
+      md.getUserMedia({ audio: true }).then(function(s2){ try{ s2.getTracks().forEach(function(t){ t.stop(); }); }catch(e){} cb(true); })
+        .catch(function(){ cb(false); });
+    }
+    function start(h){
+      if(!SR){ return startReal(h); }
+      ensureMic(function(ok){
+        if(!ok){ h.onError('마이크가 차단되어 있습니다. 주소창 왼쪽 자물쇠(설정 아이콘) → 마이크 → "허용"으로 바꾸면 이후 항상 허용됩니다.'); return; }
+        startReal(h);
+      });
+      return true;
     }
     return { start: start, stop: stop, supported: !!SR };
   })();
