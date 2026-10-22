@@ -105,7 +105,7 @@ a{color:#1e4f9a}
 .gate-box .go{width:100%;margin-top:8px;padding:8px;border:0;border-radius:8px;background:#1e3a5f;color:#ffffff;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer}
 .gate-err{color:#9b1c1c;font-size:0.875rem;min-height:1.3em;margin-top:6px}
 .gate-ver{color:#374151;font-size:0.875rem;margin-top:6px}
-/* v2.9 음성 입력·토의 녹음 */
+/* v2.10 음성 입력·토의 녹음 */
 .sync{font-size:0.875rem;padding:3px 10px;border-radius:8px;background:#e6edf8;color:#1e3a5f;font-weight:500}
 .sync.ok{background:#e9f3ec;color:#14532d}
 .sync.warn{background:#fff6e0;color:#7a4b00}
@@ -149,7 +149,7 @@ details.rec[open]>summary::after{content:"▴"}
     <input type="password" id="gatePw" inputmode="numeric" maxlength="8" aria-label="비밀번호" autofocus>
     <button type="submit" class="go" id="gateBtn">확인</button>
     <div class="gate-err" id="gateErr" role="alert"></div>
-    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v2.9</span></div>
+    <div class="gate-ver">인시스 AI혁신 연구개발실 · <span id="verGate">v2.10</span></div>
   </form>
 </div>
 
@@ -164,7 +164,7 @@ details.rec[open]>summary::after{content:"▴"}
       </div>
       <button type="button" class="btn" id="btnAll">전체 펼치기</button>
       <a class="btn" href="임원워크샵_일정표.html">일정표</a><a class="btn" href="임원워크샵_회의록.html">회의록</a><button type="button" class="btn" id="saveAll">💾 저장</button><span class="sync" id="syncSt">저장: 확인 중</span>
-      <span class="ver" id="verBadge">v2.9</span>
+      <span class="ver" id="verBadge">v2.10</span>
     </div>
   </div>
 </div>
@@ -439,7 +439,7 @@ details.rec[open]>summary::after{content:"▴"}
     </div>
   </details>
 
-  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v2.9</span></div>
+  <div class="foot">인시스 AI혁신 연구개발실 · 임원 워크샵 자료 · <span id="verFoot">v2.10</span></div>
 
 </div></div>
 </div>
@@ -448,7 +448,7 @@ details.rec[open]>summary::after{content:"▴"}
 
 <script>
 (function(){
-  var VERSION = 'v2.9';
+  var VERSION = 'v2.10';
   document.getElementById('verBadge').textContent = VERSION;
   document.getElementById('verFoot').textContent = VERSION;
 
@@ -621,7 +621,7 @@ var WS = (function(){
 
 </script>
 <script>
-/* ── 워크샵 자료: 음성 입력·토의 녹음·Firebase 저장 (v2.9 추가) ── */
+/* ── 워크샵 자료: 음성 입력·토의 녹음·Firebase 저장 (v2.10 추가) ── */
 (function(){
   var WSV = document.getElementById('verBadge').textContent;
   var toastEl = document.getElementById('toast');
@@ -662,12 +662,18 @@ var WS = (function(){
       var md = navigator.mediaDevices;
       if(!md || !md.getUserMedia){ cb(true); return; }
       md.getUserMedia({ audio: true }).then(function(s2){ try{ s2.getTracks().forEach(function(t){ t.stop(); }); }catch(e){} cb(true); })
-        .catch(function(){ cb(false); });
+        .catch(function(e){ cb(false, e && e.name); });
     }
     function start(h){
       if(!SR){ return startReal(h); }
-      ensureMic(function(ok){
-        if(!ok){ h.onError('마이크가 차단되어 있습니다. 주소창 왼쪽 자물쇠(설정 아이콘) → 마이크 → "허용"으로 바꾸면 이후 항상 허용됩니다.'); return; }
+      ensureMic(function(ok, en){
+        if(!ok){
+          var msg = '마이크가 차단되어 있습니다. 주소창 왼쪽 아이콘 → 사이트 설정 → 마이크 → "허용"으로 바꿔 주세요.';
+          if(en === 'NotFoundError' || en === 'OverconstrainedError'){ msg = '마이크 장치를 찾을 수 없습니다. 마이크(헤드셋)를 연결했는지, Windows 소리 설정의 입력 장치를 확인해 주세요.'; }
+          else if(en === 'NotReadableError' || en === 'AbortError'){ msg = '마이크를 사용할 수 없습니다. 다른 프로그램(Teams·Zoom 등)이 쓰고 있거나 Windows 설정 → 개인정보 → 마이크에서 Chrome 허용이 꺼져 있을 수 있습니다.'; }
+          else if(en === 'SecurityError'){ msg = '보안 연결(https) 페이지에서만 마이크를 쓸 수 있습니다.'; }
+          h.onError(msg + (en ? ' [' + en + ']' : '')); return;
+        }
         startReal(h);
       });
       return true;
