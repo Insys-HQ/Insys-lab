@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* HRI-200_하이브리드망_구축가이드.html v1.1 (2026-10-26) */
+/* HRI-200_하이브리드망_구축가이드.html v1.2 (2026-10-26) */
 :root{--navy:#1f3a5f;--ink:#1e2a3a;--line:#c9d3e0;--bg:#f3f6fa;--card:#fff;--blue:#1d4ed8;--soft:#e4ecf7;--warnBg:#fff3d6;--warn:#7a4a00;--okBg:#e1f3e6;--ok:#1b5e34;--badBg:#fde7e7;--bad:#8a1c1c}
 *{box-sizing:border-box}
 small{font-size:1rem}
@@ -63,7 +63,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 </head>
 <body class="m">
 <div class="nav"><div class="nav-inner">
- <div><b>HRI-200 하이브리드 재난통신망 구축 가이드</b> <small>대한적십자사 서울특별시지사 재난대응봉사회</small> <span class="ver app-version">v1.1</span></div>
+ <div><b>HRI-200 하이브리드 재난통신망 구축 가이드</b> <small>대한적십자사 서울특별시지사 재난대응봉사회</small> <span class="ver app-version">v1.2</span></div>
  <div class="tg"><button id="bM" class="on" type="button">📱 모바일</button><button id="bP" type="button">🖥 PC</button></div>
 </div></div>
 <div class="wrap">
@@ -71,7 +71,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 <div class="cover">
  <h1>HRI-200 3대 도입 · 등록부터 운용까지</h1>
  <p>HL0FRC · DS0ARC/M · HL2TLS — PDN 방식에서 HRI-200 방식으로 전환</p>
- <p>작성 2026-10-26 · <span class="app-version">v1.1</span></p>
+ <p>작성 2026-10-26 · <span class="app-version">v1.2</span></p>
 </div>
 <div class="toc">
  <a href="#a">1 구성</a><a href="#b">2 등록 절차</a><a href="#c">3 국별 입력표</a><a href="#d">4 승인 메일 후</a><a href="#e">5 설치·설정</a><a href="#f">6 운용</a><a href="#g">7 점검·문제</a><a href="#h">8 링크</a>
@@ -88,13 +88,15 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
   <tr><td class="k">HL0FRC</td><td>서울지사 무선국 (마장동)</td><td>HRI-200 신규 설치</td></tr>
   <tr><td class="k">DS0ARC/M</td><td>대응차</td><td>HRI-200 신규 설치</td></tr>
   <tr><td class="k">HL2TLS</td><td>개인 무선국</td><td>PDN → HRI-200 전환</td></tr></table></div>
- <div class="box info">HRI-200 1대 = 노드 1개입니다. <b>3대를 각각 따로 등록</b>하며, 각 등록은 해당 HRI-200의 <b>S/N</b>으로 합니다. 룸은 기존 DS0ARC 룸(48182)을 그대로 사용합니다.</div>
+ <div class="box info">HRI-200 1대 = 노드 1개이며 노드 식별은 <b>HRI-200의 S/N</b>입니다(매뉴얼 26쪽: Serial No는 변경 불가). 룸은 기존 DS0ARC 룸(48182)을 그대로 사용합니다.</div>
+ <div class="box warn"><b>PDN으로 이미 가입한 경우 (HL2TLS)</b> : PDN 등록은 <b>무전기 Radio ID</b>에 대한 것이고, HRI-200은 <b>S/N이 다른 별개 장치</b>입니다. YAESU에 S/N이 등록되어 있지 않으므로 <b>HRI-200 S/N 등록은 필요</b>합니다. 새로 "회원가입"을 처음부터 다시 하는 개념이 아니라 <b>이 S/N에 Node ID를 발급받는 절차</b>입니다.<br>
+ 다만 "기존 회원 정보로 S/N만 추가"하는 전용 화면이 있는지는 YAESU 공식 문서에서 확인하지 못했습니다. 다른 운용자 사례(<a href="https://xarc.us/2025/07/having-two-hri-200s-at-same-qth/" target="_blank" rel="noopener">xarc.us</a>)는 두 번째 HRI-200을 <b>새 Node/Room ID·새 로그인으로 등록</b>했고, YAESU에 새 등록 링크를 요청했습니다.</div>
 </section>
 
 <section id="b">
  <h2>2 등록 절차 — S/N 전송부터 회신까지 (3대 각각 반복)</h2>
  <ol class="st">
-  <li><b>S/N 확인</b> — HRI-200 본체 뒷면 스티커의 Serial Number를 <b>대소문자 그대로</b> 메모 (3대 모두 → 3장 표)</li>
+  <li><b>S/N 확인</b> — HRI-200 본체 뒷면 스티커의 Serial Number(<b>영문·숫자 8자리, 2번째 글자는 영문</b>, 예: <code>0A000000</code>)를 메모. 숫자 0/영문 O, 숫자 1/영문 I 혼동 주의. <b>무전기 S/N이 아님</b> (3대 모두 → 3장 표)</li>
   <li><b>등록 사이트 접속</b> — 아래 "멤버 등록" 링크를 열어 <b>등록용 이메일 주소를 입력하고 Send</b> 클릭<br>
    <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/regist/index.php" target="_blank" rel="noopener">📝 멤버 등록 (이메일 입력 · S/N 전송)<em class="l">🔒 로그인 후 이용</em></a>
    <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/index.php" target="_blank" rel="noopener">WIRES-X 메인 → 좌측 Member registration</a>
@@ -102,6 +104,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
   <li><b>등록 URL 메일 수신</b> — 몇 분 안에 도착. 안 오면 스팸함 확인</li>
   <li><b>메일의 URL 클릭 → 약관</b> — 라이선스 동의 체크 → <b>Agree and proceed</b></li>
   <li><b>등록 양식 입력</b> — 모든 항목 입력, <code>HRI-200 Serial Number/RADIO ID</code> 칸에 <b>S/N 입력</b> (3번 입력표 참조) → Submit</li>
+  <li><b>회신 확인</b> — 제출 직후 접수 확인 메일이 오는지 확인 (없으면 7번 점검표)</li>
   <li><b>회신 대기 2~3 영업일</b> — 승인 메일에 <b>Node ID · Room ID</b>가 옴. 보관 (4번 기록표)</li>
   <li><b>로그인</b> — WIRES-X 사이트 우측 상단 Member Login → 소프트웨어 다운로드</li>
  </ol>
@@ -118,7 +121,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
   <tr><td class="k">City / State / Country</td><td colspan="3">SEOUL / Seoul / Korea (HL2TLS는 거주지에 맞게)</td></tr>
   <tr><td class="k">S/N 기록 (직접 기입)</td><td>＿＿＿＿＿＿＿</td><td>＿＿＿＿＿＿＿</td><td>＿＿＿＿＿＿＿</td></tr></table></div>
  <div class="box warn">※ <b>확인 필요</b> : 호출부호의 슬래시(<code>/M</code>) 입력이 양식에서 허용되는지는 확인하지 못했습니다. 거부되면 <code>DS0ARC</code>로 입력하고 Comment에 대응차임을 적습니다.<br>
- ※ <b>확인 필요</b> : HL2TLS가 PDN으로 이미 등록한 이메일을 HRI-200 등록에 다시 쓸 수 있는지는 매뉴얼에서 확인하지 못했습니다. 중복 오류가 나면 다른 이메일로 등록합니다.</div>
+ ※ <b>확인 필요</b> : HL2TLS가 PDN 등록에 쓴 이메일을 HRI-200 등록에 다시 쓸 수 있는지는 확인하지 못했습니다. 중복 오류가 나면 <b>다른 이메일</b>로 등록하거나, 아래 문의 양식으로 "HRI-200 S/N 추가 등록 링크"를 요청합니다.</div>
 </section>
 
 <section id="d">
@@ -160,6 +163,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
  <h2>7 점검 · 문제 해결</h2>
  <div class="tw"><table><tr><th style="width:30%">증상</th><th>조치</th></tr>
   <tr><td class="k">등록 URL 메일이 안 옴</td><td>스팸함 확인 → 이메일 오타 확인 → 다시 Send</td></tr>
+  <tr><td class="k">이미 등록된 이메일이라고 나옴</td><td>다른 이메일로 등록하거나 문의 양식에 <b>콜사인 · HRI-200 S/N · 기존 Node ID(5자리)</b>를 적고 "이 S/N의 Node/Room ID 등록 링크"를 요청</td></tr>
   <tr><td class="k">S/N 입력 오류</td><td>스티커와 대소문자까지 대조 (0/O, 1/I 주의)</td></tr>
   <tr><td class="k">3일 지나도 승인 메일 없음 · 문의</td><td>스팸함 확인 후 <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/contact/index.php" target="_blank" rel="noopener">WIRES-X 문의(Contact us)</a> 양식 이용 — 이름·이메일 필수, 등록 완료한 경우 5자리 Node ID 입력란이 있음 (휴대폰 메일 주소는 사용 불가)</td></tr>
   <tr><td class="k">ONLINE이 안 됨</td><td>드라이버 먼저 설치했는지, COM port 선택, 소프트웨어를 무전기보다 먼저 시작했는지 확인</td></tr></table></div>
@@ -170,6 +174,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
  <div class="tw"><table><tr><th>자료</th><th>접속</th></tr>
   <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/regist/index.php" target="_blank" rel="noopener">멤버 등록 (이메일 전송)</a></td><td>🔒 로그인 후 이용</td></tr>
   <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/index.php" target="_blank" rel="noopener">WIRES-X 메인 · Member Login</a></td><td>🔒 로그인 후 이용</td></tr>
+  <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/regist/id.php" target="_blank" rel="noopener">회원 ID 찾기 (이메일+S/N 입력)</a></td><td>바로 열림 (양식)</td></tr>
   <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/contact/index.php" target="_blank" rel="noopener">WIRES-X 문의 (Contact us)</a></td><td>바로 열림 (양식)</td></tr>
   <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/node/index.php" target="_blank" rel="noopener">Node owner 페이지 (다운로드)</a></td><td>🔒 로그인 후 이용</td></tr>
   <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/contact/pdf/HRI-200_Manual_ENG_2304-N.pdf" target="_blank" rel="noopener">HRI-200 매뉴얼 PDF (2304-N)</a></td><td>바로 열림</td></tr>
@@ -178,10 +183,10 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
  <div class="box warn">YAESU 사이트 링크는 이 환경에서 접속 확인이 되지 않았습니다. 열리지 않으면 알려 주세요.</div>
 </section>
 
-<div class="foot">대한적십자사 서울특별시지사 재난대응봉사회 · <span class="app-version">v1.1</span> · 2026-10-26</div>
+<div class="foot">대한적십자사 서울특별시지사 재난대응봉사회 · <span class="app-version">v1.2</span> · 2026-10-26</div>
 </div>
 <script>
-var APP_VERSION='v1.1';
+var APP_VERSION='v1.2';
 document.querySelectorAll('.app-version').forEach(function(e){e.textContent=APP_VERSION;});
 (function(){
  var b=document.body,m=document.getElementById('bM'),p=document.getElementById('bP');
