@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* HRI-200_하이브리드망_구축가이드.html v1.3 (2026-10-26) */
+/* HRI-200_하이브리드망_구축가이드.html v1.4 (2026-10-26) */
 :root{--navy:#1f3a5f;--ink:#1e2a3a;--line:#c9d3e0;--bg:#f3f6fa;--card:#fff;--blue:#1d4ed8;--soft:#e4ecf7;--warnBg:#fff3d6;--warn:#7a4a00;--okBg:#e1f3e6;--ok:#1b5e34;--badBg:#fde7e7;--bad:#8a1c1c}
 *{box-sizing:border-box}
 small{font-size:1rem}
@@ -63,7 +63,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 </head>
 <body class="m">
 <div class="nav"><div class="nav-inner">
- <div><b>HRI-200 하이브리드 재난통신망 구축 가이드</b> <small>대한적십자사 서울특별시지사 재난대응봉사회</small> <span class="ver app-version">v1.3</span></div>
+ <div><b>HRI-200 하이브리드 재난통신망 구축 가이드</b> <small>대한적십자사 서울특별시지사 재난대응봉사회</small> <span class="ver app-version">v1.4</span></div>
  <div class="tg"><button id="bM" class="on" type="button">📱 모바일</button><button id="bP" type="button">🖥 PC</button></div>
 </div></div>
 <div class="wrap">
@@ -71,7 +71,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 <div class="cover">
  <h1>HRI-200 3대 도입 · 등록부터 운용까지</h1>
  <p>HL0FRC · DS0ARC/M · HL2TLS — PDN 방식에서 HRI-200 방식으로 전환</p>
- <p>작성 2026-10-26 · <span class="app-version">v1.3</span></p>
+ <p>작성 2026-10-26 · <span class="app-version">v1.4</span></p>
 </div>
 <div class="toc">
  <a href="#a">1 구성</a><a href="#b">2 등록 절차</a><a href="#c">3 국별 입력표</a><a href="#d">4 승인 메일 후</a><a href="#e">5 설치·설정</a><a href="#f">6 운용</a><a href="#g">7 점검·문제</a><a href="#h">8 링크</a>
@@ -98,9 +98,9 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
  <ol class="st">
   <li><b>S/N 확인</b> — HRI-200 본체 뒷면 스티커의 Serial Number(<b>영문·숫자 8자리, 2번째 글자는 영문</b>, 예: <code>0A000000</code>)를 메모. 숫자 0/영문 O, 숫자 1/영문 I 혼동 주의. <b>무전기 S/N이 아님</b> (3대 모두 → 3장 표)</li>
   <li><b>등록 사이트 접속</b> — 아래 "멤버 등록" 링크를 열어 <b>등록용 이메일 주소를 입력하고 Send</b> 클릭 — 이 페이지에는 양식이 없고, <b>이메일로 온 URL</b>에서 양식을 입력합니다 (로그인 불필요)<br>
-   <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/regist/index.php" target="_blank" rel="noopener">📝 멤버 등록 (이메일 입력)</a>
+   <a class="lk" href="https://yaesu.com/jp/en/wires-x/regist/index.php" target="_blank">📝 멤버 등록 (이메일 입력)</a>
    <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/index.php" target="_blank" rel="noopener">WIRES-X 메인 → 좌측 Member registration</a>
-   <div class="box warn">주소는 반드시 <code>https://www.yaesu.com/…</code> 처럼 <b>www.가 있어야</b> 합니다. <code>yaesu.com/…</code>(www 없음)으로 열면 404가 납니다. 그래도 안 열리면 위 "WIRES-X 메인"에서 좌측 <b>Member registration</b>을 눌러 들어가세요.</div></li>
+   <div class="box info">이 링크는 <b>이전 RC-NET 가이드의 등록 링크와 동일한 주소</b>입니다. 안 열리면 <a href="rcnet_guide.html" target="_blank">이전 가이드(rcnet_guide.html)</a>의 "멤버 등록" 링크를 누르거나, 위 "WIRES-X 메인"에서 <b>Member registration</b>으로 들어가세요.</div></li>
   <li><b>등록 URL 메일 수신</b> — 자동 발송 메일. 안 오면 스팸함·이메일 오타 확인 후 <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/contact/index.php" target="_blank" rel="noopener">문의(Contact us)</a> (YAESU 페이지 안내)</li>
   <li><b>메일의 URL 클릭 → 약관</b> — 라이선스 동의 체크 → <b>Agree and proceed</b></li>
   <li><b>등록 양식 입력</b> — 모든 항목 입력, <code>HRI-200 Serial Number/RADIO ID</code> 칸에 <b>S/N 입력</b> (3번 입력표 참조) → Submit</li>
@@ -172,7 +172,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 <section id="h">
  <h2>8 링크 모음</h2>
  <div class="tw"><table><tr><th>자료</th><th>접속</th></tr>
-  <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/regist/index.php" target="_blank" rel="noopener">멤버 등록 (이메일 전송)</a></td><td>로그인 없이 열림 (이메일 입력)</td></tr>
+  <tr><td><a class="lk" href="https://yaesu.com/jp/en/wires-x/regist/index.php" target="_blank">멤버 등록 (이메일 전송)</a></td><td>로그인 없이 열림 (이메일 입력)</td></tr>
   <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/index.php" target="_blank" rel="noopener">WIRES-X 메인 · Member Login</a></td><td>🔒 로그인 후 이용</td></tr>
   <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/regist/password.php" target="_blank" rel="noopener">비밀번호 찾기</a></td><td>바로 열림 (양식)</td></tr>
   <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/regist/id.php" target="_blank" rel="noopener">회원 ID 찾기 (이메일+S/N 입력)</a></td><td>바로 열림 (양식)</td></tr>
@@ -184,10 +184,10 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
  <div class="box warn">YAESU 사이트 링크는 이 환경에서 접속 확인이 되지 않았습니다. 열리지 않으면 알려 주세요.</div>
 </section>
 
-<div class="foot">대한적십자사 서울특별시지사 재난대응봉사회 · <span class="app-version">v1.3</span> · 2026-10-26</div>
+<div class="foot">대한적십자사 서울특별시지사 재난대응봉사회 · <span class="app-version">v1.4</span> · 2026-10-26</div>
 </div>
 <script>
-var APP_VERSION='v1.3';
+var APP_VERSION='v1.4';
 document.querySelectorAll('.app-version').forEach(function(e){e.textContent=APP_VERSION;});
 (function(){
  var b=document.body,m=document.getElementById('bM'),p=document.getElementById('bP');
