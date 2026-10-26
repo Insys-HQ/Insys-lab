@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* HRI-200_하이브리드망_구축가이드.html v1.5 (2026-10-26) */
+/* HRI-200_하이브리드망_구축가이드.html v1.6 (2026-10-26) */
 :root{--navy:#1f3a5f;--ink:#1e2a3a;--line:#c9d3e0;--bg:#f3f6fa;--card:#fff;--blue:#1d4ed8;--soft:#e4ecf7;--warnBg:#fff3d6;--warn:#7a4a00;--okBg:#e1f3e6;--ok:#1b5e34;--badBg:#fde7e7;--bad:#8a1c1c}
 *{box-sizing:border-box}
 small{font-size:1rem}
@@ -63,7 +63,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 </head>
 <body class="m">
 <div class="nav"><div class="nav-inner">
- <div><b>HRI-200 하이브리드 재난통신망 구축 가이드</b> <small>대한적십자사 서울특별시지사 재난대응봉사회</small> <span class="ver app-version">v1.5</span></div>
+ <div><b>HRI-200 하이브리드 재난통신망 구축 가이드</b> <small>대한적십자사 서울특별시지사 재난대응봉사회</small> <span class="ver app-version">v1.6</span></div>
  <div class="tg"><button id="bM" class="on" type="button">📱 모바일</button><button id="bP" type="button">🖥 PC</button></div>
 </div></div>
 <div class="wrap">
@@ -71,7 +71,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 <div class="cover">
  <h1>HRI-200 3대 도입 · 등록부터 운용까지</h1>
  <p>HL0FRC · DS0ARC/M · HL2TLS — PDN 방식에서 HRI-200 방식으로 전환</p>
- <p>작성 2026-10-26 · <span class="app-version">v1.5</span></p>
+ <p>작성 2026-10-26 · <span class="app-version">v1.6</span></p>
 </div>
 <div class="toc">
  <a href="#a">1 구성</a><a href="#b">2 등록 절차</a><a href="#c">3 국별 입력표</a><a href="#d">4 승인 메일 후</a><a href="#e">5 설치·설정</a><a href="#f">6 운용</a><a href="#g">7 점검·문제</a><a href="#h">8 링크</a>
@@ -137,6 +137,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 <section id="d">
  <h2>4 승인 메일 수신 후 기록표</h2>
  <div class="tw"><table><tr><th>항목</th><th>HL0FRC</th><th>DS0ARC/M</th><th>HL2TLS</th></tr>
+  <tr><td class="k">HRI-200 S/N</td><td><code>6I080012</code></td><td><code>6I080013</code></td><td><code>6I080005</code></td></tr>
   <tr><td class="k">Node ID (5자리)</td><td>＿＿＿＿＿</td><td>＿＿＿＿＿</td><td>＿＿＿＿＿</td></tr>
   <tr><td class="k">Room ID</td><td colspan="3">룸은 개설하지 않음 — 기존 <b>48182</b>(DS0ARC) 사용</td></tr>
   <tr><td class="k">수신 일자</td><td>＿＿＿＿＿</td><td>＿＿＿＿＿</td><td>＿＿＿＿＿</td></tr></table></div>
@@ -148,9 +149,14 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
  <ol class="st">
   <li><b>HRI-200 드라이버 먼저 설치</b> → WIRES-X 소프트웨어 설치 → PC 재시작 → USB 연결 (Node owner 페이지 다운로드 <em class="l">🔒 로그인 후 이용</em>)</li>
   <li><b>연결</b> — PC ↔ USB, RADIO 1 ↔ 무전기(CT-174 10핀 / FM 6핀은 CT-175)</li>
-  <li><b>설정</b> — Serial/Radio ID = S/N, DTMF ID = Node ID, Modulation <b>RX:FM – TX:FM</b>, Return to Room <code>48182</code></li>
+  <li><b>설정</b> — 아래 국별 설정표 입력</li>
   <li><b>시작</b> — 소프트웨어 먼저 실행 → 무전기 [D/X]+[GM] 누른 채 전원 ON(2초) → "HRI-200" 표시</li>
  </ol>
+ <div class="tw"><table><tr><th>설정 항목</th><th>HL0FRC</th><th>DS0ARC/M</th><th>HL2TLS</th></tr>
+  <tr><td class="k">Serial/Radio ID</td><td><code>6I080012</code></td><td><code>6I080013</code></td><td><code>6I080005</code></td></tr>
+  <tr><td class="k">CallSign</td><td>HL0FRC</td><td>DS0ARC/M</td><td>HL2TLS</td></tr>
+  <tr><td class="k">DTMF ID</td><td colspan="3">승인 메일의 각 국 Node ID (4번 기록표)</td></tr>
+  <tr><td class="k">공통 설정값</td><td colspan="3">Modulation RX:FM–TX:FM · Return to Room <code>48182</code> · 룸 개설 안 함</td></tr></table></div>
  <p>세부 화면은 교육 슬라이드의 해당 장을 보세요 (중복 설명 생략).</p>
  <a class="lk" href="RCNET_FM노드_운용교육.html#s6" target="_blank" rel="noopener">B-1 연결·설치</a>
  <a class="lk" href="RCNET_FM노드_운용교육.html#s7" target="_blank" rel="noopener">B-2 설정값</a>
@@ -194,10 +200,10 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
  <div class="box warn">YAESU 사이트 링크는 이 환경에서 접속 확인이 되지 않았습니다. 열리지 않으면 알려 주세요.</div>
 </section>
 
-<div class="foot">대한적십자사 서울특별시지사 재난대응봉사회 · <span class="app-version">v1.5</span> · 2026-10-26</div>
+<div class="foot">대한적십자사 서울특별시지사 재난대응봉사회 · <span class="app-version">v1.6</span> · 2026-10-26</div>
 </div>
 <script>
-var APP_VERSION='v1.5';
+var APP_VERSION='v1.6';
 document.querySelectorAll('.app-version').forEach(function(e){e.textContent=APP_VERSION;});
 (function(){
  var b=document.body,m=document.getElementById('bM'),p=document.getElementById('bP');
