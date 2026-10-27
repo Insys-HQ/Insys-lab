@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="robots" content="noindex, nofollow">
-<title>면접 평가서 v1.2 | 인시스 AI혁신 연구개발실</title>
+<title>면접 평가서 v1.3 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -256,7 +256,7 @@ textarea.ta{width:100%;min-height:64px;padding:6px 8px;border:1px solid #b9c5d4;
 <script>
 (function(){
 'use strict';
-var VERSION='v1.2';
+var VERSION='v1.3';
 var GATE_HASH='c8fee275c283170bbac1048791c5d751fcbb1e06c48a7ba574232e0702095e3a';
 var CASE_ID='c2610-02';
 var COL='interview_records';
@@ -316,8 +316,27 @@ var CATS_V2=[
   ['E2','입사 후 3개월 동안 만들어 낼 수 있는 결과는 무엇인가요?','현실적 목표 설정'],
   ['E3','회사나 업무에 대해 궁금한 점이 있나요?','관심도, 질문의 질']]}
 ];
-var QV=2;
-var CATS=CATS_V2;
+var CATS_V3=[
+ {id:'A',name:'직무 역량',w:30,qs:[
+  ['A1','가장 최근(대표) 업무·프로젝트에서 맡은 역할과 직접 수행한 범위, 결과물을 설명해 주세요.','본인 역할·직접 수행 범위, 문제 정의 능력'],
+  ['A2','ERP·MES 등 업무 시스템을 운영하거나 메뉴·화면·권한을 설정(STUDIO 같은 구성 도구)해 본 경험과 결과를 설명해 주세요.','시스템 운영 이해, 설정·구성 경험, 적용 사례']]},
+ {id:'B',name:'문제해결·사고력',w:25,qs:[
+  ['B1','시스템 장애나 사용자 문의를 해결한 경험과 원인 파악 과정, 도움을 구한 방식을 말씀해 주세요.','원인 분석 순서, 재발 방지, 정보 탐색·협력'],
+  ['B2','여러 부서의 문의·요청이 동시에 오고 일정이 촉박할 때 우선순위를 정하는 기준은 무엇인가요?','판단 기준, 커뮤니케이션, 현업 응대']]},
+ {id:'C',name:'인성·성격·협업',w:20,qs:[
+  ['C1','현업 부서나 팀 안에서 의견이 달랐거나 피드백을 받고 바꾼 경험을 말씀해 주세요.','경청, 조율, 수용성, 결과'],
+  ['C2','본인의 장점과 보완할 점, 그리고 동료가 본인을 어떻게 평가할지 말씀해 주세요.','자기 인식의 구체성·객관성']]},
+ {id:'D',name:'태도·근속·근무조건',w:15,qs:[
+  ['D1','이 직무는 신규 개발이 아니라 사내 ERP 운영·IT 유지관리가 중심이고 개발은 개발자가 맡습니다. 지원 동기와 3~5년 뒤 맡고 싶은 역할을 말씀해 주세요.','직무 범위 이해·동의, 진정성, 근속 의지'],
+  ['D2','입사 가능 시기와 근무 조건(근무지·근무 형태)에 제약이 있는지 말씀해 주세요.','입사 시기 확정 여부, 제약 사항']]},
+ {id:'E',name:'지원 적합성',w:10,qs:[
+  ['E1','현업이 ERP 기능 개선을 요청하면 요구사항을 어떻게 정리하고, STUDIO 등으로 직접 처리할 것과 개발자에게 넘길 것을 어떤 기준으로 구분하겠습니까?','요구사항 정리, 처리·개발 요청 구분 기준, 소통'],
+  ['E2','입사 후 3개월 동안 업무를 파악하고 안정적으로 운영하기 위해 무엇부터 하겠습니까?','현실적 인수·학습 계획, 우선순위'],
+  ['E3','회사나 업무에 대해 궁금한 점이 있나요?','관심도, 질문의 질']]}
+];
+var QSETS={1:CATS_V1,2:CATS_V2,3:CATS_V3};
+var QV=3;
+var CATS=CATS_V3;
 /* 지원자 자료(서류 분석·전용 질문): 이 파일에 포함 / 평가 입력값만 Firebase 저장 */
 var CASE={
  "name": "이영미",
@@ -366,6 +385,28 @@ var CASE={
    "P4",
    "공고는 AI 응용 S/W 연구개발입니다. AI 도구를 실제 업무에 어떻게 쓰고 결과는 어떻게 검증했나요? 입사 후 제조 데이터로 풀고 싶은 과제 하나와 시작 방법을 말씀해 주세요.",
    "AI 활용 깊이, 지원 동기, 과제의 현실성"
+  ]
+ ],
+ "ind3": [
+  [
+   "P1",
+   "테크노전자 3개 공장 MES 표준화에서 25개 영역 중 가장 어려웠던 영역은 무엇이었나요? 공장마다 기준이 달랐을 때 무엇을 기준으로 통일했고, 모델서픽스 6,142행 정리는 어떤 방법으로 검증했나요?",
+   "본인 역할, 기준 수립 논리, 검증 방법"
+  ],
+  [
+   "P2",
+   "LG 생산계획을 MES로 연계할 때 매핑되지 않은 항목이나 오류는 어떻게 처리했나요? 직접 작성한 변환·검증 로직(Python·SQL 등)은 어느 부분인가요?",
+   "직접 구현 범위, 예외 처리, 재현 가능성"
+  ],
+  [
+   "P3",
+   "품번 누락 때문에 저장이 안 되던 문제를 어떤 순서로 찾았나요? TiberoDB 백업이 없는 상태를 확인한 뒤 어떤 개선을 제안했고 실제로 어떻게 진행되었나요?",
+   "원인 분석 순서, 개선 제안의 실행력"
+  ],
+  [
+   "P4",
+   "MES 운영 중 현업 사용자의 문의와 교육은 어떻게 처리했나요? 공장 3곳의 사용자 요구가 충돌했을 때 어떻게 조율했나요?",
+   "현업 응대·조율, 기준 합의, 소통 방식"
   ]
  ]
 };
@@ -581,10 +622,11 @@ function printCert(){updCert();document.body.classList.add('print-cert');window.
 
 /* ---------- 지원자 자료 표시 ---------- */
 function pickQSet(ev){
-  var legacy=false;
-  if(ev){legacy=!ev.qv;}
-  else{var dr=getDraft();if(dr){legacy=!dr.qv&&Object.keys(dr.scores||{}).length>0;}}
-  QV=legacy?1:2;CATS=legacy?CATS_V1:CATS_V2;
+  var q=3;
+  if(ev){q=ev.qv||1;}
+  else{var dr=getDraft();if(dr&&Object.keys(dr.scores||{}).length>0){q=dr.qv||1;}}
+  if(!QSETS[q]){q=3;}
+  QV=q;CATS=QSETS[q];
 }
 function liHtml(arr){return (arr||[]).map(function(t){return '<li>'+esc(t)+'</li>';}).join('');}
 function renderCase(evalData){
@@ -596,7 +638,7 @@ function renderCase(evalData){
   $('caseChk').innerHTML=liHtml(c.checks);
   $('caseLinks').innerHTML=(c.links||[]).filter(function(l){return l&&/^https:\/\//.test(l.url||'');}).map(function(l){
     return '<a class="btn sub" style="text-decoration:none" href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer">'+esc(l.label||'링크')+'</a>';}).join('');
-  IND=(c.ind||[]).map(function(q){return [String(q[0]),String(q[1]),String(q[2])];});
+  IND=((QV>=3&&c.ind3)?c.ind3:(c.ind||[])).map(function(q){return [String(q[0]),String(q[1]),String(q[2])];});
   renderQ();
   apply(evalData||getDraft());
 }
