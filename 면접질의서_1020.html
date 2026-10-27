@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <meta name="robots" content="noindex, nofollow">
-<title>면접 평가서 v1.1 | 인시스 AI혁신 연구개발실</title>
+<title>면접 평가서 v1.2 | 인시스 AI혁신 연구개발실</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -256,7 +256,7 @@ textarea.ta{width:100%;min-height:64px;padding:6px 8px;border:1px solid #b9c5d4;
 <script>
 (function(){
 'use strict';
-var VERSION='v1.1';
+var VERSION='v1.2';
 var GATE_HASH='c8fee275c283170bbac1048791c5d751fcbb1e06c48a7ba574232e0702095e3a';
 var CASE_ID='c2610-02';
 var COL='interview_records';
@@ -272,7 +272,7 @@ var FIREBASE_CONFIG={
   appId:'1:225275784859:web:bd12815c6dc47c0c49e03e'
 };
 
-var CATS=[
+var CATS_V1=[
  {id:'A',name:'직무 역량',w:30,qs:[
   ['A1','가장 최근에 한 프로젝트에서 맡은 역할과 결과물을 설명해 주세요.','본인 역할·팀/개인 구분이 명확한가'],
   ['A2','AI 또는 LLM 기능을 직접 구현한 경험과 해결한 문제를 말씀해 주세요.','직접 구현 범위, 문제 정의 능력'],
@@ -298,6 +298,26 @@ var CATS=[
   ['E2','입사 후 3개월 동안 만들어 낼 수 있는 결과는 무엇인가요?','현실적 목표 설정'],
   ['E3','회사나 업무에 대해 궁금한 점이 있나요?','관심도, 질문의 질']]}
 ];
+var CATS_V2=[
+ {id:'A',name:'직무 역량',w:30,qs:[
+  ['A1','가장 최근(대표) 프로젝트에서 맡은 역할과 직접 구현한 범위, 결과물을 설명해 주세요. AI·LLM 활용이 있었다면 함께 말씀해 주세요.','본인 역할·직접 구현 범위, 문제 정의 능력'],
+  ['A2','업무 자동화 사례 또는 최근 새로 배운 기술 중 하나를 골라 시작부터 결과까지 설명해 주세요.','전후 비교(시간·건수), 자기주도 학습, 적용 사례']]},
+ {id:'B',name:'문제해결·사고력',w:25,qs:[
+  ['B1','장애·에러나 바로 풀리지 않던 문제를 해결한 경험과 원인 파악 과정, 도움을 구한 방식을 말씀해 주세요.','원인 분석 순서, 재발 방지, 정보 탐색·협력'],
+  ['B2','일정이 촉박할 때 우선순위를 정하는 기준은 무엇인가요?','판단 기준, 커뮤니케이션']]},
+ {id:'C',name:'인성·성격·협업',w:20,qs:[
+  ['C1','팀 안에서 의견이 달랐거나 피드백을 받고 바꾼 경험을 말씀해 주세요.','경청, 조율, 수용성, 결과'],
+  ['C2','본인의 장점과 보완할 점, 그리고 동료가 본인을 어떻게 평가할지 말씀해 주세요.','자기 인식의 구체성·객관성']]},
+ {id:'D',name:'태도·근속·근무조건',w:15,qs:[
+  ['D1','본 직무에 지원한 동기와 3~5년 뒤 되고 싶은 모습을 말씀해 주세요.','직무 이해, 진정성, 성장 계획과 회사 방향의 일치'],
+  ['D2','입사 가능 시기와 근무 조건(근무지·근무 형태)에 제약이 있는지 말씀해 주세요.','입사 시기 확정 여부, 제약 사항']]},
+ {id:'E',name:'지원 적합성',w:10,qs:[
+  ['E1','제조 현장과 협업해 AI·자동화를 적용한다면 어떤 과제부터 시작하겠습니까?','현장 마인드, 제조 이해, 아이디어 구체성'],
+  ['E2','입사 후 3개월 동안 만들어 낼 수 있는 결과는 무엇인가요?','현실적 목표 설정'],
+  ['E3','회사나 업무에 대해 궁금한 점이 있나요?','관심도, 질문의 질']]}
+];
+var QV=2;
+var CATS=CATS_V2;
 /* 지원자 자료(서류 분석·전용 질문): 이 파일에 포함 / 평가 입력값만 Firebase 저장 */
 var CASE={
  "name": "이영미",
@@ -448,7 +468,7 @@ function collect(){
   return {date:$('fDate').value,interviewer:$('fIv').value,
     scores:scores,memos:memos,total:r.total,grade:r.ans?gradeOf(r.total):'',
     strengths:$('sStr').value,weaknesses:$('sWeak').value,summary:$('sSum').value,decision:$('sDec').value,
-    consent:$('consent').checked,version:VERSION,savedAt:new Date().toISOString()};
+    consent:$('consent').checked,version:VERSION,qv:QV,savedAt:new Date().toISOString()};
 }
 function apply(d){
   d=d||{};
@@ -478,7 +498,7 @@ function loadSaved(){
     if(!s.exists){setStatus('저장된 자료가 없습니다.');return;}
     var ev=s.data().eval;
     if(!ev){setStatus('저장된 평가 기록이 없습니다.');return;}
-    apply(ev);setStatus('Firebase 저장본을 불러왔습니다.');
+    pickQSet(ev);renderQ();apply(ev);setStatus('Firebase 저장본을 불러왔습니다.');
   }).catch(function(e){setStatus('불러오기 실패: '+(e&&e.code?e.code:e.message));});
 }
 function resetAll(){
@@ -560,9 +580,16 @@ function printMain(){document.body.classList.remove('print-cert');window.print()
 function printCert(){updCert();document.body.classList.add('print-cert');window.print();setTimeout(function(){document.body.classList.remove('print-cert');},300);}
 
 /* ---------- 지원자 자료 표시 ---------- */
+function pickQSet(ev){
+  var legacy=false;
+  if(ev){legacy=!ev.qv;}
+  else{var dr=getDraft();if(dr){legacy=!dr.qv&&Object.keys(dr.scores||{}).length>0;}}
+  QV=legacy?1:2;CATS=legacy?CATS_V1:CATS_V2;
+}
 function liHtml(arr){return (arr||[]).map(function(t){return '<li>'+esc(t)+'</li>';}).join('');}
 function renderCase(evalData){
   var c=caseData;
+  pickQSet(evalData);
   $('fName').value=c.name||'';$('fPos').value=c.position||'';
   $('caseTags').innerHTML=(c.tags||[]).map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join('');
   $('caseStr').innerHTML=liHtml(c.strengths);
