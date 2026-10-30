@@ -27,7 +27,7 @@ main{max-width:1100px;margin:0 auto;padding:8px 12px}
 #wrap.mobile{max-width:420px}
 #wrap.pc{max-width:1100px}
 .tabs{display:flex;gap:4px;overflow-x:auto;margin-bottom:8px}
-.tabs button{flex:1;white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--navy);border-radius:6px;padding:6px 8px;font:inherit;font-weight:500;cursor:pointer}
+.tabs button{flex:1 0 auto;white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--navy);border-radius:6px;padding:6px 10px;font:inherit;font-weight:500;cursor:pointer}
 .tabs button.on{background:var(--navy);color:#fff;font-weight:700;border-color:var(--navy)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px}
 .card h2{font-size:1.05rem;margin:0 0 6px;color:var(--navy)}
@@ -39,6 +39,10 @@ table{width:100%;border-collapse:collapse;font-size:.95rem}
 th,td{border:1px solid var(--line);padding:4px 6px;text-align:left;vertical-align:top}
 th{background:var(--soft);color:var(--navy)}
 code{background:var(--soft);color:var(--navy);padding:0 4px;border-radius:4px;font-weight:500}
+.path{display:block;background:var(--soft);color:var(--navy);border-left:4px solid var(--navy);border-radius:4px;padding:4px 8px;margin:4px 0;font-weight:500;word-break:keep-all}
+.path b{font-weight:900}
+td .path{margin:2px 0 0;padding:2px 6px;font-size:.85rem}
+pre.tree{background:var(--soft);color:var(--navy);border-radius:6px;padding:8px 10px;margin:4px 0;font-size:.85rem;line-height:1.45;overflow-x:auto;white-space:pre}
 p{margin:4px 0}
 ul{margin:4px 0;padding-left:18px}
 li{margin:2px 0}
@@ -65,7 +69,7 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
 <body>
 <header>
   <div class="nav-inner">
-    <h1>IC-2730A 사용법<span class="ver" id="ver">v1.2</span></h1>
+    <h1>IC-2730A 사용법<span class="ver" id="ver">v1.3</span></h1>
     <div class="view" role="group" aria-label="화면 선택">
       <button id="bm" class="on" type="button">모바일</button>
       <button id="bp" type="button">PC</button>
@@ -79,6 +83,7 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
   <div class="tabs" id="tabs">
     <button type="button" data-t="p1" class="on">톤 88.5</button>
     <button type="button" data-t="p2">+/- 듀플렉스</button>
+    <button type="button" data-t="p5">메뉴 경로</button>
     <button type="button" data-t="p3">기능 상세</button>
     <button type="button" data-t="p4">체크·확인</button>
   </div>
@@ -86,33 +91,39 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
   <section id="p1" class="panel on card">
     <h2>톤 88.5Hz 설정</h2>
     <p>중계기는 <b>서브톤(CTCSS)</b>이 실린 신호에만 반응합니다. 톤을 켜지 않으면 중계기가 열리지 않습니다.</p>
-    <div class="note">공장 기본값이 이미 <b>88.5Hz</b>입니다. 대부분 <code>TONE</code>만 켜면 끝납니다.</div>
-    <h3>① 톤 켜기 (매뉴얼 Repeater operation)</h3>
+    <div class="note">공장 기본값이 이미 <b>88.5Hz</b>입니다(R TONE·C TONE 모두). 대부분 <code>TONE</code>만 켜면 끝납니다.</div>
+    <h3>① 톤 켜기</h3>
+    <span class="path"><b>MENU</b> › <b>EXMENU</b> › <b>EXMEN-DUP.T</b> › <b>DUP.T-TONE</b> › <b>TONE</b></span>
     <ol class="steps">
-      <li><code>MENU</code>를 눌러 메뉴 모드로 들어갑니다.</li>
-      <li><code>DIAL</code>을 돌려 <code>TONE</code>을 선택하고 <code>DIAL</code>을 눌러 다음 단계로 갑니다.</li>
-      <li><code>DIAL</code>을 돌려 <code>TONE</code>(중계기 톤)을 선택합니다. 화면에 <code>T</code>가 나타납니다.</li>
-      <li><code>DIAL</code>을 눌러 값을 확정하고, <code>MAIN BAND</code>를 눌러 메뉴를 종료합니다.</li>
-      <li>이후 송신하면 서브톤이 신호에 함께 실립니다.</li>
+      <li>(필요 시) <code>MAIN BAND</code>로 설정할 밴드를 MAIN으로 선택 <small>톤·오프셋은 MAIN 밴드에 적용됩니다.</small></li>
+      <li><code>MENU</code>를 눌러 메뉴 모드로 진입</li>
+      <li><code>DIAL</code>을 돌려 <code>EXMENU</code> 선택 → <code>DIAL</code>을 눌러 다음 단계</li>
+      <li><code>DIAL</code>로 <code>DUP.T</code> 그룹 선택 → <code>DIAL</code> 누름</li>
+      <li><code>DIAL</code>로 <code>TONE</code> 항목 선택 → <code>DIAL</code> 누름 (선택값 표시)</li>
+      <li><code>DIAL</code>로 <code>TONE</code> 선택 → <code>DIAL</code> 눌러 저장. 화면에 <code>T</code> 표시</li>
+      <li><code>MAIN BAND</code>를 눌러 메뉴 종료</li>
     </ol>
-    <h3>② 톤 주파수 확인·변경</h3>
-    <p>경로: <code>MENU</code> → <code>EXMENU</code> → <code>EXMEN-DUP.T</code> → <code>R TONE</code></p>
+    <p>매뉴얼 Repeater operation에는 상위 메뉴의 <code>TONE</code> 항목으로 같은 설정을 하는 방법도 나옵니다 (<code>MENU</code> → <code>DIAL</code>로 <code>TONE</code> → <code>DIAL</code> 눌러 <code>TONE</code> 선택 → <code>MAIN BAND</code>로 종료).</p>
+    <h3>② 중계기 톤 주파수 88.5 확인·변경</h3>
+    <span class="path"><b>MENU</b> › <b>EXMENU</b> › <b>EXMEN-DUP.T</b> › <b>DUP.T-R TONE</b> › <b>88.5</b></span>
+    <p>같은 방식으로 항목에서 <code>R TONE</code> 선택 → <code>DIAL</code> 누름 → <code>DIAL</code>로 88.5 → <code>DIAL</code> 눌러 저장 → <code>MAIN BAND</code> 종료. 기본값 복원은 값 선택 화면에서 <code>MR CALL</code>을 길게 누릅니다.</p>
     <table>
       <tr><th>항목</th><th>설정값</th><th>설명</th></tr>
       <tr><td>TONE</td><td><code>TONE</code></td><td>송신에 서브톤을 실음 (중계기 접속용). 화면 <code>T</code></td></tr>
       <tr><td>R TONE</td><td><code>88.5</code></td><td>접속 톤. 50개 CTCSS 중 선택(67.0~254.1), 기본 88.5</td></tr>
-      <tr><td>TSQL</td><td>선택</td><td>상대 톤이 맞을 때만 소리가 남. 수신 톤은 <code>C TONE</code>(기본 88.5)</td></tr>
+      <tr><td>C TONE</td><td>88.5</td><td>톤 스켈치·포켓 비프용 수신 톤. 기본 88.5</td></tr>
     </table>
-    <h3>톤 종류 한눈에</h3>
+    <h3>톤 종류 (DUP.T-TONE 선택값)</h3>
     <table>
       <tr><th>종류</th><th>동작</th></tr>
-      <tr><td>OFF</td><td>톤 사용 안 함</td></tr>
+      <tr><td>OFF</td><td>톤 사용 안 함 (기본)</td></tr>
       <tr><td>TONE</td><td>송신에만 톤을 실음 → <b>중계기 접속에 사용</b></td></tr>
       <tr><td>TSQL</td><td>송신에 톤을 싣고, 같은 톤이 오는 신호만 수신(소리)</td></tr>
-      <tr><td>DTCS</td><td>디지털 코드 스켈치 (코드 <code>CODE</code>, 극성 <code>DTCS-P</code>)</td></tr>
+      <tr><td>DTCS</td><td>디지털 코드 스켈치. 코드 <code>DUP.T-CODE</code>(023~754), 극성 <code>DUP.T-DTCS-P</code></td></tr>
       <tr><td>TSQL-R / DTCS-R</td><td>일치하는 톤·코드의 신호는 <b>소리를 막음</b> (특정 국 음소거)</td></tr>
+      <tr><td>DTC.OFF, TON.DTC, DTC.TSQ, TON.TSQ</td><td>송신·수신에 서로 다른 방식을 조합하는 스플릿 톤 항목</td></tr>
     </table>
-    <p>스플릿 톤: 송신 톤(<code>R TONE</code>)과 수신 톤(<code>C TONE</code>)을 채널별로 따로 설정할 수 있습니다.</p>
+    <p>이 외에 <code>DUP.T-TBURST</code>(OFF/ON)를 ON으로 하면 FM에서 송신을 끝낼 때 상대에게 들리는 끝 잡음(squelch tail)을 줄입니다.</p>
   </section>
 
   <section id="p2" class="panel card">
@@ -120,17 +131,25 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
     <h3>왜 +/- 설정이 필요한가</h3>
     <p>중계기는 한 주파수로 신호를 받아(<b>입력</b>) 다른 주파수로 다시 내보냅니다(<b>출력</b>). 내 무전기는 <b>출력 주파수로 수신</b>하고 <b>입력 주파수로 송신</b>해야 합니다. 이 둘의 간격이 <b>오프셋</b>, 어느 쪽이 높은지가 <b>방향(+/-)</b>입니다.</p>
     <div class="eq">한국 439MHz대: 송신이 수신보다 5MHz 낮음 → <b>DUP-</b> / 오프셋 5.000MHz<br>예) 수신(출력) 439.680 → 송신(입력) 434.680</div>
-    <h3>설정 순서 (화면 우측 MAIN 밴드 기준)</h3>
+    <h3>① 방향(DUP-) 설정 — 메뉴가 아닌 전용 키</h3>
+    <span class="path"><b>MONI DUP</b>(길게) › <b>DIAL</b>로 <b>DUP-</b> › <b>MONI DUP</b>(누름)</span>
     <ol class="steps">
-      <li><code>MAIN BAND</code>로 UHF(439MHz)가 있는 밴드를 MAIN으로 선택</li>
-      <li><code>V/MHz SCAN</code>으로 VFO 모드, 모드는 FM 확인</li>
+      <li><code>MAIN BAND</code>로 UHF 밴드를 MAIN으로 선택, <code>V/MHz SCAN</code>으로 VFO 모드, 모드는 FM 확인 <small>모드는 <code>EXMEN-MOD.TS</code> › <code>MOD.TS-MODE</code>.</small></li>
       <li><code>DIAL</code>로 수신 주파수를 중계기 <b>출력</b> 주파수에 맞춤 (예: 439.680)</li>
-      <li><code>MONI DUP</code>을 <b>길게</b> 눌러 듀플렉스 방향 화면을 띄움</li>
-      <li><code>DIAL</code>을 돌려 <code>DUP-</code> 선택 <small>OFF=단신(simplex) / DUP-=송신이 낮음 / DUP+=송신이 높음</small></li>
-      <li><code>MONI DUP</code>을 눌러 방향 확정 → 화면에 <code>DUP-</code> 표시</li>
-      <li>오프셋 확인: <code>MENU</code> → <code>DIAL</code> 돌려 <code>OFFSET</code> → <code>DIAL</code> 눌러 진입 → <code>DIAL</code>로 <b>5.000</b> 맞춤 → <code>DIAL</code> 눌러 확정 → <code>MAIN BAND</code>로 종료 <small>오프셋은 VFO 튜닝 스텝 단위로 바뀝니다. 5MHz까지 돌리기 어려우면 먼저 스텝(<code>TS</code>)을 크게 바꾸세요.</small></li>
-      <li>톤 설정(<b>톤 88.5</b> 탭)까지 마치면 송신 준비 완료</li>
+      <li><code>MONI DUP</code>을 <b>1초 이상 길게</b> 눌러 듀플렉스 방향 화면을 띄움 (VFO 모드에서)</li>
+      <li><code>DIAL</code>을 돌려 선택 <small>OFF=단신 / DUP-=송신이 낮음 / DUP+=송신이 높음</small></li>
+      <li><code>MONI DUP</code>을 눌러 확정 → 화면에 <code>DUP-</code> 표시</li>
     </ol>
+    <h3>② 오프셋 5.000MHz 설정</h3>
+    <span class="path"><b>MENU</b> › <b>EXMENU</b> › <b>EXMEN-DUP.T</b> › <b>DUP.T-OFFSET</b> › <b>5.000</b></span>
+    <ol class="steps">
+      <li><code>MENU</code> → <code>DIAL</code>로 <code>EXMENU</code> → <code>DIAL</code> 누름</li>
+      <li><code>DIAL</code>로 <code>DUP.T</code> → <code>DIAL</code> 누름 → <code>DIAL</code>로 <code>OFFSET</code> → <code>DIAL</code> 누름</li>
+      <li><code>DIAL</code>을 돌려 <b>5.000</b>에 맞춤 (범위 0~59.995MHz, 기본 0.600 등 밴드·버전별)</li>
+      <li><code>DIAL</code>을 눌러 저장 → <code>MAIN BAND</code>로 종료</li>
+    </ol>
+    <p>매뉴얼 Duplex Operation에는 상위 메뉴 <code>OFFSET</code>(<code>MENU</code> → <code>DIAL</code>로 <code>OFFSET</code> → <code>DIAL</code> 누름 → 값 → <code>DIAL</code> 누름 → <code>MAIN BAND</code>)으로 설정하는 방법도 있습니다.</p>
+    <div class="note">오프셋은 VFO 튜닝 스텝 단위로 바뀝니다. 스텝 설정: <span class="path"><b>MENU</b> › <b>EXMENU</b> › <b>EXMEN-MOD.TS</b> › <b>MOD.TS-TS</b></span> 선택값은 5, 6.25, 10, 12.5, 15, 20, 25, 30, 50kHz입니다. 5MHz까지 돌리기 어려우면 스텝을 키우세요. <code>FUNC-DIAL S</code>(다이얼 가속, 기본 ON)가 켜져 있으면 빠르게 돌릴수록 크게 움직입니다.</div>
     <h3>방향 선택값</h3>
     <table>
       <tr><th>표시</th><th>의미</th><th>이 경우</th></tr>
@@ -138,17 +157,128 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
       <tr><td>DUP-</td><td>송신 = 수신 − 오프셋</td><td><b>U밴드 중계기</b></td></tr>
       <tr><td>DUP+</td><td>송신 = 수신 + 오프셋</td><td>일부 VHF 중계기 등</td></tr>
     </table>
-    <p>오프셋 기본값은 밴드·버전마다 다릅니다(0.600 등). 범위는 0~59.995MHz이므로 U밴드는 <b>5.000으로 직접 입력</b>해야 합니다.</p>
     <h3>자동 중계기 기능 (AUTORP) <span class="tag">한국 사양</span></h3>
+    <span class="path"><b>MENU</b> › <b>EXMENU</b> › <b>EXMEN-FUNC</b> › <b>FUNC-AUTORP</b> › <b>ON / OFF</b></span>
     <ul>
-      <li>경로: <code>MENU</code> → <code>EXMENU</code> → <code>AUTORP</code> (OFF/ON)</li>
-      <li>ON이면 중계기 출력 주파수 범위에 들어갈 때 <b>듀플렉스를 자동 설정</b>하며, 수동 듀플렉스 설정보다 <b>우선</b>합니다. 이때는 위 4~7단계가 필요 없을 수 있습니다.</li>
-      <li>자동 설정값이 해당 중계기와 다르면 <code>AUTORP</code>를 OFF로 두고 수동 설정하세요.</li>
+      <li>한국 사양은 <b>기본 ON</b>입니다. FM에서 중계기 출력 주파수 범위로 들어가면 <b>듀플렉스를 자동으로 켜고 끕니다</b>. 수동 듀플렉스 설정보다 <b>우선</b>합니다.</li>
+      <li><b>오프셋과 중계기 톤(R TONE)은 자동으로 바뀌지 않습니다.</b> 그래서 ②의 오프셋 5.000과 R TONE 88.5는 직접 맞춰야 합니다.</li>
+      <li>AUTORP가 켜져 있으면 ①이 필요 없을 수 있습니다. 주파수를 맞춘 뒤 화면에 <code>DUP-</code>가 뜨는지 확인하세요.</li>
       <li>자동 설정이 적용되는 주파수 범위와 방향 표는 매뉴얼 Auto Repeater 항목(p.57 부근)에서 확인하세요.</li>
+      <li>자동 설정이 해당 중계기와 맞지 않으면 <code>OFF</code>로 두고 ①을 수동으로 하세요.</li>
     </ul>
     <h3>오프밴드 표시</h3>
     <p>송신(PTT)했을 때 화면에 <code>OFF</code>가 뜨면 송신 주파수가 아마추어 대역을 벗어난 것입니다. 방향과 오프셋을 다시 확인하세요.</p>
     <div class="warn">제주 개별 중계기 주파수·톤은 미확인입니다. 검색어: "제주 아마추어무선 중계소 439MHz", "KARL 중계기 현황", "RCNET 제주"</div>
+  </section>
+
+  <section id="p5" class="panel card">
+    <h2>메뉴 경로 총정리</h2>
+    <p><span class="tag">매뉴얼</span>Icom EXMENU 문서(IC-2730A/E) 기준. 경로는 <code>MENU › EXMENU › 그룹 › 항목</code> 순서입니다.</p>
+    <h3>자주 쓰는 설정 경로</h3>
+    <table>
+      <tr><th>설정</th><th>경로 → 값</th></tr>
+      <tr><td>톤 켜기</td><td><span class="path">MENU › EXMENU › EXMEN-DUP.T › DUP.T-TONE</span>→ <code>TONE</code></td></tr>
+      <tr><td>중계기 톤</td><td><span class="path">MENU › EXMENU › EXMEN-DUP.T › DUP.T-R TONE</span>→ <code>88.5</code></td></tr>
+      <tr><td>오프셋</td><td><span class="path">MENU › EXMENU › EXMEN-DUP.T › DUP.T-OFFSET</span>→ <code>5.000</code></td></tr>
+      <tr><td>듀플렉스 방향</td><td><span class="path">MONI DUP 길게(VFO) › DIAL › MONI DUP</span>→ <code>DUP-</code></td></tr>
+      <tr><td>자동 중계기</td><td><span class="path">MENU › EXMENU › EXMEN-FUNC › FUNC-AUTORP</span>→ ON/OFF</td></tr>
+      <tr><td>모드(FM)</td><td><span class="path">MENU › EXMENU › EXMEN-MOD.TS › MOD.TS-MODE</span>→ FM / FM-N</td></tr>
+      <tr><td>튜닝 스텝</td><td><span class="path">MENU › EXMENU › EXMEN-MOD.TS › MOD.TS-TS</span>→ 5~50kHz</td></tr>
+      <tr><td>마이크 감도</td><td><span class="path">MENU › EXMENU › EXMEN-FUNC › FUNC-MIC G</span>→ 1~4 (기본 2)</td></tr>
+      <tr><td>송신 시간 제한</td><td><span class="path">MENU › EXMENU › EXMEN-FUNC › FUNC-TOT</span>→ OFF, 1~30분</td></tr>
+      <tr><td>PTT 잠금</td><td><span class="path">MENU › EXMENU › EXMEN-FUNC › FUNC-PTT LK</span>→ ON/OFF</td></tr>
+      <tr><td>키 비프음</td><td><span class="path">MENU › EXMENU › EXMEN-SOUNDS › SOUND-KEY B</span>→ ON/OFF</td></tr>
+      <tr><td>밝기</td><td><span class="path">MENU › EXMENU › EXMEN-DISP › DISP-LIGHT</span>→ 1~4</td></tr>
+      <tr><td>설정 초기화</td><td><span class="path">MENU › EXMENU › EXMEN-OTHERS › OTHER-RESET › RESET-PART / RESET-ALL</span></td></tr>
+    </table>
+    <div class="warn"><code>RESET-PART</code>는 동작 설정만 기본값으로 되돌리고 메모리·스캔 에지·콜 채널·DTMF 메모리는 유지합니다. <code>RESET-ALL</code>은 모든 내용을 지우고 공장 상태로 돌립니다.</div>
+    <h3>공통 조작법 (진입 → 값 변경 → 종료)</h3>
+    <ol class="steps">
+      <li><code>MAIN BAND</code>로 설정할 밴드를 MAIN으로 선택 <small>MODE, TS, TONE, OFFSET, R TONE, C TONE, CODE, DTCS-P와 스캔 항목(PRIO~B-LINK)은 MAIN 밴드에 적용됩니다.</small></li>
+      <li><code>MENU</code>를 눌러 메뉴 진입</li>
+      <li><code>DIAL</code>로 <code>EXMENU</code> 선택 → <code>DIAL</code>을 눌러 다음 단계</li>
+      <li><code>DIAL</code>로 그룹 선택(예: <code>FUNC</code>) → <code>DIAL</code> 누름</li>
+      <li><code>DIAL</code>로 항목 선택(예: <code>MIC G</code>) → <code>DIAL</code> 누름 (선택값 표시)</li>
+      <li><code>DIAL</code>로 값 선택 → <code>DIAL</code>을 눌러 저장하고 한 단계 위로</li>
+      <li><code>MAIN BAND</code>(또는 <code>V/MHz SCAN</code>, <code>MR CALL</code>)를 눌러 메뉴 종료</li>
+    </ol>
+    <p>한 항목을 기본값으로 되돌리려면 값 선택 화면에서 <code>MR CALL</code>을 길게 누릅니다.</p>
+    <h3>EXMENU 구조</h3>
+<pre class="tree">MENU
+ ├ (상위 메뉴) TONE, OFFSET 등
+ └ EXMENU
+    ├ EXMEN-MOD.TS   MODE, TS
+    ├ EXMEN-DUP.T    TONE, OFFSET, R TONE,
+    │                C TONE, TBURST, CODE, DTCS-P
+    ├ EXMEN-SCAN     PRIO, PAUSE, RESUME, TEMP,
+    │                P-SKIP, B-LINK, P-EDGE, P-LINK
+    ├ EXMEN-FUNC     SQLTYP, SQL-DL, FAN, DIAL S,
+    │                AUTORP, PTT, PTT LK, LK OUT,
+    │                TOT, ACTIVE, MIC G, AP OFF,
+    │                CI-V, IF-EXC
+    ├ EXMEN-DISP     LIGHT, AT-DIM, DIM TM, CONT,
+    │                OPN.MSG, NAME, AIR
+    ├ EXMEN-SOUNDS   BEEPLV, KEY B, HOME B,
+    │                EDGE B, STOP B, SUBMUT
+    ├ EXMEN-HOMECH   SET.FRQ / SET CH, CLEAR
+    ├ EXMEN-BT SET   (UT-133 블루투스 유닛 필요)
+    └ EXMEN-OTHERS   INFO, CLONE, RESET</pre>
+    <h3>MOD.TS · DUP.T 항목</h3>
+    <table>
+      <tr><th>항목 (그룹 › 항목)</th><th>기본</th><th>선택값·기능</th></tr>
+      <tr><td>MODE<span class="path">MOD.TS › MOD.TS-MODE</span></td><td>FM</td><td>FM, FM-N(좁은 송신), AM, AM-N</td></tr>
+      <tr><td>TS<span class="path">MOD.TS › MOD.TS-TS</span></td><td>5.0</td><td>5, 6.25, 10, 12.5, 15, 20, 25, 30, 50kHz. 다이얼·스캔 스텝</td></tr>
+      <tr><td>TONE<span class="path">DUP.T › DUP.T-TONE</span></td><td>OFF</td><td>OFF, TONE, TSQL, DTCS, TSQL-R, DTCS-R 등</td></tr>
+      <tr><td>OFFSET<span class="path">DUP.T › DUP.T-OFFSET</span></td><td>0.600*</td><td>0~59.995MHz. 방향은 MONI DUP 길게</td></tr>
+      <tr><td>R TONE<span class="path">DUP.T › DUP.T-R TONE</span></td><td>88.5</td><td>CTCSS 50종(67.0~254.1Hz). 중계기 접속 톤</td></tr>
+      <tr><td>C TONE<span class="path">DUP.T › DUP.T-C TONE</span></td><td>88.5</td><td>톤 스켈치·포켓 비프용 톤</td></tr>
+      <tr><td>TBURST<span class="path">DUP.T › DUP.T-TBURST</span></td><td>OFF</td><td>ON이면 송신 종료 후 상대에게 들리는 끝 잡음 제거</td></tr>
+      <tr><td>CODE<span class="path">DUP.T › DUP.T-CODE</span></td><td>023</td><td>DTCS 코드 104종(023~754)</td></tr>
+      <tr><td>DTCS-P<span class="path">DUP.T › DUP.T-DTCS-P</span></td><td>BOTH N</td><td>BOTH N, TN-RR, TR-RN, BOTH R (N=정상, R=반전)</td></tr>
+    </table>
+    <p>*기본값은 주파수 대역·버전에 따라 다를 수 있습니다.</p>
+    <h3>SCAN 항목 (<code>EXMEN-SCAN</code>)</h3>
+    <table>
+      <tr><th>항목</th><th>기본</th><th>선택값·기능</th></tr>
+      <tr><td>PRIO<span class="path">SCAN-PRIO</span></td><td>OFF</td><td>OFF, ON(우선 채널로 이동), BELL(비프+아이콘 점멸)</td></tr>
+      <tr><td>PAUSE<span class="path">SCAN-PAUSE</span></td><td>10SEC</td><td>2~20초(2초 단위), HOLD. 신호에서 멈추는 시간</td></tr>
+      <tr><td>RESUME<span class="path">SCAN-RESUME</span></td><td>2SEC</td><td>0~5초, HOLD. 신호 종료 후 재개까지 시간 (PAUSE보다 짧게)</td></tr>
+      <tr><td>TEMP<span class="path">SCAN-TEMP</span></td><td>5MIN</td><td>5, 10, 15분. 임시 스킵 유지 시간</td></tr>
+      <tr><td>P-SKIP<span class="path">SCAN-P-SKIP</span></td><td>ON</td><td>ON이면 VFO 스캔이 PSKIP 지정 주파수를 건너뜀</td></tr>
+      <tr><td>B-LINK<span class="path">SCAN-B-LINK</span></td><td>ON</td><td>뱅크(A~J)별로 뱅크 링크 스캔 포함 여부</td></tr>
+      <tr><td>P-EDGE / P-LINK<span class="path">SCAN-P-EDGE, SCAN-P-LINK</span></td><td>버전별</td><td>프로그램 스캔 에지 PROG00~24 편집, 링크 0~9 묶기</td></tr>
+    </table>
+    <h3>FUNC 항목 (<code>EXMEN-FUNC</code>)</h3>
+    <table>
+      <tr><th>항목</th><th>기본</th><th>선택값·기능</th></tr>
+      <tr><td>SQLTYP<span class="path">FUNC-SQLTYP</span></td><td>S SQL</td><td>OFF, S SQL(S미터 스켈치), ATT(감쇠기)</td></tr>
+      <tr><td>SQL-DL<span class="path">FUNC-SQL-DL</span></td><td>SHORT</td><td>SHORT, LONG (LONG은 스켈치가 반복 열리고 닫히는 것을 줄임)</td></tr>
+      <tr><td>FAN<span class="path">FUNC-FAN</span></td><td>AUTO</td><td>SLOW, MID, FAST, AUTO</td></tr>
+      <tr><td>DIAL S<span class="path">FUNC-DIAL S</span></td><td>ON</td><td>다이얼 가속</td></tr>
+      <tr><td>AUTORP<span class="path">FUNC-AUTORP</span></td><td>ON(한국)</td><td>OFF, ON. 듀플렉스 자동 설정</td></tr>
+      <tr><td>PTT LK<span class="path">FUNC-PTT LK</span></td><td>OFF</td><td>ON이면 PTT 비활성(오송신 방지)</td></tr>
+      <tr><td>LK OUT<span class="path">FUNC-LK OUT</span></td><td>OFF</td><td>ON이면 수신 중·스켈치가 열려 있을 때 송신 차단</td></tr>
+      <tr><td>TOT<span class="path">FUNC-TOT</span></td><td>OFF</td><td>OFF, 1, 3, 5, 10, 15, 30분. 종료 10초 전 경고음</td></tr>
+      <tr><td>ACTIVE<span class="path">FUNC-ACTIVE</span></td><td>ALL</td><td>SINGLE, ALL, HAM. 다이얼이 이동하는 주파수 범위</td></tr>
+      <tr><td>MIC G<span class="path">FUNC-MIC G</span></td><td>2</td><td>1~4. 클수록 민감</td></tr>
+      <tr><td>AP OFF<span class="path">FUNC-AP OFF</span></td><td>OFF</td><td>OFF, 30~120분. 무조작 시 자동 전원 끔</td></tr>
+    </table>
+    <h3>DISP · SOUNDS · OTHERS 항목</h3>
+    <table>
+      <tr><th>항목</th><th>기본</th><th>선택값·기능</th></tr>
+      <tr><td>LIGHT<span class="path">EXMEN-DISP › DISP-LIGHT</span></td><td>4</td><td>1(어두움)~4(밝음)</td></tr>
+      <tr><td>AT-DIM / DIM TM<span class="path">DISP-AT-DIM, DISP-DIM TM</span></td><td>OFF / 5SEC</td><td>자동 밝기 줄임 및 대기 시간(5, 10초)</td></tr>
+      <tr><td>CONT<span class="path">DISP-CONT</span></td><td>6</td><td>1~10. 화면 대비</td></tr>
+      <tr><td>NAME<span class="path">DISP-NAME</span></td><td>OFF</td><td>메모리 모드에서 주파수(OFF) 또는 채널 이름(ON) 표시</td></tr>
+      <tr><td>BEEPLV<span class="path">EXMEN-SOUNDS › SOUND-BEEPLV</span></td><td>9</td><td>0(끔)~9. 비프음 크기</td></tr>
+      <tr><td>KEY B<span class="path">SOUND-KEY B</span></td><td>ON</td><td>키 터치음</td></tr>
+      <tr><td>STOP B<span class="path">SOUND-STOP B</span></td><td>OFF</td><td>스캔이 신호에서 멈출 때 비프</td></tr>
+      <tr><td>SUBMUT<span class="path">SOUND-SUBMUT</span></td><td>OFF</td><td>OFF, MUTE, BEEP, MUT.BP. MAIN 수신 중 SUB 밴드 소리 제어</td></tr>
+      <tr><td>INFO-VOLT / INFO-VER<span class="path">EXMEN-OTHERS › OTHER-INFO</span></td><td>-</td><td>전원 전압 표시 / 펌웨어 버전 표시</td></tr>
+      <tr><td>CLONE<span class="path">OTHER-CLONE › CLONE-CLONE / CLONE-MASTER</span></td><td>-</td><td>다른 IC-2730A/E와 설정 복제(받기/보내기)</td></tr>
+      <tr><td>HOMECH<span class="path">EXMEN-HOMECH › HOME-SET.FRQ / SET CH / HOME-CLEAR</span></td><td>-</td><td>현재 주파수·메모리를 홈 채널로 지정, 삭제</td></tr>
+    </table>
+    <p>스캔 시 사용하는 <code>SCAN</code> 항목과 <code>FUNC</code>의 <code>RMTMIC</code>, <code>UDMIC</code>(원격 마이크 키 지정), <code>CI-V</code>(PC 제어), <code>IF-EXC</code>(간섭 줄이기)는 필요할 때 <a href="https://www.rigpix.com/icom/ic2730ae_exmenu-civ.pdf" target="_blank" rel="noopener">EXMENU 문서</a>를 참고하세요.</p>
   </section>
 
   <section id="p3" class="panel card">
@@ -157,26 +287,17 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
     <table>
       <tr><th>키·기능</th><th>동작</th></tr>
       <tr><td>MAIN BAND</td><td>좌/우 밴드 중 <b>MAIN(송수신 기준)</b> 밴드 전환. 화면 <code>MAIN</code> 표시가 현재 MAIN 밴드. 메뉴 종료에도 사용 <span class="tag">매뉴얼</span></td></tr>
-      <tr><td>V/MHz SCAN</td><td>VFO 모드, 스캔 시작 키. 다이얼로 주파수 조정 <span class="tag q">확인필요</span></td></tr>
-      <tr><td>MR CALL</td><td>메모리 모드·콜 채널 전환 <span class="tag q">확인필요</span></td></tr>
+      <tr><td>V/MHz SCAN</td><td>메뉴 종료에 쓰이는 키. VFO 모드·스캔 시작 기능 <span class="tag q">확인필요</span></td></tr>
+      <tr><td>MR CALL</td><td>메뉴 종료 및 메뉴 값 기본 복원(길게). 메모리·콜 채널 전환 <span class="tag q">확인필요</span></td></tr>
       <tr><td>MONI DUP 짧게</td><td>스켈치를 강제로 열어 약한 신호 청취. 열리면 <code>BUSY</code> 깜박임. 다시 누르면 닫힘 (MAIN 밴드) <span class="tag">매뉴얼</span></td></tr>
       <tr><td>MONI DUP 길게</td><td>듀플렉스 방향 설정 화면 (OFF / DUP- / DUP+) <span class="tag">매뉴얼</span></td></tr>
       <tr><td>음소거</td><td>음소거 키(사진 기준 전원 버튼 옆 스피커 아이콘)를 누르면 좌우 밴드에 <code>MUTE</code> 표시, 볼륨은 유지. 아무 키로 해제 <span class="tag">매뉴얼</span></td></tr>
       <tr><td>VOL / SQL</td><td>밴드별 볼륨·스켈치. 스켈치를 올리면 잡음이 닫히고 약한 신호도 닫힘 <span class="tag q">확인필요</span></td></tr>
-      <tr><td>MIC G</td><td>마이크 감도. <code>MENU</code>→<code>EXMENU</code>→<code>EXMEN-FUNC</code>→<code>MIC G</code>에서 <code>DIAL</code>로 조정 (값이 클수록 민감) <span class="tag">매뉴얼</span></td></tr>
       <tr><td>LOW DTMF</td><td>출력 저전력 전환, DTMF 관련 키 <span class="tag q">확인필요</span></td></tr>
       <tr><td>MW</td><td>메모리 쓰기 키. 주파수·DUP·톤 설정을 맞춘 뒤 저장 <span class="tag q">확인필요</span></td></tr>
       <tr><td>MENU (열쇠)</td><td>메뉴 진입. 열쇠 표시는 키 잠금 관련 <span class="tag q">확인필요</span></td></tr>
     </table>
-    <h3>EXMENU 그룹별 항목</h3>
-    <table>
-      <tr><th>그룹</th><th>항목</th></tr>
-      <tr><td>모드·스텝</td><td>MODE(FM/FM-N/AM/AM-N), TS(튜닝 스텝) — 좌우 밴드 각각 설정</td></tr>
-      <tr><td>DUP.T</td><td>TONE, OFFSET, R TONE, C TONE, CODE, DTCS-P</td></tr>
-      <tr><td>SCAN</td><td>PRIO, PAUSE, RESUME, TEMP, P-SKIP, B-LINK</td></tr>
-      <tr><td>FUNC</td><td>MIC G 등 기능 설정</td></tr>
-    </table>
-    <p>스캔 시 스킵 채널은 건너뛰며, 스캔 중 신호가 잡히면 스톱 비프(<code>STOP B</code>)를 켜고 끌 수 있습니다.</p>
+    <p>각 메뉴 항목의 경로와 기본값은 <b>메뉴 경로</b> 탭을 보세요.</p>
   </section>
 
   <section id="p4" class="panel card">
@@ -184,9 +305,9 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
     <div class="chk" id="chk">
       <label><input type="checkbox"> MAIN BAND를 UHF(우측)로 선택, VFO·FM 확인</label>
       <label><input type="checkbox"> 수신 주파수를 중계기 출력 주파수로 입력 (예: 439.xxx)</label>
-      <label><input type="checkbox"> AUTORP 상태 확인 (ON이면 자동 설정 우선)</label>
-      <label><input type="checkbox"> DUP- 설정, 오프셋 5.000MHz 확인</label>
-      <label><input type="checkbox"> TONE 선택, R TONE 88.5 확인</label>
+      <label><input type="checkbox"> AUTORP 확인 (FUNC-AUTORP, 한국 기본 ON. 오프셋·R TONE은 자동 변경 안 됨)</label>
+      <label><input type="checkbox"> DUP- 설정 (MONI DUP 길게), 오프셋 5.000MHz 확인 (DUP.T-OFFSET)</label>
+      <label><input type="checkbox"> TONE 선택 (DUP.T-TONE), R TONE 88.5 확인</label>
       <label><input type="checkbox"> 화면에 DUP-, T 표시 확인</label>
       <label><input type="checkbox"> 송신 시 OFF 표시가 뜨지 않는지 확인</label>
       <label><input type="checkbox"> 메모리 저장 (MW, 매뉴얼 Memory 항목 확인)</label>
@@ -197,7 +318,7 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
       <tr><th>증상</th><th>확인</th></tr>
       <tr><td>송신해도 중계기가 안 열림</td><td>화면 <code>T</code>, R TONE 88.5, DUP-, 오프셋 5.000</td></tr>
       <tr><td>송신 시 <code>OFF</code> 표시</td><td>방향(DUP-/DUP+)과 오프셋 값</td></tr>
-      <tr><td>설정이 알아서 바뀜</td><td>AUTORP ON 여부 (자동 설정이 우선함)</td></tr>
+      <tr><td>DUP 표시가 알아서 바뀜</td><td>AUTORP ON 여부 (듀플렉스 자동 설정이 우선함)</td></tr>
       <tr><td>소리가 안 남</td><td>음소거(MUTE) 표시, VOL, SQL, TSQL 사용 여부</td></tr>
     </table>
     <h3>확인 필요</h3>
@@ -209,10 +330,10 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
   </section>
 </div>
 </main>
-<footer>2026 기준 · 작성 HL2TLS · 요청 HL4HQK · <span id="ver2">v1.2</span></footer>
+<footer>2026 기준 · 작성 HL2TLS · 요청 HL4HQK · <span id="ver2">v1.3</span></footer>
 <script>
 (function(){
-  var VERSION='v1.2';
+  var VERSION='v1.3';
   document.getElementById('ver').textContent=VERSION;
   document.getElementById('ver2').textContent=VERSION;
   var wrap=document.getElementById('wrap');
