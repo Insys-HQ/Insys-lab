@@ -69,7 +69,7 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
 <body>
 <header>
   <div class="nav-inner">
-    <h1>IC-2730A 사용법<span class="ver" id="ver">v1.3</span></h1>
+    <h1>IC-2730A 사용법<span class="ver" id="ver">v1.4</span></h1>
     <div class="view" role="group" aria-label="화면 선택">
       <button id="bm" class="on" type="button">모바일</button>
       <button id="bp" type="button">PC</button>
@@ -79,96 +79,105 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
 <main>
 <div id="wrap" class="mobile">
   <div class="meta"><span>작성 <b>HL2TLS</b></span><span>요청 <b>HL4HQK</b></span></div>
-  <div class="key">제주 U밴드(439MHz대) 중계기: <code>DUP-</code> 5.000MHz + 톤 <code>88.5Hz</code></div>
+  <div class="key">U밴드 광역망 교신: 수신 <code>439.680</code> / 송신 <code>434.680</code> = <code>DUP-</code> 5.000MHz + 톤 <code>88.5Hz</code></div>
   <div class="tabs" id="tabs">
-    <button type="button" data-t="p1" class="on">톤 88.5</button>
-    <button type="button" data-t="p2">+/- 듀플렉스</button>
+    <button type="button" data-t="p1" class="on">U밴드 설정</button>
+    <button type="button" data-t="p2">채널 전환</button>
     <button type="button" data-t="p5">메뉴 경로</button>
     <button type="button" data-t="p3">기능 상세</button>
     <button type="button" data-t="p4">체크·확인</button>
   </div>
 
   <section id="p1" class="panel on card">
-    <h2>톤 88.5Hz 설정</h2>
-    <p>중계기는 <b>서브톤(CTCSS)</b>이 실린 신호에만 반응합니다. 톤을 켜지 않으면 중계기가 열리지 않습니다.</p>
-    <div class="note">공장 기본값이 이미 <b>88.5Hz</b>입니다(R TONE·C TONE 모두). 대부분 <code>TONE</code>만 켜면 끝납니다.</div>
-    <h3>① 톤 켜기</h3>
-    <span class="path"><b>MENU</b> › <b>EXMENU</b> › <b>EXMEN-DUP.T</b> › <b>DUP.T-TONE</b> › <b>TONE</b></span>
-    <ol class="steps">
-      <li>(필요 시) <code>MAIN BAND</code>로 설정할 밴드를 MAIN으로 선택 <small>톤·오프셋은 MAIN 밴드에 적용됩니다.</small></li>
-      <li><code>MENU</code>를 눌러 메뉴 모드로 진입</li>
-      <li><code>DIAL</code>을 돌려 <code>EXMENU</code> 선택 → <code>DIAL</code>을 눌러 다음 단계</li>
-      <li><code>DIAL</code>로 <code>DUP.T</code> 그룹 선택 → <code>DIAL</code> 누름</li>
-      <li><code>DIAL</code>로 <code>TONE</code> 항목 선택 → <code>DIAL</code> 누름 (선택값 표시)</li>
-      <li><code>DIAL</code>로 <code>TONE</code> 선택 → <code>DIAL</code> 눌러 저장. 화면에 <code>T</code> 표시</li>
-      <li><code>MAIN BAND</code>를 눌러 메뉴 종료</li>
-    </ol>
-    <p>매뉴얼 Repeater operation에는 상위 메뉴의 <code>TONE</code> 항목으로 같은 설정을 하는 방법도 나옵니다 (<code>MENU</code> → <code>DIAL</code>로 <code>TONE</code> → <code>DIAL</code> 눌러 <code>TONE</code> 선택 → <code>MAIN BAND</code>로 종료).</p>
-    <h3>② 중계기 톤 주파수 88.5 확인·변경</h3>
-    <span class="path"><b>MENU</b> › <b>EXMENU</b> › <b>EXMEN-DUP.T</b> › <b>DUP.T-R TONE</b> › <b>88.5</b></span>
-    <p>같은 방식으로 항목에서 <code>R TONE</code> 선택 → <code>DIAL</code> 누름 → <code>DIAL</code>로 88.5 → <code>DIAL</code> 눌러 저장 → <code>MAIN BAND</code> 종료. 기본값 복원은 값 선택 화면에서 <code>MR CALL</code>을 길게 누릅니다.</p>
+    <h2>U밴드 광역망 설정</h2>
+    <div class="eq">수신(중계기 출력) 439.680MHz<br>송신(중계기 입력) 434.680MHz = 439.680 − 5.000</div>
     <table>
-      <tr><th>항목</th><th>설정값</th><th>설명</th></tr>
-      <tr><td>TONE</td><td><code>TONE</code></td><td>송신에 서브톤을 실음 (중계기 접속용). 화면 <code>T</code></td></tr>
-      <tr><td>R TONE</td><td><code>88.5</code></td><td>접속 톤. 50개 CTCSS 중 선택(67.0~254.1), 기본 88.5</td></tr>
-      <tr><td>C TONE</td><td>88.5</td><td>톤 스켈치·포켓 비프용 수신 톤. 기본 88.5</td></tr>
+      <tr><th>항목</th><th>설정값</th><th>비고</th></tr>
+      <tr><td>수신 주파수</td><td><code>439.680</code></td><td>VFO 모드에서 <code>DIAL</code>로 입력</td></tr>
+      <tr><td>듀플렉스 방향</td><td><code>DUP-</code></td><td>송신이 수신보다 낮음</td></tr>
+      <tr><td>오프셋</td><td><code>5.000</code>MHz</td><td>송신 = 434.680</td></tr>
+      <tr><td>톤</td><td><code>TONE</code> / R TONE <code>88.5</code></td><td>화면 <code>T</code> 표시</td></tr>
+      <tr><td>모드·스텝</td><td>FM · 5.0kHz</td><td>기본값. 439.680은 5kHz 배수라 그대로 입력 가능</td></tr>
     </table>
-    <h3>톤 종류 (DUP.T-TONE 선택값)</h3>
-    <table>
-      <tr><th>종류</th><th>동작</th></tr>
-      <tr><td>OFF</td><td>톤 사용 안 함 (기본)</td></tr>
-      <tr><td>TONE</td><td>송신에만 톤을 실음 → <b>중계기 접속에 사용</b></td></tr>
-      <tr><td>TSQL</td><td>송신에 톤을 싣고, 같은 톤이 오는 신호만 수신(소리)</td></tr>
-      <tr><td>DTCS</td><td>디지털 코드 스켈치. 코드 <code>DUP.T-CODE</code>(023~754), 극성 <code>DUP.T-DTCS-P</code></td></tr>
-      <tr><td>TSQL-R / DTCS-R</td><td>일치하는 톤·코드의 신호는 <b>소리를 막음</b> (특정 국 음소거)</td></tr>
-      <tr><td>DTC.OFF, TON.DTC, DTC.TSQ, TON.TSQ</td><td>송신·수신에 서로 다른 방식을 조합하는 스플릿 톤 항목</td></tr>
-    </table>
-    <p>이 외에 <code>DUP.T-TBURST</code>(OFF/ON)를 ON으로 하면 FM에서 송신을 끝낼 때 상대에게 들리는 끝 잡음(squelch tail)을 줄입니다.</p>
-  </section>
-
-  <section id="p2" class="panel card">
-    <h2>U밴드 +/- (듀플렉스) 상세</h2>
-    <h3>왜 +/- 설정이 필요한가</h3>
-    <p>중계기는 한 주파수로 신호를 받아(<b>입력</b>) 다른 주파수로 다시 내보냅니다(<b>출력</b>). 내 무전기는 <b>출력 주파수로 수신</b>하고 <b>입력 주파수로 송신</b>해야 합니다. 이 둘의 간격이 <b>오프셋</b>, 어느 쪽이 높은지가 <b>방향(+/-)</b>입니다.</p>
-    <div class="eq">한국 439MHz대: 송신이 수신보다 5MHz 낮음 → <b>DUP-</b> / 오프셋 5.000MHz<br>예) 수신(출력) 439.680 → 송신(입력) 434.680</div>
-    <h3>① 방향(DUP-) 설정 — 메뉴가 아닌 전용 키</h3>
-    <span class="path"><b>MONI DUP</b>(길게) › <b>DIAL</b>로 <b>DUP-</b> › <b>MONI DUP</b>(누름)</span>
+    <div class="note">V밴드(좌측 145.000)는 건드리지 않습니다. 모드·스텝·톤·오프셋은 <b>MAIN 밴드에만 적용</b>되므로, 우측 U밴드가 MAIN일 때 설정하면 V밴드 설정은 그대로입니다. 사진 화면은 우측 U밴드(439.680)가 MAIN(<code>MAIN</code> 표시)입니다.</div>
+    <h3>설정 순서</h3>
     <ol class="steps">
-      <li><code>MAIN BAND</code>로 UHF 밴드를 MAIN으로 선택, <code>V/MHz SCAN</code>으로 VFO 모드, 모드는 FM 확인 <small>모드는 <code>EXMEN-MOD.TS</code> › <code>MOD.TS-MODE</code>.</small></li>
-      <li><code>DIAL</code>로 수신 주파수를 중계기 <b>출력</b> 주파수에 맞춤 (예: 439.680)</li>
-      <li><code>MONI DUP</code>을 <b>1초 이상 길게</b> 눌러 듀플렉스 방향 화면을 띄움 (VFO 모드에서)</li>
-      <li><code>DIAL</code>을 돌려 선택 <small>OFF=단신 / DUP-=송신이 낮음 / DUP+=송신이 높음</small></li>
-      <li><code>MONI DUP</code>을 눌러 확정 → 화면에 <code>DUP-</code> 표시</li>
+      <li><b>MAIN 밴드 확인</b>: 우측 U밴드에 <code>MAIN</code> 표시가 있는지 확인. 없으면 우측 <code>MAIN BAND</code> 키를 누름</li>
+      <li><b>VFO 모드, 수신 주파수 입력</b>: <code>V/MHz SCAN</code>으로 VFO 모드 → <code>DIAL</code>을 돌려 <b>439.680</b>에 맞춤 <small>다이얼을 빨리 돌리면 가속됩니다(FUNC-DIAL S 기본 ON).</small></li>
+      <li><b>AUTORP 확인</b>(아래 박스 참고): 한국 기본 ON이면 이 단계에서 <code>DUP-</code>가 자동으로 뜰 수 있음</li>
+      <li><b>방향 DUP- 설정</b>(자동으로 안 뜰 때): <code>MONI DUP</code>을 <b>1초 이상 길게</b> → <code>DIAL</code>로 <code>DUP-</code> → <code>MONI DUP</code> 눌러 확정</li>
+      <li><b>오프셋 5.000 설정</b>: 경로는 아래 배너. <code>MENU</code> → <code>EXMENU</code> → <code>DUP.T</code> → <code>OFFSET</code>에서 <code>DIAL</code>로 <b>5.000</b> → <code>DIAL</code> 눌러 저장 → <code>MAIN BAND</code>로 종료</li>
+      <li><b>톤 켜기</b>: <code>MENU</code> → <code>EXMENU</code> → <code>DUP.T</code> → <code>TONE</code>에서 <code>TONE</code> 선택 → 저장 → 종료. 화면에 <code>T</code> 표시</li>
+      <li><b>톤 주파수 확인</b>: <code>DUP.T</code> → <code>R TONE</code>이 <b>88.5</b>인지 확인 (공장 기본값이 88.5)</li>
+      <li><b>최종 확인</b>: 화면 우측에 <code>439.680</code>, <code>DUP-</code>, <code>T</code>가 보이면 완료. 송신 주파수는 계산상 434.680</li>
     </ol>
-    <h3>② 오프셋 5.000MHz 설정</h3>
-    <span class="path"><b>MENU</b> › <b>EXMENU</b> › <b>EXMEN-DUP.T</b> › <b>DUP.T-OFFSET</b> › <b>5.000</b></span>
-    <ol class="steps">
-      <li><code>MENU</code> → <code>DIAL</code>로 <code>EXMENU</code> → <code>DIAL</code> 누름</li>
-      <li><code>DIAL</code>로 <code>DUP.T</code> → <code>DIAL</code> 누름 → <code>DIAL</code>로 <code>OFFSET</code> → <code>DIAL</code> 누름</li>
-      <li><code>DIAL</code>을 돌려 <b>5.000</b>에 맞춤 (범위 0~59.995MHz, 기본 0.600 등 밴드·버전별)</li>
-      <li><code>DIAL</code>을 눌러 저장 → <code>MAIN BAND</code>로 종료</li>
-    </ol>
-    <p>매뉴얼 Duplex Operation에는 상위 메뉴 <code>OFFSET</code>(<code>MENU</code> → <code>DIAL</code>로 <code>OFFSET</code> → <code>DIAL</code> 누름 → 값 → <code>DIAL</code> 누름 → <code>MAIN BAND</code>)으로 설정하는 방법도 있습니다.</p>
-    <div class="note">오프셋은 VFO 튜닝 스텝 단위로 바뀝니다. 스텝 설정: <span class="path"><b>MENU</b> › <b>EXMENU</b> › <b>EXMEN-MOD.TS</b> › <b>MOD.TS-TS</b></span> 선택값은 5, 6.25, 10, 12.5, 15, 20, 25, 30, 50kHz입니다. 5MHz까지 돌리기 어려우면 스텝을 키우세요. <code>FUNC-DIAL S</code>(다이얼 가속, 기본 ON)가 켜져 있으면 빠르게 돌릴수록 크게 움직입니다.</div>
+    <h3>메뉴 경로</h3>
+    <span class="path"><b>방향</b> MONI DUP(길게) › DIAL로 DUP- › MONI DUP</span>
+    <span class="path"><b>오프셋</b> MENU › EXMENU › EXMEN-DUP.T › DUP.T-OFFSET › 5.000</span>
+    <span class="path"><b>톤 켜기</b> MENU › EXMENU › EXMEN-DUP.T › DUP.T-TONE › TONE</span>
+    <span class="path"><b>톤 주파수</b> MENU › EXMENU › EXMEN-DUP.T › DUP.T-R TONE › 88.5</span>
+    <p>메뉴 안에서는 <code>DIAL</code>을 돌려 선택하고 <code>DIAL</code>을 눌러 다음 단계·저장, <code>MAIN BAND</code>로 종료합니다. 한 항목의 기본값 복원은 값 선택 화면에서 <code>MR CALL</code>을 길게 누릅니다.</p>
     <h3>방향 선택값</h3>
     <table>
       <tr><th>표시</th><th>의미</th><th>이 경우</th></tr>
-      <tr><td>OFF</td><td>수신·송신 같은 주파수 (단신)</td><td>직접 교신(simplex)</td></tr>
-      <tr><td>DUP-</td><td>송신 = 수신 − 오프셋</td><td><b>U밴드 중계기</b></td></tr>
+      <tr><td>OFF</td><td>수신·송신 같은 주파수 (단신)</td><td>직접 교신</td></tr>
+      <tr><td>DUP-</td><td>송신 = 수신 − 오프셋</td><td><b>U밴드 광역망</b></td></tr>
       <tr><td>DUP+</td><td>송신 = 수신 + 오프셋</td><td>일부 VHF 중계기 등</td></tr>
     </table>
-    <h3>자동 중계기 기능 (AUTORP) <span class="tag">한국 사양</span></h3>
-    <span class="path"><b>MENU</b> › <b>EXMENU</b> › <b>EXMEN-FUNC</b> › <b>FUNC-AUTORP</b> › <b>ON / OFF</b></span>
+    <div class="warn"><b>자동 중계기(AUTORP)</b> <span class="path" style="margin:2px 0"><b>MENU</b> › <b>EXMENU</b> › <b>EXMEN-FUNC</b> › <b>FUNC-AUTORP</b> › ON / OFF</span>한국 사양 기본 ON. FM에서 중계기 출력 주파수 범위로 들어가면 듀플렉스를 자동으로 켜고 끄며 수동 설정보다 우선합니다. <b>오프셋과 R TONE은 자동으로 바뀌지 않습니다.</b> 이 설정은 밴드별 항목이 아니라 무전기 전체 설정이어서, V밴드에도 같은 규칙이 적용될 수 있습니다. V밴드 설정을 절대 바꾸고 싶지 않으면 OFF로 두고 위 4번을 수동으로 하세요.</div>
+  </section>
+
+  <section id="p2" class="panel card">
+    <h2>채널 전환</h2>
+    <div class="warn"><b>가정</b>: "2CH 리그"를 <b>좌·우 2개 밴드(V/U)를 가진 이 무전기</b>로 보고, ① V↔U 밴드 전환, ② U밴드 광역망 설정을 메모리 채널에 저장해 전환하는 방법을 정리했습니다. 다른 뜻(예: 광역망 2개 채널 운용)이면 알려주세요.</div>
+    <h3>① 밴드 전환 (V ↔ U)</h3>
     <ul>
-      <li>한국 사양은 <b>기본 ON</b>입니다. FM에서 중계기 출력 주파수 범위로 들어가면 <b>듀플렉스를 자동으로 켜고 끕니다</b>. 수동 듀플렉스 설정보다 <b>우선</b>합니다.</li>
-      <li><b>오프셋과 중계기 톤(R TONE)은 자동으로 바뀌지 않습니다.</b> 그래서 ②의 오프셋 5.000과 R TONE 88.5는 직접 맞춰야 합니다.</li>
-      <li>AUTORP가 켜져 있으면 ①이 필요 없을 수 있습니다. 주파수를 맞춘 뒤 화면에 <code>DUP-</code>가 뜨는지 확인하세요.</li>
-      <li>자동 설정이 적용되는 주파수 범위와 방향 표는 매뉴얼 Auto Repeater 항목(p.57 부근)에서 확인하세요.</li>
-      <li>자동 설정이 해당 중계기와 맞지 않으면 <code>OFF</code>로 두고 ①을 수동으로 하세요.</li>
+      <li>양쪽 밴드는 각자 <code>VOL</code>, <code>SQL</code>, <code>DIAL</code>을 가집니다.</li>
+      <li><b>U밴드로 전환</b>: 우측 <code>MAIN BAND</code> 키 → 우측에 <code>MAIN</code> 표시</li>
+      <li><b>V밴드로 전환</b>: 좌측 <code>MAIN BAND</code> 키 → 좌측에 <code>MAIN</code> 표시</li>
+      <li><code>MAIN</code> 밴드가 설정(메뉴)과 송신의 대상입니다 <span class="tag q">확인필요</span>. 메뉴 설정 전에는 항상 U밴드가 MAIN인지 확인하세요.</li>
     </ul>
-    <h3>오프밴드 표시</h3>
-    <p>송신(PTT)했을 때 화면에 <code>OFF</code>가 뜨면 송신 주파수가 아마추어 대역을 벗어난 것입니다. 방향과 오프셋을 다시 확인하세요.</p>
-    <div class="warn">제주 개별 중계기 주파수·톤은 미확인입니다. 검색어: "제주 아마추어무선 중계소 439MHz", "KARL 중계기 현황", "RCNET 제주"</div>
+    <div class="note">MAIN 밴드 키로 좌·우를 바꿔도 각 밴드에 설정된 주파수·톤·오프셋은 따로 유지됩니다. 광역망 설정을 한 번 해두면 V밴드를 쓰다 돌아와도 그대로입니다.</div>
+    <h3>② 광역망 설정을 메모리 채널에 저장</h3>
+    <p>U밴드 설정(수신 439.680 · DUP- · 5.000 · 톤 88.5)을 마친 상태에서 진행합니다.</p>
+    <ol class="steps">
+      <li>U밴드가 MAIN이고 VFO 모드에서 설정이 화면에 표시된 상태인지 확인</li>
+      <li><code>MW</code>를 눌러 메모리 입력 화면 표시 <span class="tag">매뉴얼</span></li>
+      <li><code>DIAL</code>로 <code>WRITE</code> 선택 → <code>DIAL</code> 누름 <span class="tag">매뉴얼</span></li>
+      <li><code>OVERW?</code>가 나오면 <code>DIAL</code>로 <code>YES</code> → <code>DIAL</code> 누름. 삐 소리가 나고 VFO 모드로 돌아옴 <span class="tag">매뉴얼</span></li>
+    </ol>
+    <p>저장할 채널 번호를 고르는 방법과 방향·오프셋이 함께 저장되는지는 본문 확인이 필요합니다 <span class="tag q">확인필요</span> (IC-2730E/A 매뉴얼 p.35 "Writing Into a Memory or Call Channel"). 톤은 채널별로 따로 저장되는 것이 제품 사양입니다.</p>
+    <h3>채널 이름 붙이기 (최대 6자)</h3>
+    <ol class="steps">
+      <li>이름을 붙일 메모리 채널 선택</li>
+      <li><code>MW</code> → <code>DIAL</code>로 <code>EDIT</code> → <code>DIAL</code> 누름</li>
+      <li><code>DIAL</code>로 <code>NAME</code> → <code>DIAL</code> 누름</li>
+      <li><code>DIAL</code>로 글자 선택, <code>◄</code> <code>►</code>로 커서 이동 (<code>CLR</code>은 글자 삭제, 글자 미선택 상태에서 <code>►</code>는 빈칸)</li>
+      <li>완성 후 <code>DIAL</code> 누름 → <code>WRITE</code> → <code>OVERW?</code>에서 <code>YES</code> → 삐 소리 후 VFO로 복귀 <span class="tag">매뉴얼</span></li>
+    </ol>
+    <span class="path"><b>이름 표시 켜기</b> MENU › EXMENU › EXMEN-DISP › DISP-NAME › ON</span>
+    <h3>③ 저장한 채널로 전환</h3>
+    <ol class="steps">
+      <li><code>MR CALL</code>을 눌러 메모리 모드로 진입 <span class="tag q">확인필요</span></li>
+      <li><code>DIAL</code>을 돌려 저장한 채널 선택 (화면에 채널 번호, 이름 표시를 켰다면 이름 표시)</li>
+      <li>VFO(직접 입력)로 돌아갈 때: <code>V/MHz SCAN</code> <span class="tag q">확인필요</span></li>
+    </ol>
+    <h3>채널 운용 예</h3>
+    <table>
+      <tr><th>채널</th><th>수신</th><th>방향·오프셋</th><th>톤</th><th>이름 예</th></tr>
+      <tr><td>CH 1</td><td>439.680</td><td>DUP- 5.000</td><td>TONE 88.5</td><td>RCNET</td></tr>
+      <tr><td>CH 2</td><td>(필요 시 추가)</td><td>-</td><td>-</td><td>-</td></tr>
+    </table>
+    <h3>전환 조작 요약</h3>
+    <table>
+      <tr><th>하고 싶은 일</th><th>조작</th></tr>
+      <tr><td>U밴드로 전환</td><td>우측 <code>MAIN BAND</code></td></tr>
+      <tr><td>V밴드로 전환</td><td>좌측 <code>MAIN BAND</code></td></tr>
+      <tr><td>직접 주파수 입력 (VFO)</td><td><code>V/MHz SCAN</code> 후 <code>DIAL</code> <span class="tag q">확인필요</span></td></tr>
+      <tr><td>저장 채널 호출</td><td><code>MR CALL</code> 후 <code>DIAL</code> <span class="tag q">확인필요</span></td></tr>
+      <tr><td>채널 저장</td><td><code>MW</code> → <code>WRITE</code> → <code>YES</code></td></tr>
+      <tr><td>소리만 끄기</td><td>음소거 키 (좌우 모두 <code>MUTE</code> 표시)</td></tr>
+    </table>
   </section>
 
   <section id="p5" class="panel card">
@@ -187,6 +196,7 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
       <tr><td>마이크 감도</td><td><span class="path">MENU › EXMENU › EXMEN-FUNC › FUNC-MIC G</span>→ 1~4 (기본 2)</td></tr>
       <tr><td>송신 시간 제한</td><td><span class="path">MENU › EXMENU › EXMEN-FUNC › FUNC-TOT</span>→ OFF, 1~30분</td></tr>
       <tr><td>PTT 잠금</td><td><span class="path">MENU › EXMENU › EXMEN-FUNC › FUNC-PTT LK</span>→ ON/OFF</td></tr>
+      <tr><td>메모리 이름 표시</td><td><span class="path">MENU › EXMENU › EXMEN-DISP › DISP-NAME</span>→ ON/OFF</td></tr>
       <tr><td>키 비프음</td><td><span class="path">MENU › EXMENU › EXMEN-SOUNDS › SOUND-KEY B</span>→ ON/OFF</td></tr>
       <tr><td>밝기</td><td><span class="path">MENU › EXMENU › EXMEN-DISP › DISP-LIGHT</span>→ 1~4</td></tr>
       <tr><td>설정 초기화</td><td><span class="path">MENU › EXMENU › EXMEN-OTHERS › OTHER-RESET › RESET-PART / RESET-ALL</span></td></tr>
@@ -228,7 +238,7 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
       <tr><th>항목 (그룹 › 항목)</th><th>기본</th><th>선택값·기능</th></tr>
       <tr><td>MODE<span class="path">MOD.TS › MOD.TS-MODE</span></td><td>FM</td><td>FM, FM-N(좁은 송신), AM, AM-N</td></tr>
       <tr><td>TS<span class="path">MOD.TS › MOD.TS-TS</span></td><td>5.0</td><td>5, 6.25, 10, 12.5, 15, 20, 25, 30, 50kHz. 다이얼·스캔 스텝</td></tr>
-      <tr><td>TONE<span class="path">DUP.T › DUP.T-TONE</span></td><td>OFF</td><td>OFF, TONE, TSQL, DTCS, TSQL-R, DTCS-R 등</td></tr>
+      <tr><td>TONE<span class="path">DUP.T › DUP.T-TONE</span></td><td>OFF</td><td>OFF, TONE, TSQL, DTCS, TSQL-R, DTCS-R, DTC.OFF, TON.DTC, DTC.TSQ, TON.TSQ</td></tr>
       <tr><td>OFFSET<span class="path">DUP.T › DUP.T-OFFSET</span></td><td>0.600*</td><td>0~59.995MHz. 방향은 MONI DUP 길게</td></tr>
       <tr><td>R TONE<span class="path">DUP.T › DUP.T-R TONE</span></td><td>88.5</td><td>CTCSS 50종(67.0~254.1Hz). 중계기 접속 톤</td></tr>
       <tr><td>C TONE<span class="path">DUP.T › DUP.T-C TONE</span></td><td>88.5</td><td>톤 스켈치·포켓 비프용 톤</td></tr>
@@ -236,7 +246,7 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
       <tr><td>CODE<span class="path">DUP.T › DUP.T-CODE</span></td><td>023</td><td>DTCS 코드 104종(023~754)</td></tr>
       <tr><td>DTCS-P<span class="path">DUP.T › DUP.T-DTCS-P</span></td><td>BOTH N</td><td>BOTH N, TN-RR, TR-RN, BOTH R (N=정상, R=반전)</td></tr>
     </table>
-    <p>*기본값은 주파수 대역·버전에 따라 다를 수 있습니다.</p>
+    <p>*기본값은 주파수 대역·버전에 따라 다를 수 있습니다. TONE: TONE=송신에 톤, TSQL=톤 송신+같은 톤만 수신, TSQL-R/DTCS-R=일치하는 신호 음소거.</p>
     <h3>SCAN 항목 (<code>EXMEN-SCAN</code>)</h3>
     <table>
       <tr><th>항목</th><th>기본</th><th>선택값·기능</th></tr>
@@ -278,7 +288,7 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
       <tr><td>CLONE<span class="path">OTHER-CLONE › CLONE-CLONE / CLONE-MASTER</span></td><td>-</td><td>다른 IC-2730A/E와 설정 복제(받기/보내기)</td></tr>
       <tr><td>HOMECH<span class="path">EXMEN-HOMECH › HOME-SET.FRQ / SET CH / HOME-CLEAR</span></td><td>-</td><td>현재 주파수·메모리를 홈 채널로 지정, 삭제</td></tr>
     </table>
-    <p>스캔 시 사용하는 <code>SCAN</code> 항목과 <code>FUNC</code>의 <code>RMTMIC</code>, <code>UDMIC</code>(원격 마이크 키 지정), <code>CI-V</code>(PC 제어), <code>IF-EXC</code>(간섭 줄이기)는 필요할 때 <a href="https://www.rigpix.com/icom/ic2730ae_exmenu-civ.pdf" target="_blank" rel="noopener">EXMENU 문서</a>를 참고하세요.</p>
+    <p><code>RMTMIC</code>, <code>UDMIC</code>(원격 마이크 키 지정), <code>CI-V</code>(PC 제어), <code>IF-EXC</code>(간섭 줄이기)는 필요할 때 <a href="https://www.rigpix.com/icom/ic2730ae_exmenu-civ.pdf" target="_blank" rel="noopener">EXMENU 문서</a>를 참고하세요.</p>
   </section>
 
   <section id="p3" class="panel card">
@@ -286,7 +296,7 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
     <p><span class="tag">매뉴얼</span>확인됨 · <span class="tag q">확인필요</span>매뉴얼 해당 항목 확인</p>
     <table>
       <tr><th>키·기능</th><th>동작</th></tr>
-      <tr><td>MAIN BAND</td><td>좌/우 밴드 중 <b>MAIN(송수신 기준)</b> 밴드 전환. 화면 <code>MAIN</code> 표시가 현재 MAIN 밴드. 메뉴 종료에도 사용 <span class="tag">매뉴얼</span></td></tr>
+      <tr><td>MAIN BAND</td><td>좌/우 밴드 중 <b>MAIN(설정 기준)</b> 밴드 전환. 화면 <code>MAIN</code> 표시가 현재 MAIN 밴드. 메뉴 종료에도 사용 <span class="tag">매뉴얼</span></td></tr>
       <tr><td>V/MHz SCAN</td><td>메뉴 종료에 쓰이는 키. VFO 모드·스캔 시작 기능 <span class="tag q">확인필요</span></td></tr>
       <tr><td>MR CALL</td><td>메뉴 종료 및 메뉴 값 기본 복원(길게). 메모리·콜 채널 전환 <span class="tag q">확인필요</span></td></tr>
       <tr><td>MONI DUP 짧게</td><td>스켈치를 강제로 열어 약한 신호 청취. 열리면 <code>BUSY</code> 깜박임. 다시 누르면 닫힘 (MAIN 밴드) <span class="tag">매뉴얼</span></td></tr>
@@ -294,7 +304,7 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
       <tr><td>음소거</td><td>음소거 키(사진 기준 전원 버튼 옆 스피커 아이콘)를 누르면 좌우 밴드에 <code>MUTE</code> 표시, 볼륨은 유지. 아무 키로 해제 <span class="tag">매뉴얼</span></td></tr>
       <tr><td>VOL / SQL</td><td>밴드별 볼륨·스켈치. 스켈치를 올리면 잡음이 닫히고 약한 신호도 닫힘 <span class="tag q">확인필요</span></td></tr>
       <tr><td>LOW DTMF</td><td>출력 저전력 전환, DTMF 관련 키 <span class="tag q">확인필요</span></td></tr>
-      <tr><td>MW</td><td>메모리 쓰기 키. 주파수·DUP·톤 설정을 맞춘 뒤 저장 <span class="tag q">확인필요</span></td></tr>
+      <tr><td>MW</td><td>메모리 입력 화면을 띄우는 키. EDIT(이름 등), WRITE(저장) 선택 <span class="tag">매뉴얼</span></td></tr>
       <tr><td>MENU (열쇠)</td><td>메뉴 진입. 열쇠 표시는 키 잠금 관련 <span class="tag q">확인필요</span></td></tr>
     </table>
     <p>각 메뉴 항목의 경로와 기본값은 <b>메뉴 경로</b> 탭을 보세요.</p>
@@ -303,14 +313,16 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
   <section id="p4" class="panel card">
     <h2>설정 체크리스트</h2>
     <div class="chk" id="chk">
-      <label><input type="checkbox"> MAIN BAND를 UHF(우측)로 선택, VFO·FM 확인</label>
-      <label><input type="checkbox"> 수신 주파수를 중계기 출력 주파수로 입력 (예: 439.xxx)</label>
+      <label><input type="checkbox"> 우측 U밴드가 MAIN인지 확인 (V밴드는 설정 안 함)</label>
+      <label><input type="checkbox"> VFO 모드에서 수신 주파수 439.680 입력</label>
       <label><input type="checkbox"> AUTORP 확인 (FUNC-AUTORP, 한국 기본 ON. 오프셋·R TONE은 자동 변경 안 됨)</label>
-      <label><input type="checkbox"> DUP- 설정 (MONI DUP 길게), 오프셋 5.000MHz 확인 (DUP.T-OFFSET)</label>
+      <label><input type="checkbox"> DUP- 설정 (MONI DUP 길게)</label>
+      <label><input type="checkbox"> 오프셋 5.000MHz 확인 (DUP.T-OFFSET)</label>
       <label><input type="checkbox"> TONE 선택 (DUP.T-TONE), R TONE 88.5 확인</label>
-      <label><input type="checkbox"> 화면에 DUP-, T 표시 확인</label>
+      <label><input type="checkbox"> 화면에 439.680, DUP-, T 표시 확인 (송신 434.680)</label>
       <label><input type="checkbox"> 송신 시 OFF 표시가 뜨지 않는지 확인</label>
-      <label><input type="checkbox"> 메모리 저장 (MW, 매뉴얼 Memory 항목 확인)</label>
+      <label><input type="checkbox"> 메모리 저장 (MW → WRITE → YES) 및 이름 붙이기</label>
+      <label><input type="checkbox"> 채널 전환 테스트 (MAIN BAND, MR CALL)</label>
     </div>
     <button class="btn" id="reset" type="button">체크 초기화</button>
     <h3>안 될 때 점검</h3>
@@ -319,21 +331,22 @@ footer{max-width:1100px;margin:0 auto;padding:4px 12px 12px;font-size:.85rem;col
       <tr><td>송신해도 중계기가 안 열림</td><td>화면 <code>T</code>, R TONE 88.5, DUP-, 오프셋 5.000</td></tr>
       <tr><td>송신 시 <code>OFF</code> 표시</td><td>방향(DUP-/DUP+)과 오프셋 값</td></tr>
       <tr><td>DUP 표시가 알아서 바뀜</td><td>AUTORP ON 여부 (듀플렉스 자동 설정이 우선함)</td></tr>
+      <tr><td>설정했는데 V밴드가 바뀜</td><td>설정 시 MAIN이 V밴드였는지 확인</td></tr>
       <tr><td>소리가 안 남</td><td>음소거(MUTE) 표시, VOL, SQL, TSQL 사용 여부</td></tr>
     </table>
     <h3>확인 필요</h3>
     <ul>
-      <li>1750Hz 톤버스트·중계기 입력신호 확인은 매뉴얼 Repeater and Duplex Operations(p.54 부근) 확인</li>
+      <li>메모리 채널 선택·저장(p.34~35), 1750Hz 톤버스트·중계기 입력신호 확인(p.54 부근), AUTORP 적용 주파수 표(p.57 부근)는 매뉴얼 본문 확인</li>
       <li>매뉴얼: <a href="https://www.icomamerica.com/lineup/products/110/" target="_blank" rel="noopener">Icom America</a> · <a href="https://www.manualslib.com/manual/858114/Icom-I2730a.html" target="_blank" rel="noopener">ManualsLib 본문</a> · <a href="https://www.manualowl.com/m/Icom/IC-2730A/Manual/445431?page=53" target="_blank" rel="noopener">ManualOwl</a> · <a href="https://www.rigpix.com/icom/ic2730ae_exmenu-civ.pdf" target="_blank" rel="noopener">EXMENU</a></li>
       <li>한국 중계기 목록: <a href="https://www.repeaterbook.com/row_repeaters/verify.php?state_id=KR&type=age" target="_blank" rel="noopener">RepeaterBook</a></li>
     </ul>
   </section>
 </div>
 </main>
-<footer>2026 기준 · 작성 HL2TLS · 요청 HL4HQK · <span id="ver2">v1.3</span></footer>
+<footer>2026 기준 · 작성 HL2TLS · 요청 HL4HQK · <span id="ver2">v1.4</span></footer>
 <script>
 (function(){
-  var VERSION='v1.3';
+  var VERSION='v1.4';
   document.getElementById('ver').textContent=VERSION;
   document.getElementById('ver2').textContent=VERSION;
   var wrap=document.getElementById('wrap');
