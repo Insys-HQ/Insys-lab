@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>전주 세척장 일보 v1.0</title>
+<title>전주 세척장 일보 v1.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -124,6 +124,20 @@ body.mode-p .pcc{display:table-cell}
 .toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:#1f2937;color:#fff;padding:8px 14px;border-radius:8px;z-index:60;max-width:92vw;opacity:0;pointer-events:none;transition:opacity .2s}
 .toast.show{opacity:1}
 .empty{color:var(--sub);text-align:center;padding:6px 0}
+.prog{width:100%;height:10px;margin-top:6px}
+.imgs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+body.mode-p .imgs{grid-template-columns:repeat(6,1fr)}
+.imgs img{width:100%;height:84px;object-fit:cover;border:1px solid var(--line);border-radius:6px;cursor:pointer;background:#fff}
+.ocrbox{margin-top:6px}
+.ocrbox summary{cursor:pointer;color:var(--navy);font-weight:700}
+.ocrt td:first-child,.ocrt th:first-child{min-width:120px}
+.ocrt input{width:64px;border:1px solid var(--line);border-radius:4px;padding:2px 4px;text-align:right;color:var(--ink);background:#fff}
+.ocrt input.nm{width:100%;text-align:left}
+.ocrt input.bad,.tin input.bad{border-color:#c05050;background:#fdeeee}
+.tin{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;font-size:.93rem}
+.tin label{display:flex;align-items:center;gap:4px}
+.tin input{width:104px;border:1px solid var(--line);border-radius:4px;padding:2px 4px;text-align:right;color:var(--ink);background:#fff}
+.vimg{max-width:100%;max-height:68vh;display:block;margin:0 auto 8px}
 </style>
 </head>
 <body class="mode-m">
@@ -131,7 +145,7 @@ body.mode-p .pcc{display:table-cell}
 <header class="nav">
   <div class="nav-inner">
     <h1>전주 세척장 일보</h1>
-    <span class="ver" id="verH">v1.0</span>
+    <span class="ver" id="verH">v1.1</span>
     <div class="seg" role="group" aria-label="화면 선택">
       <button type="button" id="vwM" class="on" aria-pressed="true">모바일</button>
       <button type="button" id="vwP" aria-pressed="false">PC</button>
@@ -145,10 +159,11 @@ body.mode-p .pcc{display:table-cell}
   <section class="card" id="secUpload">
     <h2>엑셀 불러오기</h2>
     <label class="drop" id="drop" for="file">
-      엑셀 파일을 끌어놓거나 눌러서 선택
-      <small>일일 세척 및 출고 실적 양식 (.xlsx / .xls) · 여러 파일·여러 시트 가능</small>
-      <input type="file" id="file" accept=".xlsx,.xls" multiple>
+      엑셀 또는 화면캡처 이미지를 끌어놓거나 눌러서 선택
+      <small>엑셀(.xlsx/.xls) · 캡처 이미지(.png/.jpg) · 여러 파일 가능</small>
+      <input type="file" id="file" accept=".xlsx,.xls,image/*" multiple>
     </label>
+    <progress id="prog" class="prog" hidden></progress>
     <div id="pvBox" hidden>
       <div id="pvList"></div>
       <div class="row pvbtn">
@@ -191,6 +206,15 @@ body.mode-p .pcc{display:table-cell}
       <div class="tw"><table id="detail"></table></div>
       <div class="cnt" id="detCnt"></div>
     </section>
+
+    <section class="card" id="secImg">
+      <div class="row">
+        <h2 class="grow" style="margin:0">원본 캡처 이미지 <span id="imgCnt"></span></h2>
+        <button type="button" class="btn ghost" id="btnImgToggle">보기</button>
+        <label class="btn ghost" style="cursor:pointer">이미지 첨부<input type="file" id="fileImg" accept="image/*" multiple hidden></label>
+      </div>
+      <div class="imgs" id="imgs" hidden></div>
+    </section>
   </div>
 
   <section class="card" id="secTrend" hidden>
@@ -207,7 +231,7 @@ body.mode-p .pcc{display:table-cell}
 <footer class="foot">
   <div class="nav-inner">
     <span>대외비 · 인시스 AI혁신 연구개발실</span>
-    <span id="verF">v1.0</span>
+    <span id="verF">v1.1</span>
   </div>
 </footer>
 
@@ -220,19 +244,31 @@ body.mode-p .pcc{display:table-cell}
     </div>
   </div>
 </div>
+<div class="modal" id="imgModal" hidden style="z-index:40">
+  <div class="mbox" style="max-width:960px">
+    <img id="vImg" class="vimg" alt="">
+    <p id="vName"></p>
+    <div class="mbtn">
+      <button type="button" class="btn danger" id="vDel">이미지 삭제</button>
+      <button type="button" class="btn ghost" id="vClose">닫기</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
 <script>
 (function(){
 'use strict';
-var VERSION='v1.0';
+var VERSION='v1.1';
 var COLL='jeonju_wash_daily';
 var FBCFG={apiKey:"AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",authDomain:"insys-work.firebaseapp.com",projectId:"insys-work",storageBucket:"insys-work.firebasestorage.app",messagingSenderId:"225275784859",appId:"1:225275784859:web:bd12815c6dc47c0c49e03e"};
 
-var db=null, fbOK=false;
+var db=null, storage=null, fbOK=false;
+var imgOpen=false, viewImg=null;
 var reports={};      // date -> doc
 var dates=[];        // 최신순
 var cur=null;
@@ -278,6 +314,7 @@ function initFB(){
     if(!window.firebase)throw new Error('Firebase SDK 로드 실패');
     firebase.initializeApp(FBCFG);
     db=firebase.firestore();fbOK=true;
+    try{storage=firebase.storage()}catch(e2){storage=null}
   }catch(e){fbOK=false;setStatus('Firebase 연결 실패: '+(e.message||e),'err')}
 }
 function refreshDates(){dates=Object.keys(reports).sort().reverse()}
@@ -411,6 +448,7 @@ async function handleFiles(fileList){
   pending=[];
   for(var n=0;n<files.length;n++){
     var f=files[n];
+    if(isImg(f)){await handleImage(f);continue}
     try{
       var buf=await f.arrayBuffer();
       var wb=XLSX.read(buf,{type:'array'});
@@ -429,16 +467,357 @@ async function handleFiles(fileList){
     }
   }
   $('file').value='';
+  setProg('',null);
+  setStatus('파일 분석 완료 — 아래 미리보기를 확인하고 저장하세요.');
   renderPending();
 }
 
-/* ---------- 미리보기 ---------- */
+/* ---------- 이미지 : 격자 인식 + OCR ---------- */
+var TESS_URL='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+var ocrW=null;
+function isImg(f){return /^image\//.test(f.type||'')||/\.(png|jpe?g|webp|bmp|gif)$/i.test(f.name||'')}
+function loadScript(src){return new Promise(function(res,rej){var s=document.createElement('script');s.src=src;s.onload=res;s.onerror=function(){rej(new Error('인식 엔진을 불러오지 못했습니다.'))};document.head.appendChild(s)})}
+function setProg(msg,v,max){
+  var p=$('prog');
+  if(v==null){p.hidden=true;return}
+  if(msg)setStatus(msg);
+  p.hidden=false;p.max=max||1;p.value=v;
+}
+function fileToCanvas(file){
+  return new Promise(function(res,rej){
+    var u=URL.createObjectURL(file),im=new Image();
+    im.onload=function(){var c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);URL.revokeObjectURL(u);res(c)};
+    im.onerror=function(){URL.revokeObjectURL(u);rej(new Error('이미지를 열 수 없습니다.'))};
+    im.src=u;
+  });
+}
+async function compressImage(file){
+  var cv=await fileToCanvas(file),sc=Math.min(1,2000/Math.max(cv.width,cv.height));
+  var c=document.createElement('canvas');c.width=Math.round(cv.width*sc);c.height=Math.round(cv.height*sc);
+  var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(cv,0,0,c.width,c.height);
+  return new Promise(function(res,rej){c.toBlob(function(b){b?res(b):rej(new Error('이미지 변환 실패'))},'image/jpeg',0.9)});
+}
+async function uploadImage(date,file){
+  if(!storage)throw new Error('Firebase Storage 미연결');
+  var blob=await compressImage(file);
+  var path='jeonju_wash/'+date+'/'+Date.now()+'_'+Math.random().toString(36).slice(2,6)+'.jpg';
+  var ref=storage.ref(path);
+  await ref.put(blob,{contentType:'image/jpeg'});
+  var url=await ref.getDownloadURL();
+  return {path:path,url:url,name:file.name,at:new Date().toISOString()};
+}
+function grayOf(cv){
+  var W=cv.width,H=cv.height,d=cv.getContext('2d').getImageData(0,0,W,H).data,g=new Uint8Array(W*H),i,p;
+  for(i=0,p=0;i<g.length;i++,p+=4)g[i]=(d[p]*299+d[p+1]*587+d[p+2]*114)/1000;
+  var hist=new Array(256).fill(0),acc=0,med=0;
+  for(i=0;i<g.length;i++)hist[g[i]]++;
+  for(i=0;i<256;i++){acc+=hist[i];if(acc>=g.length/2){med=i;break}}
+  return {g:g,W:W,H:H,med:med};
+}
+function groupIdx(arr,gap,maxW){
+  var out=[],st=null,pr=null;
+  function push(){if(st!==null&&(pr-st+1)<=maxW)out.push(Math.round((st+pr)/2))}
+  arr.forEach(function(v){if(st===null){st=v;pr=v;return}if(v-pr<=gap){pr=v}else{push();st=v;pr=v}});
+  push();
+  return out;
+}
+function detectGrid(cv){
+  var G=grayOf(cv),W=G.W,H=G.H,g=G.g,med=G.med,TH=35,x,y,rs=[],cs=[];
+  for(y=0;y<H;y++){var c=0,o=y*W;for(x=0;x<W;x++){if(Math.abs(g[o+x]-med)>TH)c++}if(c/W>0.6)rs.push(y)}
+  for(x=0;x<W;x++){var c2=0;for(y=0;y<H;y++){if(Math.abs(g[y*W+x]-med)>TH)c2++}if(c2/H>0.5)cs.push(x)}
+  return {G:G,xs:groupIdx(cs,3,8),ys:groupIdx(rs,3,8)};
+}
+function hasH(G,y,xa,xb){
+  var n=0,t=0,x,dy,hit,yy;
+  for(x=Math.max(0,Math.round(xa));x<Math.min(G.W,Math.round(xb));x++){
+    t++;hit=false;
+    for(dy=-1;dy<=1;dy++){yy=y+dy;if(yy>=0&&yy<G.H&&Math.abs(G.g[yy*G.W+x]-G.med)>35){hit=true;break}}
+    if(hit)n++;
+  }
+  return t>0&&n/t>0.7;
+}
+function hasV(G,x,ya,yb){
+  var n=0,t=0,y,dx,hit,xx;
+  for(y=Math.max(0,Math.round(ya)+2);y<Math.min(G.H,Math.round(yb)-2);y++){
+    t++;hit=false;
+    for(dx=-1;dx<=1;dx++){xx=x+dx;if(xx>=0&&xx<G.W&&Math.abs(G.g[y*G.W+xx]-G.med)>35){hit=true;break}}
+    if(hit)n++;
+  }
+  return t>0&&n/t>0.6;
+}
+function inkInfo(G,x0,y0,x1,y1){
+  x0=Math.max(0,Math.round(x0));y0=Math.max(0,Math.round(y0));x1=Math.min(G.W,Math.round(x1));y1=Math.min(G.H,Math.round(y1));
+  if(x1-x0<2||y1-y0<2)return {empty:true,dash:false,n:0};
+  var vals=[],g=G.g,x,y;
+  for(y=y0;y<y1;y++)for(x=x0;x<x1;x++)vals.push(g[y*G.W+x]);
+  vals.sort(function(a,b){return a-b});
+  var bg=vals[vals.length>>1],n=0,mnx=1e9,mxx=-1,mny=1e9,mxy=-1;
+  for(y=y0;y<y1;y++)for(x=x0;x<x1;x++){
+    if(Math.abs(g[y*G.W+x]-bg)>45){n++;if(x<mnx)mnx=x;if(x>mxx)mxx=x;if(y<mny)mny=y;if(y>mxy)mxy=y}
+  }
+  var h=mxy-mny+1,w=mxx-mnx+1;
+  return {empty:n<8,dash:n>=3&&n<40&&h<=3&&w>=3,n:n,w:w,h:h};
+}
+function prepCanvas(cv,x0,y0,x1,y1,sc){
+  var w=Math.max(1,Math.round(x1-x0)),h=Math.max(1,Math.round(y1-y0)),pad=8;
+  var c=document.createElement('canvas');c.width=w*sc+pad*2;c.height=h*sc+pad*2;
+  var ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+  var t=document.createElement('canvas');t.width=w*sc;t.height=h*sc;
+  var tc=t.getContext('2d');tc.imageSmoothingEnabled=true;tc.imageSmoothingQuality='high';
+  tc.drawImage(cv,Math.round(x0),Math.round(y0),w,h,0,0,w*sc,h*sc);
+  var id=tc.getImageData(0,0,t.width,t.height),d=id.data,n=d.length/4,i,s=0,gs=new Uint8Array(n);
+  for(i=0;i<n;i++){gs[i]=(d[i*4]*299+d[i*4+1]*587+d[i*4+2]*114)/1000;s+=gs[i]}
+  var inv=(s/n)<128,lo=255,hi=0,v;
+  for(i=0;i<n;i++){v=inv?255-gs[i]:gs[i];gs[i]=v;if(v<lo)lo=v;if(v>hi)hi=v}
+  var range=Math.max(1,hi-lo);
+  for(i=0;i<n;i++){v=(gs[i]-lo)*255/range;d[i*4]=v;d[i*4+1]=v;d[i*4+2]=v;d[i*4+3]=255}
+  tc.putImageData(id,0,0);ctx.drawImage(t,pad,pad);
+  return c;
+}
+async function drain(workers,list,tick){
+  var next=0;
+  async function loop(w){
+    while(next<list.length){
+      var j=list[next++];
+      try{var r=await w.recognize(j.cv);j.text=(r.data.text||'').trim();j.conf=r.data.confidence}catch(e){j.text='';j.conf=0}
+      tick();
+    }
+  }
+  await Promise.all(workers.map(loop));
+}
+function cleanKo(t){return String(t||'').replace(/\n+/g,' ').replace(/([가-힣])\s+(?=[가-힣])/g,'$1').replace(/[|\\_~`]/g,'').replace(/\s+/g,' ').trim()}
+function numFrom(t){var s=String(t==null?'':t).replace(/[^0-9]/g,'');return s?parseInt(s,10):null}
+function lev(a,b){
+  var m=a.length,n=b.length,d=[],i,j;
+  for(i=0;i<=m;i++)d[i]=[i];
+  for(j=1;j<=n;j++)d[0][j]=j;
+  for(i=1;i<=m;i++)for(j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  return d[m][n];
+}
+function fuzzy(t,set,ratio){
+  if(!t||!set||!set.length)return t;
+  var best=null,bd=1e9;
+  set.forEach(function(s){var d=lev(t,s);if(d<bd){bd=d;best=s}});
+  return (best!==null&&bd<=Math.floor(Math.max(t.length,best.length)*ratio))?best:t;
+}
+function knownSets(){
+  var n={},c={},w={};
+  Object.keys(reports).forEach(function(d){
+    (reports[d].items||[]).forEach(function(it){
+      if(it.name)n[it.name]=1;if(it.cat)c[it.cat]=1;
+      String(it.note||'').split(/[,，、.\s]+/).forEach(function(x){if(x)w[x]=1});
+    });
+  });
+  return {names:Object.keys(n),cats:Object.keys(c),workers:Object.keys(w)};
+}
+function fixNote(t,workers){
+  return cleanKo(t).split(/[,，、.\s]+/).filter(Boolean).map(function(x){return fuzzy(x,workers,0.34)}).join(',');
+}
+async function getOcr(){
+  if(ocrW)return ocrW;
+  if(!window.Tesseract)await loadScript(TESS_URL);
+  var T=window.Tesseract;
+  setProg('인식 엔진 준비 중… (처음 한 번은 1~2분 걸릴 수 있습니다)',0,1);
+  async function mk(lang,params){var w=await T.createWorker(lang,1,{});await w.setParameters(params);return w}
+  var eng=await Promise.all([0,1,2].map(function(){return mk('eng',{tessedit_char_whitelist:'0123456789,.-',tessedit_pageseg_mode:'7'})}));
+  var kor=await mk('kor+eng',{tessedit_pageseg_mode:'6'});
+  ocrW={eng:eng,kor:kor};
+  return ocrW;
+}
+function blankDoc(name){
+  return {date:'',items:[],dayWash:0,dayShip:0,cumWash:null,cumShip:null,calcWash:0,calcShip:0,itemCount:0,version:VERSION,sourceFile:name||'',uploadedAt:''};
+}
+function calcWarn(d){
+  var cw=0,cs=0,w=[];
+  d.items.forEach(function(it){cw+=it.wAmt;cs+=it.sAmt});
+  d.calcWash=cw;d.calcShip=cs;d.itemCount=d.items.length;
+  if(d.dayWash!=null&&Math.abs(d.dayWash-cw)>10)w.push('세척 합계 차이 '+sgn(d.dayWash-cw)+'원 (일일 실적과 품목 합계가 다릅니다)');
+  if(d.dayShip!=null&&Math.abs(d.dayShip-cs)>10)w.push('출고 합계 차이 '+sgn(d.dayShip-cs)+'원 (일일 실적과 품목 합계가 다릅니다)');
+  return w;
+}
+async function ocrImage(cv){
+  var grid=detectGrid(cv),G=grid.G,xs=grid.xs,ys=grid.ys,k,r,e;
+  if(xs.length===12)xs.push(G.W-1);
+  if(xs.length!==13)return {error:'표의 열 구분선을 찾지 못했습니다(감지 '+xs.length+'개). 표 전체가 보이게 캡처해 주세요.'};
+  if(ys.length<8)return {error:'표의 행 구분선을 찾지 못했습니다.'};
+  var nR=ys.length-1,hts=[];
+  for(k=0;k<nR;k++)hts.push(ys[k+1]-ys[k]);
+  var hm=hts.slice().sort(function(a,b){return a-b})[nR>>1],ds=4;
+  for(k=0;k<Math.min(6,nR);k++){if(hts[k]>hm*1.4){ds=k+1;break}}
+  var nData=(nR-2)-ds;
+  if(nData<3)return {error:'품목 행을 찾지 못했습니다.'};
+  var master=dates.length?(reports[dates[0]].items||null):null;
+  var aligned=!!(master&&master.length===nData);
+  var known=knownSets(),jobs=[],map={};
+  function cell(ci,kk){return [xs[ci]+3,ys[kk]+3,xs[ci+1]-3,ys[kk+1]-3]}
+  function addJob(key,kind,box){
+    var ink=inkInfo(G,box[0],box[1],box[2],box[3]);
+    if(ink.empty)return;
+    if(kind==='n'&&ink.dash)return;
+    var j={key:key,kind:kind,cv:prepCanvas(cv,box[0],box[1],box[2],box[3],3)};
+    jobs.push(j);map[key]=j;
+  }
+  for(k=0;k<Math.min(ds,4);k++)addJob('d:'+k,'n',[xs[1]+3,ys[k]+3,xs[3]-3,ys[k+1]-3]);
+  for(r=0;r<nData;r++){
+    var kk=ds+r;
+    [5,6,7,8,9,10].forEach(function(ci){addJob('n:'+r+':'+ci,'n',cell(ci,kk))});
+    if(!aligned)[3,4].forEach(function(ci){addJob('n:'+r+':'+ci,'n',cell(ci,kk))});
+    addJob('t:'+r+':note','t',cell(11,kk));
+  }
+  [nR-2,nR-1].forEach(function(kt,ix){
+    addJob('n:tot'+ix+':w','n',[xs[5]+3,ys[kt]+3,xs[8]-3,ys[kt+1]-3]);
+    addJob('n:tot'+ix+':s','n',[xs[8]+3,ys[kt]+3,xs[11]-3,ys[kt+1]-3]);
+  });
+  var aStart=[],bStart=[],mab=[];
+  if(!aligned){
+    for(r=0;r<nData;r++){
+      var k0=ds+r;
+      mab[r]=!hasV(G,xs[1],ys[k0],ys[k0+1]);
+      aStart[r]=(r===0||hasH(G,ys[k0],xs[0]+4,xs[1]-4))?r:aStart[r-1];
+      bStart[r]=(r===0||mab[r]||mab[r-1]||hasH(G,ys[k0],xs[1]+4,xs[2]-4))?r:bStart[r-1];
+    }
+    for(r=0;r<nData;r++){
+      if(mab[r]){addJob('t:ab:'+r,'t',[xs[0]+3,ys[ds+r]+3,xs[2]-3,ys[ds+r+1]-3]);continue}
+      if(aStart[r]===r){
+        e=r;while(e+1<nData&&aStart[e+1]===r&&!mab[e+1])e++;
+        addJob('t:a:'+r,'t',[xs[0]+3,ys[ds+r]+3,xs[1]-3,ys[ds+e+1]-3]);
+      }
+      if(bStart[r]===r){
+        e=r;while(e+1<nData&&bStart[e+1]===r&&!mab[e+1])e++;
+        addJob('t:b:'+r,'t',[xs[1]+3,ys[ds+r]+3,xs[2]-3,ys[ds+e+1]-3]);
+      }
+      addJob('t:c:'+r,'t',cell(2,ds+r));
+    }
+  }
+  var w=await getOcr(),total=jobs.length,done=0;
+  function tick(){done++;setProg('이미지 인식 중… '+done+'/'+total,done,total)}
+  setProg('이미지 인식 중… 0/'+total,0,total);
+  await Promise.all([
+    drain(w.eng,jobs.filter(function(j){return j.kind==='n'}),tick),
+    drain([w.kor],jobs.filter(function(j){return j.kind==='t'}),tick)
+  ]);
+  function nv(key){var j=map[key];if(!j)return {v:0,low:false};var v=numFrom(j.text);return {v:v==null?0:v,low:(v==null||j.conf<65)}}
+  function tx(key){var j=map[key];return j?cleanKo(j.text):''}
+  var catOf=[],itemOf=[],subOf=[];
+  if(!aligned){
+    for(r=0;r<nData;r++){
+      if(mab[r]){catOf[r]=tx('t:ab:'+r);itemOf[r]=catOf[r];continue}
+      subOf[r]=tx('t:c:'+r);
+    }
+    for(r=0;r<nData;r++){
+      if(mab[r])continue;
+      if(aStart[r]===r){var ta=tx('t:a:'+r);for(e=r;e<nData&&aStart[e]===r&&!mab[e];e++)catOf[e]=ta}
+      if(bStart[r]===r){var tb=tx('t:b:'+r);for(e=r;e<nData&&bStart[e]===r&&!mab[e];e++)itemOf[e]=tb}
+    }
+  }
+  var items=[];
+  for(r=0;r<nData;r++){
+    var it={cat:'',name:'',inQty:0,price:0,wPat:0,wQty:0,wAmt:0,sPat:0,sQty:0,sAmt:0,note:'',_low:{}};
+    if(aligned){var m=master[r];it.cat=m.cat;it.name=m.name;it.inQty=m.inQty;it.price=m.price}
+    else{
+      it.cat=fuzzy(catOf[r]||'',known.cats,0.3);
+      it.name=fuzzy([itemOf[r]||'',mab[r]?'':(subOf[r]||'')].filter(Boolean).join(' '),known.names,0.3);
+      it.inQty=nv('n:'+r+':3').v;it.price=nv('n:'+r+':4').v;
+    }
+    [['wPat',5],['wQty',6],['wAmt',7],['sPat',8],['sQty',9],['sAmt',10]].forEach(function(fc){
+      var o=nv('n:'+r+':'+fc[1]);it[fc[0]]=o.v;if(o.low)it._low[fc[0]]=1;
+    });
+    it.note=map['t:'+r+':note']?fixNote(map['t:'+r+':note'].text,known.workers):'';
+    if(!aligned&&!it.name&&!it.wPat&&!it.wQty&&!it.wAmt&&!it.sPat&&!it.sQty&&!it.sAmt)continue;
+    items.push(it);
+  }
+  var date='';
+  for(k=0;k<4;k++){
+    var jd=map['d:'+k];if(!jd)continue;
+    var m2=jd.text.replace(/\s+/g,'').match(/(20\d{2})\D?(\d{1,2})\D?(\d{1,2})/);
+    if(m2&&+m2[2]>=1&&+m2[2]<=12&&+m2[3]>=1&&+m2[3]<=31){date=m2[1]+'-'+p2(m2[2])+'-'+p2(m2[3]);break}
+  }
+  function tv(key){var j=map[key];return j?numFrom(j.text):null}
+  var doc=blankDoc('');
+  doc.date=date;doc.items=items;
+  doc.dayWash=tv('n:tot0:w');doc.dayShip=tv('n:tot0:s');doc.cumWash=tv('n:tot1:w');doc.cumShip=tv('n:tot1:s');
+  var warn=['화면캡처에서 자동 인식한 값입니다. 붉은 칸과 합계를 반드시 확인하세요.'];
+  var cw=0,cs=0;items.forEach(function(x){cw+=x.wAmt;cs+=x.sAmt});
+  if(doc.dayWash==null||doc.dayShip==null){
+    doc.dayWash=cw;doc.dayShip=cs;warn.push('일일 실적 합계를 인식하지 못해 품목 합계로 계산했습니다.');
+  }
+  if(aligned)warn.push('지난 일보('+md(dates[0])+')와 행 수가 같아 품목명을 그대로 사용했습니다.');
+  else if(master)warn.push('지난 일보와 행 수가 달라(저장 '+master.length+' / 인식 '+nData+') 품목명도 인식했습니다. 품목명을 확인하세요.');
+  if(!date)warn.push('작업일을 인식하지 못했습니다. 날짜를 직접 입력하세요.');
+  calcWarn(doc);
+  return {doc:doc,warn:warn};
+}
+async function handleImage(f){
+  try{
+    setProg('이미지 분석 중… '+f.name,0,1);
+    var cv=await fileToCanvas(f);
+    var res=await ocrImage(cv);
+    var fm=String(f.name||'').match(/(20\d{2})[-_.]?(\d{2})[-_.]?(\d{2})/);
+    if(res.error){
+      var bd=blankDoc(f.name);if(fm)bd.date=fm[1]+'-'+fm[2]+'-'+fm[3];
+      pending.push({file:f.name,sheet:'',imgFile:f,attachOnly:true,doc:bd,warn:[res.error+' 이미지만 첨부할 수 있습니다.']});
+      return;
+    }
+    res.doc.sourceFile=f.name;
+    if(!res.doc.date&&fm)res.doc.date=fm[1]+'-'+fm[2]+'-'+fm[3];
+    pending.push({file:f.name,sheet:'',imgFile:f,ocr:true,attachOnly:false,doc:res.doc,warn:res.warn});
+  }catch(e){
+    var b2=blankDoc(f.name);
+    pending.push({file:f.name,sheet:'',imgFile:f,attachOnly:true,doc:b2,warn:['이미지 분석 실패: '+(e.message||e)+' — 이미지만 첨부할 수 있습니다.']});
+  }
+}
+
+/* ---------- 미리보기 / 저장 ---------- */
+function hasReport(d,ex){
+  if(reports[d])return true;
+  return pending.some(function(p,j){return j!==ex&&p.doc&&p.doc.date===d&&!p.attachOnly&&p.doc.items.length});
+}
 function tagFor(i){
-  var d=pending[i]&&pending[i].doc?pending[i].doc.date:'';
+  var p=pending[i],d=p&&p.doc?p.doc.date:'';
   if(!/^\d{4}-\d{2}-\d{2}$/.test(d||''))return '<span class="tag un">날짜 필요</span>';
-  var later=pending.some(function(p,j){return j>i&&p.doc&&p.doc.date===d});
+  if(p.attachOnly)return hasReport(d,i)?'<span class="tag new">첨부</span>':'<span class="tag un">해당 일보 없음</span>';
+  var later=pending.some(function(q,j){return j>i&&q.doc&&q.doc.date===d&&!q.attachOnly&&q.doc.items.length});
   if(later)return '<span class="tag un">중복(뒤 항목 우선)</span>';
   return reports[d]?'<span class="tag ow">덮어쓰기</span>':'<span class="tag new">신규</span>';
+}
+function pvSummary(d){var act=d.items.filter(isActive).length;return '품목 '+d.items.length+'개 (실적 '+act+'개) · 세척 '+fmt(d.dayWash)+' · 출고 '+fmt(d.dayShip)}
+function warnHtml(arr){return arr.map(function(w){return '<div class="warn">⚠ '+esc(w)+'</div>'}).join('')}
+function pvRowBad(it){
+  var b={},low=it._low||{};
+  Object.keys(low).forEach(function(k){b[k]=1});
+  function chk(q,a,qf,af){
+    if(q>0&&a<=0){b[af]=1}
+    else if(a>0&&q<=0){b[qf]=1}
+    else if(q>0&&it.price>0){var ex=q*it.price;if(Math.abs(a-ex)>ex*0.03){b[qf]=1;b[af]=1}}
+  }
+  chk(it.wQty,it.wAmt,'wQty','wAmt');chk(it.sQty,it.sAmt,'sQty','sAmt');
+  if(it.inQty>0){
+    if(it.wPat>0&&it.wQty>0&&it.wPat*it.inQty!==it.wQty)b.wPat=1;
+    if(it.sPat>0&&it.sQty>0&&it.sPat*it.inQty!==it.sQty)b.sPat=1;
+  }
+  return b;
+}
+function ocrTable(p,i){
+  var d=p.doc;
+  var h='<details class="ocrbox" open><summary>인식 결과 확인·수정 (붉은 칸은 다시 확인)</summary><div class="tscroll"><table class="ocrt"><thead><tr><th>품목</th><th>세척<br>PAT</th><th>세척<br>수량</th><th>세척<br>금액</th><th>출고<br>PAT</th><th>출고<br>수량</th><th>출고<br>금액</th><th></th></tr></thead><tbody>';
+  d.items.forEach(function(it,r){
+    var bad=pvRowBad(it);
+    function inp(f){return '<td><input type="text" inputmode="numeric" data-i="'+i+'" data-r="'+r+'" data-f="'+f+'" class="'+(bad[f]?'bad':'')+'" value="'+(it[f]||'')+'"></td>'}
+    h+='<tr><td><input type="text" class="nm" data-i="'+i+'" data-r="'+r+'" data-f="name" value="'+esc(it.name)+'"><span class="nt">'+esc(it.cat)+'</span></td>'
+      +inp('wPat')+inp('wQty')+inp('wAmt')+inp('sPat')+inp('sQty')+inp('sAmt')
+      +'<td><button type="button" class="btn ghost" data-del="'+i+':'+r+'" style="padding:0 6px" title="이 행 삭제">×</button></td></tr>';
+  });
+  h+='</tbody></table></div><div class="tin">';
+  [['dayWash','일 세척'],['dayShip','일 출고'],['cumWash','누적 세척'],['cumShip','누적 출고']].forEach(function(t){
+    h+='<label>'+t[1]+' <input type="text" inputmode="numeric" data-i="'+i+'" data-t="'+t[0]+'" value="'+(d[t[0]]==null?'':d[t[0]])+'"></label>';
+  });
+  return h+'</div></details>';
+}
+function refreshPv(i){
+  var p=pending[i];if(!p||!p.doc||!p.ocr)return;
+  var w=calcWarn(p.doc),s=$('pvs'+i),x=$('pvw'+i);
+  if(s)s.textContent=pvSummary(p.doc);
+  if(x)x.innerHTML=warnHtml(w);
 }
 function renderPending(){
   var box=$('pvBox');
@@ -446,13 +825,18 @@ function renderPending(){
   box.hidden=false;
   var h='',okN=0;
   pending.forEach(function(p,i){
-    h+='<div class="pv"><div class="pvh">'+esc(p.file)+(p.sheet?' · '+esc(p.sheet):'')+'</div>';
+    h+='<div class="pv"><div class="pvh">'+esc(p.file)+(p.sheet?' · '+esc(p.sheet):'')+(p.imgFile?' · 이미지':'')+'</div>';
     if(p.error){h+='<div class="warn">⚠ '+esc(p.error)+'</div></div>';return}
     okN++;
-    var d=p.doc,act=d.items.filter(isActive).length;
+    var d=p.doc,empty=!d.items.length;
     h+='<div class="pvm">작업일 <input type="date" data-i="'+i+'" value="'+esc(d.date)+'"> <span id="pvt'+i+'">'+tagFor(i)+'</span></div>';
-    h+='<div class="pvm">품목 '+d.items.length+'개 (실적 '+act+'개) · 세척 '+fmt(d.dayWash)+' · 출고 '+fmt(d.dayShip)+'</div>';
-    p.warn.forEach(function(w){h+='<div class="warn">⚠ '+esc(w)+'</div>'});
+    if(p.imgFile)h+='<div class="pvm"><label><input type="checkbox" data-a="'+i+'"'+((p.attachOnly||empty)?' checked':'')+(empty?' disabled':'')+'> 이미지만 첨부 (표 인식 결과는 저장하지 않음)</label></div>';
+    if(!empty&&!p.attachOnly)h+='<div class="pvm" id="pvs'+i+'">'+pvSummary(d)+'</div>';
+    h+=warnHtml(p.warn||[]);
+    if(!empty&&!p.attachOnly){
+      h+='<div id="pvw'+i+'">'+warnHtml(p.ocr?calcWarn(d):[])+'</div>';
+      if(p.ocr)h+=ocrTable(p,i);
+    }
     h+='</div>';
   });
   $('pvList').innerHTML=h;
@@ -462,10 +846,17 @@ async function saveAll(){
   var list=pending.filter(function(p){return p.doc&&/^\d{4}-\d{2}-\d{2}$/.test(p.doc.date)});
   if(!list.length){toast('저장할 일보가 없습니다. 작업일을 확인하세요.');return}
   $('btnSave').disabled=true;
-  var ok=0,fail=0,errMsg='',last=null;
-  for(var i=0;i<list.length;i++){
-    var doc=Object.assign({},list[i].doc);
+  var ok=0,fail=0,errMsg='',last=null,imgOk=0,imgFail=0,imgMsg='',i,p;
+  var dataList=list.filter(function(q){return !q.attachOnly&&q.doc.items.length});
+  var imgList=list.filter(function(q){return q.imgFile});
+  for(i=0;i<dataList.length;i++){
+    p=dataList[i];
+    var doc=Object.assign({},p.doc);
+    doc.items=p.doc.items.map(function(it){var c=Object.assign({},it);delete c._low;return c});
+    doc.itemCount=doc.items.length;
     doc.uploadedAt=new Date().toISOString();
+    var old=reports[doc.date];
+    doc.images=old&&old.images?old.images.slice():[];
     try{
       if(!fbOK)throw new Error('Firebase 미연결');
       await db.collection(COLL).doc(doc.date).set(doc);
@@ -474,20 +865,58 @@ async function saveAll(){
     reports[doc.date]=doc;
     if(!last||doc.date>last)last=doc.date;
   }
+  for(i=0;i<imgList.length;i++){
+    p=imgList[i];
+    var dt=p.doc.date,rep=reports[dt];
+    if(!rep){imgFail++;imgMsg='해당 날짜의 일보가 없어 이미지를 첨부할 수 없습니다.';continue}
+    setProg('이미지 업로드 중… '+(i+1)+'/'+imgList.length,i,imgList.length);
+    try{
+      var im=await uploadImage(dt,p.imgFile);
+      var next=(rep.images||[]).concat([im]);
+      if(!fbOK)throw new Error('Firebase 미연결');
+      await db.collection(COLL).doc(dt).update({images:next});
+      rep.images=next;imgOk++;
+      if(!last||dt>last)last=dt;
+    }catch(e2){imgFail++;imgMsg=e2.message||String(e2)}
+  }
+  setProg('',null);
   pending=[];
-  refreshDates();cur=last;
+  refreshDates();
+  if(last)cur=last;
+  imgOpen=imgOk>0;
   render();
-  if(fail){
-    setStatus('저장 실패 '+fail+'건: '+errMsg+' — 화면에는 표시되지만 새로고침하면 사라집니다.','err');
-    toast('저장 실패 '+fail+'건 (Firestore 규칙 확인)');
+  if(fail||imgFail){
+    var em=[];
+    if(fail)em.push('일보 저장 실패 '+fail+'건: '+errMsg+' — 화면에는 표시되지만 새로고침하면 사라집니다.');
+    if(imgFail)em.push('이미지 첨부 실패 '+imgFail+'건: '+imgMsg+(imgMsg.indexOf('일보가 없어')<0?' (Storage 규칙 확인)':''));
+    setStatus(em.join(' / '),'err');
+    toast('저장 실패 '+(fail+imgFail)+'건 (Firebase 규칙 확인)');
   }else{
     setStatus('Firebase 연결됨 · 저장된 일보 '+dates.length+'건','ok');
-    toast(ok+'건 저장했습니다.');
+    toast((ok?ok+'건 저장':'')+(ok&&imgOk?' · ':'')+(imgOk?'이미지 '+imgOk+'장 첨부':'')+'했습니다.');
   }
 }
 
+/* ---------- 원본 캡처 이미지 보기 ---------- */
+function renderImages(){
+  var r=reports[cur],im=(r&&r.images)||[];
+  $('imgCnt').textContent='('+im.length+'장)';
+  $('btnImgToggle').disabled=!im.length;
+  $('btnImgToggle').textContent=imgOpen?'숨기기':'보기';
+  var box=$('imgs');
+  box.hidden=!(imgOpen&&im.length);
+  box.innerHTML=im.map(function(m,i){return '<img src="'+esc(m.url)+'" alt="'+esc(m.name)+'" data-i="'+i+'" loading="lazy">'}).join('');
+}
+function openViewer(i){
+  var r=reports[cur],m=r&&r.images&&r.images[i];if(!m)return;
+  viewImg={date:cur,i:i};
+  $('vImg').src=m.url;
+  $('vName').textContent=(m.name||'')+' · '+String(m.at||'').slice(0,10);
+  $('imgModal').hidden=false;
+}
+
 /* ---------- 화면 ---------- */
-function selectDate(d){cur=d;render();window.scrollTo(0,0)}
+function selectDate(d){cur=d;imgOpen=false;render();window.scrollTo(0,0)}
 function render(){
   renderPending();
   var has=dates.length>0;
@@ -551,6 +980,7 @@ function renderReport(){
   else ch+='<div class="catsum"><span>세척 '+fmt(r.dayWash)+'</span><span>출고 '+fmt(r.dayShip)+'</span></div>';
   $('cats').innerHTML=ch;
   renderDetail();
+  renderImages();
 }
 function renderDetail(){
   var r=reports[cur];
@@ -634,9 +1064,32 @@ function bind(){
   ['dragleave','drop'].forEach(function(ev){dp.addEventListener(ev,function(e){e.preventDefault();dp.classList.remove('over')})});
   dp.addEventListener('drop',function(e){handleFiles(e.dataTransfer&&e.dataTransfer.files)});
   $('pvList').addEventListener('input',function(e){
-    var el=e.target;if(!el||el.type!=='date')return;
-    var i=+el.getAttribute('data-i');
-    if(pending[i]&&pending[i].doc){pending[i].doc.date=el.value;pending.forEach(function(p,j){var t=$('pvt'+j);if(t)t.innerHTML=tagFor(j)})}
+    var el=e.target;if(!el||el.type==='checkbox')return;
+    var i=+el.getAttribute('data-i'),p=pending[i];if(!p||!p.doc)return;
+    var f=el.getAttribute('data-f'),t=el.getAttribute('data-t');
+    if(f){
+      var r=+el.getAttribute('data-r'),it=p.doc.items[r];if(!it)return;
+      if(f==='name')it.name=el.value;
+      else{it[f]=numFrom(el.value)||0;if(it._low)delete it._low[f]}
+      var bad=pvRowBad(it),tr=el.closest('tr');
+      Array.prototype.forEach.call(tr.querySelectorAll('input[data-f]'),function(x){var ff=x.getAttribute('data-f');if(ff!=='name')x.classList.toggle('bad',!!bad[ff])});
+      refreshPv(i);
+    }else if(t){
+      p.doc[t]=el.value.trim()===''?null:numFrom(el.value);refreshPv(i);
+    }else if(el.type==='date'){
+      p.doc.date=el.value;
+      pending.forEach(function(q,j){var tt=$('pvt'+j);if(tt)tt.innerHTML=tagFor(j)});
+    }
+  });
+  $('pvList').addEventListener('change',function(e){
+    var el=e.target;if(!el||el.type!=='checkbox')return;
+    var i=+el.getAttribute('data-a');
+    if(pending[i]){pending[i].attachOnly=el.checked;renderPending()}
+  });
+  $('pvList').addEventListener('click',function(e){
+    var bt=e.target.closest?e.target.closest('[data-del]'):null;if(!bt)return;
+    var a=bt.getAttribute('data-del').split(':'),i=+a[0],r=+a[1];
+    if(pending[i]&&pending[i].doc){pending[i].doc.items.splice(r,1);renderPending()}
   });
   $('btnSave').onclick=saveAll;
   $('btnCancel').onclick=function(){pending=[];renderPending()};
@@ -645,8 +1098,8 @@ function bind(){
   $('btnNewer').onclick=function(){var i=dates.indexOf(cur);if(i>0)selectDate(dates[i-1])};
   $('btnDel').onclick=async function(){
     if(!cur)return;
-    var d=cur;
-    var yes=await askConfirm(dlabel(d)+' 일보를 삭제할까요? Firebase에서도 삭제되며 되돌릴 수 없습니다.','삭제');
+    var d=cur,rep=reports[d];
+    var yes=await askConfirm(dlabel(d)+' 일보를 삭제할까요? 첨부 이미지도 함께 삭제되며 되돌릴 수 없습니다.','삭제');
     if(!yes)return;
     try{
       if(!fbOK)throw new Error('Firebase 미연결');
@@ -654,9 +1107,47 @@ function bind(){
     }catch(e){
       setStatus('삭제 실패: '+(e.message||e),'err');toast('삭제 실패');return;
     }
+    ((rep&&rep.images)||[]).forEach(function(m){if(storage&&m.path){storage.ref(m.path).delete().catch(function(){})}});
     delete reports[d];refreshDates();
-    cur=dates[0]||null;render();toast('삭제했습니다.');
+    cur=dates[0]||null;imgOpen=false;render();toast('삭제했습니다.');
   };
+  $('btnImgToggle').onclick=function(){imgOpen=!imgOpen;renderImages()};
+  $('imgs').addEventListener('click',function(e){var im=e.target;if(im&&im.tagName==='IMG')openViewer(+im.getAttribute('data-i'))});
+  $('vClose').onclick=function(){$('imgModal').hidden=true;viewImg=null};
+  $('vDel').onclick=async function(){
+    if(!viewImg)return;
+    var v=viewImg,rep=reports[v.date],m=rep&&rep.images&&rep.images[v.i];if(!m)return;
+    var yes=await askConfirm('이 캡처 이미지를 삭제할까요? Firebase Storage에서도 삭제되며 되돌릴 수 없습니다.','삭제');
+    if(!yes)return;
+    try{
+      var left=rep.images.filter(function(x,ix){return ix!==v.i});
+      if(!fbOK)throw new Error('Firebase 미연결');
+      await db.collection(COLL).doc(v.date).update({images:left});
+      rep.images=left;
+      if(storage&&m.path){try{await storage.ref(m.path).delete()}catch(e2){}}
+    }catch(e){setStatus('이미지 삭제 실패: '+(e.message||e),'err');toast('이미지 삭제 실패');return}
+    $('imgModal').hidden=true;viewImg=null;renderImages();toast('이미지를 삭제했습니다.');
+  };
+  $('fileImg').addEventListener('change',async function(e){
+    var files=Array.prototype.slice.call(e.target.files||[]).filter(isImg);
+    e.target.value='';
+    if(!files.length||!cur)return;
+    if(!storage||!fbOK){toast('Firebase Storage에 연결되지 않았습니다.');return}
+    var date=cur,n=0,msg='',i;
+    for(i=0;i<files.length;i++){
+      setProg('이미지 업로드 중… '+(i+1)+'/'+files.length,i,files.length);
+      try{
+        var im=await uploadImage(date,files[i]);
+        var rep=reports[date],next=(rep.images||[]).concat([im]);
+        await db.collection(COLL).doc(date).update({images:next});
+        rep.images=next;n++;
+      }catch(err){msg=err.message||String(err)}
+    }
+    setProg('',null);
+    if(msg){setStatus('이미지 첨부 실패: '+msg+' (Storage 규칙 확인)','err');toast('이미지 첨부 일부 실패')}
+    else{setStatus('이미지 '+n+'장을 첨부했습니다.','ok');toast('이미지 '+n+'장 첨부')}
+    imgOpen=true;renderImages();
+  });
   $('tgZero').onchange=function(){opt.zero=this.checked;if(cur)renderDetail()};
   $('tgInq').onchange=function(){opt.inq=this.checked;if(cur)renderDetail()};
   $('tgNote').onchange=function(){opt.note=this.checked;if(cur)renderDetail()};
