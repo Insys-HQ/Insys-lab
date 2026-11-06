@@ -93,6 +93,22 @@
   .opt input{margin:3px 0 0;flex:0 0 auto;width:15px;height:15px;accent-color:var(--accent);}
   .mk{display:none;}
 
+  /* ===== 순위 선택 ===== */
+  .rank{display:grid;grid-template-columns:1fr;gap:5px;}
+  .ropt{font-family:inherit;font-size:13px;text-align:left;color:var(--text);
+    display:flex;align-items:center;gap:7px;width:100%;
+    padding:6px 9px;border:1.5px solid var(--line);border-radius:7px;background:#fff;cursor:pointer;}
+  .ropt:hover{border-color:var(--tint-b);background:#FAFCFE;}
+  .ropt[data-rank]{border-color:var(--accent);background:#F2F7FC;font-weight:500;}
+  .rb{flex:0 0 auto;width:21px;height:21px;border-radius:50%;
+    border:1.5px solid var(--line);background:#fff;color:var(--text-l);
+    font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;}
+  .ropt[data-rank] .rb{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .rsuf{font-size:10.5px;color:var(--accent);font-weight:700;margin-left:auto;flex:0 0 auto;}
+  .rclr{font-family:inherit;font-size:11px;color:var(--text-l);background:none;
+    border:1px solid var(--line);border-radius:5px;padding:3px 8px;cursor:pointer;margin-top:5px;}
+  .rclr:hover{background:#F2F5F9;}
+
   /* ===== 버튼 ===== */
   .actions{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);
     padding:8px 0;margin-top:8px;}
@@ -129,11 +145,14 @@
     .grid2{grid-template-columns:1fr 1fr;}
     .types{grid-template-columns:1fr 1fr 1fr;}
     .opts.c2{grid-template-columns:1fr 1fr 1fr;}
+    .rank{grid-template-columns:1fr 1fr;}
+    .ropt{font-size:14px;}
     .vtab{font-size:12.5px;}
     button.act{font-size:14px;}
   }
   body.view-mobile .grid2,
   body.view-mobile .types,
+  body.view-mobile .rank,
   body.view-mobile .opts.c2{grid-template-columns:1fr;}
 
   /* ===== 인쇄(PDF) ===== */
@@ -167,7 +186,17 @@
     .mk{display:inline-block;font-size:11pt;line-height:1.2;color:#1F3A5F;flex:0 0 auto;}
     .types{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
     .opts.c2{grid-template-columns:1fr 1fr 1fr;}
+    .rank{grid-template-columns:1fr 1fr;}
+    .ropt{border:1px solid #C9CFD8;padding:3px 6px;font-size:10pt;}
+    .ropt[data-rank]{border:1.5px solid #1F3A5F;background:#F2F7FC !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .rb{width:17px;height:17px;font-size:9pt;}
+    .rclr{display:none !important;}
     .grid2{grid-template-columns:1fr 1fr;}
+    /* 모바일 보기 상태로 인쇄해도 문서는 항상 다단으로 */
+    body.view-mobile .types{grid-template-columns:1fr 1fr 1fr;}
+    body.view-mobile .rank{grid-template-columns:1fr 1fr;}
+    body.view-mobile .grid2{grid-template-columns:1fr 1fr;}
+    body.view-mobile .opts.c2{grid-template-columns:1fr 1fr 1fr;}
     footer{padding:8px 0 0;font-size:8.5pt;border-top:1px solid #C9CFD8;margin-top:6px;}
   }
 </style>
@@ -177,7 +206,7 @@
 <header class="cover"><div class="nav-inner">
   <div class="hd-top">
     <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-    <span class="hd-ver">v1.0</span>
+    <span class="hd-ver" id="hVer">v1.1</span>
   </div>
   <h1>AI 기반 PCB 검사 자동화 검사기<br>제작사양 의견서</h1>
   <div class="hd-sub">수신 : 위너콤 생산부문 / 현장 상주 관리자 &nbsp;·&nbsp; 발신 : 인시스 AI혁신 연구개발실</div>
@@ -197,21 +226,6 @@
     아래 항목을 작성해 주시면 설치 형태와 검사 사양에 반영하겠습니다.
     <b>모르는 항목은 공란</b>으로 두셔도 됩니다. 작성 후 하단의 <b>PDF 저장</b> 버튼으로 저장하여 회신 부탁드립니다.
   </div>
-
-  <!-- 0. 작성자 -->
-  <section class="card">
-    <div class="card-h"><span class="no">0</span>작성자 정보</div>
-    <div class="card-b">
-      <div class="grid2">
-        <div class="fld"><span class="lb">회사 / 사업장</span><input type="text" id="f_comp" placeholder="예) 위너콤 ○○공장"></div>
-        <div class="fld"><span class="lb">부서 / 직책</span><input type="text" id="f_dept" placeholder="예) 생산기술팀 / 팀장"></div>
-        <div class="fld"><span class="lb">성명</span><input type="text" id="f_name"></div>
-        <div class="fld"><span class="lb">연락처 또는 이메일</span><input type="text" id="f_contact"></div>
-        <div class="fld"><span class="lb">작성일</span><input type="date" id="f_date"></div>
-        <div class="fld"><span class="lb">검사기 설치 예정 공정 / 라인</span><input type="text" id="f_line" placeholder="예) 2라인 후공정 검사"></div>
-      </div>
-    </div>
-  </section>
 
   <!-- 1. 설치 형태 -->
   <section class="card">
@@ -405,15 +419,21 @@
   <section class="card">
     <div class="card-h"><span class="no">5</span>투입 · 배출 방식</div>
     <div class="card-b">
+      <div class="notice" style="margin-bottom:10px;">
+        투입 · 배출 방식은 <b>가장 원하시는 것부터 순서대로</b> 선택해 주십시오. 항목을 누르면 1순위부터 차례로 번호가 매겨집니다.
+        <b>선호도가 높더라도 기술 난이도가 높은 방식은 구현이 어려울 수 있어</b>, 순위를 받아 기술 검토를 거친 뒤 최종 적용 방식을 결정합니다.
+      </div>
+
       <div class="fld">
-        <span class="lb">PCB가 검사기로 들어오는 상태</span>
-        <div class="opts c2">
-          <label class="opt"><input type="radio" name="inMode" value="작업자가 1매씩 투입"><span class="mk"></span>작업자가 1매씩 투입</label>
-          <label class="opt"><input type="radio" name="inMode" value="트레이에 정렬된 상태"><span class="mk"></span>트레이에 정렬된 상태</label>
-          <label class="opt"><input type="radio" name="inMode" value="벌크(무작위)로 담겨 옴"><span class="mk"></span>벌크(무작위)로 담겨 옴</label>
-          <label class="opt"><input type="radio" name="inMode" value="컨베이어로 반송"><span class="mk"></span>컨베이어로 반송</label>
+        <span class="lb">PCB가 검사기로 들어오는 상태 — <span class="req">선호 순서대로</span> 선택</span>
+        <div class="rank" data-rank-group="inMode">
+          <button type="button" class="ropt" data-v="작업자가 1매씩 투입"><span class="rb"></span>작업자가 1매씩 투입<span class="rsuf"></span></button>
+          <button type="button" class="ropt" data-v="트레이에 정렬된 상태"><span class="rb"></span>트레이에 정렬된 상태<span class="rsuf"></span></button>
+          <button type="button" class="ropt" data-v="벌크(무작위)로 담겨 옴"><span class="rb"></span>벌크(무작위)로 담겨 옴<span class="rsuf"></span></button>
+          <button type="button" class="ropt" data-v="컨베이어로 반송"><span class="rb"></span>컨베이어로 반송<span class="rsuf"></span></button>
         </div>
-        <div class="hint">현재 검토 중인 방식은 <b>PCB가 서로 겹치지 않게 펼쳐진 상태</b>를 전제로 합니다. 벌크 투입이면 구조가 크게 달라집니다.</div>
+        <button type="button" class="rclr no-print" data-clr="inMode">순위 지우기</button>
+        <div class="hint">현재 검토 중인 방식은 <b>PCB가 서로 겹치지 않게 펼쳐진 상태</b>를 전제로 합니다. 벌크 투입은 선호도가 높아도 난이도가 가장 높습니다.</div>
       </div>
       <div class="fld">
         <span class="lb">작업자가 검사면(앞·뒷면)을 맞춰 올려놓을 수 있습니까</span>
@@ -424,13 +444,14 @@
         </div>
       </div>
       <div class="fld">
-        <span class="lb">검사 후 배출 방식</span>
-        <div class="opts c2">
-          <label class="opt"><input type="radio" name="outMode" value="작업자 수거"><span class="mk"></span>작업자 수거</label>
-          <label class="opt"><input type="radio" name="outMode" value="양·불 자동 분리 배출"><span class="mk"></span>양 · 불 자동 분리 배출</label>
-          <label class="opt"><input type="radio" name="outMode" value="컨베이어로 다음 공정"><span class="mk"></span>컨베이어로 다음 공정</label>
-          <label class="opt"><input type="radio" name="outMode" value="미정"><span class="mk"></span>미정</label>
+        <span class="lb">검사 후 배출 방식 — <span class="req">선호 순서대로</span> 선택</span>
+        <div class="rank" data-rank-group="outMode">
+          <button type="button" class="ropt" data-v="작업자 수거"><span class="rb"></span>작업자 수거<span class="rsuf"></span></button>
+          <button type="button" class="ropt" data-v="양·불 자동 분리 배출"><span class="rb"></span>양 · 불 자동 분리 배출<span class="rsuf"></span></button>
+          <button type="button" class="ropt" data-v="컨베이어로 다음 공정"><span class="rb"></span>컨베이어로 다음 공정<span class="rsuf"></span></button>
+          <button type="button" class="ropt" data-v="불량만 별도 배출, 양품은 그대로 통과"><span class="rb"></span>불량만 별도 배출, 양품은 통과<span class="rsuf"></span></button>
         </div>
+        <button type="button" class="rclr no-print" data-clr="outMode">순위 지우기</button>
       </div>
     </div>
   </section>
@@ -588,7 +609,7 @@
 </div></div>
 
 <footer>
-  인시스 AI혁신 연구개발실 &nbsp;·&nbsp; ys.kim@in-sys.co.kr &nbsp;·&nbsp; 문서버전 <span id="fVer">v1.0</span><br>
+  인시스 AI혁신 연구개발실 &nbsp;·&nbsp; ys.kim@in-sys.co.kr &nbsp;·&nbsp; 문서버전 <span id="fVer">v1.1</span><br>
   AI 기반 PCB 검사 자동화 검사기 제작사양 의견서
 </footer>
 
@@ -597,16 +618,11 @@
 <script>
 (function(){
   "use strict";
-  var VER = 'v1.0';
+  var VER = 'v1.1';
   var $ = function(id){ return document.getElementById(id); };
 
   $('fVer').textContent = VER;
-
-  /* ---- 오늘 날짜 기본값 ---- */
-  (function(){
-    var d = new Date(), p = function(n){ return (n<10?'0':'')+n; };
-    $('f_date').value = d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
-  })();
+  $('hVer').textContent = VER;
 
   /* ---- 보기 전환 ---- */
   function setView(m){
@@ -629,11 +645,65 @@
   for(var i=0;i<typeRadios.length;i++) typeRadios[i].addEventListener('change', syncType);
   syncType();
 
+  /* ---- 순위 선택 ---- */
+  function renderRank(g){
+    var opts = document.querySelectorAll('[data-rank-group="'+g+'"] .ropt');
+    for(var i=0;i<opts.length;i++){
+      var r = opts[i].getAttribute('data-rank');
+      opts[i].querySelector('.rb').textContent = r ? r : '';
+      opts[i].querySelector('.rsuf').textContent = r ? (r + '순위') : '';
+      opts[i].style.order = r ? String(Number(r)) : '99';   /* 순위대로 위로 정렬 */
+    }
+  }
+  function toggleRank(btn){
+    var g = btn.parentNode.getAttribute('data-rank-group');
+    var opts = document.querySelectorAll('[data-rank-group="'+g+'"] .ropt');
+    var cur = btn.getAttribute('data-rank');
+    if(cur){
+      btn.removeAttribute('data-rank');
+      for(var i=0;i<opts.length;i++){
+        var r = opts[i].getAttribute('data-rank');
+        if(r && Number(r) > Number(cur)) opts[i].setAttribute('data-rank', String(Number(r)-1));
+      }
+    } else {
+      var used = 0;
+      for(var j=0;j<opts.length;j++) if(opts[j].getAttribute('data-rank')) used++;
+      btn.setAttribute('data-rank', String(used+1));
+    }
+    renderRank(g);
+  }
+  function clearRank(g){
+    var opts = document.querySelectorAll('[data-rank-group="'+g+'"] .ropt');
+    for(var i=0;i<opts.length;i++) opts[i].removeAttribute('data-rank');
+    renderRank(g);
+  }
+  (function(){
+    var all = document.querySelectorAll('.ropt');
+    for(var i=0;i<all.length;i++){
+      all[i].addEventListener('click', function(){ toggleRank(this); });
+    }
+    var clrs = document.querySelectorAll('.rclr');
+    for(var j=0;j<clrs.length;j++){
+      clrs[j].addEventListener('click', function(){ clearRank(this.getAttribute('data-clr')); });
+    }
+    renderRank('inMode'); renderRank('outMode');
+  })();
+
   /* ---- 값 수집 ---- */
   function val(id){ var e=$(id); return e ? String(e.value||'').trim() : ''; }
   function radio(name){
     var n = document.querySelector('input[name="'+name+'"]:checked');
     return n ? n.value : '';
+  }
+  function ranks(g){
+    var ns = document.querySelectorAll('[data-rank-group="'+g+'"] .ropt'), a=[];
+    for(var i=0;i<ns.length;i++){
+      var r = ns[i].getAttribute('data-rank');
+      if(r) a.push({ r:Number(r), v:ns[i].getAttribute('data-v') });
+    }
+    a.sort(function(x,y){ return x.r - y.r; });
+    var out=[]; for(var k=0;k<a.length;k++) out.push(a[k].r + '순위 ' + a[k].v);
+    return out.join('  /  ');
   }
   function checks(name){
     var ns = document.querySelectorAll('input[name="'+name+'"]:checked'), a=[];
@@ -682,11 +752,6 @@
     L.push('AI 기반 PCB 검사 자동화 검사기 제작사양 의견서 (' + VER + ')');
     L.push('인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr');
 
-    hr('0. 작성자');
-    push('회사/사업장', val('f_comp')); push('부서/직책', val('f_dept'));
-    push('성명', val('f_name')); push('연락처', val('f_contact'));
-    push('작성일', val('f_date')); push('설치 예정 라인', val('f_line'));
-
     hr('1. 설치 형태');
     push('선호 유형', radio('insType') ? ('유형 ' + radio('insType')) : '');
     push('유형A 최대치수(W×D×H)', dim('a_w','a_d','a_h'));
@@ -713,9 +778,9 @@
     push('현재 검사 방식', radio('curIns'));
 
     hr('5. 투입·배출');
-    push('투입 상태', radio('inMode'));
+    push('투입 상태 (선호 순위)', ranks('inMode'));
     push('검사면 정렬 가능 여부', radio('face'));
-    push('배출 방식', radio('outMode'));
+    push('배출 방식 (선호 순위)', ranks('outMode'));
 
     hr('6. 설치 환경');
     push('전원', val('f_power')); push('에어', val('f_air'));
@@ -776,6 +841,7 @@
     for(var j=0;j<ss.length;j++) ss[j].selectedIndex = 0;
     var cs = document.querySelectorAll('input[type=radio],input[type=checkbox]');
     for(var k=0;k<cs.length;k++) cs[k].checked = false;
+    clearRank('inMode'); clearRank('outMode');
     syncType();
     toast('초기화되었습니다');
   });
