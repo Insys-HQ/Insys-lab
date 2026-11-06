@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>AI 기반 PCB 검사 자동화 검사기 제작사양 의견서</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1F3A5F; --navy-d:#16293F; --accent:#2E5E8C;
+    --text:#2B3440; --text-l:#5A6675; --line:#D6DCE4; --line-s:#E8ECF1;
+    --bg:#F4F6F9; --card:#FFFFFF;
+    --tint:#EDF2F8; --tint-b:#C9D8E8;
+    --warn-bg:#FFF6E5; --warn-tx:#7A5200; --warn-b:#E8CF9A;
+    --ok:#1E6B3A; --req:#B23A2E;
+    --maxw:1100px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Noto Sans KR',sans-serif; font-size:14px; line-height:1.55;
+    color:var(--text); background:var(--bg); -webkit-text-size-adjust:100%;
+  }
+
+  /* ===== 헤더 : 배경 전체폭 / 내용은 본문과 동일 폭 ===== */
+  header.cover{background:linear-gradient(135deg,var(--navy),var(--navy-d));color:#EEF3F9;padding:12px 0;}
+  .nav-inner{max-width:var(--maxw);margin:0 auto;padding:0 14px;}
+  .hd-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .hd-dept{font-size:11px;font-weight:500;letter-spacing:.3px;color:#B9CBE0;}
+  .hd-ver{margin-left:auto;font-size:11px;font-weight:700;background:rgba(255,255,255,.15);
+    border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:2px 9px;white-space:nowrap;}
+  header.cover h1{font-size:16px;font-weight:900;margin:4px 0 2px;line-height:1.35;}
+  .hd-sub{font-size:11.5px;color:#C4D4E6;}
+
+  /* ===== 보기 전환 탭 ===== */
+  .viewbar{background:var(--card);border-bottom:1px solid var(--line);}
+  .viewbar .nav-inner{display:flex;align-items:center;gap:6px;padding-top:6px;padding-bottom:6px;}
+  .viewbar .lb{font-size:11px;color:var(--text-l);margin-right:2px;}
+  .vtab{font-family:inherit;font-size:11.5px;font-weight:700;padding:4px 12px;border:1px solid var(--line);
+    background:#fff;color:var(--text-l);border-radius:6px;cursor:pointer;}
+  .vtab.on{background:var(--navy);border-color:var(--navy);color:#fff;}
+
+  /* ===== 본문 ===== */
+  main{max-width:var(--maxw);margin:8px auto;padding:0 14px 12px;transition:max-width .2s;}
+  body.view-mobile main{max-width:430px;}
+
+  .notice{background:var(--tint);border:1px solid var(--tint-b);border-radius:8px;
+    padding:10px 12px;margin-bottom:8px;font-size:12.5px;color:#1C3550;}
+  .notice b{color:var(--navy-d);}
+
+  section.card{background:var(--card);border:1px solid var(--line);border-radius:8px;
+    margin-bottom:8px;overflow:hidden;}
+  .card-h{background:var(--tint);border-bottom:1px solid var(--line);
+    padding:7px 12px;font-size:13px;font-weight:700;color:var(--navy-d);
+    display:flex;align-items:center;gap:7px;}
+  .card-h .no{background:var(--navy);color:#fff;font-size:10.5px;font-weight:700;
+    width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;}
+  .card-b{padding:10px 12px;}
+
+  .fld{margin-bottom:9px;}
+  .fld:last-child{margin-bottom:0;}
+  label.lb,.lb{display:block;font-size:12px;font-weight:500;color:var(--text-l);margin-bottom:3px;}
+  .req{color:var(--req);font-weight:700;}
+  .hint{font-size:11px;color:var(--text-l);margin-top:3px;line-height:1.45;}
+
+  input[type=text],input[type=number],input[type=date],select,textarea{
+    font-family:inherit;font-size:14px;color:var(--text);width:100%;
+    padding:6px 9px;border:1px solid var(--line);border-radius:6px;background:#fff;}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(46,94,140,.13);}
+  textarea{resize:vertical;min-height:62px;line-height:1.5;}
+  .grid2{display:grid;grid-template-columns:1fr;gap:8px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
+
+  /* ===== 설치 유형 카드 ===== */
+  .types{display:grid;grid-template-columns:1fr;gap:8px;}
+  .type{border:1.5px solid var(--line);border-radius:8px;padding:9px 10px;background:#FCFDFE;cursor:pointer;}
+  .type.sel{border-color:var(--accent);background:#F2F7FC;box-shadow:0 0 0 2px rgba(46,94,140,.1);}
+  .type-h{display:flex;align-items:flex-start;gap:7px;}
+  .type-h input{margin:3px 0 0;flex:0 0 auto;width:15px;height:15px;accent-color:var(--accent);}
+  .type-t{font-size:13px;font-weight:700;color:var(--navy-d);}
+  .type-d{font-size:11.5px;color:var(--text-l);margin-top:2px;line-height:1.45;}
+  .dims{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);}
+  .dims .lb{font-size:11.5px;}
+  .dim-u{font-size:10.5px;color:var(--text-l);display:block;margin-bottom:2px;}
+
+  /* ===== 체크 / 라디오 목록 ===== */
+  .opts{display:grid;grid-template-columns:1fr;gap:4px;}
+  .opts.c2{grid-template-columns:1fr 1fr;}
+  .opt{display:flex;align-items:flex-start;gap:6px;font-size:13px;padding:3px 0;cursor:pointer;}
+  .opt input{margin:3px 0 0;flex:0 0 auto;width:15px;height:15px;accent-color:var(--accent);}
+  .mk{display:none;}
+
+  /* ===== 버튼 ===== */
+  .actions{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);
+    padding:8px 0;margin-top:8px;}
+  .actions .nav-inner{display:flex;gap:6px;flex-wrap:wrap;}
+  button.act{font-family:inherit;font-size:13px;font-weight:700;padding:8px 14px;border-radius:7px;
+    border:1px solid var(--line);background:#fff;color:var(--text);cursor:pointer;}
+  button.act:hover{background:#F2F5F9;}
+  button.act.pri{background:var(--navy);border-color:var(--navy);color:#fff;}
+  button.act.pri:hover{background:var(--navy-d);}
+  .toast{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);
+    background:#243447;color:#fff;font-size:12.5px;padding:8px 16px;border-radius:20px;
+    opacity:0;pointer-events:none;transition:opacity .25s;z-index:99;}
+  .toast.on{opacity:1;}
+
+  footer{max-width:var(--maxw);margin:0 auto;padding:10px 14px 16px;
+    font-size:11px;color:var(--text-l);text-align:center;line-height:1.6;}
+
+  /* 인쇄 미러 값 */
+  .pv{display:none;}
+
+  /* ===== PC ===== */
+  @media (min-width:768px){
+    body{font-size:16px;}
+    header.cover h1{font-size:20px;}
+    .hd-sub{font-size:12.5px;}
+    .hd-dept,.hd-ver{font-size:12px;}
+    .card-h{font-size:14.5px;}
+    label.lb,.lb{font-size:13px;}
+    input[type=text],input[type=number],input[type=date],select,textarea{font-size:15px;}
+    .opt{font-size:14px;}
+    .type-t{font-size:14.5px;}
+    .type-d,.hint{font-size:12.5px;}
+    .notice{font-size:13.5px;}
+    .grid2{grid-template-columns:1fr 1fr;}
+    .types{grid-template-columns:1fr 1fr 1fr;}
+    .opts.c2{grid-template-columns:1fr 1fr 1fr;}
+    .vtab{font-size:12.5px;}
+    button.act{font-size:14px;}
+  }
+  body.view-mobile .grid2,
+  body.view-mobile .types,
+  body.view-mobile .opts.c2{grid-template-columns:1fr;}
+
+  /* ===== 인쇄(PDF) ===== */
+  @page{size:A4;margin:12mm 11mm;}
+  @media print{
+    body{background:#fff;font-size:10.5pt;color:#2B3440;}
+    body.view-mobile main{max-width:none;}
+    main{max-width:none;margin:0;padding:0;}
+    .viewbar,.actions,.toast,.no-print{display:none !important;}
+    header.cover{background:#fff !important;color:#16293F;border-bottom:2px solid #1F3A5F;padding:0 0 6px;}
+    .hd-dept,.hd-sub{color:#5A6675;}
+    .hd-ver{background:#EDF2F8;border-color:#C9D8E8;color:#16293F;}
+    .nav-inner{padding:0;max-width:none;}
+    section.card{break-inside:avoid;page-break-inside:avoid;border:1px solid #C9CFD8;margin-bottom:5px;}
+    .card-h{background:#EDF2F8 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:4px 8px;font-size:10.5pt;}
+    .card-h .no{background:#1F3A5F !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .card-b{padding:6px 8px;}
+    .fld{margin-bottom:5px;}
+    .hint{display:none;}
+    .notice{font-size:9.5pt;padding:6px 8px;}
+    input,select,textarea{display:none !important;}
+    .pv{display:inline-block;min-height:1.4em;width:100%;
+        border-bottom:1px solid #C9CFD8;padding:1px 2px;font-size:10.5pt;color:#1C2A3A;
+        white-space:pre-wrap;word-break:break-word;}
+    .pv.empty{color:#9AA4B0;}
+    .type{border:1px solid #C9CFD8;background:#fff;padding:5px 7px;}
+    .type.sel{border:2px solid #1F3A5F;background:#F2F7FC !important;
+        -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .type-h input{display:none !important;}
+    .opt input{display:none !important;}
+    .mk{display:inline-block;font-size:11pt;line-height:1.2;color:#1F3A5F;flex:0 0 auto;}
+    .types{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
+    .opts.c2{grid-template-columns:1fr 1fr 1fr;}
+    .grid2{grid-template-columns:1fr 1fr;}
+    footer{padding:8px 0 0;font-size:8.5pt;border-top:1px solid #C9CFD8;margin-top:6px;}
+  }
+</style>
+</head>
+<body class="view-mobile">
+
+<header class="cover"><div class="nav-inner">
+  <div class="hd-top">
+    <span class="hd-dept">인시스 AI혁신 연구개발실</span>
+    <span class="hd-ver">v1.0</span>
+  </div>
+  <h1>AI 기반 PCB 검사 자동화 검사기<br>제작사양 의견서</h1>
+  <div class="hd-sub">수신 : 위너콤 생산부문 / 현장 상주 관리자 &nbsp;·&nbsp; 발신 : 인시스 AI혁신 연구개발실</div>
+</div></header>
+
+<div class="viewbar no-print"><div class="nav-inner">
+  <span class="lb">보기</span>
+  <button type="button" class="vtab on" id="tabM">모바일</button>
+  <button type="button" class="vtab" id="tabP">PC</button>
+  <span style="margin-left:auto;font-size:11px;color:var(--text-l);">작성 후 하단 <b>PDF 저장</b></span>
+</div></div>
+
+<main>
+
+  <div class="notice">
+    위너콤 PCB 납땜 외관검사 자동화 검사기의 <b>제작사양 확정</b>을 위해 현장 의견을 구합니다.
+    아래 항목을 작성해 주시면 설치 형태와 검사 사양에 반영하겠습니다.
+    <b>모르는 항목은 공란</b>으로 두셔도 됩니다. 작성 후 하단의 <b>PDF 저장</b> 버튼으로 저장하여 회신 부탁드립니다.
+  </div>
+
+  <!-- 0. 작성자 -->
+  <section class="card">
+    <div class="card-h"><span class="no">0</span>작성자 정보</div>
+    <div class="card-b">
+      <div class="grid2">
+        <div class="fld"><span class="lb">회사 / 사업장</span><input type="text" id="f_comp" placeholder="예) 위너콤 ○○공장"></div>
+        <div class="fld"><span class="lb">부서 / 직책</span><input type="text" id="f_dept" placeholder="예) 생산기술팀 / 팀장"></div>
+        <div class="fld"><span class="lb">성명</span><input type="text" id="f_name"></div>
+        <div class="fld"><span class="lb">연락처 또는 이메일</span><input type="text" id="f_contact"></div>
+        <div class="fld"><span class="lb">작성일</span><input type="date" id="f_date"></div>
+        <div class="fld"><span class="lb">검사기 설치 예정 공정 / 라인</span><input type="text" id="f_line" placeholder="예) 2라인 후공정 검사"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1. 설치 형태 -->
+  <section class="card">
+    <div class="card-h"><span class="no">1</span>검사기 설치 형태 <span style="font-weight:500;font-size:11.5px;color:var(--text-l);">— 가장 중요</span></div>
+    <div class="card-b">
+      <div class="fld">
+        <span class="lb">선호하는 설치 형태를 <span class="req">1개 선택</span>하시고, 해당 유형의 <span class="req">최대 허용 치수</span>를 입력해 주십시오.</span>
+        <div class="hint">현장에서 수용 가능한 최대 크기를 알려주시면, 그 범위 안에서 검사기를 설계합니다. 치수는 여유 공간이 아니라 <b>장비 외형이 차지해도 되는 최대값</b>으로 기재해 주십시오.</div>
+      </div>
+
+      <div class="types">
+        <label class="type" data-type="A">
+          <div class="type-h">
+            <input type="radio" name="insType" value="A"><span class="mk"></span>
+            <div>
+              <div class="type-t">유형 A · 데스크탑형</div>
+              <div class="type-d">기존 작업대 <b>위에 올려놓는</b> 구조. 바닥 공간을 쓰지 않음</div>
+            </div>
+          </div>
+          <div class="dims">
+            <span class="lb">최대 허용 치수 (mm)</span>
+            <div class="grid3">
+              <div><span class="dim-u">가로(W)</span><input type="number" id="a_w" min="0" placeholder="0"><span class="pv"></span></div>
+              <div><span class="dim-u">세로(D)</span><input type="number" id="a_d" min="0" placeholder="0"><span class="pv"></span></div>
+              <div><span class="dim-u">높이(H)</span><input type="number" id="a_h" min="0" placeholder="0"><span class="pv"></span></div>
+            </div>
+          </div>
+        </label>
+
+        <label class="type" data-type="B">
+          <div class="type-h">
+            <input type="radio" name="insType" value="B"><span class="mk"></span>
+            <div>
+              <div class="type-t">유형 B · 작업대 사이 삽입형</div>
+              <div class="type-d">작업대와 작업대 <b>사이에 끼워 넣는</b> 구조. 라인 흐름에 삽입</div>
+            </div>
+          </div>
+          <div class="dims">
+            <span class="lb">최대 허용 치수 (mm)</span>
+            <div class="grid3">
+              <div><span class="dim-u">가로(W)</span><input type="number" id="b_w" min="0" placeholder="0"><span class="pv"></span></div>
+              <div><span class="dim-u">세로(D)</span><input type="number" id="b_d" min="0" placeholder="0"><span class="pv"></span></div>
+              <div><span class="dim-u">높이(H)</span><input type="number" id="b_h" min="0" placeholder="0"><span class="pv"></span></div>
+            </div>
+          </div>
+        </label>
+
+        <label class="type" data-type="C">
+          <div class="type-h">
+            <input type="radio" name="insType" value="C"><span class="mk"></span>
+            <div>
+              <div class="type-t">유형 C · 작업대 전면 설치형</div>
+              <div class="type-d">작업대 앞, <b>작업자 사이 공간</b>에 독립 설치. 바닥 설치</div>
+            </div>
+          </div>
+          <div class="dims">
+            <span class="lb">최대 허용 치수 (mm)</span>
+            <div class="grid3">
+              <div><span class="dim-u">가로(W)</span><input type="number" id="c_w" min="0" placeholder="0"><span class="pv"></span></div>
+              <div><span class="dim-u">세로(D)</span><input type="number" id="c_d" min="0" placeholder="0"><span class="pv"></span></div>
+              <div><span class="dim-u">높이(H)</span><input type="number" id="c_h" min="0" placeholder="0"><span class="pv"></span></div>
+            </div>
+          </div>
+        </label>
+      </div>
+
+      <div class="fld" style="margin-top:9px;">
+        <span class="lb">선택 이유 / 현장 제약 사항</span>
+        <textarea id="f_typeWhy" placeholder="예) 작업대 위는 조명 간섭이 있어 전면 설치가 유리함"></textarea><span class="pv"></span>
+      </div>
+      <div class="fld">
+        <span class="lb">작업대 규격 (참고)</span>
+        <div class="grid3">
+          <div><span class="dim-u">작업대 폭(mm)</span><input type="number" id="f_tblW" placeholder="0"><span class="pv"></span></div>
+          <div><span class="dim-u">작업대 깊이(mm)</span><input type="number" id="f_tblD" placeholder="0"><span class="pv"></span></div>
+          <div><span class="dim-u">작업대 높이(mm)</span><input type="number" id="f_tblH" placeholder="0"><span class="pv"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. 검사 대상 -->
+  <section class="card">
+    <div class="card-h"><span class="no">2</span>검사 대상 PCB</div>
+    <div class="card-b">
+      <div class="grid2">
+        <div class="fld">
+          <span class="lb">검사 <span class="req">기종(품종) 수</span></span>
+          <input type="number" id="f_models" min="0" placeholder="예) 4"><span class="pv"></span>
+          <div class="hint">AI 검사는 <b>기종마다 별도 학습</b>이 필요합니다. 기종 수가 개발·유지보수 비용을 직접 좌우합니다.</div>
+        </div>
+        <div class="fld">
+          <span class="lb">향후 1년 내 기종 추가 예정 수</span>
+          <input type="number" id="f_modelsAdd" min="0" placeholder="예) 2"><span class="pv"></span>
+        </div>
+      </div>
+      <div class="fld">
+        <span class="lb">기종별 PCB 크기 (가로 × 세로 mm)</span>
+        <textarea id="f_pcbSize" placeholder="예)&#10;A형 100 × 50&#10;B형 80 × 45"></textarea><span class="pv"></span>
+      </div>
+      <div class="grid2">
+        <div class="fld"><span class="lb">일일 검사 수량 (매/일)</span><input type="number" id="f_qtyDay" placeholder="0"><span class="pv"></span></div>
+        <div class="fld"><span class="lb">월 검사 수량 (매/월)</span><input type="number" id="f_qtyMon" placeholder="0"><span class="pv"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 택트타임 -->
+  <section class="card">
+    <div class="card-h"><span class="no">3</span>목표 택트타임</div>
+    <div class="card-b">
+      <div class="grid2">
+        <div class="fld">
+          <span class="lb">PCB 1매당 <span class="req">목표 택트타임</span> (초)</span>
+          <input type="number" id="f_tact" step="0.1" min="0" placeholder="예) 8"><span class="pv"></span>
+          <div class="hint">투입부터 판정 완료까지. 이 값이 카메라 대수와 촬영 분할 횟수를 결정합니다.</div>
+        </div>
+        <div class="fld">
+          <span class="lb">허용 가능한 최대 택트타임 (초)</span>
+          <input type="number" id="f_tactMax" step="0.1" min="0" placeholder="예) 12"><span class="pv"></span>
+        </div>
+      </div>
+      <div class="fld">
+        <span class="lb">현재 육안검사 1매 소요시간 (초)</span>
+        <input type="number" id="f_tactNow" step="0.1" min="0" placeholder="0"><span class="pv"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 검출 대상 불량 -->
+  <section class="card">
+    <div class="card-h"><span class="no">4</span>검출 대상 불량</div>
+    <div class="card-b">
+      <div class="fld">
+        <span class="lb">검출이 <span class="req">반드시 필요한</span> 불량 유형 (복수 선택)</span>
+        <div class="opts c2" id="defGrp">
+          <label class="opt"><input type="checkbox" name="def" value="미납(솔더 부족)"><span class="mk"></span>미납 (솔더 부족)</label>
+          <label class="opt"><input type="checkbox" name="def" value="과납(솔더 과다)"><span class="mk"></span>과납 (솔더 과다)</label>
+          <label class="opt"><input type="checkbox" name="def" value="냉납"><span class="mk"></span>냉납</label>
+          <label class="opt"><input type="checkbox" name="def" value="리드 들뜸"><span class="mk"></span>리드 들뜸</label>
+          <label class="opt"><input type="checkbox" name="def" value="브릿지(단락)"><span class="mk"></span>브릿지 (단락)</label>
+          <label class="opt"><input type="checkbox" name="def" value="납볼·이물"><span class="mk"></span>납볼 · 이물</label>
+          <label class="opt"><input type="checkbox" name="def" value="리드 미삽입"><span class="mk"></span>리드 미삽입</label>
+          <label class="opt"><input type="checkbox" name="def" value="부품 누락"><span class="mk"></span>부품 누락</label>
+          <label class="opt"><input type="checkbox" name="def" value="극성 오삽"><span class="mk"></span>극성 오삽</label>
+          <label class="opt"><input type="checkbox" name="def" value="커넥터 체결 불량"><span class="mk"></span>커넥터 체결 불량</label>
+          <label class="opt"><input type="checkbox" name="def" value="외관 손상·크랙"><span class="mk"></span>외관 손상 · 크랙</label>
+          <label class="opt"><input type="checkbox" name="def" value="기타"><span class="mk"></span>기타</label>
+        </div>
+      </div>
+      <div class="fld">
+        <span class="lb">기타 불량 유형 / 보충 설명</span>
+        <textarea id="f_defEtc" placeholder="현장에서 가장 자주 나오는 불량 순서로 적어주시면 도움이 됩니다"></textarea><span class="pv"></span>
+      </div>
+      <div class="grid2">
+        <div class="fld">
+          <span class="lb"><span class="req">최소 검출 결함 크기</span> (mm)</span>
+          <input type="number" id="f_defMin" step="0.01" min="0" placeholder="예) 0.2"><span class="pv"></span>
+          <div class="hint">카메라 해상도를 결정하는 가장 중요한 값입니다. 정확히 모르시면 <b>대략적인 추정값</b>이라도 기재 부탁드립니다.</div>
+        </div>
+        <div class="fld">
+          <span class="lb">높이 차이로만 판별되는 불량이 있습니까</span>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="h3d" value="있음 (3D 높이 검사 필요)"><span class="mk"></span>있음 — 3D 높이 검사 필요</label>
+            <label class="opt"><input type="radio" name="h3d" value="없음 (2D 외관으로 충분)"><span class="mk"></span>없음 — 2D 외관으로 충분</label>
+            <label class="opt"><input type="radio" name="h3d" value="판단 어려움"><span class="mk"></span>판단 어려움</label>
+          </div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="fld"><span class="lb">현재 불량률 (%)</span><input type="number" id="f_defRate" step="0.01" min="0" placeholder="0"><span class="pv"></span></div>
+        <div class="fld">
+          <span class="lb">허용 가능한 과검율 (%)</span>
+          <input type="number" id="f_overRate" step="0.1" min="0" placeholder="예) 3"><span class="pv"></span>
+          <div class="hint">양품을 불량으로 잘못 판정하는 비율. 미검(놓침)은 0%를 목표로 합니다.</div>
+        </div>
+      </div>
+      <div class="fld">
+        <span class="lb">현재 검사 방식</span>
+        <div class="opts c2">
+          <label class="opt"><input type="radio" name="curIns" value="육안"><span class="mk"></span>육안</label>
+          <label class="opt"><input type="radio" name="curIns" value="확대경·현미경"><span class="mk"></span>확대경 · 현미경</label>
+          <label class="opt"><input type="radio" name="curIns" value="기존 자동검사 설비"><span class="mk"></span>기존 자동검사 설비</label>
+          <label class="opt"><input type="radio" name="curIns" value="검사 없음"><span class="mk"></span>검사 없음</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. 투입·배출 -->
+  <section class="card">
+    <div class="card-h"><span class="no">5</span>투입 · 배출 방식</div>
+    <div class="card-b">
+      <div class="fld">
+        <span class="lb">PCB가 검사기로 들어오는 상태</span>
+        <div class="opts c2">
+          <label class="opt"><input type="radio" name="inMode" value="작업자가 1매씩 투입"><span class="mk"></span>작업자가 1매씩 투입</label>
+          <label class="opt"><input type="radio" name="inMode" value="트레이에 정렬된 상태"><span class="mk"></span>트레이에 정렬된 상태</label>
+          <label class="opt"><input type="radio" name="inMode" value="벌크(무작위)로 담겨 옴"><span class="mk"></span>벌크(무작위)로 담겨 옴</label>
+          <label class="opt"><input type="radio" name="inMode" value="컨베이어로 반송"><span class="mk"></span>컨베이어로 반송</label>
+        </div>
+        <div class="hint">현재 검토 중인 방식은 <b>PCB가 서로 겹치지 않게 펼쳐진 상태</b>를 전제로 합니다. 벌크 투입이면 구조가 크게 달라집니다.</div>
+      </div>
+      <div class="fld">
+        <span class="lb">작업자가 검사면(앞·뒷면)을 맞춰 올려놓을 수 있습니까</span>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="face" value="가능 — 항상 검사면이 위로"><span class="mk"></span>가능 — 항상 검사면이 위로 오게 놓을 수 있음</label>
+          <label class="opt"><input type="radio" name="face" value="불가 — 뒤집힌 상태가 섞임"><span class="mk"></span>불가 — 뒤집힌 상태가 섞여 들어옴</label>
+          <label class="opt"><input type="radio" name="face" value="가능하나 오투입 우려 있음"><span class="mk"></span>가능하나 오투입 우려 있음</label>
+        </div>
+      </div>
+      <div class="fld">
+        <span class="lb">검사 후 배출 방식</span>
+        <div class="opts c2">
+          <label class="opt"><input type="radio" name="outMode" value="작업자 수거"><span class="mk"></span>작업자 수거</label>
+          <label class="opt"><input type="radio" name="outMode" value="양·불 자동 분리 배출"><span class="mk"></span>양 · 불 자동 분리 배출</label>
+          <label class="opt"><input type="radio" name="outMode" value="컨베이어로 다음 공정"><span class="mk"></span>컨베이어로 다음 공정</label>
+          <label class="opt"><input type="radio" name="outMode" value="미정"><span class="mk"></span>미정</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. 설치 환경 -->
+  <section class="card">
+    <div class="card-h"><span class="no">6</span>설치 환경</div>
+    <div class="card-b">
+      <div class="grid2">
+        <div class="fld">
+          <span class="lb">공급 전원</span>
+          <select id="f_power">
+            <option value="">선택</option>
+            <option>단상 220V</option><option>3상 380V</option><option>둘 다 가능</option><option>확인 필요</option>
+          </select><span class="pv"></span>
+        </div>
+        <div class="fld">
+          <span class="lb">압축공기(에어) 공급</span>
+          <select id="f_air">
+            <option value="">선택</option>
+            <option>가능</option><option>불가</option><option>확인 필요</option>
+          </select><span class="pv"></span>
+        </div>
+        <div class="fld">
+          <span class="lb">주변 조명 환경</span>
+          <select id="f_light">
+            <option value="">선택</option>
+            <option>실내 형광등 (일정)</option><option>창가 — 시간대별 변화 있음</option><option>조도 변화 큼</option>
+          </select><span class="pv"></span>
+          <div class="hint">외광 변화가 크면 차광 커버가 필요합니다.</div>
+        </div>
+        <div class="fld">
+          <span class="lb">진동 · 충격원 유무</span>
+          <select id="f_vib">
+            <option value="">선택</option>
+            <option>없음</option><option>인접 설비 진동 있음</option><option>프레스 등 충격원 있음</option>
+          </select><span class="pv"></span>
+        </div>
+        <div class="fld">
+          <span class="lb">네트워크(유선 LAN) 인출 가능</span>
+          <select id="f_net">
+            <option value="">선택</option>
+            <option>가능</option><option>불가</option><option>확인 필요</option>
+          </select><span class="pv"></span>
+        </div>
+        <div class="fld">
+          <span class="lb">바닥 허용 하중 제약</span>
+          <input type="text" id="f_floor" placeholder="예) 제약 없음 / 500kg 이하"><span class="pv"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. 반입 경로 -->
+  <section class="card">
+    <div class="card-h"><span class="no">7</span>장비 반입 경로</div>
+    <div class="card-b">
+      <div class="fld"><span class="lb">반입 경로상 <b>최소</b> 통과 치수 (문 · 통로 · 엘리베이터 기준, mm)</span>
+        <div class="grid3">
+          <div><span class="dim-u">최소 폭</span><input type="number" id="f_inW" placeholder="0"><span class="pv"></span></div>
+          <div><span class="dim-u">최소 높이</span><input type="number" id="f_inH" placeholder="0"><span class="pv"></span></div>
+          <div><span class="dim-u">엘리베이터 하중(kg)</span><input type="number" id="f_inL" placeholder="0"><span class="pv"></span></div>
+        </div>
+        <div class="hint">분할 반입이 필요한지 판단하기 위한 항목입니다.</div>
+      </div>
+      <div class="fld"><span class="lb">반입 관련 특이사항</span><input type="text" id="f_inEtc" placeholder="예) 2층, 화물 엘리베이터만 이용 가능"><span class="pv"></span></div>
+    </div>
+  </section>
+
+  <!-- 8. 운영 조건 -->
+  <section class="card">
+    <div class="card-h"><span class="no">8</span>운영 조건</div>
+    <div class="card-b">
+      <div class="grid2">
+        <div class="fld"><span class="lb">해당 공정 작업자 수 (명)</span><input type="number" id="f_oper" min="0" placeholder="0"><span class="pv"></span></div>
+        <div class="fld">
+          <span class="lb">근무 형태</span>
+          <select id="f_shift"><option value="">선택</option><option>주간 1교대</option><option>2교대</option><option>3교대</option></select><span class="pv"></span>
+        </div>
+        <div class="fld">
+          <span class="lb">검사 결과 데이터 보관 요구</span>
+          <select id="f_keep"><option value="">선택</option><option>불필요</option><option>판정 결과만 저장</option><option>불량 이미지 저장</option><option>전수 이미지 저장</option></select><span class="pv"></span>
+        </div>
+        <div class="fld">
+          <span class="lb">이미지 보관 기간</span>
+          <input type="text" id="f_keepTerm" placeholder="예) 6개월 / 1년"><span class="pv"></span>
+        </div>
+        <div class="fld">
+          <span class="lb">MES · 상위 시스템 연동 필요</span>
+          <select id="f_mes"><option value="">선택</option><option>필요</option><option>불필요</option><option>향후 필요</option></select><span class="pv"></span>
+        </div>
+        <div class="fld">
+          <span class="lb">검사 설비 운용 담당 (사내 인력)</span>
+          <input type="text" id="f_owner" placeholder="예) 생산기술팀 전담자 1명"><span class="pv"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. 협동로봇 -->
+  <section class="card">
+    <div class="card-h"><span class="no">9</span>협동로봇 적용에 대한 현장 의견</div>
+    <div class="card-b">
+      <div class="fld">
+        <span class="lb">검토 중인 구성은 <b>협동로봇에 카메라를 부착</b>해 검사 위치로 이동하는 방식입니다. 현장 수용 가능 여부를 알려주십시오.</span>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="cobot" value="수용 가능"><span class="mk"></span>수용 가능 — 작업자와 같은 공간에서 운용 가능</label>
+          <label class="opt"><input type="radio" name="cobot" value="안전펜스 설치 조건으로 가능"><span class="mk"></span>안전펜스 설치를 조건으로 가능</label>
+          <label class="opt"><input type="radio" name="cobot" value="로봇 없는 고정식 선호"><span class="mk"></span>로봇 없는 <b>고정식</b> 검사기를 선호</label>
+          <label class="opt"><input type="radio" name="cobot" value="사내 협의 필요"><span class="mk"></span>사내 안전부서 협의 필요</label>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="fld">
+          <span class="lb">사내 협동로봇 운용 경험</span>
+          <select id="f_cobotExp"><option value="">선택</option><option>있음</option><option>없음</option></select><span class="pv"></span>
+        </div>
+        <div class="fld">
+          <span class="lb">안전 위험성평가 수행 주체</span>
+          <select id="f_safety"><option value="">선택</option><option>위너콤 자체 수행</option><option>설비 공급사 수행 요청</option><option>협의 필요</option></select><span class="pv"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. 종합 의견 -->
+  <section class="card">
+    <div class="card-h"><span class="no">10</span>종합 의견</div>
+    <div class="card-b">
+      <div class="fld">
+        <span class="lb">위 1번의 세 가지 유형 중 <span class="req">최종 권장 유형</span></span>
+        <div class="opts c2">
+          <label class="opt"><input type="radio" name="final" value="유형 A · 데스크탑형"><span class="mk"></span>유형 A · 데스크탑형</label>
+          <label class="opt"><input type="radio" name="final" value="유형 B · 작업대 사이 삽입형"><span class="mk"></span>유형 B · 작업대 사이</label>
+          <label class="opt"><input type="radio" name="final" value="유형 C · 작업대 전면 설치형"><span class="mk"></span>유형 C · 작업대 전면</label>
+        </div>
+      </div>
+      <div class="fld">
+        <span class="lb">도입 희망 시기</span>
+        <input type="text" id="f_when" placeholder="예) 2027년 1분기"><span class="pv"></span>
+      </div>
+      <div class="fld">
+        <span class="lb">기타 요청 사항 · 우려되는 점</span>
+        <textarea id="f_free" style="min-height:90px;" placeholder="설계에 반영할 사항을 자유롭게 기재해 주십시오"></textarea><span class="pv"></span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="actions no-print"><div class="nav-inner">
+  <button type="button" class="act pri" id="btnPdf">PDF 저장</button>
+  <button type="button" class="act" id="btnCopy">메일 본문 복사</button>
+  <button type="button" class="act" id="btnClear">초기화</button>
+</div></div>
+
+<footer>
+  인시스 AI혁신 연구개발실 &nbsp;·&nbsp; ys.kim@in-sys.co.kr &nbsp;·&nbsp; 문서버전 <span id="fVer">v1.0</span><br>
+  AI 기반 PCB 검사 자동화 검사기 제작사양 의견서
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var VER = 'v1.0';
+  var $ = function(id){ return document.getElementById(id); };
+
+  $('fVer').textContent = VER;
+
+  /* ---- 오늘 날짜 기본값 ---- */
+  (function(){
+    var d = new Date(), p = function(n){ return (n<10?'0':'')+n; };
+    $('f_date').value = d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+  })();
+
+  /* ---- 보기 전환 ---- */
+  function setView(m){
+    document.body.classList.toggle('view-mobile', m==='m');
+    $('tabM').classList.toggle('on', m==='m');
+    $('tabP').classList.toggle('on', m==='p');
+  }
+  $('tabM').addEventListener('click', function(){ setView('m'); });
+  $('tabP').addEventListener('click', function(){ setView('p'); });
+
+  /* ---- 설치 유형 선택 강조 ---- */
+  function syncType(){
+    var cards = document.querySelectorAll('.type');
+    for(var i=0;i<cards.length;i++){
+      var r = cards[i].querySelector('input[type=radio]');
+      cards[i].classList.toggle('sel', !!(r && r.checked));
+    }
+  }
+  var typeRadios = document.querySelectorAll('input[name=insType]');
+  for(var i=0;i<typeRadios.length;i++) typeRadios[i].addEventListener('change', syncType);
+  syncType();
+
+  /* ---- 값 수집 ---- */
+  function val(id){ var e=$(id); return e ? String(e.value||'').trim() : ''; }
+  function radio(name){
+    var n = document.querySelector('input[name="'+name+'"]:checked');
+    return n ? n.value : '';
+  }
+  function checks(name){
+    var ns = document.querySelectorAll('input[name="'+name+'"]:checked'), a=[];
+    for(var i=0;i<ns.length;i++) a.push(ns[i].value);
+    return a;
+  }
+
+  /* ---- 인쇄용 값 미러링 ---- */
+  function fillPrint(){
+    var fields = document.querySelectorAll('input[type=text],input[type=number],input[type=date],select,textarea');
+    for(var i=0;i<fields.length;i++){
+      var el = fields[i];
+      var pv = el.nextElementSibling;
+      if(!pv || !pv.classList || !pv.classList.contains('pv')){
+        pv = document.createElement('span');
+        pv.className = 'pv';
+        el.parentNode.insertBefore(pv, el.nextSibling);
+      }
+      var v = String(el.value||'').trim();
+      pv.textContent = v || '—';
+      pv.classList.toggle('empty', !v);
+    }
+    var marks = document.querySelectorAll('.opt .mk, .type-h .mk');
+    for(var j=0;j<marks.length;j++){
+      var box = marks[j].previousElementSibling;
+      marks[j].textContent = (box && box.checked) ? '■' : '□';
+    }
+  }
+  window.addEventListener('beforeprint', fillPrint);
+
+  $('btnPdf').addEventListener('click', function(){
+    fillPrint();
+    setTimeout(function(){ window.print(); }, 60);
+  });
+
+  /* ---- 메일 본문 텍스트 ---- */
+  function buildText(){
+    var L = [];
+    var push = function(k,v){ L.push(k + ' : ' + (v || '-')); };
+    var hr = function(t){ L.push(''); L.push('[' + t + ']'); };
+    var dim = function(a,b,c){
+      var w=val(a), d=val(b), h=val(c);
+      return (w||d||h) ? ((w||'?')+' × '+(d||'?')+' × '+(h||'?')) : '';
+    };
+
+    L.push('AI 기반 PCB 검사 자동화 검사기 제작사양 의견서 (' + VER + ')');
+    L.push('인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr');
+
+    hr('0. 작성자');
+    push('회사/사업장', val('f_comp')); push('부서/직책', val('f_dept'));
+    push('성명', val('f_name')); push('연락처', val('f_contact'));
+    push('작성일', val('f_date')); push('설치 예정 라인', val('f_line'));
+
+    hr('1. 설치 형태');
+    push('선호 유형', radio('insType') ? ('유형 ' + radio('insType')) : '');
+    push('유형A 최대치수(W×D×H)', dim('a_w','a_d','a_h'));
+    push('유형B 최대치수(W×D×H)', dim('b_w','b_d','b_h'));
+    push('유형C 최대치수(W×D×H)', dim('c_w','c_d','c_h'));
+    push('선택 이유/제약', val('f_typeWhy'));
+    push('작업대 규격(W×D×H)', dim('f_tblW','f_tblD','f_tblH'));
+
+    hr('2. 검사 대상 PCB');
+    push('기종(품종) 수', val('f_models')); push('추가 예정 기종', val('f_modelsAdd'));
+    push('기종별 크기', val('f_pcbSize'));
+    push('일일 수량', val('f_qtyDay')); push('월 수량', val('f_qtyMon'));
+
+    hr('3. 목표 택트타임');
+    push('목표 택트(초)', val('f_tact')); push('허용 최대 택트(초)', val('f_tactMax'));
+    push('현재 육안검사 시간(초)', val('f_tactNow'));
+
+    hr('4. 검출 대상 불량');
+    push('필수 검출 불량', checks('def').join(', '));
+    push('기타/보충', val('f_defEtc'));
+    push('최소 검출 결함 크기(mm)', val('f_defMin'));
+    push('높이 기반 불량 유무', radio('h3d'));
+    push('현재 불량률(%)', val('f_defRate')); push('허용 과검율(%)', val('f_overRate'));
+    push('현재 검사 방식', radio('curIns'));
+
+    hr('5. 투입·배출');
+    push('투입 상태', radio('inMode'));
+    push('검사면 정렬 가능 여부', radio('face'));
+    push('배출 방식', radio('outMode'));
+
+    hr('6. 설치 환경');
+    push('전원', val('f_power')); push('에어', val('f_air'));
+    push('조명 환경', val('f_light')); push('진동·충격', val('f_vib'));
+    push('네트워크', val('f_net')); push('바닥 하중', val('f_floor'));
+
+    hr('7. 반입 경로');
+    push('최소 폭(mm)', val('f_inW')); push('최소 높이(mm)', val('f_inH'));
+    push('엘리베이터 하중(kg)', val('f_inL')); push('특이사항', val('f_inEtc'));
+
+    hr('8. 운영 조건');
+    push('작업자 수', val('f_oper')); push('근무 형태', val('f_shift'));
+    push('데이터 보관', val('f_keep')); push('보관 기간', val('f_keepTerm'));
+    push('MES 연동', val('f_mes')); push('운용 담당', val('f_owner'));
+
+    hr('9. 협동로봇');
+    push('현장 수용 여부', radio('cobot'));
+    push('운용 경험', val('f_cobotExp')); push('위험성평가 주체', val('f_safety'));
+
+    hr('10. 종합 의견');
+    push('최종 권장 유형', radio('final'));
+    push('도입 희망 시기', val('f_when'));
+    push('기타 요청·우려', val('f_free'));
+
+    return L.join('\n');
+  }
+
+  function toast(msg){
+    var t = $('toast');
+    t.textContent = msg; t.classList.add('on');
+    setTimeout(function(){ t.classList.remove('on'); }, 2000);
+  }
+
+  $('btnCopy').addEventListener('click', function(){
+    var txt = buildText();
+    function fallback(){
+      var ta = document.createElement('textarea');
+      ta.value = txt;
+      ta.style.position='fixed'; ta.style.left='-9999px';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch(e){ ok = false; }
+      document.body.removeChild(ta);
+      toast(ok ? '메일 본문이 복사되었습니다' : '복사에 실패했습니다');
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){
+        toast('메일 본문이 복사되었습니다');
+      })['catch'](fallback);
+    } else { fallback(); }
+  });
+
+  $('btnClear').addEventListener('click', function(){
+    if(!window.confirm('작성한 내용을 모두 지웁니다. 계속할까요?')) return;
+    var fs = document.querySelectorAll('input[type=text],input[type=number],textarea');
+    for(var i=0;i<fs.length;i++) fs[i].value = '';
+    var ss = document.querySelectorAll('select');
+    for(var j=0;j<ss.length;j++) ss[j].selectedIndex = 0;
+    var cs = document.querySelectorAll('input[type=radio],input[type=checkbox]');
+    for(var k=0;k<cs.length;k++) cs[k].checked = false;
+    syncType();
+    toast('초기화되었습니다');
+  });
+})();
+</script>
+</body>
+</html>
