@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>전주 세척장 일보 v1.1</title>
+<title>전주 세척장 일보 v1.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -145,7 +145,7 @@ body.mode-p .imgs{grid-template-columns:repeat(6,1fr)}
 <header class="nav">
   <div class="nav-inner">
     <h1>전주 세척장 일보</h1>
-    <span class="ver" id="verH">v1.1</span>
+    <span class="ver" id="verH">v1.2</span>
     <div class="seg" role="group" aria-label="화면 선택">
       <button type="button" id="vwM" class="on" aria-pressed="true">모바일</button>
       <button type="button" id="vwP" aria-pressed="false">PC</button>
@@ -160,7 +160,7 @@ body.mode-p .imgs{grid-template-columns:repeat(6,1fr)}
     <h2>엑셀 불러오기</h2>
     <label class="drop" id="drop" for="file">
       엑셀 또는 화면캡처 이미지를 끌어놓거나 눌러서 선택
-      <small>엑셀(.xlsx/.xls) · 캡처 이미지(.png/.jpg) · 여러 파일 가능</small>
+      <small>엑셀(.xlsx/.xls) · 캡처 이미지(.png/.jpg) · <b>Ctrl+V로 캡처 붙여넣기</b> · 여러 파일 가능</small>
       <input type="file" id="file" accept=".xlsx,.xls,image/*" multiple>
     </label>
     <progress id="prog" class="prog" hidden></progress>
@@ -231,7 +231,7 @@ body.mode-p .imgs{grid-template-columns:repeat(6,1fr)}
 <footer class="foot">
   <div class="nav-inner">
     <span>대외비 · 인시스 AI혁신 연구개발실</span>
-    <span id="verF">v1.1</span>
+    <span id="verF">v1.2</span>
   </div>
 </footer>
 
@@ -263,12 +263,12 @@ body.mode-p .imgs{grid-template-columns:repeat(6,1fr)}
 <script>
 (function(){
 'use strict';
-var VERSION='v1.1';
+var VERSION='v1.2';
 var COLL='jeonju_wash_daily';
 var FBCFG={apiKey:"AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",authDomain:"insys-work.firebaseapp.com",projectId:"insys-work",storageBucket:"insys-work.firebasestorage.app",messagingSenderId:"225275784859",appId:"1:225275784859:web:bd12815c6dc47c0c49e03e"};
 
 var db=null, storage=null, fbOK=false;
-var imgOpen=false, viewImg=null;
+var imgOpen=false, viewImg=null, busy=false;
 var reports={};      // date -> doc
 var dates=[];        // 최신순
 var cur=null;
@@ -444,7 +444,10 @@ function parseRows(rows,fileName){
 async function handleFiles(fileList){
   var files=Array.prototype.slice.call(fileList||[]);
   if(!files.length)return;
+  if(busy){toast('분석 중입니다. 잠시 후 다시 시도하세요.');return}
   if(!window.XLSX){toast('엑셀 라이브러리를 불러오지 못했습니다.');return}
+  busy=true;
+  try{
   pending=[];
   for(var n=0;n<files.length;n++){
     var f=files[n];
@@ -470,6 +473,7 @@ async function handleFiles(fileList){
   setProg('',null);
   setStatus('파일 분석 완료 — 아래 미리보기를 확인하고 저장하세요.');
   renderPending();
+  }finally{busy=false}
 }
 
 /* ---------- 이미지 : 격자 인식 + OCR ---------- */
@@ -1090,6 +1094,20 @@ function bind(){
     var bt=e.target.closest?e.target.closest('[data-del]'):null;if(!bt)return;
     var a=bt.getAttribute('data-del').split(':'),i=+a[0],r=+a[1];
     if(pending[i]&&pending[i].doc){pending[i].doc.items.splice(r,1);renderPending()}
+  });
+  document.addEventListener('paste',function(e){
+    var items=(e.clipboardData&&e.clipboardData.items)||[],files=[],i,f,t=new Date();
+    var stamp=p2(t.getHours())+p2(t.getMinutes())+p2(t.getSeconds());
+    for(i=0;i<items.length;i++){
+      if(items[i].kind==='file'&&/^image\//.test(items[i].type)){
+        f=items[i].getAsFile();
+        if(f)files.push(new File([f],'붙여넣기_'+stamp+(files.length?'_'+(files.length+1):'')+'.png',{type:f.type||'image/png'}));
+      }
+    }
+    if(!files.length)return;
+    e.preventDefault();
+    toast('붙여넣은 캡처 '+files.length+'장을 분석합니다.');
+    handleFiles(files);
   });
   $('btnSave').onclick=saveAll;
   $('btnCancel').onclick=function(){pending=[];renderPending()};
