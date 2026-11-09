@@ -206,7 +206,7 @@
 <header class="cover"><div class="nav-inner">
   <div class="hd-top">
     <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-    <span class="hd-ver" id="hVer">v1.1</span>
+    <span class="hd-ver" id="hVer">v1.2</span>
   </div>
   <h1>AI 기반 PCB 검사 자동화 검사기<br>제작사양 의견서</h1>
   <div class="hd-sub">수신 : 위너콤 생산부문 / 현장 상주 관리자 &nbsp;·&nbsp; 발신 : 인시스 AI혁신 연구개발실</div>
@@ -379,21 +379,6 @@
       <div class="fld">
         <span class="lb">기타 불량 유형 / 보충 설명</span>
         <textarea id="f_defEtc" placeholder="현장에서 가장 자주 나오는 불량 순서로 적어주시면 도움이 됩니다"></textarea><span class="pv"></span>
-      </div>
-      <div class="grid2">
-        <div class="fld">
-          <span class="lb"><span class="req">최소 검출 결함 크기</span> (mm)</span>
-          <input type="number" id="f_defMin" step="0.01" min="0" placeholder="예) 0.2"><span class="pv"></span>
-          <div class="hint">카메라 해상도를 결정하는 가장 중요한 값입니다. 정확히 모르시면 <b>대략적인 추정값</b>이라도 기재 부탁드립니다.</div>
-        </div>
-        <div class="fld">
-          <span class="lb">높이 차이로만 판별되는 불량이 있습니까</span>
-          <div class="opts">
-            <label class="opt"><input type="radio" name="h3d" value="있음 (3D 높이 검사 필요)"><span class="mk"></span>있음 — 3D 높이 검사 필요</label>
-            <label class="opt"><input type="radio" name="h3d" value="없음 (2D 외관으로 충분)"><span class="mk"></span>없음 — 2D 외관으로 충분</label>
-            <label class="opt"><input type="radio" name="h3d" value="판단 어려움"><span class="mk"></span>판단 어려움</label>
-          </div>
-        </div>
       </div>
       <div class="grid2">
         <div class="fld"><span class="lb">현재 불량률 (%)</span><input type="number" id="f_defRate" step="0.01" min="0" placeholder="0"><span class="pv"></span></div>
@@ -609,7 +594,7 @@
 </div></div>
 
 <footer>
-  인시스 AI혁신 연구개발실 &nbsp;·&nbsp; ys.kim@in-sys.co.kr &nbsp;·&nbsp; 문서버전 <span id="fVer">v1.1</span><br>
+  인시스 AI혁신 연구개발실 &nbsp;·&nbsp; ys.kim@in-sys.co.kr &nbsp;·&nbsp; 문서버전 <span id="fVer">v1.2</span><br>
   AI 기반 PCB 검사 자동화 검사기 제작사양 의견서
 </footer>
 
@@ -618,7 +603,7 @@
 <script>
 (function(){
   "use strict";
-  var VER = 'v1.1';
+  var VER = 'v1.2';
   var $ = function(id){ return document.getElementById(id); };
 
   $('fVer').textContent = VER;
@@ -772,8 +757,6 @@
     hr('4. 검출 대상 불량');
     push('필수 검출 불량', checks('def').join(', '));
     push('기타/보충', val('f_defEtc'));
-    push('최소 검출 결함 크기(mm)', val('f_defMin'));
-    push('높이 기반 불량 유무', radio('h3d'));
     push('현재 불량률(%)', val('f_defRate')); push('허용 과검율(%)', val('f_overRate'));
     push('현재 검사 방식', radio('curIns'));
 
