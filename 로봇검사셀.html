@@ -121,7 +121,7 @@
 <header class="cover"><div class="nav-inner">
   <div class="hd-top">
     <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-    <span class="hd-ver" id="hVer">v1.0</span>
+    <span class="hd-ver" id="hVer">v1.1</span>
   </div>
   <h1>협동로봇 PCB 검사셀 시뮬레이터</h1>
   <div class="hd-sub">두산 A0509 + Cognex IS3805CP · 컨베이어 없음 · 작업대 안착 검사</div>
@@ -142,20 +142,22 @@
           <b>로봇 받침대</b> 500 × 500 × 750 mm &nbsp;·&nbsp;
           <b>두산 A0509</b> 6축 / 가반 5 kg / 리치 900 mm / 반복정도 ±0.03 mm &nbsp;·&nbsp;
           <b>Cognex IS3805CP</b> 5 MP · 오토포커스 · Multi-Torch &nbsp;·&nbsp;
-          <b>L38-300</b> 3D 라인스캔
+          <b>L38-300</b> 3D 라인스캔<br>
+          <b>검사 대상</b> 타원형 PCB 100 × 50 mm 1매 + 샤크 안테나 케이스 1개 (조립 전 펼쳐진 상태) &nbsp;·&nbsp;
+          <b>목표 택트</b> 10초 이내
         </div>
         <div class="card-b">
           <div class="axisbar">
             <div class="ax" id="axT"><div class="k">대상 PCB</div><div class="v" id="vT">-</div></div>
             <div class="ax" id="axW"><div class="k">작업거리 WD</div><div class="v" id="vW">-</div></div>
             <div class="ax" id="axA"><div class="k">PCB 기울기</div><div class="v" id="vA">-</div></div>
-            <div class="ax" id="axP"><div class="k">진행</div><div class="v" id="vP">-</div></div>
+            <div class="ax" id="axP"><div class="k">검사 완료</div><div class="v" id="vP">-</div></div>
           </div>
           <div class="chips">
             <span class="chip" id="cScan">3D 스캔 <b id="bScan">OFF</b></span>
             <span class="chip" id="cAlign">직각 정렬 <b id="bAlign">-</b></span>
             <span class="chip" id="cShot">촬영 <b id="bShot">OFF</b></span>
-            <span class="chip" id="cSen">검사 대상 <b id="bSen">0 / 3</b></span>
+            <span class="chip" id="cSen">검사 완료 <b id="bSen">0</b></span>
           </div>
           <div class="vbox">
             <div class="lamp" id="lamp">--</div>
@@ -228,12 +230,12 @@
   </section>
 </main>
 
-<footer>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · <span id="fVer">v1.0</span></footer>
+<footer>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · <span id="fVer">v1.1</span></footer>
 
 <script>
 (function(){
 "use strict";
-var VER='v1.0';
+var VER='v1.1';
 var $=function(id){return document.getElementById(id);};
 $('hVer').textContent=VER; $('fVer').textContent=VER;
 
@@ -248,11 +250,8 @@ var WD=40;                                      // 작업거리 200 mm
 var PCB_W=20, PCB_D=10, PCB_T=1.2;              // PCB 100 × 50 mm
 var HOME={r:46,z:TBL_Z+96};                     // 원점 (베이스 기준 수평거리 / 높이)
 
-var TARGETS=[
-  {x:152,y:62,rz:-14,ta: 2.6,tb:-1.8},
-  {x:186,y:74,rz:  9,ta:-1.9,tb: 2.4},
-  {x:218,y:60,rz:-25,ta: 3.4,tb: 1.2}
-];
+var TARGETS=[ {x:156,y:64,rz:-12,ta:2.2,tb:-1.6} ];   // 타원형 PCB 100 × 50 mm · 1매
+var CASE={x:204,y:74,rz:16};                           // 샤크 안테나 케이스 240 × 80 mm · 1개
 
 /* ======================= 투영 ======================= */
 var VIEW={yaw:38,pitch:25};
@@ -382,6 +381,17 @@ function solveArm(tx,ty,tz,tiltA,tiltB){
           reachRatio:Dl/(L1+L2)};
 }
 
+/* 타원 / 물방울 외곽선 (tear<1 이면 -u 쪽이 좁아짐) */
+function ellOutline(hu,hv,N,tear){
+  var p=[];
+  for(var i=0;i<N;i++){
+    var t=2*Math.PI*i/N;
+    var f = tear ? (tear + (1-tear)*(1+Math.cos(t))/2) : 1;
+    p.push([hu*Math.cos(t), hv*Math.sin(t)*f]);
+  }
+  return p;
+}
+
 /* ======================= 상태 ======================= */
 var STATES=[
   {ph:'대기',    t:'wait',   sig:'START', lb:'START 대기'},
@@ -450,11 +460,10 @@ function draw(){
   })();
   s+=box(PED.x0,PED.x1,PED.y0,PED.y1,TBL_Z-6,TBL_Z,MAT.panel,0.7);
 
-  /* PCB 3매 (작업대 위 · 겹치지 않게) */
-  for(var i=0;i<TARGETS.length;i++){
-    var t=TARGETS[i], insp=(i===tIdx&&running), gone=(i<tIdx||(i===tIdx&&idx>=8));
-    s+=drawPcb(t, insp, gone);
-  }
+  /* 샤크 안테나 케이스 1개 + 타원형 PCB 1매 (조립 전 펼쳐진 상태) */
+  s+=drawCase();
+  s+=drawPcb(TARGETS[0], running);
+  s+=drawLeads();
 
   /* 로봇 */
   s+=drawRobot();
@@ -466,44 +475,140 @@ function draw(){
   updHUD();
 }
 
-function drawPcb(t,insp,gone){
-  var o='', rz=t.rz*Math.PI/180, ca=Math.cos(rz), sa=Math.sin(rz);
+function pcbFrame(t){
+  var rz=t.rz*Math.PI/180, ca=Math.cos(rz), sa=Math.sin(rz);
   var ta=t.ta*Math.PI/180, tb=t.tb*Math.PI/180;
-  function LP(u,v,n){
-    var X=t.x + (u*ca - v*sa), Y=t.y + (u*sa + v*ca);
-    var Z=TBL_Z + n + u*Math.sin(tb) + v*Math.sin(ta);
-    return {X:X,Y:Y,Z:Z};
+  return function(u,v,n){
+    return {X:t.x+(u*ca-v*sa), Y:t.y+(u*sa+v*ca),
+            Z:TBL_Z+n+u*Math.sin(tb)+v*Math.sin(ta)};
+  };
+}
+
+/* ---- 타원형 PCB 100 × 50 mm ---- */
+function drawPcb(t,insp){
+  var o='', LP=pcbFrame(t);
+  var hu=PCB_W/2, hv=PCB_D/2;
+  var O=ellOutline(hu,hv,30,0);
+
+  // 측면 (기판 두께)
+  for(var i=0;i<O.length;i++){
+    var a=O[i], b=O[(i+1)%O.length];
+    var mx=(a[0]+b[0])/2, my=(a[1]+b[1])/2;
+    var nl=Math.hypot(mx/ (hu*hu), my/(hv*hv))||1;
+    var nx=(mx/(hu*hu))/nl, ny=(my/(hv*hv))/nl;
+    var lam=Math.max(0,nx*LGT.x+ny*LGT.y), k=0.52+0.5*lam;
+    var q=[LP(a[0],a[1],0),LP(b[0],b[1],0),LP(b[0],b[1],PCB_T),LP(a[0],a[1],PCB_T)].map(PJ);
+    o+=quad(q[0],q[1],q[2],q[3],shade(MAT.pcb,k),shade(MAT.pcb,k*0.7),0.4);
   }
-  var hw=PCB_W/2, hd=PCB_D/2;
-  function face(n,base,k){
-    var q=[LP(-hw,-hd,n),LP(hw,-hd,n),LP(hw,hd,n),LP(-hw,hd,n)].map(PJ);
-    return quad(q[0],q[1],q[2],q[3],shade(base,k),shade(base,k*0.7),0.6);
+  // 상면
+  var top=O.map(function(c){return PJ(LP(c[0],c[1],PCB_T));});
+  o+='<polygon points="'+top.map(pt).join(' ')+'" fill="'+shade(MAT.pcb,1.06)+'" stroke="'+shade(MAT.pcb,0.68)+'" stroke-width="0.5"/>';
+
+  // 금도금 패드 (타원 내부만)
+  for(var r2=0;r2<3;r2++) for(var c2=0;c2<7;c2++){
+    var pu=-hu+2.0+c2*2.7, pv=-hv+1.6+r2*2.6;
+    if((pu*pu)/(hu*hu)+(pv*pv)/(hv*hv) > 0.62) continue;
+    var qq=[LP(pu-0.75,pv-0.6,PCB_T+0.05),LP(pu+0.75,pv-0.6,PCB_T+0.05),
+            LP(pu+0.75,pv+0.6,PCB_T+0.05),LP(pu-0.75,pv+0.6,PCB_T+0.05)].map(PJ);
+    o+=quad(qq[0],qq[1],qq[2],qq[3],shade(MAT.gold,1.1),shade(MAT.gold,0.72),0.3);
   }
-  // 측면
-  var sideSeq=[[-hw,-hd,hw,-hd],[hw,-hd,hw,hd],[hw,hd,-hw,hd],[-hw,hd,-hw,-hd]];
-  for(var i=0;i<sideSeq.length;i++){
-    var e=sideSeq[i];
-    var q=[LP(e[0],e[1],0),LP(e[2],e[3],0),LP(e[2],e[3],PCB_T),LP(e[0],e[1],PCB_T)].map(PJ);
-    o+=quad(q[0],q[1],q[2],q[3],shade(MAT.pcb,0.62),shade(MAT.pcb,0.44),0.5);
-  }
-  o+=face(PCB_T,MAT.pcb, gone?0.72:1.06);
-  // 패드 · 부품
-  for(var r2=0;r2<2;r2++) for(var c=0;c<6;c++){
-    var pu=-hw+3.2+c*2.9, pv=-hd+3+r2*4.2;
-    var qq=[LP(pu-0.9,pv-0.8,PCB_T+0.05),LP(pu+0.9,pv-0.8,PCB_T+0.05),LP(pu+0.9,pv+0.8,PCB_T+0.05),LP(pu-0.9,pv+0.8,PCB_T+0.05)].map(PJ);
-    o+=quad(qq[0],qq[1],qq[2],qq[3],shade(MAT.gold,gone?0.8:1.1),shade(MAT.gold,0.7),0.35);
-  }
-  // 커넥터 블록
-  var cu=hw-3.4;
-  var cq=[LP(cu-2,-2.4,PCB_T),LP(cu+2,-2.4,PCB_T),LP(cu+2,2.4,PCB_T),LP(cu-2,2.4,PCB_T)];
-  var top=cq.map(function(p){return PJ({X:p.X,Y:p.Y,Z:p.Z+1.8});});
-  o+=quad(top[0],top[1],top[2],top[3],shade(MAT.dark,1.05),shade(MAT.dark,0.7),0.4);
-  var f0=[PJ(cq[0]),PJ(cq[1]),top[1],top[0]];
-  o+=quad(f0[0],f0[1],f0[2],f0[3],shade(MAT.dark,0.74),shade(MAT.dark,0.5),0.4);
-  // 검사 대상 표시
+  // SMD 부품 2개
+  [[-3.4,0.4,2.2,1.3],[3.0,-0.9,1.6,1.1]].forEach(function(b){
+    var base=[LP(b[0]-b[2]/2,b[1]-b[3]/2,PCB_T),LP(b[0]+b[2]/2,b[1]-b[3]/2,PCB_T),
+              LP(b[0]+b[2]/2,b[1]+b[3]/2,PCB_T),LP(b[0]-b[2]/2,b[1]+b[3]/2,PCB_T)];
+    var tp=base.map(function(q){return PJ({X:q.X,Y:q.Y,Z:q.Z+1.1});});
+    o+=quad(tp[0],tp[1],tp[2],tp[3],shade(MAT.dark,1.05),shade(MAT.dark,0.7),0.35);
+    o+=quad(PJ(base[0]),PJ(base[1]),tp[1],tp[0],shade(MAT.dark,0.74),shade(MAT.dark,0.5),0.35);
+  });
+  // 커넥터 단자 (리드선 결선부)
+  var cu=hu-2.6;
+  var cb=[LP(cu-1.2,-1.6,PCB_T),LP(cu+1.2,-1.6,PCB_T),LP(cu+1.2,1.6,PCB_T),LP(cu-1.2,1.6,PCB_T)];
+  var ct=cb.map(function(q){return PJ({X:q.X,Y:q.Y,Z:q.Z+1.4});});
+  o+=quad(ct[0],ct[1],ct[2],ct[3],shade([228,228,232],1.02),'#9AA0A8',0.35);
+  o+=quad(PJ(cb[0]),PJ(cb[1]),ct[1],ct[0],shade([228,228,232],0.74),'#9AA0A8',0.35);
+
   if(insp){
-    var oq=[LP(-hw-1.6,-hd-1.6,PCB_T+0.1),LP(hw+1.6,-hd-1.6,PCB_T+0.1),LP(hw+1.6,hd+1.6,PCB_T+0.1),LP(-hw-1.6,hd+1.6,PCB_T+0.1)].map(PJ);
-    o+='<polygon points="'+oq.map(pt).join(' ')+'" fill="none" stroke="#2E5E8C" stroke-width="1.1" stroke-dasharray="3 2"/>';
+    var ring=ellOutline(hu+1.6,hv+1.6,30,0).map(function(c){return PJ(LP(c[0],c[1],PCB_T+0.1));});
+    o+='<polygon points="'+ring.map(pt).join(' ')+'" fill="none" stroke="#2E5E8C" stroke-width="1.1" stroke-dasharray="3 2"/>';
+  }
+  return o;
+}
+
+/* ---- 샤크 안테나 케이스 (베이스 240 × 80 mm) ---- */
+function caseFrame(){
+  var rz=CASE.rz*Math.PI/180, ca=Math.cos(rz), sa=Math.sin(rz);
+  return function(u,v,n){ return {X:CASE.x+(u*ca-v*sa), Y:CASE.y+(u*sa+v*ca), Z:TBL_Z+n}; };
+}
+function drawCase(){
+  var o='', CP=caseFrame(), TH=2.6;
+  var hu=24, hv=8;
+  var O=ellOutline(hu,hv,40,0.34);
+
+  // 측면
+  for(var i=0;i<O.length;i++){
+    var a=O[i], b=O[(i+1)%O.length];
+    var mx=(a[0]+b[0])/2, my=(a[1]+b[1])/2;
+    var nl=Math.hypot(mx,my)||1;
+    var lam=Math.max(0,(mx/nl)*LGT.x+(my/nl)*LGT.y), k=0.5+0.52*lam;
+    var q=[CP(a[0],a[1],0),CP(b[0],b[1],0),CP(b[0],b[1],TH),CP(a[0],a[1],TH)].map(PJ);
+    o+=quad(q[0],q[1],q[2],q[3],shade([44,46,50],k),shade([30,32,36],k*0.7),0.4);
+  }
+  // 상면
+  var top=O.map(function(c){return PJ(CP(c[0],c[1],TH));});
+  o+='<polygon points="'+top.map(pt).join(' ')+'" fill="'+shade([58,60,66],1.04)+'" stroke="#2A2C31" stroke-width="0.5"/>';
+  // 내부 단차
+  var inn=ellOutline(hu-3.6,hv-2.2,40,0.34).map(function(c){return PJ(CP(c[0],c[1],TH+0.35));});
+  o+='<polygon points="'+inn.map(pt).join(' ')+'" fill="'+shade([48,50,56],1.02)+'" stroke="#34363C" stroke-width="0.45"/>';
+
+  // 마운팅 홀 4개
+  [[-17,0],[-4,-4.4],[-4,4.4],[13,0]].forEach(function(h){
+    var q=PJ(CP(h[0],h[1],TH+0.4));
+    o+='<ellipse cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" rx="1.5" ry="0.95" fill="#1B1D21" stroke="#5A5E66" stroke-width="0.4"/>';
+  });
+
+  // 코엑스 커넥터 보스 (실버)
+  (function(){
+    var bc=CP(4,0,TH), b0={x:bc.X,y:bc.Y,z:bc.Z}, b1={x:bc.X,y:bc.Y,z:bc.Z+3.4};
+    o+=tube(b0,b1,2.5,[176,180,188],false,true);
+    var br=CP(4,0,TH+3.9); var qq=PJ(br);
+    o+='<ellipse cx="'+qq.x.toFixed(1)+'" cy="'+qq.y.toFixed(1)+'" rx="1.25" ry="0.8" fill="#3A3D44"/>';
+    // 브래킷
+    var k0=CP(0.6,-2.6,TH), k1=CP(0.6,2.6,TH);
+    o+=tube({x:k0.X,y:k0.Y,z:k0.Z},{x:k0.X,y:k0.Y,z:k0.Z+2.4},0.9,[168,172,180],false,true);
+    o+=tube({x:k1.X,y:k1.Y,z:k1.Z},{x:k1.X,y:k1.Y,z:k1.Z+2.4},0.9,[168,172,180],false,true);
+  })();
+
+  // 출선 케이블 (직조 슬리브) + 그레이 커넥터
+  (function(){
+    var segs=[[21,-1.0],[27,-2.8],[32,-5.6],[36,-9.2]];
+    var prev=CP(17,0,TH*0.5);
+    for(var i=0;i<segs.length;i++){
+      var cur=CP(segs[i][0],segs[i][1],TH*0.5);
+      o+=tube({x:prev.X,y:prev.Y,z:prev.Z},{x:cur.X,y:cur.Y,z:cur.Z},1.5,[78,80,86],i===0,false);
+      prev=cur;
+    }
+    // 그레이 커넥터 30 × 20 mm
+    var cn=CP(39,-10.6,0);
+    o+=box(cn.X-3.2,cn.X+3.2,cn.Y-2.2,cn.Y+2.2,TBL_Z,TBL_Z+4.2,[172,176,184],0.5);
+    for(var j=0;j<4;j++){
+      var sx=cn.X-2.3+j*1.5;
+      var q0=P(sx,cn.Y-2.25,TBL_Z+1.0), q1=P(sx,cn.Y-2.25,TBL_Z+3.4);
+      o+='<line x1="'+q0.x.toFixed(1)+'" y1="'+q0.y.toFixed(1)+'" x2="'+q1.x.toFixed(1)+'" y2="'+q1.y.toFixed(1)+'" stroke="#5E636B" stroke-width="0.9"/>';
+    }
+  })();
+  return o;
+}
+
+/* ---- PCB ↔ 케이스 리드선 ---- */
+function drawLeads(){
+  var o='', LP=pcbFrame(TARGETS[0]), CP=caseFrame();
+  var hu=PCB_W/2;
+  var cols=['#2F6FD0','#2A2E34','#D9B528'];
+  for(var i=0;i<3;i++){
+    var a=PJ(LP(hu-2.4, -1.1+i*1.1, PCB_T+1.2));
+    var b=PJ(CP(-2.5+i*1.0, -3.4+i*0.5, 2.6+1.2));
+    var mx=(a.x+b.x)/2, my=(a.y+b.y)/2+5.5+i*1.1;
+    o+='<path d="M'+pt(a)+' Q'+mx.toFixed(1)+','+my.toFixed(1)+' '+pt(b)+'" fill="none" stroke="'+cols[i]+'" stroke-width="1.15" stroke-linecap="round" opacity=".92"/>';
   }
   return o;
 }
@@ -593,12 +698,7 @@ function drawRobot(){
 function drawVision(t){
   var o='', A=solveArm(armT.x,armT.y,armT.z,armT.ta,armT.tb);
   if(!t) return '';
-  var rz=t.rz*Math.PI/180, ca=Math.cos(rz), sa=Math.sin(rz);
-  var ta=t.ta*Math.PI/180, tb=t.tb*Math.PI/180;
-  function LP(u,v,n){
-    return {X:t.x+(u*ca-v*sa), Y:t.y+(u*sa+v*ca),
-            Z:TBL_Z+n+u*Math.sin(tb)+v*Math.sin(ta)};
-  }
+  var LP=pcbFrame(t);
   var hw=PCB_W/2, hd=PCB_D/2;
 
   /* 3D 라인스캔 : 레이저 라인이 PCB 위를 지나감 */
@@ -639,17 +739,17 @@ function drawVision(t){
 function updHUD(){
   var A=solveArm(armT.x,armT.y,armT.z,armT.ta,armT.tb);
   var t=TARGETS[tIdx];
-  $('vT').textContent = running||done>0 ? ('#'+(tIdx+1)+' / '+TARGETS.length) : '-';
+  $('vT').textContent = running ? '타원 PCB 100×50' : '-';
   var wd=(armT.z-(TBL_Z+PCB_T))*U;
   $('vW').textContent = (wd>0&&wd<520) ? Math.round(wd)+' mm' : '-';
   $('vA').textContent = (aligned||scanT>=0) ? ('θ'+t.ta.toFixed(1)+'° φ'+t.tb.toFixed(1)+'°') : '-';
-  $('vP').textContent = done+' / '+TARGETS.length;
+  $('vP').textContent = done+' 매';
   ['axT','axW','axA','axP'].forEach(function(k){ var e=$(k); if(e) e.classList.toggle('on', running); });
 
   $('bScan').textContent = scanT>=0?'ON':'OFF';  $('cScan').classList.toggle('on',scanT>=0);
   $('bAlign').textContent = aligned?'⊥ 직각':'-'; $('cAlign').classList.toggle('on',aligned);
   $('bShot').textContent = shotT>=0?'노광':'OFF'; $('cShot').classList.toggle('on',shotT>=0);
-  $('bSen').textContent = done+' / '+TARGETS.length;
+  $('bSen').textContent = String(done);
   $('cSen').classList.toggle('alarm',alarm);
 
   var lp=$('lamp'); lp.textContent=verdict||'--';
@@ -751,7 +851,7 @@ function runState(){
       pause(D.act,next);
     } else {
       var h=homePos();
-      addLog('=== 전수 '+done+'매 완료 · 원점 복귀 ===');
+      addLog('=== PCB '+done+'매 검사 완료 · 원점 복귀 ===');
       moveTo(h.x,h.y,h.z,0,0,D.move,function(){ tIdx=0; next(); });
     }
     return;
@@ -827,6 +927,7 @@ $('tabP').addEventListener('click',function(){ setView('p'); });
   renderSpd(); setMes('wait'); draw(); renderSteps(); updSig();
   addLog('협동로봇 PCB 검사셀 시뮬레이터 '+VER+' 준비 완료.');
   addLog('구성 : 두산 A0509 + Cognex IS3805CP(2D) + L38-300(3D) · 받침대 500×500×750 mm · 컨베이어 없음');
+  addLog('대상 : 타원형 PCB 100 × 50 mm 1매 + 샤크 안테나 케이스 1개 (조립 전 펼쳐진 상태)');
 })();
 })();
 </script>
