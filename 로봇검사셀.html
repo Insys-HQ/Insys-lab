@@ -121,7 +121,7 @@
 <header class="cover"><div class="nav-inner">
   <div class="hd-top">
     <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-    <span class="hd-ver" id="hVer">v1.6</span>
+    <span class="hd-ver" id="hVer">v1.7</span>
   </div>
   <h1>협동로봇 PCB 검사셀 시뮬레이터</h1>
   <div class="hd-sub">두산 A0509 + Cognex IS3805CP · 컨베이어 없음 · 작업대 안착 검사</div>
@@ -143,8 +143,8 @@
           <b>두산 A0509</b> 6축 / 가반 5 kg / 리치 900 mm / 반복정도 ±0.03 mm &nbsp;·&nbsp;
           <b>Cognex IS3805CP</b> 5 MP · 오토포커스 · Multi-Torch &nbsp;·&nbsp;
           <b>L38-300</b> 3D 라인스캔<br>
-          <b>검사 대상</b> 타원형 PCB 150 × 75 mm 1매 + 샤크 안테나 케이스 1개(<b>안착지그</b> 안착 — 지그는 좌측 45° 경사 고정) — 작업대에 <b>상하(전후) 방향 · 약 10° 기울기</b>로 로봇 바로 앞에 안착 &nbsp;·&nbsp;
-          <b>동시 판독</b> PCB 외관 + 케이스 <b>QR 코드</b> 1회 촬영 &nbsp;·&nbsp;
+          <b>검사 대상</b> 타원형 PCB 150 × 75 mm 1매 + 샤크 안테나 케이스 1개(<b>아세탈 안착부</b> 안착 — 우측이 높은 <b>30° 경사</b>·고정) — 작업대에 <b>상하(전후) 방향 · 약 10° 기울기</b>로 로봇 바로 앞에 안착 &nbsp;·&nbsp;
+          <b>3D 측정</b> 협동로봇이 전 구간 주행하며 라인스캔 &nbsp;·&nbsp; <b>동시 판독</b> PCB 외관 + 케이스 <b>QR 코드</b> 1회 촬영 &nbsp;·&nbsp;
           <b>흐름</b> 지그는 제자리 고정, PCB·케이스만 좌측 투입 → 검사 → 우측 배출 &nbsp;·&nbsp;
           <b>목표 택트</b> 10초 이내 &nbsp;·&nbsp; <b>15" 모니터</b> 받침대 전면 숏암 거치 (판정 + 3색 경광등 팝업)
         </div>
@@ -238,7 +238,7 @@
 <script>
 (function(){
 "use strict";
-var VER='v1.6';
+var VER='v1.7';
 var $=function(id){return document.getElementById(id);};
 $('hVer').textContent=VER; $('fVer').textContent=VER;
 
@@ -254,12 +254,17 @@ var WD=40;                                      // 작업거리 200 mm
 var PCB_W=30, PCB_D=15, PCB_T=1.2;      // 타원 PCB 150 × 75 mm (1.5배)              // PCB 100 × 50 mm
 var HOME={r:46,z:TBL_Z+84};                     // 원점 (베이스 기준 수평거리 / 높이)
 
-var TARGETS=[ {x:40,y:157,rz:98,ta:2.2,tb:-1.6} ];    // 카메라 조준점 = PCB·QR 중간 (동시 판독)
-var PCBP={x:36,y:192,rz:260,ta:2.2,tb:-1.6};            // 타원형 PCB 100 × 50 mm · 1매 (상하 배치)
+var TARGETS=[ {x:40,y:152,rz:98,ta:2.2,tb:-1.6} ];
+var SCANU=44;                                           // 로봇 주행 스캔 반경 (±220 mm)    // 카메라 조준점 = PCB·QR 중간 (동시 판독)
+var PCBP={x:36,y:184,rz:260,ta:2.2,tb:-1.6};            // 타원형 PCB 100 × 50 mm · 1매 (상하 배치)
 var CASE={x:44,y:135,rz:93};                           // 케이스 (지그 안착 자세 · 좌측 45° 경사)
 var JIG ={x:44,y:135,rz:93};                           // 안착지그 — 고정 (이송하지 않음)                            // 샤크 안테나 케이스 240 × 80 mm · 1개 (QR 부착)
 var QRSN='A5030-261109-0137';                           // 케이스 QR 시리얼
-var JIGH=3;                                             // 케이스 안착지그 상면 15 mm
+var JHU=28, JHV=13;                                     // 아세탈 안착부 280 × 130 mm
+var JIG_LO=2.6;                                         // 좌측(낮은 쪽) 상면 13 mm
+var JIG_K=Math.tan(30*Math.PI/180);                     // 우측이 높은 30° 경사
+function jigTop(v){ return JIG_LO+(JHV-v)*JIG_K; }      // 안착부 로컬 상면 높이
+function sg(x){ return x<0?-1:1; }
 var PART_IN=-110, PART_OUT=180;                         // 좌측 투입점 / 우측 배출점 (X 오프셋)
 var partX=0;                                            // 현재 조립품 X 오프셋
 var MON={x:80,y:-50,z:TBL_Z+54};                       // 15" 모니터 중심 (받침대 암 거치)
@@ -281,7 +286,7 @@ function viewDir(){
 }
 var LGT=(function(){var l={x:-0.42,y:-0.46,z:0.78};var m=Math.hypot(l.x,l.y,l.z);return {x:l.x/m,y:l.y/m,z:l.z/m};})();
 
-var MAT={ jig:[146,158,174], jigEdge:[118,130,148],
+var MAT={ acetal:[236,232,221], jig:[146,158,174], jigEdge:[118,130,148],
   dark:[58,64,74], mid:[150,158,170], light:[206,212,222], steel:[164,172,184],
   blue:[62,96,146], navy:[36,54,80], gold:[198,170,92], pcb:[46,118,62],
   wood:[198,186,168], panel:[178,186,196], cam:[48,52,60],
@@ -436,11 +441,12 @@ function ellOutline(hu,hv,N,tear){
 var STATES=[
   {ph:'대기',    t:'wait',   sig:'START', lb:'START 대기'},
   {ph:'투입',    t:'feed',   lb:'좌측 작업자 투입 → 검사 위치 이동·정지'},
-  {ph:'이동',    t:'approach',lb:'로봇 이동 → 대상 PCB 상부 스캔 시작점'},
-  {ph:'위치 측정',t:'scan3d', lb:'3D 라인스캔 → PCB·케이스 위치·기울기 측정'},
+  {ph:'이동',    t:'approach',lb:'로봇 이동 → 주행 스캔 시작단(안착부 앞단) 진입'},
+  {ph:'위치 측정',t:'scan3d', lb:'협동로봇 주행 라인스캔 → 전 구간(안착부+PCB) 형상 측정'},
   {ph:'자세 보정',t:'align',  lb:'측정값 반영 → 카메라를 PCB 면에 직각 정렬'},
   {ph:'비전 검사',t:'light',  on:true,  lb:'Multi-Torch 조명 ON'},
-  {ph:'비전 검사',t:'shot',   lb:'2D 촬영 1회 → PCB 외관 + 케이스 QR 동시 판독'},
+  {ph:'비전 검사',t:'shot',   lb:'로봇 이동 → PCB 상부 직각 정렬 후 2D 외관 촬영'},
+  {ph:'비전 검사',t:'qr',     lb:'로봇 이동 → 케이스 QR 판독 (경사 30° 직각 보정)'},
   {ph:'판정',    t:'verdict', lb:'판정 + MES 전송'},
   {ph:'판정',    t:'alarm',   cond:'ng', sig:'RESUME', lb:'NG 알람 · 제거 대기'},
   {ph:'복귀',    t:'light',   on:false, lb:'조명 OFF'},
@@ -451,7 +457,7 @@ var LOOP=1;
 
 var idx=0, running=false, waitSig=null, alarm=false, verdict='';
 var tIdx=0, done=0, okN=0, ngN=0;
-var lightOn=false, scanT=-1, shotT=-1, aligned=false;
+var lightOn=false, scanT=-1, shotT=-1, qrT=-1, aligned=false;
 var armT={x:RB.x+HOME.r*Math.cos(1.35),y:RB.y+HOME.r*Math.sin(1.35),z:HOME.z,ta:0,tb:0};   // 현재 공구 목표
 var token=0, timer=null;
 var LOGS=[];
@@ -586,8 +592,8 @@ function drawPcb(t,insp){
   return o;
 }
 
-/* 케이스 안착 높이 — 지그 위치(partX≈0)에서만 지그 상면으로 올라감 */
-function caseLift(){ var d=Math.abs(partX); return JIGH*Math.max(0,Math.min(1,(26-d)/18)); }
+/* 케이스 안착 계수 0~1 — 안착부 위치(partX≈0)에서만 경사면에 올라앉음 */
+function seatF(){ var d=Math.abs(partX); return Math.max(0,Math.min(1,(26-d)/18)); }
 
 /* ---- 케이스 안착지그 (280 × 125 × 15 mm · 좌측 45° 경사 · 고정) ---- */
 function jigFrame(){
@@ -595,51 +601,54 @@ function jigFrame(){
   return function(u,v,n){ return {X:JIG.x+(u*ca-v*sa), Y:JIG.y+(u*sa+v*ca), Z:TBL_Z+n}; };
 }
 function drawJig(){
-  var o='', JP=jigFrame(), HU=28, HV=12.5, R=3.0, i;
-  var O=[[HU-R,HV],[-(HU-R),HV],[-HU,HV-R],[-HU,-(HV-R)],[-(HU-R),-HV],[HU-R,-HV],[HU,-(HV-R)],[HU,HV-R]];
-
-  // 측면 (판재 두께)
-  for(i=0;i<O.length;i++){
-    var a=O[i], b=O[(i+1)%O.length];
-    var ex=b[0]-a[0], ey=b[1]-a[1], el=Math.hypot(ex,ey)||1;
-    var nx=ey/el, ny=-ex/el;
-    var lam=Math.max(0,nx*LGT.x+ny*LGT.y), k=0.52+0.5*lam;
-    var q=[JP(a[0],a[1],0),JP(b[0],b[1],0),JP(b[0],b[1],JIGH),JP(a[0],a[1],JIGH)].map(PJ);
-    o+=quad(q[0],q[1],q[2],q[3],shade(MAT.jig,k),shade(MAT.jig,k*0.68),0.45);
+  var o='', JP=jigFrame(), N=64, i, O=[];
+  for(i=0;i<N;i++){                                    // 수퍼타원 외곽 — 모서리 각이 드러나지 않음
+    var th=2*Math.PI*i/N, c=Math.cos(th), d=Math.sin(th), e=0.62;
+    O.push([JHU*sg(c)*Math.pow(Math.abs(c),e), JHV*sg(d)*Math.pow(Math.abs(d),e)]);
   }
-  // 상면
-  var top=O.map(function(c){return PJ(JP(c[0],c[1],JIGH));});
-  o+='<polygon points="'+top.map(pt).join(' ')+'" fill="'+shade(MAT.jig,1.08)+'" stroke="'+shade(MAT.jig,0.62)+'" stroke-width="0.5"/>';
+  var rz=JIG.rz*Math.PI/180, ca=Math.cos(rz), sa=Math.sin(rz);
 
-  // 케이스 안착 포켓 (물방울 외곽 + 여유 1.2)
-  var pk=ellOutline(24+1.2,8+1.2,40,0.34).map(function(c){return PJ(JP(c[0],c[1],JIGH-0.08));});
-  o+='<polygon points="'+pk.map(pt).join(' ')+'" fill="'+shade(MAT.jig,0.74)+'" stroke="'+shade(MAT.jig,0.55)+'" stroke-width="0.45"/>';
-  var pk2=ellOutline(24-1.0,8-1.0,40,0.34).map(function(c){return PJ(JP(c[0],c[1],JIGH-0.14));});
-  o+='<polygon points="'+pk2.map(pt).join(' ')+'" fill="'+shade(MAT.jig,0.62)+'" stroke="none"/>';
+  // 측면 — 바닥에서 경사 상면까지 (64분할로 매끄럽게)
+  for(i=0;i<N;i++){
+    var a=O[i], b=O[(i+1)%N];
+    var mx=(a[0]+b[0])/2, my=(a[1]+b[1])/2;
+    var lu=mx/(JHU*JHU), lv=my/(JHV*JHV), ln=Math.hypot(lu,lv)||1;
+    var wx=(lu/ln)*ca-(lv/ln)*sa, wy=(lu/ln)*sa+(lv/ln)*ca;
+    var lam=Math.max(0,wx*LGT.x+wy*LGT.y), k=0.74+0.30*lam;
+    var q=[JP(a[0],a[1],0),JP(b[0],b[1],0),JP(b[0],b[1],jigTop(b[1])),JP(a[0],a[1],jigTop(a[1]))].map(PJ);
+    o+=quad(q[0],q[1],q[2],q[3],shade(MAT.acetal,k),shade(MAT.acetal,k*0.94),0.28);
+  }
 
-  // 기준핀 2개 (케이스 양 끝 바깥)
-  [[-26.2,0],[26.2,0]].forEach(function(h){
-    var b0=JP(h[0],h[1],JIGH-0.2), b1=JP(h[0],h[1],JIGH+2.6);
-    o+=tube({x:b0.X,y:b0.Y,z:b0.Z},{x:b1.X,y:b1.Y,z:b1.Z},0.95,[186,190,198],false,true);
-  });
-  // 측면 지지블록 2개
-  [[0,10.6],[0,-10.6]].forEach(function(h){
-    var c0=JP(h[0]-4,h[1]-1.6,JIGH), c1=JP(h[0]+4,h[1]+1.6,JIGH);
-    o+=box(Math.min(c0.X,c1.X),Math.max(c0.X,c1.X),Math.min(c0.Y,c1.Y),Math.max(c0.Y,c1.Y),TBL_Z+JIGH,TBL_Z+JIGH+2.0,[152,160,172],0.45);
-  });
-  // 고정 볼트 4개
-  [[-23,8.6],[23,8.6],[-23,-8.6],[23,-8.6]].forEach(function(h){
-    var q=PJ(JP(h[0],h[1],JIGH+0.12));
-    o+='<ellipse cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" rx="1.25" ry="0.8" fill="#6E7682" stroke="#4E555F" stroke-width="0.35"/>';
-  });
+  // 경사 상면 (30° · 우측이 높음)
+  (function(){
+    var nx=-JIG_K*sa, ny=JIG_K*ca, nl=Math.sqrt(nx*nx+ny*ny+1);
+    var lam=Math.max(0,(nx/nl)*LGT.x+(ny/nl)*LGT.y), k=0.98+0.20*lam;
+    var tp=O.map(function(c){ return PJ(JP(c[0],c[1],jigTop(c[1]))); });
+    o+='<polygon points="'+tp.map(pt).join(' ')+'" fill="'+shade(MAT.acetal,k)+'" stroke="'+shade(MAT.acetal,k*0.9)+'" stroke-width="0.4"/>';
+  })();
+
+  // 케이스 요람 — 완만한 2단 함몰 (각진 단차 없음)
+  var cr1=ellOutline(25.6,9.6,56,0.34).map(function(c){ return PJ(JP(c[0],c[1],jigTop(c[1])-0.35)); });
+  o+='<polygon points="'+cr1.map(pt).join(' ')+'" fill="'+shade(MAT.acetal,0.90)+'" stroke="none"/>';
+  var cr2=ellOutline(24.4,8.5,56,0.34).map(function(c){ return PJ(JP(c[0],c[1],jigTop(c[1])-0.75)); });
+  o+='<polygon points="'+cr2.map(pt).join(' ')+'" fill="'+shade(MAT.acetal,0.82)+'" stroke="none"/>';
+
+  // 배선 도피홈 — 둥근 슬롯
+  (function(){
+    var sl=[], t2;
+    for(var m=0;m<24;m++){ t2=Math.PI*(m/23)-Math.PI/2; sl.push([26.2+2.0*Math.cos(t2), 3.0*Math.sin(t2)]); }
+    sl.push([21.5,-3.0]); sl.push([21.5,3.0]);
+    var q=sl.map(function(c){ return PJ(JP(c[0],c[1],jigTop(c[1])-0.30)); });
+    o+='<polygon points="'+q.map(pt).join(' ')+'" fill="'+shade(MAT.acetal,0.86)+'" stroke="none"/>';
+  })();
   return o;
 }
 
 /* ---- 샤크 안테나 케이스 (베이스 240 × 80 mm) ---- */
 function caseFrame(){
   var rz=CASE.rz*Math.PI/180, ca=Math.cos(rz), sa=Math.sin(rz);
-  var lf=caseLift();
-  return function(u,v,n){ return {X:CASE.x+partX+(u*ca-v*sa), Y:CASE.y+(u*sa+v*ca), Z:TBL_Z+lf+n}; };
+  var sf=seatF();
+  return function(u,v,n){ return {X:CASE.x+partX+(u*ca-v*sa), Y:CASE.y+(u*sa+v*ca), Z:TBL_Z+sf*jigTop(v)+n}; };
 }
 function drawCase(){
   var o='', CP=caseFrame(), TH=2.6;
@@ -696,7 +705,7 @@ function drawCase(){
 
   // 출선 케이블 (직조 슬리브) + 그레이 커넥터
   (function(){
-    var segs=[[20,0.9],[25,2.1],[29,3.3],[31,4.5]];
+    var segs=[[18,0.8],[22,1.8],[26,2.8],[28,3.8]];
     var prev=CP(17,0,TH*0.5);
     for(var i=0;i<segs.length;i++){
       var cur=CP(segs[i][0],segs[i][1],TH*0.5);
@@ -704,7 +713,7 @@ function drawCase(){
       prev=cur;
     }
     // 그레이 커넥터 30 × 20 mm
-    var cn=CP(33,5.0,0);
+    var cn=CP(30,4.4,0);
     o+=box(cn.X-3.2,cn.X+3.2,cn.Y-2.2,cn.Y+2.2,TBL_Z,TBL_Z+4.2,[172,176,184],0.5);
     for(var j=0;j<4;j++){
       var sx=cn.X-2.3+j*1.5;
@@ -779,7 +788,7 @@ function drawMonitor(){
     g+='<rect x="1.6" y="6" width="28" height="23" fill="none" stroke="'+(shotT>=0?'#E8873A':'#26394C')+'" stroke-width="'+(shotT>=0?.9:.5)+'"/>';
 
     // ── 좌측 하단 : 케이스 QR 동시 판독 결과 ──
-    var qrOn=(shotT>=0)||!!verdict;
+    var qrOn=(qrT>=0)||!!verdict;
     g+='<rect x="1.6" y="30.2" width="28" height="6.2" rx=".6" fill="#0F1A24" stroke="'+(qrOn?'#3FBF63':'#26394C')+'" stroke-width=".5"/>';
     (function(){
       var QX=2.3, QY=30.8, M=0.46;
@@ -918,7 +927,7 @@ function drawVision(t){
 
   /* 3D 라인스캔 : 레이저 라인이 PCB·케이스 위를 지나감 */
   if(scanT>=0){
-    var su=-hw-1 + (2*hw+2)*scanT;
+    var su=-SCANU + 2*SCANU*scanT;
     var a=LP(su,-hd-1,PCB_T+0.15), b=LP(su,hd+1,PCB_T+0.15);
     var qa=PJ(a), qb=PJ(b);
     var src=vadd(A.lens,A.tool,-2);
@@ -942,8 +951,8 @@ function drawVision(t){
     }
   }
 
-  /* QR 판독 마커 : 케이스 라벨 위 */
-  if(shotT>=0){
+  /* QR 판독 마커 : 케이스 라벨 위 (로봇이 QR 위치로 이동했을 때) */
+  if(qrT>=0){
     var QP=caseFrame();
     var qc=[QP(-18.6,3.2,2.6+0.6),QP(-10.6,3.2,2.6+0.6),QP(-10.6,-3.2,2.6+0.6),QP(-18.6,-3.2,2.6+0.6)].map(PJ);
     o+='<polygon points="'+qc.map(pt).join(' ')+'" fill="none" stroke="#3FBF63" stroke-width="1.3"/>';
@@ -973,7 +982,7 @@ function updHUD(){
   $('bScan').textContent = scanT>=0?'ON':'OFF';  $('cScan').classList.toggle('on',scanT>=0);
   $('bAlign').textContent = aligned?'⊥ 직각':'-'; $('cAlign').classList.toggle('on',aligned);
   $('bShot').textContent = shotT>=0?'노광':'OFF'; $('cShot').classList.toggle('on',shotT>=0);
-  var qrOn=(shotT>=0)||!!verdict;
+  var qrOn=(qrT>=0)||!!verdict;
   $('bQr').textContent = qrOn?QRSN:'-'; $('cQr').classList.toggle('on',qrOn);
   $('bSen').textContent = String(done);
   $('cSen').classList.toggle('alarm',alarm);
@@ -1051,26 +1060,45 @@ function runState(){
   }
   if(st.t==='approach'){
     aligned=false; verdict=''; setMes('wait');
-    moveTo(t.x,t.y,TBL_Z+PCB_T+WD+10,0,0,D.move,next);
+    var SP=pcbFrame(t)(-SCANU,0,0);
+    moveTo(SP.X,SP.Y,TBL_Z+PCB_T+WD+10,0,0,D.move,next);
     return;
   }
   if(st.t==='scan3d'){
+    /* 카메라 내부 스캔이 아니라 — 협동로봇이 전 구간을 주행하며 라인스캔 */
+    var FR=pcbFrame(t), SZ=TBL_Z+PCB_T+WD;
     scanT=0;
-    anim(D.move*1.25,function(p){ scanT=p; },function(){
+    addLog('[3D] 로봇 주행 라인스캔 시작 — 주행거리 '+Math.round(2*SCANU*U)+' mm');
+    anim(D.move*2.4,function(p){
+      scanT=p;
+      var q=FR(-SCANU+2*SCANU*p,0,0);
+      armT.x=q.X; armT.y=q.Y; armT.z=SZ; armT.ta=0; armT.tb=0;
+    },function(){
       scanT=-1;
-      addLog('[3D] 위치·기울기 측정 완료 — θ'+t.ta.toFixed(1)+'° φ'+t.tb.toFixed(1)+'°');
+      addLog('[3D] 전체 스캔 완료 — θ'+t.ta.toFixed(1)+'° φ'+t.tb.toFixed(1)+'° (안착부 경사 30° 포함)');
       next();
     });
     return;
   }
   if(st.t==='align'){
-    moveTo(t.x,t.y,TBL_Z+PCB_T+WD,t.ta,t.tb,D.move,function(){ aligned=true; next(); });
+    moveTo(PCBP.x,PCBP.y,TBL_Z+PCB_T+WD,t.ta,t.tb,D.move,function(){ aligned=true; next(); });
     return;
   }
   if(st.t==='light'){ lightOn=st.on; pause(D.act,next); return; }
   if(st.t==='shot'){
     shotT=0;
-    anim(D.act*1.5,function(p){ shotT=p; },function(){ shotT=-1; addLog('[2D] 영상 취득 완료'); next(); });
+    anim(D.act*1.5,function(p){ shotT=p; },function(){ shotT=-1; addLog('[2D] PCB 외관 영상 취득 완료'); next(); });
+    return;
+  }
+  if(st.t==='qr'){
+    /* 로봇이 케이스 QR 상부로 이동 — 30° 경사면에 직각 보정 */
+    var QW=caseFrame()(-15,0,2.6);
+    moveTo(QW.X,QW.Y,QW.Z+WD,1.5,-29.9,D.move,function(){
+      qrT=0;
+      anim(D.act*1.3,function(p){ qrT=p; },function(){
+        qrT=-1; addLog('[QR] 케이스 코드 판독 완료 — '+QRSN); next();
+      });
+    });
     return;
   }
   if(st.t==='verdict'){
@@ -1136,13 +1164,13 @@ $('bRun').addEventListener('click',function(){
 });
 $('bStop').addEventListener('click',function(){
   running=false; waitSig=null; token++; clearTimeout(timer);
-  scanT=-1; shotT=-1; lightOn=false;
+  scanT=-1; shotT=-1; qrT=-1; lightOn=false;
   $('bRun').disabled=false; updSig(); addLog('■ 정지'); draw(); renderSteps();
 });
 $('bReset').addEventListener('click',function(){
   running=false; waitSig=null; token++; clearTimeout(timer);
   idx=0; tIdx=0; done=0; okN=0; ngN=0; verdict=''; alarm=false;
-  lightOn=false; scanT=-1; shotT=-1; aligned=false; partX=0;
+  lightOn=false; scanT=-1; shotT=-1; qrT=-1; aligned=false; partX=0;
   var h=homePos(); armT={x:h.x,y:h.y,z:h.z,ta:0,tb:0};
   setMes('wait'); $('bRun').disabled=false; updSig();
   addLog('↺ 초기화'); draw(); renderSteps();
