@@ -121,7 +121,7 @@
 <header class="cover"><div class="nav-inner">
   <div class="hd-top">
     <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-    <span class="hd-ver" id="hVer">v1.3</span>
+    <span class="hd-ver" id="hVer">v1.4</span>
   </div>
   <h1>협동로봇 PCB 검사셀 시뮬레이터</h1>
   <div class="hd-sub">두산 A0509 + Cognex IS3805CP · 컨베이어 없음 · 작업대 안착 검사</div>
@@ -238,7 +238,7 @@
 <script>
 (function(){
 "use strict";
-var VER='v1.3';
+var VER='v1.4';
 var $=function(id){return document.getElementById(id);};
 $('hVer').textContent=VER; $('fVer').textContent=VER;
 
@@ -258,6 +258,8 @@ var TARGETS=[ {x:40,y:155,rz:80,ta:2.2,tb:-1.6} ];    // 카메라 조준점 = P
 var PCBP={x:36,y:184,rz:260,ta:2.2,tb:-1.6};            // 타원형 PCB 100 × 50 mm · 1매 (상하 배치)
 var CASE={x:44,y:126,rz:80};                            // 샤크 안테나 케이스 240 × 80 mm · 1개 (QR 부착)
 var QRSN='A5030-261109-0137';                           // 케이스 QR 시리얼
+var PART_IN=-110, PART_OUT=180;                         // 좌측 투입점 / 우측 배출점 (X 오프셋)
+var partX=0;                                            // 현재 조립품 X 오프셋
 var MON={x:80,y:-50,z:TBL_Z+54};                       // 15" 모니터 중심 (받침대 암 거치)
 
 /* ======================= 투영 ======================= */
@@ -431,6 +433,7 @@ function ellOutline(hu,hv,N,tear){
 /* ======================= 상태 ======================= */
 var STATES=[
   {ph:'대기',    t:'wait',   sig:'START', lb:'START 대기'},
+  {ph:'투입',    t:'feed',   lb:'좌측 작업자 투입 → 검사 위치 이동·정지'},
   {ph:'이동',    t:'approach',lb:'로봇 이동 → 대상 PCB 상부 스캔 시작점'},
   {ph:'위치 측정',t:'scan3d', lb:'3D 라인스캔 → PCB·케이스 위치·기울기 측정'},
   {ph:'자세 보정',t:'align',  lb:'측정값 반영 → 카메라를 PCB 면에 직각 정렬'},
@@ -439,7 +442,8 @@ var STATES=[
   {ph:'판정',    t:'verdict', lb:'판정 + MES 전송'},
   {ph:'판정',    t:'alarm',   cond:'ng', sig:'RESUME', lb:'NG 알람 · 제거 대기'},
   {ph:'복귀',    t:'light',   on:false, lb:'조명 OFF'},
-  {ph:'복귀',    t:'next',    lb:'우측 다음 작업자 배출 → 다음 조립품 투입 대기'}
+  {ph:'배출',    t:'out',     lb:'검사 완료품 → 우측 다음 작업자에게 이동'},
+  {ph:'복귀',    t:'next',    lb:'로봇 원점 복귀 → 다음 조립품 투입 대기'}
 ];
 var LOOP=1;
 
@@ -504,7 +508,7 @@ function draw(){
 
   /* 샤크 안테나 케이스 1개 + 타원형 PCB 1매 (조립 전 펼쳐진 상태) */
   s+=drawCase();
-  s+=drawPcb(PCBP, running);
+  s+=drawPcb(PCBP, running && Math.abs(partX)<6);
   s+=drawLeads();
 
   /* 15" 모니터 */
@@ -524,7 +528,7 @@ function pcbFrame(t){
   var rz=t.rz*Math.PI/180, ca=Math.cos(rz), sa=Math.sin(rz);
   var ta=t.ta*Math.PI/180, tb=t.tb*Math.PI/180;
   return function(u,v,n){
-    return {X:t.x+(u*ca-v*sa), Y:t.y+(u*sa+v*ca),
+    return {X:t.x+partX+(u*ca-v*sa), Y:t.y+(u*sa+v*ca),
             Z:TBL_Z+n+u*Math.sin(tb)+v*Math.sin(ta)};
   };
 }
@@ -582,7 +586,7 @@ function drawPcb(t,insp){
 /* ---- 샤크 안테나 케이스 (베이스 240 × 80 mm) ---- */
 function caseFrame(){
   var rz=CASE.rz*Math.PI/180, ca=Math.cos(rz), sa=Math.sin(rz);
-  return function(u,v,n){ return {X:CASE.x+(u*ca-v*sa), Y:CASE.y+(u*sa+v*ca), Z:TBL_Z+n}; };
+  return function(u,v,n){ return {X:CASE.x+partX+(u*ca-v*sa), Y:CASE.y+(u*sa+v*ca), Z:TBL_Z+n}; };
 }
 function drawCase(){
   var o='', CP=caseFrame(), TH=2.6;
@@ -961,6 +965,12 @@ function moveTo(tx,ty,tz,ta,tb,dur,cb){
 
 function homePos(){ return {x:RB.x+HOME.r*Math.cos(1.35), y:RB.y+HOME.r*Math.sin(1.35), z:HOME.z}; }
 
+/* 조립품(PCB + 케이스) 좌우 이송 */
+function movePart(from,to,dur,cb){
+  partX=from;
+  anim(dur,function(p){ partX=from+(to-from)*p; },function(){ partX=to; if(cb) cb(); });
+}
+
 function runState(){
   if(!running) return;
   var st=STATES[idx], D=durs(), t=TARGETS[tIdx];
@@ -970,6 +980,20 @@ function runState(){
   if(st.t==='wait'){
     waitSig=st.sig; updSig();
     if($('autoSig').checked) pause(D.act,function(){ fire('START',true); });
+    return;
+  }
+  if(st.t==='feed'){
+    aligned=false; verdict=''; setMes('wait');
+    addLog('[투입] 좌측 작업대 → 검사 위치 이송');
+    movePart(PART_IN,0,Math.round(D.move*1.35),function(){
+      addLog('[투입] 검사 위치 정지 — 안착 확인');
+      pause(D.act,next);
+    });
+    return;
+  }
+  if(st.t==='out'){
+    addLog('[배출] 검사 완료품 → 우측 다음 작업자 이송');
+    movePart(0,PART_OUT,Math.round(D.move*1.35),next);
     return;
   }
   if(st.t==='approach'){
@@ -1065,7 +1089,7 @@ $('bStop').addEventListener('click',function(){
 $('bReset').addEventListener('click',function(){
   running=false; waitSig=null; token++; clearTimeout(timer);
   idx=0; tIdx=0; done=0; okN=0; ngN=0; verdict=''; alarm=false;
-  lightOn=false; scanT=-1; shotT=-1; aligned=false;
+  lightOn=false; scanT=-1; shotT=-1; aligned=false; partX=0;
   var h=homePos(); armT={x:h.x,y:h.y,z:h.z,ta:0,tb:0};
   setMes('wait'); $('bRun').disabled=false; updSig();
   addLog('↺ 초기화'); draw(); renderSteps();
