@@ -121,7 +121,7 @@
 <header class="cover"><div class="nav-inner">
   <div class="hd-top">
     <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-    <span class="hd-ver" id="hVer">v1.1</span>
+    <span class="hd-ver" id="hVer">v1.2</span>
   </div>
   <h1>협동로봇 PCB 검사셀 시뮬레이터</h1>
   <div class="hd-sub">두산 A0509 + Cognex IS3805CP · 컨베이어 없음 · 작업대 안착 검사</div>
@@ -144,7 +144,7 @@
           <b>Cognex IS3805CP</b> 5 MP · 오토포커스 · Multi-Torch &nbsp;·&nbsp;
           <b>L38-300</b> 3D 라인스캔<br>
           <b>검사 대상</b> 타원형 PCB 100 × 50 mm 1매 + 샤크 안테나 케이스 1개 (조립 전 펼쳐진 상태) &nbsp;·&nbsp;
-          <b>목표 택트</b> 10초 이내
+          <b>목표 택트</b> 10초 이내 &nbsp;·&nbsp; <b>15" 모니터</b> 받침대 암 거치 (판정 표시 + 3색 경광등 팝업)
         </div>
         <div class="card-b">
           <div class="axisbar">
@@ -173,11 +173,11 @@
             </div>
           </div>
 
-          <svg viewBox="80 113 468 358" id="scene"></svg>
+          <svg viewBox="124 80 310 356" id="scene"></svg>
 
           <div class="row" style="margin-top:5px;">
-            <span style="font-size:12px;color:var(--text-l);">시점 <b id="yawV" style="color:var(--navy-d);">38°</b></span>
-            <input type="range" id="yaw" min="0" max="90" value="38" style="flex:0 1 130px;min-width:70px;">
+            <span style="font-size:12px;color:var(--text-l);">시점 <b id="yawV" style="color:var(--navy-d);">22°</b></span>
+            <input type="range" id="yaw" min="0" max="90" value="22" style="flex:0 1 130px;min-width:70px;">
             <button class="act sm" id="bFront">정면</button>
             <button class="act sm" id="bIso">45°</button>
             <button class="act sm" id="bSide">측면</button>
@@ -230,32 +230,34 @@
   </section>
 </main>
 
-<footer>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · <span id="fVer">v1.1</span></footer>
+<footer>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · <span id="fVer">v1.2</span></footer>
 
 <script>
 (function(){
 "use strict";
-var VER='v1.1';
+var VER='v1.2';
 var $=function(id){return document.getElementById(id);};
 $('hVer').textContent=VER; $('fVer').textContent=VER;
 
 /* ======================= 치수 (1 unit = 5 mm) ======================= */
 var U=5;
 var TBL_Z=150;                                  // 작업대 상면 = 750 mm
-var PED={x0:10,x1:110,y0:20,y1:120};            // 로봇 받침대 500×500 mm
-var RB={x:60,y:70,z:TBL_Z};                     // 로봇 베이스 중심
-var ATB={x0:122,x1:262,y0:10,y1:130};           // 조립라인 작업대 700×600 mm
+var PED={x0:5,x1:105,y0:0,y1:100};             // 로봇 받침대 500×500 mm (작업대 앞 밀착)
+var RB={x:55,y:50,z:TBL_Z};                     // 로봇 베이스 중심
+var ATB={x0:-170,x1:540,y0:100,y1:220};         // 조립라인 작업대 — 좌우로 연속
+var SEAMS=[-40,105,250,395];                    // 작업대 유닛 이음선 (1 유닛 700 mm)
 var D1=31, L1=80, L2=90, TOOL=30;               // 베이스높이 155 / 상완 400 / 전완+손목 450 / 툴 150 mm
 var WD=40;                                      // 작업거리 200 mm
 var PCB_W=20, PCB_D=10, PCB_T=1.2;              // PCB 100 × 50 mm
 var HOME={r:46,z:TBL_Z+96};                     // 원점 (베이스 기준 수평거리 / 높이)
 
-var TARGETS=[ {x:156,y:64,rz:-12,ta:2.2,tb:-1.6} ];   // 타원형 PCB 100 × 50 mm · 1매
-var CASE={x:204,y:74,rz:16};                           // 샤크 안테나 케이스 240 × 80 mm · 1개
+var TARGETS=[ {x:145,y:128,rz:-12,ta:2.2,tb:-1.6} ];  // 타원형 PCB 100 × 50 mm · 1매
+var CASE={x:201,y:142,rz:16};                          // 샤크 안테나 케이스 240 × 80 mm · 1개
+var MON={x:-52,y:-6,z:TBL_Z+92};                       // 15" 모니터 중심 (받침대 암 거치)
 
 /* ======================= 투영 ======================= */
-var VIEW={yaw:38,pitch:25};
-var VCX=306, VCY=372, VOX=136, VOY=70;
+var VIEW={yaw:22,pitch:26};
+var VCX=306, VCY=372, VOX=120, VOY=70;
 function P(X,Y,Z){
   var ty=VIEW.yaw*Math.PI/180, tp=VIEW.pitch*Math.PI/180;
   var x0=X-VOX, y0=Y-VOY;
@@ -273,7 +275,8 @@ var LGT=(function(){var l={x:-0.42,y:-0.46,z:0.78};var m=Math.hypot(l.x,l.y,l.z)
 var MAT={
   dark:[58,64,74], mid:[150,158,170], light:[206,212,222], steel:[164,172,184],
   blue:[62,96,146], navy:[36,54,80], gold:[198,170,92], pcb:[46,118,62],
-  wood:[198,186,168], panel:[178,186,196], cam:[48,52,60]
+  wood:[198,186,168], panel:[178,186,196], cam:[48,52,60],
+  bench:[178,204,180], benchEdge:[150,178,152]
 };
 function shade(b,k){
   return 'rgb('+[0,1,2].map(function(i){return Math.max(0,Math.min(255,Math.round(b[i]*k)));}).join(',')+')';
@@ -430,20 +433,26 @@ function draw(){
 
   /* 바닥 */
   (function(){
-    var f=[P(-40,-60,0),P(330,-60,0),P(330,200,0),P(-40,200,0)];
+    var f=[P(-180,-120,0),P(560,-120,0),P(560,250,0),P(-180,250,0)];
     s+='<polygon points="'+f.map(pt).join(' ')+'" fill="#EDF0F4"/>';
-    for(var gx=-40;gx<=330;gx+=30){ var a=P(gx,-60,0), b=P(gx,200,0);
+    for(var gx=-180;gx<=560;gx+=40){ var a=P(gx,-120,0), b=P(gx,250,0);
       s+='<line x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'" stroke="#DDE3EA" stroke-width="0.7"/>'; }
-    for(var gy=-60;gy<=200;gy+=30){ var c=P(-40,gy,0), d=P(330,gy,0);
+    for(var gy=-120;gy<=250;gy+=40){ var c=P(-180,gy,0), d=P(560,gy,0);
       s+='<line x1="'+c.x.toFixed(1)+'" y1="'+c.y.toFixed(1)+'" x2="'+d.x.toFixed(1)+'" y2="'+d.y.toFixed(1)+'" stroke="#DDE3EA" stroke-width="0.7"/>'; }
   })();
 
-  /* 조립라인 작업대 (컨베이어 없음) — 아래부터 그려 상판이 다리를 덮도록 */
-  [[ATB.x0+5,ATB.y1-11],[ATB.x1-11,ATB.y1-11],[ATB.x0+5,ATB.y0+5],[ATB.x1-11,ATB.y0+5]].forEach(function(l){
-    s+=box(l[0],l[0]+6,l[1],l[1]+6,0,TBL_Z-30,MAT.steel,0.5);
-  });
-  s+=box(ATB.x0+2,ATB.x1-2,ATB.y0+2,ATB.y1-2,TBL_Z-30,TBL_Z-5,MAT.panel,0.6);
-  s+=box(ATB.x0,ATB.x1,ATB.y0,ATB.y1,TBL_Z-5,TBL_Z,MAT.wood,0.7);
+  /* 조립라인 작업대 — 좌우로 연속되는 라인 (컨베이어 없음) */
+  (function(){
+    var i;
+    for(i=0;i<SEAMS.length;i++) s+=box(SEAMS[i]+4,SEAMS[i]+10,ATB.y1-13,ATB.y1-7,0,TBL_Z-30,MAT.steel,0.5);  // 뒷다리
+    for(i=0;i<SEAMS.length;i++) s+=box(SEAMS[i]+4,SEAMS[i]+10,ATB.y0+7,ATB.y0+13,0,TBL_Z-30,MAT.steel,0.5);  // 앞다리
+    s+=box(ATB.x0+2,ATB.x1-2,ATB.y0+3,ATB.y1-3,TBL_Z-30,TBL_Z-5,MAT.panel,0.6);                              // 에이프런
+    s+=box(ATB.x0,ATB.x1,ATB.y0,ATB.y1,TBL_Z-5,TBL_Z,MAT.bench,0.7);                                         // 상판 (옅은 초록)
+    for(i=0;i<SEAMS.length;i++){                                                                             // 유닛 이음선
+      var a=P(SEAMS[i],ATB.y0,TBL_Z), b=P(SEAMS[i],ATB.y1,TBL_Z);
+      s+='<line x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'" stroke="#8FA892" stroke-width="0.9"/>';
+    }
+  })();
 
   /* 로봇 받침대 500×500×750 — 아래부터 그려 상판이 몸체를 덮도록 */
   s+=box(PED.x0+3,PED.x1-3,PED.y0+3,PED.y1-3,0,6,MAT.dark,0.5);
@@ -464,6 +473,9 @@ function draw(){
   s+=drawCase();
   s+=drawPcb(TARGETS[0], running);
   s+=drawLeads();
+
+  /* 15" 모니터 */
+  s+=drawMonitor();
 
   /* 로봇 */
   s+=drawRobot();
@@ -610,6 +622,94 @@ function drawLeads(){
     var mx=(a.x+b.x)/2, my=(a.y+b.y)/2+5.5+i*1.1;
     o+='<path d="M'+pt(a)+' Q'+mx.toFixed(1)+','+my.toFixed(1)+' '+pt(b)+'" fill="none" stroke="'+cols[i]+'" stroke-width="1.15" stroke-linecap="round" opacity=".92"/>';
   }
+  return o;
+}
+
+/* ---- 15" 모니터 (받침대 암 거치) + 경광등 팝업 ---- */
+function drawMonitor(){
+  var o='';
+  var HW=34.5, HH=20.5, SW=33, SH=19;                 // 외형 / 유효화면 반치수 (15" 16:9)
+  var MM=function(u,v,n){ return {X:MON.x+u, Y:MON.y-n, Z:MON.z+v}; };
+
+  // 폴 (받침대 상면 → 모니터 높이) + 수평 암
+  var pX=14, pY=12;
+  o+=tube({x:pX,y:pY,z:TBL_Z},{x:pX,y:pY,z:MON.z+4},2.4,MAT.steel,true,true);
+  o+=tube({x:pX,y:pY,z:MON.z},{x:MON.x,y:MON.y+9,z:MON.z},2.0,MAT.steel,true,true);
+  o+=box(pX-7,pX+7,pY-7,pY+7,TBL_Z,TBL_Z+2.4,MAT.steel,0.5);                 // 베이스 플랜지
+  o+=tube({x:MON.x,y:MON.y+9,z:MON.z},{x:MON.x,y:MON.y+4,z:MON.z},4.2,MAT.steel,true,true); // VESA
+
+  // 케이스
+  o+=box(MON.x-HW,MON.x+HW,MON.y,MON.y+4,MON.z-HH,MON.z+HH,[38,42,50],0.6);
+
+  // 유효화면 평면 → 로컬 2D
+  var O=PJ(MM(-SW,SH,0.4)), UX=PJ(MM(-SW+1,SH,0.4)), VY=PJ(MM(-SW,SH-1,0.4));
+  var ux=UX.x-O.x, uy=UX.y-O.y, vx=VY.x-O.x, vy=VY.y-O.y;
+  var det=Math.abs(ux*vy-uy*vx);
+  var W=SW*2, H=SH*2;
+  var g='<g transform="matrix('+[ux,uy,vx,vy,O.x,O.y].map(function(n){return n.toFixed(4);}).join(' ')+')">';
+  g+='<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#0B1118"/>';
+
+  if(det>0.10){
+    var vOK=(verdict==='OK'), vNG=(verdict==='NG');
+    var vCol=vOK?'#16A34A':(vNG?'#DC2626':'#39424D');
+    var stat=alarm?'#DC2626':(running?'#22C55E':'#6B7683');
+
+    // 타이틀바
+    g+='<rect x="0" y="0" width="'+W+'" height="4.4" fill="#17304F"/>';
+    g+='<circle cx="3" cy="2.2" r="1.25" fill="'+stat+'"/>';
+    g+='<rect x="6" y="1.3" width="16" height="1.8" rx=".8" fill="#4E6C93"/>';
+
+    // ── 좌측 : 취득 PCB 영상 ──
+    g+='<rect x="1.6" y="6" width="28" height="28" fill="#0F1A24" stroke="#26394C" stroke-width=".5"/>';
+    g+='<ellipse cx="15.6" cy="20" rx="11" ry="5.6" fill="'+(shotT>=0?'#3E9E48':'#2E7D36')+'"/>';
+    for(var r=0;r<3;r++) for(var c=0;c<5;c++){
+      var px=9.0+c*2.7, py=16.6+r*2.4;
+      var dx=(px-15.6)/11, dy=(py-20)/5.6;
+      if(dx*dx+dy*dy>0.62) continue;
+      g+='<rect x="'+px.toFixed(1)+'" y="'+py.toFixed(1)+'" width="1.5" height="1.1" rx=".2" fill="#C6AA5C"/>';
+    }
+    g+='<line x1="15.6" y1="7.5" x2="15.6" y2="32.5" stroke="#E8873A" stroke-width=".35" opacity="'+((scanT>=0||shotT>=0)?'.95':'.3')+'"/>';
+    g+='<line x1="3" y1="20" x2="28.2" y2="20" stroke="#E8873A" stroke-width=".35" opacity="'+((scanT>=0||shotT>=0)?'.95':'.3')+'"/>';
+    if(shotT>=0 && shotT<0.3)
+      g+='<rect x="1.6" y="6" width="28" height="28" fill="#FFFFFF" opacity="'+((1-shotT/0.3)*0.55).toFixed(2)+'"/>';
+    g+='<rect x="1.6" y="6" width="28" height="28" fill="none" stroke="'+(shotT>=0?'#E8873A':'#26394C')+'" stroke-width="'+(shotT>=0?.9:.5)+'"/>';
+
+    // ── 중앙 : 판정 (크게) ──
+    g+='<rect x="31.5" y="6" width="17" height="17" rx="1.6" fill="'+vCol+'"/>';
+    g+='<text x="40" y="19.2" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="11.5" font-weight="900" fill="#FFFFFF">'+(verdict||'--')+'</text>';
+    // 카운터
+    [[done,'#93A4B8',31.5],[okN,'#3FBF63',37.3],[ngN,'#EF5A52',43.1]].forEach(function(b){
+      g+='<rect x="'+b[2]+'" y="25" width="5.4" height="9" rx=".8" fill="#132030" stroke="#26394C" stroke-width=".4"/>';
+      g+='<rect x="'+b[2]+'" y="25" width="5.4" height="1.4" rx=".6" fill="'+b[1]+'"/>';
+      g+='<text x="'+(b[2]+2.7)+'" y="31.8" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="4.2" font-weight="900" fill="'+b[1]+'">'+b[0]+'</text>';
+    });
+
+    // ── 우측 : 경광등 팝업창 ──
+    var PX=50.5, PY=5.2, PW=14.2, PH=30;
+    g+='<rect x="'+(PX+0.5)+'" y="'+(PY+0.5)+'" width="'+PW+'" height="'+PH+'" rx="1" fill="#000000" opacity=".45"/>';
+    g+='<rect x="'+PX+'" y="'+PY+'" width="'+PW+'" height="'+PH+'" rx="1" fill="#E8EDF3" stroke="#9AA8B8" stroke-width=".4"/>';
+    g+='<rect x="'+PX+'" y="'+PY+'" width="'+PW+'" height="3.4" rx="1" fill="#2E5E8C"/>';
+    g+='<rect x="'+(PX+PW-3.2)+'" y="'+(PY+0.9)+'" width="1.6" height="1.6" fill="#D8E2EE"/>';
+    // 3색 타워
+    var lampR=alarm, lampY=running&&!alarm&&verdict!=='OK', lampG=!alarm&&verdict==='OK';
+    var cx=PX+PW/2, ty=PY+5.4, lw=6.4, lh=6.2;
+    [['#E53935',lampR],['#F2B705',lampY],['#2FA85A',lampG]].forEach(function(L,i){
+      var yy=ty+i*lh;
+      if(L[1]) g+='<ellipse cx="'+cx+'" cy="'+(yy+lh/2)+'" rx="7" ry="4.4" fill="'+L[0]+'" opacity=".30"/>';
+      g+='<rect x="'+(cx-lw/2)+'" y="'+yy+'" width="'+lw+'" height="'+(lh-0.5)+'" rx="1" fill="'+(L[1]?L[0]:'#C3CCD6')+'" stroke="#8E99A6" stroke-width=".3"/>';
+      if(L[1]) g+='<rect x="'+(cx-lw/2+0.8)+'" y="'+(yy+0.6)+'" width="'+(lw-1.6)+'" height="1.5" rx=".6" fill="#FFFFFF" opacity=".55"/>';
+    });
+    g+='<rect x="'+(cx-3.4)+'" y="'+(ty+3*lh-0.3)+'" width="6.8" height="1.6" rx=".5" fill="#6E7885"/>';
+    g+='<rect x="'+(cx-1.1)+'" y="'+(ty+3*lh+1.3)+'" width="2.2" height="3.2" fill="#8A94A1"/>';
+    g+='<rect x="'+(cx-3.0)+'" y="'+(ty+3*lh+4.5)+'" width="6.0" height="1.5" rx=".4" fill="#6E7885"/>';
+  }
+  g+='</g>';
+  o+=g;
+
+  // 화면 반사 + 전원 LED
+  o+='<polygon points="'+[MM(-SW,SH,0.45),MM(SW,SH,0.45),MM(SW,-SH,0.45),MM(-SW,-SH,0.45)].map(function(q){return pt(PJ(q));}).join(' ')+'" fill="#FFFFFF" opacity=".05"/>';
+  var pl=PJ(MM(HW-4,-HH+2.4,0.6));
+  o+='<circle cx="'+pl.x.toFixed(1)+'" cy="'+pl.y.toFixed(1)+'" r="1.2" fill="'+(running?'#22C55E':'#5A6470')+'"/>';
   return o;
 }
 
