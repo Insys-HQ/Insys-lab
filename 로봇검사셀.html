@@ -121,7 +121,7 @@
 <header class="cover"><div class="nav-inner">
   <div class="hd-top">
     <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-    <span class="hd-ver" id="hVer">v1.2</span>
+    <span class="hd-ver" id="hVer">v1.3</span>
   </div>
   <h1>협동로봇 PCB 검사셀 시뮬레이터</h1>
   <div class="hd-sub">두산 A0509 + Cognex IS3805CP · 컨베이어 없음 · 작업대 안착 검사</div>
@@ -143,8 +143,10 @@
           <b>두산 A0509</b> 6축 / 가반 5 kg / 리치 900 mm / 반복정도 ±0.03 mm &nbsp;·&nbsp;
           <b>Cognex IS3805CP</b> 5 MP · 오토포커스 · Multi-Torch &nbsp;·&nbsp;
           <b>L38-300</b> 3D 라인스캔<br>
-          <b>검사 대상</b> 타원형 PCB 100 × 50 mm 1매 + 샤크 안테나 케이스 1개 (조립 전 펼쳐진 상태) &nbsp;·&nbsp;
-          <b>목표 택트</b> 10초 이내 &nbsp;·&nbsp; <b>15" 모니터</b> 받침대 암 거치 (판정 표시 + 3색 경광등 팝업)
+          <b>검사 대상</b> 타원형 PCB 100 × 50 mm 1매 + 샤크 안테나 케이스 1개 — 작업대에 <b>상하(전후) 방향 · 약 10° 기울기</b>로 로봇 바로 앞에 안착 &nbsp;·&nbsp;
+          <b>동시 판독</b> PCB 외관 + 케이스 <b>QR 코드</b> 1회 촬영 &nbsp;·&nbsp;
+          <b>흐름</b> 작업자 투입 → 검사 → 우측 다음 작업자 배출 &nbsp;·&nbsp;
+          <b>목표 택트</b> 10초 이내 &nbsp;·&nbsp; <b>15" 모니터</b> 받침대 전면 숏암 거치 (판정 + 3색 경광등 팝업)
         </div>
         <div class="card-b">
           <div class="axisbar">
@@ -157,6 +159,7 @@
             <span class="chip" id="cScan">3D 스캔 <b id="bScan">OFF</b></span>
             <span class="chip" id="cAlign">직각 정렬 <b id="bAlign">-</b></span>
             <span class="chip" id="cShot">촬영 <b id="bShot">OFF</b></span>
+            <span class="chip" id="cQr">QR 판독 <b id="bQr">-</b></span>
             <span class="chip" id="cSen">검사 완료 <b id="bSen">0</b></span>
           </div>
           <div class="vbox">
@@ -173,7 +176,7 @@
             </div>
           </div>
 
-          <svg viewBox="124 80 310 356" id="scene"></svg>
+          <svg viewBox="124 100 286 330" id="scene"></svg>
 
           <div class="row" style="margin-top:5px;">
             <span style="font-size:12px;color:var(--text-l);">시점 <b id="yawV" style="color:var(--navy-d);">22°</b></span>
@@ -235,25 +238,27 @@
 <script>
 (function(){
 "use strict";
-var VER='v1.2';
+var VER='v1.3';
 var $=function(id){return document.getElementById(id);};
 $('hVer').textContent=VER; $('fVer').textContent=VER;
 
 /* ======================= 치수 (1 unit = 5 mm) ======================= */
 var U=5;
 var TBL_Z=150;                                  // 작업대 상면 = 750 mm
-var PED={x0:5,x1:105,y0:0,y1:100};             // 로봇 받침대 500×500 mm (작업대 앞 밀착)
-var RB={x:55,y:50,z:TBL_Z};                     // 로봇 베이스 중심
+var PED={x0:5,x1:105,y0:-10,y1:90};            // 로봇 받침대 500×500 mm (작업대 앞)
+var RB={x:55,y:40,z:TBL_Z};                     // 로봇 베이스 중심
 var ATB={x0:-170,x1:540,y0:100,y1:220};         // 조립라인 작업대 — 좌우로 연속
 var SEAMS=[-40,105,250,395];                    // 작업대 유닛 이음선 (1 유닛 700 mm)
 var D1=31, L1=80, L2=90, TOOL=30;               // 베이스높이 155 / 상완 400 / 전완+손목 450 / 툴 150 mm
 var WD=40;                                      // 작업거리 200 mm
 var PCB_W=20, PCB_D=10, PCB_T=1.2;              // PCB 100 × 50 mm
-var HOME={r:46,z:TBL_Z+96};                     // 원점 (베이스 기준 수평거리 / 높이)
+var HOME={r:46,z:TBL_Z+84};                     // 원점 (베이스 기준 수평거리 / 높이)
 
-var TARGETS=[ {x:145,y:128,rz:-12,ta:2.2,tb:-1.6} ];  // 타원형 PCB 100 × 50 mm · 1매
-var CASE={x:201,y:142,rz:16};                          // 샤크 안테나 케이스 240 × 80 mm · 1개
-var MON={x:-52,y:-6,z:TBL_Z+92};                       // 15" 모니터 중심 (받침대 암 거치)
+var TARGETS=[ {x:40,y:155,rz:80,ta:2.2,tb:-1.6} ];    // 카메라 조준점 = PCB·QR 중간 (동시 판독)
+var PCBP={x:36,y:184,rz:260,ta:2.2,tb:-1.6};            // 타원형 PCB 100 × 50 mm · 1매 (상하 배치)
+var CASE={x:44,y:126,rz:80};                            // 샤크 안테나 케이스 240 × 80 mm · 1개 (QR 부착)
+var QRSN='A5030-261109-0137';                           // 케이스 QR 시리얼
+var MON={x:80,y:-50,z:TBL_Z+54};                       // 15" 모니터 중심 (받침대 암 거치)
 
 /* ======================= 투영 ======================= */
 var VIEW={yaw:22,pitch:26};
@@ -384,6 +389,34 @@ function solveArm(tx,ty,tz,tiltA,tiltB){
           reachRatio:Dl/(L1+L2)};
 }
 
+/* QR 모듈 매트릭스 11×11 — 파인더 3개 + 타이밍 + 고정 데이터 */
+var QRMAT=(function(){
+  var N=11, m=[], r, c;
+  for(r=0;r<N;r++){ m[r]=[]; for(c=0;c<N;c++) m[r][c]=0; }
+  var F=[[1,1,1,1,1],[1,0,0,0,1],[1,0,1,0,1],[1,0,0,0,1],[1,1,1,1,1]];
+  [[0,0],[0,6],[6,0]].forEach(function(o){
+    for(r=0;r<5;r++) for(c=0;c<5;c++) m[o[0]+r][o[1]+c]=F[r][c];
+  });
+  for(c=0;c<N;c++) if(m[5][c]===0) m[5][c]=(c%2===0)?1:0;      // 타이밍 행
+  for(r=0;r<N;r++) if(m[r][5]===0) m[r][5]=(r%2===0)?1:0;      // 타이밍 열
+  var sd=20261109;
+  for(r=0;r<N;r++) for(c=0;c<N;c++){
+    var inF=((r<5&&c<5)||(r<5&&c>5)||(r>5&&c<5));
+    if(inF||r===5||c===5) continue;
+    sd=(sd*1103515245+12345)&0x7FFFFFFF;
+    m[r][c]=((sd>>16)&1);
+  }
+  return m;
+})();
+function qrRects(x0,y0,mod,col){
+  var o='', r, c, N=QRMAT.length;
+  for(r=0;r<N;r++) for(c=0;c<N;c++){
+    if(!QRMAT[r][c]) continue;
+    o+='<rect x="'+(x0+c*mod).toFixed(2)+'" y="'+(y0+r*mod).toFixed(2)+'" width="'+mod.toFixed(2)+'" height="'+mod.toFixed(2)+'" fill="'+col+'"/>';
+  }
+  return o;
+}
+
 /* 타원 / 물방울 외곽선 (tear<1 이면 -u 쪽이 좁아짐) */
 function ellOutline(hu,hv,N,tear){
   var p=[];
@@ -399,21 +432,21 @@ function ellOutline(hu,hv,N,tear){
 var STATES=[
   {ph:'대기',    t:'wait',   sig:'START', lb:'START 대기'},
   {ph:'이동',    t:'approach',lb:'로봇 이동 → 대상 PCB 상부 스캔 시작점'},
-  {ph:'위치 측정',t:'scan3d', lb:'3D 라인스캔 → PCB 위치·기울기 측정'},
+  {ph:'위치 측정',t:'scan3d', lb:'3D 라인스캔 → PCB·케이스 위치·기울기 측정'},
   {ph:'자세 보정',t:'align',  lb:'측정값 반영 → 카메라를 PCB 면에 직각 정렬'},
   {ph:'비전 검사',t:'light',  on:true,  lb:'Multi-Torch 조명 ON'},
-  {ph:'비전 검사',t:'shot',   lb:'2D 이미지 촬영 (1회 노광)'},
+  {ph:'비전 검사',t:'shot',   lb:'2D 촬영 1회 → PCB 외관 + 케이스 QR 동시 판독'},
   {ph:'판정',    t:'verdict', lb:'판정 + MES 전송'},
   {ph:'판정',    t:'alarm',   cond:'ng', sig:'RESUME', lb:'NG 알람 · 제거 대기'},
   {ph:'복귀',    t:'light',   on:false, lb:'조명 OFF'},
-  {ph:'복귀',    t:'next',    lb:'다음 PCB로 이동 / 전수 완료 시 원점 복귀'}
+  {ph:'복귀',    t:'next',    lb:'우측 다음 작업자 배출 → 다음 조립품 투입 대기'}
 ];
 var LOOP=1;
 
 var idx=0, running=false, waitSig=null, alarm=false, verdict='';
 var tIdx=0, done=0, okN=0, ngN=0;
 var lightOn=false, scanT=-1, shotT=-1, aligned=false;
-var armT={x:RB.x+HOME.r,y:RB.y,z:HOME.z,ta:0,tb:0};   // 현재 공구 목표
+var armT={x:RB.x+HOME.r*Math.cos(1.35),y:RB.y+HOME.r*Math.sin(1.35),z:HOME.z,ta:0,tb:0};   // 현재 공구 목표
 var token=0, timer=null;
 var LOGS=[];
 var logBox=$('logBox');
@@ -471,7 +504,7 @@ function draw(){
 
   /* 샤크 안테나 케이스 1개 + 타원형 PCB 1매 (조립 전 펼쳐진 상태) */
   s+=drawCase();
-  s+=drawPcb(TARGETS[0], running);
+  s+=drawPcb(PCBP, running);
   s+=drawLeads();
 
   /* 15" 모니터 */
@@ -590,9 +623,23 @@ function drawCase(){
     o+=tube({x:k1.X,y:k1.Y,z:k1.Z},{x:k1.X,y:k1.Y,z:k1.Z+2.4},0.9,[168,172,180],false,true);
   })();
 
+  // QR 코드 라벨 (케이스 상면) — 비전이 PCB 와 동시에 판독
+  (function(){
+    var u0=-15.0, v0=2.7, LW=7.0, LH=5.4, NZ=TH+0.45;
+    var Oq=PJ(CP(u0,v0,NZ)), Uq=PJ(CP(u0+1,v0,NZ)), Vq=PJ(CP(u0,v0-1,NZ));
+    var ux=Uq.x-Oq.x, uy=Uq.y-Oq.y, vx=Vq.x-Oq.x, vy=Vq.y-Oq.y;
+    if(Math.abs(ux*vy-uy*vx)<0.02) return;
+    var g='<g transform="matrix('+[ux,uy,vx,vy,Oq.x,Oq.y].map(function(n){return n.toFixed(4);}).join(' ')+')">';
+    g+='<rect x="0" y="0" width="'+LW+'" height="'+LH+'" rx=".3" fill="#F7F8FA" stroke="#9AA0A8" stroke-width=".12"/>';
+    g+=qrRects(0.5,0.5,0.4,'#14161A');                  // 11×11 모듈 (4.4 × 4.4)
+    for(var k=0;k<4;k++) g+='<rect x="5.3" y="'+(0.9+k*1.0)+'" width="1.5" height="0.34" rx=".12" fill="#5A6069"/>';
+    g+='</g>';
+    o+=g;
+  })();
+
   // 출선 케이블 (직조 슬리브) + 그레이 커넥터
   (function(){
-    var segs=[[21,-1.0],[27,-2.8],[32,-5.6],[36,-9.2]];
+    var segs=[[21,-0.9],[27,-2.2],[32,-3.9],[35,-5.8]];
     var prev=CP(17,0,TH*0.5);
     for(var i=0;i<segs.length;i++){
       var cur=CP(segs[i][0],segs[i][1],TH*0.5);
@@ -600,7 +647,7 @@ function drawCase(){
       prev=cur;
     }
     // 그레이 커넥터 30 × 20 mm
-    var cn=CP(39,-10.6,0);
+    var cn=CP(38,-6.8,0);
     o+=box(cn.X-3.2,cn.X+3.2,cn.Y-2.2,cn.Y+2.2,TBL_Z,TBL_Z+4.2,[172,176,184],0.5);
     for(var j=0;j<4;j++){
       var sx=cn.X-2.3+j*1.5;
@@ -613,13 +660,13 @@ function drawCase(){
 
 /* ---- PCB ↔ 케이스 리드선 ---- */
 function drawLeads(){
-  var o='', LP=pcbFrame(TARGETS[0]), CP=caseFrame();
+  var o='', LP=pcbFrame(PCBP), CP=caseFrame();
   var hu=PCB_W/2;
   var cols=['#2F6FD0','#2A2E34','#D9B528'];
   for(var i=0;i<3;i++){
     var a=PJ(LP(hu-2.4, -1.1+i*1.1, PCB_T+1.2));
-    var b=PJ(CP(-2.5+i*1.0, -3.4+i*0.5, 2.6+1.2));
-    var mx=(a.x+b.x)/2, my=(a.y+b.y)/2+5.5+i*1.1;
+    var b=PJ(CP(19.2-i*1.1, 1.6-i*1.2, 2.6+1.2));
+    var mx=(a.x+b.x)/2, my=(a.y+b.y)/2+4.0+i*1.0;
     o+='<path d="M'+pt(a)+' Q'+mx.toFixed(1)+','+my.toFixed(1)+' '+pt(b)+'" fill="none" stroke="'+cols[i]+'" stroke-width="1.15" stroke-linecap="round" opacity=".92"/>';
   }
   return o;
@@ -631,12 +678,12 @@ function drawMonitor(){
   var HW=34.5, HH=20.5, SW=33, SH=19;                 // 외형 / 유효화면 반치수 (15" 16:9)
   var MM=function(u,v,n){ return {X:MON.x+u, Y:MON.y-n, Z:MON.z+v}; };
 
-  // 폴 (받침대 상면 → 모니터 높이) + 수평 암
-  var pX=14, pY=12;
-  o+=tube({x:pX,y:pY,z:TBL_Z},{x:pX,y:pY,z:MON.z+4},2.4,MAT.steel,true,true);
-  o+=tube({x:pX,y:pY,z:MON.z},{x:MON.x,y:MON.y+9,z:MON.z},2.0,MAT.steel,true,true);
+  // 폴 (받침대 전면 상단) + 짧은 수평 암 — 로봇 팔 동선 밖(앞쪽)
+  var pX=92, pY=0;
+  o+=tube({x:pX,y:pY,z:TBL_Z},{x:pX,y:pY,z:MON.z+3},2.4,MAT.steel,true,true);
+  o+=tube({x:pX,y:pY,z:MON.z},{x:MON.x,y:MON.y+5,z:MON.z},2.0,MAT.steel,true,true);
   o+=box(pX-7,pX+7,pY-7,pY+7,TBL_Z,TBL_Z+2.4,MAT.steel,0.5);                 // 베이스 플랜지
-  o+=tube({x:MON.x,y:MON.y+9,z:MON.z},{x:MON.x,y:MON.y+4,z:MON.z},4.2,MAT.steel,true,true); // VESA
+  o+=tube({x:MON.x,y:MON.y+5,z:MON.z},{x:MON.x,y:MON.y+4,z:MON.z},4.2,MAT.steel,true,true); // VESA
 
   // 케이스
   o+=box(MON.x-HW,MON.x+HW,MON.y,MON.y+4,MON.z-HH,MON.z+HH,[38,42,50],0.6);
@@ -660,19 +707,30 @@ function drawMonitor(){
     g+='<rect x="6" y="1.3" width="16" height="1.8" rx=".8" fill="#4E6C93"/>';
 
     // ── 좌측 : 취득 PCB 영상 ──
-    g+='<rect x="1.6" y="6" width="28" height="28" fill="#0F1A24" stroke="#26394C" stroke-width=".5"/>';
-    g+='<ellipse cx="15.6" cy="20" rx="11" ry="5.6" fill="'+(shotT>=0?'#3E9E48':'#2E7D36')+'"/>';
+    g+='<rect x="1.6" y="6" width="28" height="23" fill="#0F1A24" stroke="#26394C" stroke-width=".5"/>';
+    g+='<ellipse cx="15.6" cy="17.5" rx="10.4" ry="4.8" fill="'+(shotT>=0?'#3E9E48':'#2E7D36')+'"/>';
     for(var r=0;r<3;r++) for(var c=0;c<5;c++){
-      var px=9.0+c*2.7, py=16.6+r*2.4;
-      var dx=(px-15.6)/11, dy=(py-20)/5.6;
+      var px=9.2+c*2.6, py=14.6+r*2.1;
+      var dx=(px-15.6)/10.4, dy=(py-17.5)/4.8;
       if(dx*dx+dy*dy>0.62) continue;
-      g+='<rect x="'+px.toFixed(1)+'" y="'+py.toFixed(1)+'" width="1.5" height="1.1" rx=".2" fill="#C6AA5C"/>';
+      g+='<rect x="'+px.toFixed(1)+'" y="'+py.toFixed(1)+'" width="1.45" height="1.0" rx=".2" fill="#C6AA5C"/>';
     }
-    g+='<line x1="15.6" y1="7.5" x2="15.6" y2="32.5" stroke="#E8873A" stroke-width=".35" opacity="'+((scanT>=0||shotT>=0)?'.95':'.3')+'"/>';
-    g+='<line x1="3" y1="20" x2="28.2" y2="20" stroke="#E8873A" stroke-width=".35" opacity="'+((scanT>=0||shotT>=0)?'.95':'.3')+'"/>';
+    g+='<line x1="15.6" y1="7.2" x2="15.6" y2="27.8" stroke="#E8873A" stroke-width=".35" opacity="'+((scanT>=0||shotT>=0)?'.95':'.3')+'"/>';
+    g+='<line x1="3" y1="17.5" x2="28.2" y2="17.5" stroke="#E8873A" stroke-width=".35" opacity="'+((scanT>=0||shotT>=0)?'.95':'.3')+'"/>';
     if(shotT>=0 && shotT<0.3)
-      g+='<rect x="1.6" y="6" width="28" height="28" fill="#FFFFFF" opacity="'+((1-shotT/0.3)*0.55).toFixed(2)+'"/>';
-    g+='<rect x="1.6" y="6" width="28" height="28" fill="none" stroke="'+(shotT>=0?'#E8873A':'#26394C')+'" stroke-width="'+(shotT>=0?.9:.5)+'"/>';
+      g+='<rect x="1.6" y="6" width="28" height="23" fill="#FFFFFF" opacity="'+((1-shotT/0.3)*0.55).toFixed(2)+'"/>';
+    g+='<rect x="1.6" y="6" width="28" height="23" fill="none" stroke="'+(shotT>=0?'#E8873A':'#26394C')+'" stroke-width="'+(shotT>=0?.9:.5)+'"/>';
+
+    // ── 좌측 하단 : 케이스 QR 동시 판독 결과 ──
+    var qrOn=(shotT>=0)||!!verdict;
+    g+='<rect x="1.6" y="30.2" width="28" height="6.2" rx=".6" fill="#0F1A24" stroke="'+(qrOn?'#3FBF63':'#26394C')+'" stroke-width=".5"/>';
+    (function(){
+      var QX=2.3, QY=30.8, M=0.46;
+      g+='<rect x="'+QX+'" y="'+QY+'" width="'+(M*11+0.5)+'" height="'+(M*11+0.5)+'" rx=".2" fill="#F4F6F8"/>';
+      g+=qrRects(QX+0.25,QY+0.25,M,qrOn?'#101418':'#8792A0');
+    })();
+    g+='<text x="8.6" y="32.9" font-family="\'Noto Sans KR\',sans-serif" font-size="1.9" font-weight="700" fill="'+(qrOn?'#3FBF63':'#6B7683')+'">QR '+(qrOn?'DECODE OK':'WAIT')+'</text>';
+    g+='<text x="8.6" y="35.6" font-family="\'Noto Sans KR\',sans-serif" font-size="2.0" font-weight="900" fill="'+(qrOn?'#DCE6F2':'#44505E')+'">'+(qrOn?QRSN:'----------------')+'</text>';
 
     // ── 중앙 : 판정 (크게) ──
     g+='<rect x="31.5" y="6" width="17" height="17" rx="1.6" fill="'+vCol+'"/>';
@@ -799,9 +857,9 @@ function drawVision(t){
   var o='', A=solveArm(armT.x,armT.y,armT.z,armT.ta,armT.tb);
   if(!t) return '';
   var LP=pcbFrame(t);
-  var hw=PCB_W/2, hd=PCB_D/2;
+  var hw=44, hd=9;                       // 동시 화각 : PCB + 케이스 QR 전체
 
-  /* 3D 라인스캔 : 레이저 라인이 PCB 위를 지나감 */
+  /* 3D 라인스캔 : 레이저 라인이 PCB·케이스 위를 지나감 */
   if(scanT>=0){
     var su=-hw-1 + (2*hw+2)*scanT;
     var a=LP(su,-hd-1,PCB_T+0.15), b=LP(su,hd+1,PCB_T+0.15);
@@ -812,9 +870,9 @@ function drawVision(t){
     o+='<line x1="'+qa.x.toFixed(1)+'" y1="'+qa.y.toFixed(1)+'" x2="'+qb.x.toFixed(1)+'" y2="'+qb.y.toFixed(1)+'" stroke="#2FA8E8" stroke-width="1.9" opacity=".95"/>';
   }
 
-  /* 2D 촬영 : 화각 마커 + 셔터 플래시 */
+  /* 2D 촬영 : 화각 마커 + 셔터 플래시 (PCB + 케이스 QR 동시) */
   if(shotT>=0){
-    var FU=hw+2.4, FV=hd+2.4, HZ=PCB_T+0.2;
+    var FU=hw, FV=hd, HZ=PCB_T+0.2;
     var c4=[LP(-FU,-FV,HZ),LP(FU,-FV,HZ),LP(FU,FV,HZ),LP(-FU,FV,HZ)].map(PJ);
     var fl2=(shotT<0.3)?(1-shotT/0.3):0;
     if(fl2>0) o+='<polygon points="'+c4.map(pt).join(' ')+'" fill="#FFFFFF" opacity="'+(fl2*0.62).toFixed(2)+'"/>';
@@ -827,9 +885,18 @@ function drawVision(t){
     }
   }
 
+  /* QR 판독 마커 : 케이스 라벨 위 */
+  if(shotT>=0){
+    var QP=caseFrame();
+    var qc=[QP(-18.6,3.2,2.6+0.6),QP(-10.6,3.2,2.6+0.6),QP(-10.6,-3.2,2.6+0.6),QP(-18.6,-3.2,2.6+0.6)].map(PJ);
+    o+='<polygon points="'+qc.map(pt).join(' ')+'" fill="none" stroke="#3FBF63" stroke-width="1.3"/>';
+    var qt=PJ(QP(-14.6,5.6,2.6+0.6));
+    o+='<text x="'+qt.x.toFixed(1)+'" y="'+qt.y.toFixed(1)+'" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="5" font-weight="900" fill="#2E8B4F">QR</text>';
+  }
+
   /* 조명 ON : 확산광 */
   if(lightOn && shotT<0){
-    var cq=[LP(-hw-1.5,-hd-1.5,PCB_T+0.1),LP(hw+1.5,-hd-1.5,PCB_T+0.1),LP(hw+1.5,hd+1.5,PCB_T+0.1),LP(-hw-1.5,hd+1.5,PCB_T+0.1)].map(PJ);
+    var cq=[LP(-hw,-hd,PCB_T+0.1),LP(hw,-hd,PCB_T+0.1),LP(hw,hd,PCB_T+0.1),LP(-hw,hd,PCB_T+0.1)].map(PJ);
     o+='<polygon points="'+cq.map(pt).join(' ')+'" fill="#FFE9B0" opacity=".22"/>';
   }
   return o;
@@ -839,7 +906,7 @@ function drawVision(t){
 function updHUD(){
   var A=solveArm(armT.x,armT.y,armT.z,armT.ta,armT.tb);
   var t=TARGETS[tIdx];
-  $('vT').textContent = running ? '타원 PCB 100×50' : '-';
+  $('vT').textContent = running ? 'PCB 100×50 + 케이스 QR' : '-';
   var wd=(armT.z-(TBL_Z+PCB_T))*U;
   $('vW').textContent = (wd>0&&wd<520) ? Math.round(wd)+' mm' : '-';
   $('vA').textContent = (aligned||scanT>=0) ? ('θ'+t.ta.toFixed(1)+'° φ'+t.tb.toFixed(1)+'°') : '-';
@@ -849,6 +916,8 @@ function updHUD(){
   $('bScan').textContent = scanT>=0?'ON':'OFF';  $('cScan').classList.toggle('on',scanT>=0);
   $('bAlign').textContent = aligned?'⊥ 직각':'-'; $('cAlign').classList.toggle('on',aligned);
   $('bShot').textContent = shotT>=0?'노광':'OFF'; $('cShot').classList.toggle('on',shotT>=0);
+  var qrOn=(shotT>=0)||!!verdict;
+  $('bQr').textContent = qrOn?QRSN:'-'; $('cQr').classList.toggle('on',qrOn);
   $('bSen').textContent = String(done);
   $('cSen').classList.toggle('alarm',alarm);
 
@@ -890,7 +959,7 @@ function moveTo(tx,ty,tz,ta,tb,dur,cb){
   },cb);
 }
 
-function homePos(){ return {x:RB.x+HOME.r*Math.cos(-0.35), y:RB.y+HOME.r*Math.sin(-0.35), z:HOME.z}; }
+function homePos(){ return {x:RB.x+HOME.r*Math.cos(1.35), y:RB.y+HOME.r*Math.sin(1.35), z:HOME.z}; }
 
 function runState(){
   if(!running) return;
