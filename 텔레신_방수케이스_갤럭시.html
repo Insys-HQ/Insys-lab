@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>텔레신 방수케이스 갤럭시 사용 가이드 v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1f3a5f;--ink:#2b3440;--line:#cfd8e3;--soft:#eef3f9;--warn-bg:#fff4e0;--warn:#7a4a00;--ok-bg:#e8f4ec;--ok:#1d5a35}
+*{box-sizing:border-box}
+html{font-size:14px}
+body{margin:0;font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:#f6f8fb;line-height:1.5;font-size:1rem}
+@media (min-width:768px){html{font-size:16px}}
+.nav{background:var(--navy);width:100%}
+.nav-inner{max-width:1100px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.nav h1{margin:0;font-size:1.1rem;font-weight:700;color:#fff}
+.ver{font-size:.85rem;color:#dbe6f3;font-weight:500}
+.tools{display:flex;gap:6px}
+.tools button{font-family:inherit;font-size:.9rem;font-weight:500;border:1px solid #9fb4cf;background:#fff;color:var(--navy);padding:6px 12px;border-radius:6px;cursor:pointer}
+.tools button.on{background:#dbe6f3;font-weight:700;border-color:#fff}
+.wrap{max-width:1100px;margin:0 auto;padding:8px 14px}
+#app{margin:0 auto;transition:max-width .2s}
+#app.mobile{max-width:420px}
+#app.pc{max-width:1100px}
+.lead{background:#fff;border:1px solid var(--line);border-left:5px solid var(--navy);border-radius:8px;padding:10px 12px;margin:8px 0}
+.lead b{color:var(--navy)}
+.grid{display:grid;gap:8px;grid-template-columns:1fr}
+#app.pc .grid.two{grid-template-columns:1fr 1fr}
+#app.pc .grid.three{grid-template-columns:1fr 1fr 1fr}
+.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:0}
+.card h2{margin:0 0 6px;font-size:1.1rem;color:var(--navy);font-weight:700}
+.sec{margin:8px 0}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+th{background:var(--soft);color:var(--navy);font-weight:700;white-space:nowrap}
+ol,ul{margin:4px 0;padding-left:20px}
+li{margin:2px 0}
+.note{border-radius:6px;padding:6px 10px;margin:6px 0;font-size:.95rem}
+.warn{background:var(--warn-bg);color:var(--warn);border:1px solid #f0d49a}
+.ok{background:var(--ok-bg);color:var(--ok);border:1px solid #b9dcc6}
+.tag{display:inline-block;background:var(--navy);color:#fff;border-radius:4px;padding:0 6px;font-size:.8rem;margin-right:4px}
+.steps{list-style:none;padding:0;margin:0}
+.steps li{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px dashed var(--line)}
+.steps li:last-child{border-bottom:0}
+.steps input{margin-top:4px;width:18px;height:18px;flex:none}
+.steps label{cursor:pointer;flex:1}
+.steps li.done label{color:#7b8794;text-decoration:line-through}
+.bar{height:8px;background:#e1e8f0;border-radius:4px;overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;width:0;background:var(--navy);transition:width .2s}
+.row{display:flex;gap:6px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.btn{font-family:inherit;font-size:.9rem;border:1px solid var(--navy);background:#fff;color:var(--navy);padding:5px 12px;border-radius:6px;cursor:pointer;font-weight:500}
+.btn:hover{background:var(--soft)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0}
+.tabs button{font-family:inherit;font-size:.9rem;border:1px solid var(--line);background:#fff;color:var(--ink);padding:5px 12px;border-radius:6px;cursor:pointer}
+.tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700}
+.pane{display:none}
+.pane.on{display:block}
+footer{max-width:1100px;margin:0 auto;padding:8px 14px;font-size:.85rem;color:#5b6775}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <h1>텔레신 방수케이스 사용 가이드 (갤럭시)</h1>
+    <span class="ver" id="ver">v1.0</span>
+    <div class="tools" role="group" aria-label="화면 선택">
+      <button type="button" id="btnMobile" class="on">모바일</button>
+      <button type="button" id="btnPc">PC</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+<div id="app" class="mobile">
+
+  <div class="lead">
+    <b>핵심:</b> 수심 <b>20m 방수(IP68)</b> 케이스입니다. 폰을 넣고 <b>버클 5개 잠금 → 진공 펌핑 3~4회</b>로 밀폐한 뒤, 블루투스 리모컨 버튼으로 촬영합니다.<br>
+    모델 <b>P4-WTP-06</b> · 안드로이드(갤럭시) 기준으로 정리했습니다.
+  </div>
+
+  <div class="note warn">※ 갤럭시 설정 메뉴 이름은 기종·One UI 버전에 따라 다를 수 있습니다. 설명서 원문에 없는 갤럭시 메뉴 경로는 <span class="tag">참고</span>로 표시했습니다.</div>
+
+  <div class="tabs" id="tabs">
+    <button type="button" data-t="p1" class="on">① 기본·버튼</button>
+    <button type="button" data-t="p2">② 연결·설정</button>
+    <button type="button" data-t="p3">③ 장착·진공</button>
+    <button type="button" data-t="p4">④ 사용 후·주의</button>
+  </div>
+
+  <!-- 탭1 -->
+  <section class="pane on" id="p1">
+    <div class="grid two">
+      <div class="card sec">
+        <h2>주요 스펙</h2>
+        <table>
+          <tr><th>방수</th><td>20m (IP68)</td></tr>
+          <tr><th>호환</th><td>7인치 이하 일자형 스마트폰</td></tr>
+          <tr><th>크기·무게</th><td>203.66×109.18×52mm · 397g</td></tr>
+          <tr><th>배터리</th><td>80mAh · 충전 2시간</td></tr>
+          <tr><th>충전 입력</th><td>포고핀 5V 0.5A</td></tr>
+          <tr><th>소재</th><td>ABS+PC+알루미늄 합금</td></tr>
+        </table>
+        <div class="note warn">폰 케이스를 씌운 채 장착하지 마세요.</div>
+      </div>
+      <div class="card sec">
+        <h2>버튼 기능</h2>
+        <table>
+          <tr><th>버튼</th><th>짧게</th><th>길게</th></tr>
+          <tr><td>촬영</td><td>녹화 시작/정지</td><td><b>2초: 전원 ON/OFF</b></td></tr>
+          <tr><td>줌 W</td><td>광각(줌 아웃)</td><td>-</td></tr>
+          <tr><td>줌 T</td><td>망원(줌 인)</td><td>-</td></tr>
+          <tr><td>모드 1</td><td>촬영 모드 전환</td><td>잠금화면 카메라 실행<br><span style="color:#a33">※ 삼성 미지원</span></td></tr>
+          <tr><td>모드 2</td><td>촬영 모드 전환</td><td>전·후면 카메라 전환</td></tr>
+        </table>
+        <div class="note warn">설명서상 <b>삼성은 '빠른 깨우기'(모드 1 길게) 미지원</b>입니다. 화면이 꺼지면 폰 전원 버튼으로 직접 켜세요.</div>
+      </div>
+    </div>
+    <div class="card sec">
+      <h2>케이스 각 부분</h2>
+      <table>
+        <tr><th>①</th><td>포고핀 충전 포트 (왼쪽 측면)</td><th>③</th><td>진공 밸브</td></tr>
+        <tr><th>②</th><td>밀봉 버클 (5개)</td><th>④</th><td>1/4인치 나사 구멍 (삼각대용)</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 탭2 -->
+  <section class="pane" id="p2">
+    <div class="grid two">
+      <div class="card sec">
+        <h2>블루투스 연결</h2>
+        <ol>
+          <li>케이스 <b>촬영 버튼 2초</b> 길게 → 전원 ON, 표시등 깜빡임(페어링 모드)</li>
+          <li>갤럭시 <b>설정 → 연결 → 블루투스</b> <span class="tag">참고</span></li>
+          <li><b>TELESIN_SDC</b> 선택</li>
+        </ol>
+        <div class="note ok">아이폰 전용 '확대/축소(손쉬운 사용)' 설정은 갤럭시에서는 필요 없습니다.</div>
+      </div>
+      <div class="card sec">
+        <h2>사용 전 폰 설정</h2>
+        <ol>
+          <li><b>화면 자동 꺼짐</b>: 설정 → 디스플레이 → 화면 자동 꺼짐 시간 → <b>가장 긴 시간</b> <span class="tag">참고</span><br>
+            <small>원문은 '안 함'이나, 갤럭시는 '안 함' 항목이 없는 경우가 많습니다.</small></li>
+          <li><b>방해 금지 모드</b> 켜기: 설정 → 알림 → 방해 금지 <span class="tag">참고</span></li>
+          <li><b>기본 카메라 앱</b> 실행</li>
+        </ol>
+      </div>
+    </div>
+    <div class="card sec">
+      <h2>전원·절전</h2>
+      <table>
+        <tr><th>전원 ON</th><td>촬영 버튼 2초 → 표시등 깜빡임, 페어링 모드</td></tr>
+        <tr><th>전원 OFF</th><td>켜짐/절전 중 촬영 버튼 2초 → 표시등 3번 깜빡이고 꺼짐</td></tr>
+        <tr><th>자동 절전</th><td>페어링 후 60분 조작 없음</td></tr>
+        <tr><th>연결 끊김</th><td>폰 설정·거리·블루투스 OFF → 절전, 30분 후 자동 꺼짐</td></tr>
+        <tr><th>절전 해제</th><td>아무 버튼 누름 (마지막 연결 폰 블루투스가 켜져 있으면 자동 재연결)</td></tr>
+        <tr><th>미연결</th><td>전원 ON 후 2분 내 페어링 안 되면 자동 꺼짐</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 탭3 -->
+  <section class="pane" id="p3">
+    <div class="card sec">
+      <div class="row"><h2 style="margin:0">장착·진공 체크리스트</h2>
+        <button type="button" class="btn" id="btnReset">초기화</button></div>
+      <div class="bar"><i id="prog"></i></div>
+      <div id="progTxt" style="font-size:.9rem">0 / 12 완료</div>
+      <ul class="steps" id="steps">
+        <li><input type="checkbox" id="s1"><label for="s1">렌즈·케이스 내부 유리·투명 내부를 천으로 닦기</label></li>
+        <li><input type="checkbox" id="s2"><label for="s2">밀봉 버클 <b>5개</b> 모두 풀기</label></li>
+        <li><input type="checkbox" id="s3"><label for="s3">투명 커버 열기 (<b>폰·손 완전히 건조</b>, 물 들어가면 김서림)</label></li>
+        <li><input type="checkbox" id="s4"><label for="s4">폰을 <b>왼쪽 끝에 밀착</b>, 카메라 렌즈를 창에 맞춰 클램프에 끼우기 (렌즈 가려지면 위치 미세 조정)</label></li>
+        <li><input type="checkbox" id="s5"><label for="s5">밀봉 버클 <b>5개</b> 단단히 잠그기</label></li>
+        <li><input type="checkbox" id="s6"><label for="s6">손목 스트랩 연결</label></li>
+        <li><input type="checkbox" id="s7"><label for="s7">진공 밸브 커버 풀기</label></li>
+        <li><input type="checkbox" id="s8"><label for="s8">펌프의 고무 헤드를 밸브에 눌러 붙이기</label></li>
+        <li><input type="checkbox" id="s9"><label for="s9"><b>3~4회</b> 펌핑해 공기 빼기</label></li>
+        <li><input type="checkbox" id="s10"><label for="s10">진공 밸브 커버 다시 단단히 잠그기</label></li>
+        <li><input type="checkbox" id="s11"><label for="s11">블루투스 연결·카메라 앱 실행·버튼 동작 확인</label></li>
+        <li><input type="checkbox" id="s12"><label for="s12">(처음 1회) 휴지 넣고 밀폐 후 <b>30분 침수</b> → 열기 전 외부 확인, 휴지 건조 시 정상</label></li>
+      </ul>
+    </div>
+    <div class="card sec">
+      <h2>케이스에서 폰 꺼내기</h2>
+      <ol>
+        <li>진공 밸브 커버를 풉니다.</li>
+        <li><b>검은 고무 패킹을 눌러 압력</b>을 뺍니다.</li>
+        <li>압력이 빠진 뒤 버클을 풉니다.</li>
+      </ol>
+      <div class="note warn">순서를 지키지 않으면 음압으로 흡착되어 열리지 않습니다.</div>
+    </div>
+    <div class="card sec">
+      <h2>방수 테스트 결과</h2>
+      <p style="margin:0"><b>휴지가 마름</b> → 방수 정상 / <b>휴지가 젖음</b> → 즉시 고객센터 문의</p>
+    </div>
+  </section>
+
+  <!-- 탭4 -->
+  <section class="pane" id="p4">
+    <div class="grid two">
+      <div class="card sec">
+        <h2>바닷물 사용 후 관리</h2>
+        <ol>
+          <li>폰을 빼고 <b>잠근 상태</b>로 민물에 <b>10분</b> 담그기</li>
+          <li>흐르는 수돗물에 <b>5분</b> 헹구기</li>
+          <li><b>수건</b>으로 닦기 (헤어드라이어·히터 금지)</li>
+          <li><b>내부는 방수 안 됨</b> – 내부는 절대 헹구지 않기 (회로 손상)</li>
+        </ol>
+      </div>
+      <div class="card sec">
+        <h2>충전</h2>
+        <ol>
+          <li>제공된 충전 케이블의 접점을 <b>왼쪽 측면 충전 포트</b>에 연결</li>
+          <li>반대쪽은 USB 전원에 연결 (약 <b>2시간</b>)</li>
+        </ol>
+        <div class="note warn">충전 중 수건·옷으로 덮지 마세요(화재 위험).</div>
+      </div>
+    </div>
+    <div class="card sec">
+      <h2>주의사항</h2>
+      <ul>
+        <li>분해·손상 금지, 변형·파손 시 즉시 사용 중단</li>
+        <li>낙하, 고온, 단락(쇼트) 환경 피하기</li>
+        <li>온천, 정체불명 액체, 부식성 액체에서 사용 금지</li>
+        <li>건조하고 통풍 잘 되는 곳에 보관, 어린이 손이 닿지 않게</li>
+        <li>보증기간: 수령일로부터 <b>6개월</b></li>
+      </ul>
+    </div>
+  </section>
+
+</div>
+</main>
+<footer>텔레신 P4-WTP-06 설명서 요약 (갤럭시 기준) · <span id="ver2">v1.0</span></footer>
+
+<script>
+(function(){
+  var VERSION='v1.0';
+  document.getElementById('ver').textContent=VERSION;
+  document.getElementById('ver2').textContent=VERSION;
+
+  var app=document.getElementById('app');
+  var bm=document.getElementById('btnMobile'), bp=document.getElementById('btnPc');
+  function setView(v){
+    app.className=v;
+    bm.classList.toggle('on',v==='mobile');
+    bp.classList.toggle('on',v==='pc');
+  }
+  bm.addEventListener('click',function(){setView('mobile');});
+  bp.addEventListener('click',function(){setView('pc');});
+  setView('mobile');
+
+  var tabs=document.querySelectorAll('#tabs button');
+  tabs.forEach(function(b){
+    b.addEventListener('click',function(){
+      tabs.forEach(function(x){x.classList.remove('on');});
+      document.querySelectorAll('.pane').forEach(function(p){p.classList.remove('on');});
+      b.classList.add('on');
+      document.getElementById(b.getAttribute('data-t')).classList.add('on');
+    });
+  });
+
+  var boxes=document.querySelectorAll('#steps input');
+  function upd(){
+    var n=0;
+    boxes.forEach(function(c){
+      if(c.checked)n++;
+      c.parentNode.classList.toggle('done',c.checked);
+    });
+    document.getElementById('prog').style.width=(n/boxes.length*100)+'%';
+    document.getElementById('progTxt').textContent=n+' / '+boxes.length+' 완료';
+  }
+  boxes.forEach(function(c){c.addEventListener('change',upd);});
+  document.getElementById('btnReset').addEventListener('click',function(){
+    boxes.forEach(function(c){c.checked=false;});
+    upd();
+  });
+  upd();
+})();
+</script>
+</body>
+</html>
