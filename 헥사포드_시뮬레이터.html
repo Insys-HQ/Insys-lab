@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>헥사포드 비전검사 시뮬레이터 v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* 헥사포드 비전검사 시뮬레이터 v1.0 — 인시스 AI혁신 연구개발실 */
+*{box-sizing:border-box}
+html{font-size:14px}
+@media (min-width:768px){html{font-size:16px}}
+body{margin:0;font-family:'Noto Sans KR',sans-serif;font-size:1rem;line-height:1.35;color:#1f2a3a;background:#eef1f5}
+.nav{background:#1e3a5f;color:#fff}
+.nav-inner{max-width:1100px;margin:0 auto;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.brand b{font-weight:700;font-size:1.1rem}
+.ver{margin-left:8px;background:#e3eaf4;color:#1e3a5f;border-radius:10px;padding:0 8px;font-weight:700}
+.seg{display:flex;gap:4px}
+.seg button{border:1px solid #9fb3cf;background:#e3eaf4;color:#1e3a5f;border-radius:6px;padding:4px 10px;font:inherit;cursor:pointer}
+.seg button.on{background:#fff;color:#1e3a5f;font-weight:700;border-color:#fff}
+.wrap{max-width:1100px;margin:0 auto;padding:8px 12px}
+body.mobile .nav-inner,body.mobile .wrap{max-width:440px}
+.tabs{display:flex;gap:4px;margin:0 0 8px;overflow-x:auto}
+.tabs button{flex:1 0 auto;border:1px solid #b8c6dc;background:#e3eaf4;color:#1e3a5f;border-radius:6px;padding:6px 10px;font:inherit;cursor:pointer;white-space:nowrap}
+.tabs button.on{background:#1e3a5f;color:#fff;border-color:#1e3a5f;font-weight:700}
+.tab{display:none}.tab.on{display:block}
+.card{background:#fff;border:1px solid #d5dbe3;border-radius:8px;padding:10px 12px;margin:0 0 8px}
+.ct{font-weight:700;font-size:1.05rem;color:#1e3a5f;margin:0 0 6px}
+.ct small{font-weight:400;color:#475569;margin-left:6px;font-size:1rem}
+input{font:inherit}
+.grid2{display:block}
+body.pc .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px}
+body.pc .fg.w{grid-template-columns:repeat(4,1fr)}
+.f{display:flex;flex-direction:column;min-width:0}
+.f .l{color:#334155;margin-bottom:2px}
+.f .in{display:flex;align-items:center;gap:4px}
+.f em{font-style:normal;color:#475569;white-space:nowrap}
+input[type=number],select{width:100%;min-width:0;border:1px solid #b8c2d0;border-radius:5px;padding:4px 6px;font:inherit;color:#1f2a3a;background:#fff}
+.as{font-style:normal;background:#fbf0cc;color:#713f12;border-radius:4px;padding:0 4px;margin-left:4px;font-size:1rem}
+.btns{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0 0}
+.btns button,.b{border:1px solid #b8c6dc;background:#e3eaf4;color:#1e3a5f;border-radius:6px;padding:5px 10px;font:inherit;cursor:pointer}
+.btns button.pri,.b.pri{background:#1e3a5f;color:#fff;border-color:#1e3a5f;font-weight:500}
+.opts{display:flex;flex-wrap:wrap;gap:4px 14px;margin:6px 0 0}
+.opts label{display:flex;align-items:center;gap:4px;cursor:pointer}
+canvas{display:block;width:100%;background:#f8fafc;border:1px solid #d5dbe3;border-radius:6px}
+#cv3{height:300px;touch-action:none;cursor:grab}
+body.pc #cv3{height:430px}
+#cvA{height:180px}
+.srow{display:grid;grid-template-columns:2.4rem 1fr 7.8rem;gap:6px;align-items:center;margin:0 0 2px}
+.srow input[type=range]{width:100%;margin:0}
+.srow .u{color:#475569}
+.srow .in{display:flex;align-items:center;gap:4px;flex-wrap:nowrap}
+.msg{margin:6px 0 0;color:#1f2a3a}
+.chip{display:inline-block;padding:0 8px;border-radius:10px;font-weight:500;white-space:nowrap}
+.chip.ok{background:#dff3e4;color:#14532d}
+.chip.warn{background:#fbf0cc;color:#713f12}
+.chip.ng{background:#fbe0e0;color:#7f1d1d}
+.chip.info{background:#e3eaf4;color:#1e3a5f}
+.tw{overflow-x:auto}
+table.tb{width:100%;border-collapse:collapse}
+.tb th{background:#e3eaf4;color:#1e3a5f;text-align:left;padding:3px 6px;border:1px solid #d5dbe3;white-space:nowrap}
+.tb td{padding:3px 6px;border:1px solid #d5dbe3;white-space:nowrap}
+.bar{display:inline-block;vertical-align:middle;width:70px;height:10px;background:#e2e8f0;border-radius:5px;overflow:hidden;margin-right:4px}
+.bar i{display:block;height:100%;background:#3b6aa5}
+.bar i.bad{background:#b91c1c}
+.rb{position:relative;display:block;height:12px;background:#f1f5f9;border-radius:6px;min-width:150px}
+.rb .a{position:absolute;top:0;height:100%;background:#cbd5e1;border-radius:6px}
+.rb .u{position:absolute;top:2px;height:8px;background:#3b6aa5;border-radius:4px}
+.rb .u.bad{background:#b91c1c}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+body.pc .kpi{grid-template-columns:repeat(3,1fr)}
+.kpi div{background:#f1f5f9;border-radius:6px;padding:4px 8px}
+.kpi b{display:block;color:#1e3a5f}
+.ck{display:grid;grid-template-columns:auto 1fr;gap:3px 8px;align-items:start}
+textarea{width:100%;min-height:260px;border:1px solid #b8c2d0;border-radius:6px;padding:6px 8px;font:inherit;color:#1f2a3a;background:#fff;resize:vertical}
+.foot{background:#e3eaf4;color:#1f2a3a;margin-top:8px}
+.foot .nav-inner{padding:6px 12px}
+.toast{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);background:#1e3a5f;color:#fff;padding:6px 14px;border-radius:8px;display:none;max-width:92vw;z-index:9}
+.note{background:#fbf0cc;color:#713f12;border-radius:6px;padding:4px 8px;margin:0 0 8px}
+</style>
+</head>
+<body class="mobile">
+<header class="nav"><div class="nav-inner">
+  <div class="brand"><b>헥사포드 비전검사 시뮬레이터</b><span class="ver" id="verTop">v1.0</span></div>
+  <div class="seg" id="devSeg"><button data-dev="mobile" class="on" id="btnMobile">모바일</button><button data-dev="pc" id="btnPc">PC</button></div>
+</div></header>
+
+<main class="wrap">
+  <div class="note">노란 <i class="as">가정</i> 표시 값은 대성·코그넥스 확인 전 임의 가정값입니다. 확인 후 수정하세요. (카메라 사양은 코그넥스 제안서 기준)</div>
+  <div class="tabs" id="tabs">
+    <button data-tab="tab1" class="on">① 기구·자세</button>
+    <button data-tab="tab2">② 작업영역·스트로크</button>
+    <button data-tab="tab3">③ 컨베이어·촬영</button>
+    <button data-tab="tab4">④ 사양·문의</button>
+  </div>
+
+  <!-- ① 기구·자세 -->
+  <section class="tab on" id="tab1">
+    <div class="grid2">
+      <div class="card">
+        <div class="ct">3D 뷰 <small>드래그 회전 · 휠 확대</small></div>
+        <canvas id="cv3"></canvas>
+        <div class="btns">
+          <button data-view="iso">사시도</button><button data-view="front">정면</button><button data-view="side">측면</button><button data-view="top">상면</button>
+          <button data-view="zin">확대 +</button><button data-view="zout">축소 −</button>
+        </div>
+        <div class="opts">
+          <label><input type="checkbox" data-k="inverted"> 역설치(매달기·카메라 하향)</label>
+          <label><input type="checkbox" data-k="pivotOn"> 2D 초점(TCP) 기준 자세</label>
+        </div>
+        <div class="msg" id="alignMsg"></div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="ct">자세 입력 <small>(TCP = 2D 카메라 초점)</small></div>
+          <div id="poseRows"></div>
+          <div class="btns">
+            <button id="btnZero">자세 초기화</button>
+            <button id="btnAlign" class="pri">3D 측정값으로 자동 정렬</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ct">PCB 자세 <small>(3D 카메라 측정값 가정)</small></div>
+          <div class="fg" id="fgPcb"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">레그 상태</div>
+      <div class="tw" id="legTbl"></div>
+    </div>
+    <div class="card">
+      <div class="ct">기구·하중 파라미터</div>
+      <div class="fg w" id="fgMech"></div>
+      <div class="btns"><button id="btnReset">전체 초기값으로 복원</button></div>
+    </div>
+  </section>
+
+  <!-- ② 작업영역 -->
+  <section class="tab" id="tab2">
+    <div class="grid2">
+      <div class="card">
+        <div class="ct">요구 작업영역 <small>± 범위 (TCP 기준)</small></div>
+        <div class="fg" id="fgRng"></div>
+        <div class="btns">
+          <button id="btnH0" class="pri">최소 스트로크 홈 높이(h0) 탐색·적용</button>
+          <button id="btnApplySpec">권장 Lmin·스트로크 적용</button>
+        </div>
+        <div class="msg" id="wsMsg"></div>
+      </div>
+      <div class="card">
+        <div class="ct">판정 요약 <small>3⁶=729개 자세 샘플</small></div>
+        <div id="wsSum"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">레그별 필요 길이 범위 <small>회색: 액추에이터 가동범위 · 청색: 사용범위</small></div>
+      <div class="tw" id="wsTbl"></div>
+    </div>
+  </section>
+
+  <!-- ③ 컨베이어·촬영 -->
+  <section class="tab" id="tab3">
+    <div class="card">
+      <div class="ct">컨베이어·검사 조건 <small>컨베이어 폭 100 · 전장 320 mm 키트 기준</small></div>
+      <div class="fg w" id="fgConv"></div>
+    </div>
+    <div class="card">
+      <div class="ct">동작 미리보기 <small>상면도 · 이송 방향 →</small></div>
+      <canvas id="cvA"></canvas>
+      <div class="btns">
+        <button id="btnPlay" class="pri">일시정지</button>
+        <button data-sp="1">×1</button><button data-sp="2">×2</button><button data-sp="5">×5</button>
+      </div>
+      <div class="msg" id="animStatus"></div>
+    </div>
+    <div class="card"><div class="ct">핵심 수치</div><div class="kpi" id="convKpi"></div></div>
+    <div class="card"><div class="ct">타당성 판정</div><div class="ck" id="convCk"></div></div>
+  </section>
+
+  <!-- ④ 사양·문의 -->
+  <section class="tab" id="tab4">
+    <div class="card">
+      <div class="ct">대성 액추에이터 요구 사양 <small>시뮬레이터 산출 (6ea 동일 사양)</small></div>
+      <div class="tw" id="specTbl"></div>
+    </div>
+    <div class="card">
+      <div class="ct">대성 문의서 초안</div>
+      <textarea id="inqText" readonly></textarea>
+      <div class="btns">
+        <button id="btnCopyInq" class="pri">문의서 복사</button>
+        <button id="btnDlInq">문의서 .md 저장</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot"><div class="nav-inner">
+  <span>인시스 AI혁신 연구개발실</span>
+  <span><button class="b" id="btnCopyLink">페이지 링크 복사</button> <b id="verFoot">v1.0</b> · 2026-11-09</span>
+</div></footer>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+var VERSION='v1.0';
+var PAGE_URL='https://insys-hq.github.io/Insys-lab/'+encodeURIComponent('헥사포드_시뮬레이터')+'.html';
+var D2R=Math.PI/180,R2D=180/Math.PI;
+function $(id){return document.getElementById(id);}
+function fm(x,d){if(d==null)d=1;return isFinite(x)?x.toFixed(d):'-';}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+function interp(x,x0,x1,y0,y1){return y0+(y1-y0)*(x-x0)/(x1-x0);}
+$('verTop').textContent=VERSION;$('verFoot').textContent=VERSION;
+
+/* ---------- 상태 ---------- */
+function DEF(){return {
+  Rb:150,Rp:110,db:40,dp:40,h0:300,Lmin:270,stroke:80,jmax:30,Fmax:0,
+  mass:2.5,comx:0,comy:0,comz:40,sf:2,bl2:70,bl3:110,
+  WD2:240,lens:'A',d:150,
+  inverted:true,pivotOn:true,
+  pose:{x:0,y:0,z:0,rx:0,ry:0,rz:0},
+  pcb:{dx:5,dy:-4,dz:3,tx:6,ty:-4,rz:3,L:70,W:50},
+  hold:{L:100,W:80},
+  rng:{x:10,y:10,z:8,rx:5,ry:5,rz:3},
+  conv:{v:50,ctl:'pid',ripple:0.5,Leff:280,Bw:100,pitch:200,pxW:2448,exp:200,dy:0,tproc:100,tmove:200,tsettle:100,jitter:1,ttrack:0.3}
+};}
+var S=DEF();
+function getP(o,p){return p.split('.').reduce(function(a,k){return a[k];},o);}
+function setP(o,p,v){var ks=p.split('.');var l=ks.pop();ks.reduce(function(a,k){return a[k];},o)[l]=v;}
+
+/* ---------- 수학 ---------- */
+function add(a,b){return [a[0]+b[0],a[1]+b[1],a[2]+b[2]];}
+function sub(a,b){return [a[0]-b[0],a[1]-b[1],a[2]-b[2]];}
+function mul(a,s){return [a[0]*s,a[1]*s,a[2]*s];}
+function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+function cross(a,b){return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];}
+function norm(a){return Math.sqrt(dot(a,a));}
+function rotZYX(rx,ry,rz){
+  var a=rx*D2R,b=ry*D2R,c=rz*D2R;
+  var ca=Math.cos(a),sa=Math.sin(a),cb=Math.cos(b),sb=Math.sin(b),cc=Math.cos(c),sc=Math.sin(c);
+  return [[cc*cb,cc*sb*sa-sc*ca,cc*sb*ca+sc*sa],[sc*cb,sc*sb*sa+cc*ca,sc*sb*ca-cc*sa],[-sb,cb*sa,cb*ca]];
+}
+function mv(R,v){return [R[0][0]*v[0]+R[0][1]*v[1]+R[0][2]*v[2],R[1][0]*v[0]+R[1][1]*v[1]+R[1][2]*v[2],R[2][0]*v[0]+R[2][1]*v[1]+R[2][2]*v[2]];}
+function gauss(M){
+  var n=6,i,j,k;
+  for(i=0;i<n;i++){
+    var p=i;for(j=i+1;j<n;j++)if(Math.abs(M[j][i])>Math.abs(M[p][i]))p=j;
+    if(Math.abs(M[p][i])<1e-9)return null;
+    var t=M[i];M[i]=M[p];M[p]=t;
+    for(j=i+1;j<n;j++){var f=M[j][i]/M[i][i];for(k=i;k<=n;k++)M[j][k]-=f*M[i][k];}
+  }
+  var x=new Array(n);
+  for(i=n-1;i>=0;i--){var s=M[i][n];for(j=i+1;j<n;j++)s-=M[i][j]*x[j];x[i]=s/M[i][i];}
+  return x;
+}
+
+/* ---------- 기구학·정역학 ---------- */
+function geom(s){
+  var B=[],A=[];
+  for(var k=0;k<3;k++){
+    var pr=[[120*k+s.db/2,120*k+60-s.dp/2],[120*(k+1)-s.db/2,120*k+60+s.dp/2]];
+    for(var q=0;q<2;q++){
+      B.push([s.Rb*Math.cos(pr[q][0]*D2R),s.Rb*Math.sin(pr[q][0]*D2R),0]);
+      A.push([s.Rp*Math.cos(pr[q][1]*D2R),s.Rp*Math.sin(pr[q][1]*D2R),0]);
+    }
+  }
+  return {B:B,A:A};
+}
+function pivotLocal(s){return [s.d/2,0,s.bl2+s.WD2];}
+function ik(s,g,pose,pivotOn){
+  var R=rotZYX(pose.rx,pose.ry,pose.rz),t=[pose.x,pose.y,pose.z],c=[0,0,s.h0];
+  if(pivotOn){var p=pivotLocal(s);c=add(add(c,p),sub(t,mv(R,p)));}else c=add(c,t);
+  var ezp=mv(R,[0,0,1]);
+  var legs=g.A.map(function(a,i){
+    var P=add(c,mv(R,a)),d=sub(P,g.B[i]),L=norm(d),u=mul(d,1/L);
+    return {B:g.B[i],P:P,L:L,u:u,
+      ab:Math.acos(clamp(u[2],-1,1))*R2D,ap:Math.acos(clamp(dot(u,ezp),-1,1))*R2D};
+  });
+  return {R:R,c:c,legs:legs,ezp:ezp};
+}
+function statics(s,r){
+  var W=[0,0,(s.inverted?1:-1)*s.mass*9.81];
+  var com=add(r.c,mv(r.R,[s.comx,s.comy,s.comz]));
+  var rf=mul(W,-1),rm=mul(cross(com,W),-1),M=[],i,j;
+  for(i=0;i<6;i++)M.push([0,0,0,0,0,0,0]);
+  r.legs.forEach(function(l,jj){var m=cross(l.P,l.u);for(var q=0;q<3;q++){M[q][jj]=l.u[q];M[q+3][jj]=m[q];}});
+  for(i=0;i<3;i++){M[i][6]=rf[i];M[i+3][6]=rm[i];}
+  return gauss(M);
+}
+function computeWS(s,quick){
+  var g=geom(s),r=s.rng;
+  var per=[];for(var i=0;i<6;i++)per.push({min:1e9,max:-1e9});
+  var gmin=1e9,gmax=-1e9,jb=0,jp=0,fmax=0,sing=0;
+  for(var n=0;n<729;n++){
+    var q=n,v=[];for(var k=0;k<6;k++){v.push((q%3)-1);q=Math.floor(q/3);}
+    var pose={x:v[0]*r.x,y:v[1]*r.y,z:v[2]*r.z,rx:v[3]*r.rx,ry:v[4]*r.ry,rz:v[5]*r.rz};
+    var res=ik(s,g,pose,s.pivotOn);
+    for(var j=0;j<6;j++){
+      var l=res.legs[j];
+      if(l.L<per[j].min)per[j].min=l.L;if(l.L>per[j].max)per[j].max=l.L;
+      if(l.L<gmin)gmin=l.L;if(l.L>gmax)gmax=l.L;
+      if(l.ab>jb)jb=l.ab;if(l.ap>jp)jp=l.ap;
+    }
+    if(!quick){var f=statics(s,res);if(!f)sing++;else{for(var m=0;m<6;m++)fmax=Math.max(fmax,Math.abs(f[m]));}}
+  }
+  return {per:per,gmin:gmin,gmax:gmax,req:gmax-gmin,jb:jb,jp:jp,fmax:fmax,sing:sing};
+}
+function searchH0(s){
+  var best=null;
+  for(var h=100;h<=400;h+=5){
+    var s2=Object.assign({},s,{h0:h}),w=computeWS(s2,true);
+    var jok=Math.max(w.jb,w.jp)<=s.jmax,key=(jok?0:1e6)+w.req+0.1*w.gmax;
+    if(!best||key<best.key)best={h:h,key:key,w:w,jok:jok};
+  }
+  return best;
+}
+function fov2(s){var k=s.lens==='A'?{x:0.528,y:0.4415}:{x:0.352,y:0.2945};return {fx:k.x*s.WD2,fy:k.y*s.WD2};}
+
+/* ---------- 컨베이어·촬영 계산 ---------- */
+function computeConv(){
+  var c=S.conv,v=Math.max(c.v,0.001),H=S.bl2+S.WD2,wd3=H-S.bl3;
+  var fov3=interp(wd3,180,925,95,460),res3=interp(wd3,180,925,0.05,0.24);
+  var dyl=c.dy>0?c.dy:res3,lineRate=v/dyl;
+  var f2=fov2(S),fx=f2.fx,fy=f2.fy,px=fx/c.pxW;
+  var blur=v*c.exp*1e-6,blurPx=blur/px,expMax=0.5*px/v*1e6;
+  var r=c.ripple/100,yErr=S.hold.L*r,trErr=S.d*r,trig=v*c.jitter/1000;
+  var tReady=(c.tproc+c.tmove+c.tsettle)/1000;
+  var win=(S.d-S.hold.L/2)/v,dMin=S.hold.L/2+v*tReady,takt=c.pitch/v;
+  var margin=(fx-S.pcb.L)/2,track=v*c.ttrack;
+  var ck=[];
+  function add1(lv,name,val){ck.push({lv:lv,name:name,val:val});}
+  add1(S.hold.W<=c.Bw?'ok':'ng','홀더 폭 ≤ 벨트 폭',fm(S.hold.W,0)+' / '+fm(c.Bw,0)+' mm');
+  add1((wd3>=180&&wd3<=925)?'ok':'ng','L38 작동거리(WD) 180~925mm',fm(wd3,0)+' mm (2D WD+돌출차)');
+  add1(fov3>=S.hold.W+10?'ok':(fov3>=S.hold.W?'warn':'ng'),'L38 시야 ≥ 홀더 폭(+10mm)',fm(fov3,0)+' mm vs '+fm(S.hold.W,0)+' mm');
+  add1(S.d+S.hold.L<=c.Leff?'ok':'ng','벨트 길이 ≥ 스테이션 간격+홀더',fm(S.d+S.hold.L,0)+' / '+fm(c.Leff,0)+' mm');
+  add1(S.d/2<=S.Rp?'ok':'ng','카메라 장착(간격/2 ≤ 플랫폼 반경)',fm(S.d/2,0)+' / '+fm(S.Rp,0)+' mm');
+  add1(win>=tReady?'ok':'ng','자세 보정 시간창 ≥ 처리+이동+안정',fm(win*1000,0)+' / '+fm(tReady*1000,0)+' ms'+(win>=tReady?'':' → 간격 d ≥ '+fm(dMin,0)+' mm 필요'));
+  add1((c.pitch>=S.hold.L+20&&takt>=tReady)?'ok':'ng','홀더 피치·takt (여유 20mm, takt ≥ 보정시간)','피치 '+fm(c.pitch,0)+' mm · takt '+fm(takt,2)+' s');
+  add1(blurPx<=0.5?'ok':(blurPx<=1?'warn':'ng'),'모션 블러 (0.5px 이하 권장)',fm(blur*1000,1)+' µm = '+fm(blurPx,2)+' px');
+  var cov=(fx>=S.pcb.L+2*(trErr+trig)&&fy>=S.pcb.W)?'ok':((fx>=S.pcb.L&&fy>=S.pcb.W)?'warn':'ng');
+  add1(cov,'2D 시야 ≥ PCB + 이월·트리거 오차','시야 '+fm(fx,0)+'×'+fm(fy,0)+' / PCB '+fm(S.pcb.L,0)+'×'+fm(S.pcb.W,0)+' · 오차 ±'+fm(trErr+trig,1)+' mm');
+  add1(yErr<=0.2?'ok':(yErr<=1?'warn':'ng'),'속도변동 → 3D 스캔 길이 왜곡 (≤0.2 양호)',fm(yErr,2)+' mm (±'+fm(c.ripple,2)+'%)');
+  add1(S.d>c.pitch?'warn':'ok','스테이션 사이 홀더 수',S.d>c.pitch?'2개 이상 → 자세값 FIFO 큐 필요':'1개 이하');
+  return {wd3:wd3,fov3:fov3,res3:res3,dyl:dyl,lineRate:lineRate,fx:fx,fy:fy,px:px,blur:blur,blurPx:blurPx,expMax:expMax,
+    yErr:yErr,trErr:trErr,trig:trig,tReady:tReady,win:win,dMin:dMin,takt:takt,margin:margin,track:track,transfer:S.d/v,ck:ck};
+}
+
+/* ---------- UI 구성 ---------- */
+function F(k,label,unit,o){
+  o=o||{};
+  return '<label class="f"><span class="l">'+label+(o.as?'<i class="as">가정</i>':'')+'</span><span class="in"><input type="number" data-k="'+k+'" step="'+(o.step||1)+'"'+(o.min!=null?' min="'+o.min+'"':'')+'><em>'+unit+'</em></span></label>';
+}
+function SEL(k,label,opts){
+  return '<label class="f"><span class="l">'+label+'</span><select data-k="'+k+'">'+opts.map(function(o){return '<option value="'+o[0]+'">'+o[1]+'</option>';}).join('')+'</select></label>';
+}
+function SL(k,label,mn,mx,st,unit){
+  return '<div class="srow"><span>'+label+'</span><input type="range" data-k="pose.'+k+'" min="'+mn+'" max="'+mx+'" step="'+st+'"><span class="in"><input type="number" data-k="pose.'+k+'" step="'+st+'"> <span class="u">'+unit+'</span></span></div>';
+}
+function build(){
+  $('poseRows').innerHTML=SL('x','X',-60,60,0.5,'mm')+SL('y','Y',-60,60,0.5,'mm')+SL('z','Z',-40,40,0.5,'mm')+SL('rx','Rx',-25,25,0.1,'°')+SL('ry','Ry',-25,25,0.1,'°')+SL('rz','Rz',-25,25,0.1,'°');
+  $('fgPcb').innerHTML=F('pcb.dx','X 편차','mm',{step:0.5})+F('pcb.dy','Y 편차','mm',{step:0.5})+F('pcb.dz','Z 편차','mm',{step:0.5})+
+    F('pcb.tx','기울기 Rx','°',{step:0.1})+F('pcb.ty','기울기 Ry','°',{step:0.1})+F('pcb.rz','회전 Rz','°',{step:0.1})+
+    F('pcb.L','PCB 길이(이송방향)','mm',{as:1})+F('pcb.W','PCB 폭','mm',{as:1});
+  $('fgMech').innerHTML=F('Rb','베이스 조인트 반경','mm')+F('Rp','플랫폼 조인트 반경','mm')+F('db','베이스 쌍 간격','°')+F('dp','플랫폼 쌍 간격','°')+
+    F('h0','홈 높이 h0','mm')+F('Lmin','액추에이터 최소길이','mm',{as:1})+F('stroke','스트로크','mm',{as:1})+F('jmax','조인트 허용각','°',{as:1})+
+    F('Fmax','정격 추력(0=미입력)','N',{as:1})+F('mass','탑재 질량','kg',{as:1,step:0.1})+F('sf','안전계수','배',{step:0.1})+F('bl2','2D 카메라 돌출','mm',{as:1})+
+    F('bl3','3D 카메라 돌출','mm',{as:1})+F('comx','무게중심 X','mm',{as:1})+F('comy','무게중심 Y','mm',{as:1})+F('comz','무게중심 Z','mm',{as:1});
+  $('fgRng').innerHTML=F('rng.x','X ±','mm')+F('rng.y','Y ±','mm')+F('rng.z','Z ±','mm')+F('rng.rx','Rx ±','°')+F('rng.ry','Ry ±','°')+F('rng.rz','Rz ±','°');
+  $('fgConv').innerHTML=F('conv.v','벨트 속도','mm/s')+
+    SEL('conv.ctl','속도 제어 방식',[['open','개루프(가변저항)'],['pid','엔코더 PID'],['servo','산업용 서보'],['custom','직접 입력']])+
+    F('conv.ripple','속도 변동 ±','%',{as:1,step:0.1})+F('conv.Leff','유효 벨트 길이','mm',{as:1})+
+    F('conv.Bw','벨트 폭','mm')+F('hold.L','홀더 길이','mm',{as:1})+F('hold.W','홀더 폭','mm',{as:1})+F('conv.pitch','홀더 피치','mm',{as:1})+
+    F('d','3D↔2D 광축 간격 d','mm')+F('WD2','2D 작동거리(WD)','mm')+
+    SEL('lens','2D 렌즈 시야 (제안서)',[['A','A: WD150 → 79×66mm'],['B','B: WD200 → 70×59mm']])+F('conv.pxW','2D 가로 화소','px',{as:1})+
+    F('conv.exp','2D 노출시간','µs',{as:1})+F('conv.dy','3D 스캔 간격(0=자동)','mm',{step:0.01})+
+    F('conv.tproc','3D 처리시간','ms',{as:1})+F('conv.tmove','헥사포드 이동','ms',{as:1})+F('conv.tsettle','안정화','ms',{as:1})+
+    F('conv.jitter','트리거 지터','ms',{as:1,step:0.1})+F('conv.ttrack','추종 시간(B안)','s',{step:0.1});
+}
+function syncInputs(skip){
+  document.querySelectorAll('[data-k]').forEach(function(el){
+    if(el===skip)return;
+    var v=getP(S,el.dataset.k);
+    if(el.type==='checkbox')el.checked=!!v;else el.value=v;
+  });
+}
+document.addEventListener('input',function(e){
+  var el=e.target;if(!el.dataset||!el.dataset.k)return;
+  var v;
+  if(el.type==='checkbox')v=el.checked;
+  else if(el.type==='number'||el.type==='range'){v=parseFloat(el.value);if(isNaN(v))return;}
+  else v=el.value;
+  setP(S,el.dataset.k,v);
+  if(el.dataset.k==='conv.ctl'){var m={open:5,pid:0.5,servo:0.1};if(m[v]!=null)S.conv.ripple=m[v];}
+  if(el.dataset.k==='conv.ripple'){S.conv.ctl='custom';}
+  syncInputs(el);update();
+});
+
+/* ---------- 토스트·복사 ---------- */
+var tt=null;
+function toast(msg){var t=$('toast');t.textContent=msg;t.style.display='block';clearTimeout(tt);tt=setTimeout(function(){t.style.display='none';},3200);}
+function copyText(txt,okMsg){
+  function fb(){var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast(okMsg);}catch(e){toast('복사 실패: 직접 선택해 복사하세요');}document.body.removeChild(ta);}
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(function(){toast(okMsg);},fb);}else fb();
+}
+function chip(lv,t){return '<span class="chip '+lv+'">'+t+'</span>';}
+
+/* ---------- 3D 뷰 ---------- */
+var cv3=$('cv3'),V={yaw:-35,pitch:22,zoom:1};
+function fit(cv){
+  var dpr=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);}
+  var x=cv.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return {x:x,w:w,h:h};
+}
+function draw3D(res){
+  var o=fit(cv3),g=o.x,w=o.w,h=o.h;if(!w||!h)return;
+  g.clearRect(0,0,w,h);
+  var H=S.bl2+S.WD2,zc=(S.h0+H)/2,maxd=Math.max(2*(S.Rb+30),S.h0+H+40,S.conv.Leff);
+  var ya=V.yaw*D2R,pa=V.pitch*D2R,cy=Math.cos(ya),sy=Math.sin(ya),cp=Math.cos(pa),sp=Math.sin(pa);
+  var sc=Math.min(w,h)/(maxd*1.3)*V.zoom,inv=S.inverted;
+  function P(p){
+    var q=inv?[p[0],-p[1],-(p[2]-zc)]:[p[0],p[1],p[2]-zc];
+    var x1=q[0]*cy-q[1]*sy,y1=q[0]*sy+q[1]*cy,z2=y1*sp+q[2]*cp;
+    return [w/2+sc*x1,h/2-sc*z2];
+  }
+  function poly(pts,fill,stroke,lw,dash){
+    g.beginPath();pts.forEach(function(p,i){var q=P(p);if(i)g.lineTo(q[0],q[1]);else g.moveTo(q[0],q[1]);});g.closePath();
+    if(fill){g.fillStyle=fill;g.fill();}
+    if(stroke){g.lineWidth=lw||1;g.strokeStyle=stroke;g.setLineDash(dash||[]);g.stroke();g.setLineDash([]);}
+  }
+  function line(a,b,stroke,lw,dash){var p=P(a),q=P(b);g.beginPath();g.moveTo(p[0],p[1]);g.lineTo(q[0],q[1]);g.lineWidth=lw||1;g.strokeStyle=stroke;g.lineCap='round';g.setLineDash(dash||[]);g.stroke();g.setLineDash([]);}
+  function dotp(p,r,fill){var q=P(p);g.beginPath();g.arc(q[0],q[1],r,0,7);g.fillStyle=fill;g.fill();}
+  function label(p,txt,dx,dy){var q=P(p);g.font='500 13px "Noto Sans KR",sans-serif';g.lineWidth=3;g.strokeStyle='rgba(255,255,255,.9)';g.strokeText(txt,q[0]+dx,q[1]+dy);g.fillStyle='#1f2a3a';g.fillText(txt,q[0]+dx,q[1]+dy);}
+  var zb=S.h0+H,R=res.R,c=res.c;
+  function W(pt){return add(c,mv(R,pt));}
+  // 벨트
+  var Lh=S.conv.Leff/2,Bh=S.conv.Bw/2;
+  poly([[-Lh,-Bh,zb],[Lh,-Bh,zb],[Lh,Bh,zb],[-Lh,Bh,zb]],'rgba(107,143,122,.35)','#4f7a63',1);
+  line([-Lh,-Bh-18,zb],[Lh,-Bh-18,zb],'#4f7a63',2);line([Lh,-Bh-18,zb],[Lh-12,-Bh-12,zb],'#4f7a63',2);line([Lh,-Bh-18,zb],[Lh-12,-Bh-24,zb],'#4f7a63',2);
+  label([0,-Bh-18,zb],'컨베이어 이송 →',-40,-4);
+  // 3D 스캔 라인(홈 자세)
+  line([-S.d/2,-Bh,zb],[-S.d/2,Bh,zb],'#b91c1c',2);
+  label([-S.d/2,Bh,zb],'3D 스캔 라인',-30,14);
+  // PCB·홀더
+  var Rp2=rotZYX(S.pcb.tx,S.pcb.ty,S.pcb.rz),pc=[S.d/2+S.pcb.dx,S.pcb.dy,zb+S.pcb.dz];
+  function rect(L,Wd,zo){return [[-L/2,-Wd/2,zo],[L/2,-Wd/2,zo],[L/2,Wd/2,zo],[-L/2,Wd/2,zo]].map(function(p){return add(pc,mv(Rp2,p));});}
+  poly(rect(S.hold.L,S.hold.W,-2),'rgba(148,163,184,.55)','#64748b',1);
+  poly(rect(S.pcb.L,S.pcb.W,1),'#4f9d7b','#2f6b52',1.5);
+  label(pc,'PCB',-10,-8);
+  // 베이스 판
+  var ring=[],i;
+  for(i=0;i<360;i+=10)ring.push([(S.Rb+25)*Math.cos(i*D2R),(S.Rb+25)*Math.sin(i*D2R),0]);
+  poly(ring,'rgba(203,213,225,.6)','#64748b',1.5);
+  label([0,S.Rb+25,0],'베이스',-14,-4);
+  // 레그
+  var f=statics(S,res);
+  res.legs.forEach(function(l,j){
+    var bad=l.L<S.Lmin||l.L>S.Lmin+S.stroke;
+    var mid=add(l.B,mul(l.u,l.L*0.55));
+    line(l.B,mid,bad?'#b91c1c':'#334155',7);
+    line(mid,l.P,bad?'#ef9a9a':'#94a3b8',4);
+    dotp(l.B,4,'#1f2a3a');dotp(l.P,4,'#1f2a3a');
+    var q=P(mid);g.font='700 12px "Noto Sans KR",sans-serif';g.fillStyle='#fff';g.strokeStyle='#1f2a3a';g.lineWidth=0;
+    g.fillStyle='#1e3a5f';g.fillText(String(j+1),q[0]+6,q[1]-4);
+  });
+  // 플랫폼
+  var ring2=[];
+  for(i=0;i<360;i+=10)ring2.push(W([(S.Rp+25)*Math.cos(i*D2R),(S.Rp+25)*Math.sin(i*D2R),0]));
+  poly(ring2,'rgba(219,228,240,.75)','#1e3a5f',1.5);
+  label(W([0,-(S.Rp+25),0]),'플랫폼',-14,14);
+  // 카메라 박스
+  function box(cx,wd,z1,fill,name){
+    var cs=[];[0,z1].forEach(function(z){[[-1,-1],[1,-1],[1,1],[-1,1]].forEach(function(s){cs.push(W([cx+s[0]*wd/2,s[1]*wd/2,z]));});});
+    poly(cs.slice(0,4),'rgba(255,255,255,.5)','#1e3a5f',1);
+    for(var k=0;k<4;k++)line(cs[k],cs[k+4],'#1e3a5f',1.2);
+    poly(cs.slice(4,8),fill,'#1e3a5f',1.2);
+    label(cs[6],name,6,-4);
+  }
+  box(-S.d/2,46,S.bl3,'rgba(185,28,28,.7)','3D 카메라(L38)');
+  box(S.d/2,42,S.bl2,'rgba(30,58,95,.8)','2D 카메라(IS3805)');
+  // 광축·FOV
+  var pl=pivotLocal(S),pw=W(pl);
+  line(W([S.d/2,0,S.bl2]),pw,'#b45309',1.5,[5,4]);
+  line(W([-S.d/2,0,S.bl3]),W([-S.d/2,0,S.bl3+(S.bl2+S.WD2-S.bl3)]),'#b91c1c',1.5,[5,4]);
+  var f2=fov2(S),ex=[R[0][0],R[1][0],R[2][0]],ey=[R[0][1],R[1][1],R[2][1]];
+  function fp(a,b){return add(pw,add(mul(ex,a*f2.fx/2),mul(ey,b*f2.fy/2)));}
+  poly([fp(-1,-1),fp(1,-1),fp(1,1),fp(-1,1)],'rgba(180,83,9,.12)','#b45309',1.5,[6,3]);
+  dotp(pw,5,'#b45309');label(pw,'TCP(2D 초점)',8,16);
+  // 정렬 메시지는 update()에서
+}
+function viewBtn(t){
+  if(t==='iso'){V.yaw=-35;V.pitch=22;}
+  else if(t==='front'){V.yaw=0;V.pitch=0;}
+  else if(t==='side'){V.yaw=90;V.pitch=0;}
+  else if(t==='top'){V.yaw=0;V.pitch=90;}
+  else if(t==='zin')V.zoom=clamp(V.zoom*1.2,0.4,4);
+  else if(t==='zout')V.zoom=clamp(V.zoom/1.2,0.4,4);
+  update();
+}
+document.querySelectorAll('[data-view]').forEach(function(b){b.addEventListener('click',function(){viewBtn(b.dataset.view);});});
+var drag=null;
+cv3.addEventListener('pointerdown',function(e){drag={x:e.clientX,y:e.clientY};try{cv3.setPointerCapture(e.pointerId);}catch(x){}cv3.style.cursor='grabbing';});
+cv3.addEventListener('pointermove',function(e){if(!drag)return;V.yaw+=(e.clientX-drag.x)*0.5;V.pitch=clamp(V.pitch+(e.clientY-drag.y)*0.5,-10,90);drag={x:e.clientX,y:e.clientY};update();});
+function endDrag(){drag=null;cv3.style.cursor='grab';}
+cv3.addEventListener('pointerup',endDrag);cv3.addEventListener('pointercancel',endDrag);
+cv3.addEventListener('wheel',function(e){e.preventDefault();V.zoom=clamp(V.zoom*(e.deltaY<0?1.1:1/1.1),0.4,4);update();},{passive:false});
+
+/* ---------- 탭① 표·정렬 ---------- */
+function renderLegs(res,f){
+  var h='<table class="tb"><thead><tr><th>#</th><th>길이(mm)</th><th>스트로크 위치</th><th>관절각 B/P(°)</th><th>힘(N)</th><th>판정</th></tr></thead><tbody>';
+  res.legs.forEach(function(l,i){
+    var pct=(l.L-S.Lmin)/S.stroke*100,bad=pct<0||pct>100,why=[];
+    if(bad)why.push('스트로크');
+    if(Math.max(l.ab,l.ap)>S.jmax)why.push('관절각');
+    var fv=f?f[i]:NaN,fa=Math.abs(fv)*S.sf;
+    if(S.Fmax>0&&fa>S.Fmax)why.push('추력');
+    h+='<tr><td>'+(i+1)+'</td><td>'+fm(l.L,1)+'</td><td><span class="bar"><i class="'+(bad?'bad':'')+'" style="width:'+clamp(pct,0,100)+'%"></i></span>'+fm(pct,0)+'%</td><td>'+fm(l.ab,1)+' / '+fm(l.ap,1)+'</td><td>'+(f?((fv>=0?'압축 ':'인장 ')+fm(Math.abs(fv),1)):'해 없음')+'</td><td>'+(why.length?chip('ng',why.join('·')+' 초과'):chip('ok','정상'))+'</td></tr>';
+  });
+  $('legTbl').innerHTML=h+'</tbody></table>';
+}
+function renderAlign(res){
+  var H=S.bl2+S.WD2,Rq=rotZYX(S.pcb.tx,S.pcb.ty,S.pcb.rz),nq=mv(Rq,[0,0,1]);
+  var ang=Math.acos(clamp(dot(res.ezp,nq),-1,1))*R2D;
+  var pw=add(res.c,mv(res.R,pivotLocal(S))),pc=[S.d/2+S.pcb.dx,S.pcb.dy,S.h0+H+S.pcb.dz];
+  var dist=norm(sub(pw,pc)),lv=(ang<=0.5&&dist<=1)?'ok':(ang<=2?'warn':'ng');
+  $('alignMsg').innerHTML='2D 카메라 정렬 오차 '+chip(lv,'각도 '+fm(ang,2)+'° · 초점 위치 '+fm(dist,2)+' mm')+(lv==='ok'?'':' <span>→ “3D 측정값으로 자동 정렬” 누르면 보정됩니다.</span>');
+}
+
+/* ---------- 탭② ---------- */
+var WS=null;
+function renderWS(){
+  var w=computeWS(S,false);WS=w;
+  var Lmax=S.Lmin+S.stroke,inR=w.gmin>=S.Lmin-1e-6&&w.gmax<=Lmax+1e-6,jm=Math.max(w.jb,w.jp);
+  var rows=[
+    ['필요 스트로크',fm(w.req,1)+' mm',chip(w.req<=S.stroke?'ok':'ng','설정 '+fm(S.stroke,0)+' mm')],
+    ['필요 길이 범위',fm(w.gmin,1)+' ~ '+fm(w.gmax,1)+' mm',chip(inR?'ok':'ng','가동 '+fm(S.Lmin,0)+' ~ '+fm(Lmax,0)+' mm')],
+    ['최대 관절각 (베이스/플랫폼)',fm(w.jb,1)+' / '+fm(w.jp,1)+'°',chip(jm<=S.jmax?'ok':'ng','허용 '+fm(S.jmax,0)+'°')],
+    ['레그 최대 추력 (안전계수 포함)',fm(w.fmax*S.sf,0)+' N',S.Fmax>0?chip(w.fmax*S.sf<=S.Fmax?'ok':'ng','정격 '+fm(S.Fmax,0)+' N'):chip('info','정격 미입력')],
+    ['특이점(해 없음) 자세',w.sing+' / 729',chip(w.sing===0?'ok':'ng',w.sing===0?'없음':'있음')],
+    ['권장 사양 (여유 10%)','Lmin ≤ '+Math.floor(w.gmin)+' mm · 스트로크 ≥ '+Math.ceil((w.gmax-Math.floor(w.gmin))*1.1)+' mm',chip('info','참고')]
+  ];
+  var h='<table class="tb"><tbody>';
+  rows.forEach(function(r){h+='<tr><td>'+r[0]+'</td><td><b>'+r[1]+'</b></td><td>'+r[2]+'</td></tr>';});
+  $('wsSum').innerHTML='<div class="tw">'+h+'</tbody></table></div>';
+  var a=Math.min(S.Lmin,w.gmin)-8,b=Math.max(Lmax,w.gmax)+8,span=b-a;
+  var t='<table class="tb"><thead><tr><th>#</th><th>최소</th><th>최대</th><th>변위</th><th>범위 막대</th></tr></thead><tbody>';
+  w.per.forEach(function(p,i){
+    var bad=p.min<S.Lmin-1e-6||p.max>Lmax+1e-6;
+    t+='<tr><td>'+(i+1)+'</td><td>'+fm(p.min,1)+'</td><td>'+fm(p.max,1)+'</td><td>'+fm(p.max-p.min,1)+'</td><td><span class="rb"><span class="a" style="left:'+((S.Lmin-a)/span*100)+'%;width:'+(S.stroke/span*100)+'%"></span><span class="u '+(bad?'bad':'')+'" style="left:'+((p.min-a)/span*100)+'%;width:'+Math.max(1,(p.max-p.min)/span*100)+'%"></span></span></td></tr>';
+  });
+  $('wsTbl').innerHTML=t+'</tbody></table>';
+}
+$('btnH0').addEventListener('click',function(){
+  var best=searchH0(S);
+  S.h0=best.h;syncInputs(null);update();
+  $('wsMsg').innerHTML='h0 = '+best.h+' mm 적용 → 필요 스트로크 '+fm(best.w.req,1)+' mm '+chip(best.jok?'ok':'warn',best.jok?'관절각 허용 이내':'관절각 허용 초과 — 조인트 확인')
+    +' <span>(주의: 필요 길이 범위가 바뀌므로 Lmin 재확인)</span>';
+  toast('홈 높이 최적화 적용: h0='+best.h+' mm');
+});
+$('btnApplySpec').addEventListener('click',function(){
+  var w=computeWS(S,true);
+  S.Lmin=Math.floor(w.gmin);S.stroke=Math.ceil((w.gmax-S.Lmin)*1.1);
+  syncInputs(null);update();toast('Lmin='+S.Lmin+' mm, 스트로크='+S.stroke+' mm 적용');
+});
+
+/* ---------- 탭③ ---------- */
+var CVR=null;
+function renderConv(){
+  var r=computeConv();CVR=r;
+  var k=[
+    ['3D 시야 / 해상도 (추정)',fm(r.fov3,0)+' mm / '+fm(r.res3,3)+' mm'],
+    ['3D 필요 스캔율',fm(r.lineRate,0)+' Hz (간격 '+fm(r.dyl,3)+' mm)'],
+    ['2D 시야 / 화소 크기',fm(r.fx,0)+'×'+fm(r.fy,0)+' mm / '+fm(r.px*1000,1)+' µm'],
+    ['모션 블러',fm(r.blur*1000,1)+' µm ('+fm(r.blurPx,2)+' px)'],
+    ['0.5px 허용 노출 상한',fm(r.expMax,0)+' µs'],
+    ['3D→2D 이송 시간',fm(r.transfer,2)+' s'],
+    ['보정 시간창 / 필요',fm(r.win*1000,0)+' / '+fm(r.tReady*1000,0)+' ms'],
+    ['필요 최소 간격 d',fm(r.dMin,0)+' mm'],
+    ['홀더 takt',fm(r.takt,2)+' s'],
+    ['스캔 길이 왜곡',fm(r.yErr,2)+' mm'],
+    ['이월 위치 오차 (d×변동)',fm(r.trErr,1)+' mm'],
+    ['B안 추종 필요 스트로크',fm(r.track,0)+' mm (X 범위 ±'+fm(S.rng.x,0)+')']
+  ];
+  $('convKpi').innerHTML=k.map(function(x){return '<div>'+x[0]+'<b>'+x[1]+'</b></div>';}).join('');
+  $('convCk').innerHTML=r.ck.map(function(c){return '<div>'+chip(c.lv,c.lv==='ok'?'양호':(c.lv==='warn'?'주의':'부적합'))+'</div><div>'+c.name+'<br><b>'+c.val+'</b></div>';}).join('');
+  drawAnim();
+}
+var cvA=$('cvA'),animOn=true,animMul=1,tA=0,lastTs=0;
+function drawAnim(){
+  if(!CVR)return;
+  var o=fit(cvA),g=o.x,w=o.w,h=o.h;if(!w||!h)return;
+  g.clearRect(0,0,w,h);
+  var c=S.conv,Lh=S.hold.L,Wh=S.hold.W,v=Math.max(c.v,0.001),pad=14,sc=(w-2*pad)/c.Leff,bw=c.Bw*sc,yc=h/2+8;
+  function X(mm){return pad+mm*sc;}
+  g.fillStyle='#d9e2dc';g.fillRect(X(0),yc-bw/2,c.Leff*sc,bw);g.strokeStyle='#64748b';g.lineWidth=1;g.strokeRect(X(0),yc-bw/2,c.Leff*sc,bw);
+  var x3=c.Leff/2-S.d/2,x2=c.Leff/2+S.d/2,fx=CVR.fx,fy=CVR.fy;
+  var fh=Math.min(fy*sc,h-6);
+  g.setLineDash([5,3]);g.strokeStyle='#b45309';g.lineWidth=1.5;g.strokeRect(X(x2-fx/2),yc-fh/2,fx*sc,fh);g.setLineDash([]);
+  g.font='500 13px "Noto Sans KR",sans-serif';g.fillStyle='#b45309';g.fillText('2D 시야',X(x2-fx/2)+3,yc-fh/2+13);
+  g.strokeStyle='#b91c1c';g.lineWidth=2;g.beginPath();g.moveTo(X(x3),yc-bw/2-6);g.lineTo(X(x3),yc+bw/2+6);g.stroke();
+  g.fillStyle='#b91c1c';g.fillText('3D 라인',X(x3)-24,yc-bw/2-9);
+  var T=c.pitch/v,tReady=CVR.tReady,i,status='대기 (홀더 접근 전)',lead=-1e9,flash=false;
+  var list=[];
+  for(i=-5;i<=5;i++){
+    var xf=v*tA-i*c.pitch,xr=xf-Lh;
+    if(xr>c.Leff||xf<0)continue;
+    list.push({xf:xf,xr:xr});
+    var x0=Math.max(xr,0),x1=Math.min(xf,c.Leff);
+    g.fillStyle='rgba(148,163,184,.8)';g.fillRect(X(x0),yc-Wh*sc/2,(x1-x0)*sc,Wh*sc);
+    g.strokeStyle='#475569';g.lineWidth=1;g.strokeRect(X(x0),yc-Wh*sc/2,(x1-x0)*sc,Wh*sc);
+    var pxm=xf-Lh/2-S.pcb.L/2,pxM=pxm+S.pcb.L,q0=Math.max(pxm,0),q1=Math.min(pxM,c.Leff);
+    if(q1>q0){g.fillStyle='#4f9d7b';g.fillRect(X(q0),yc-S.pcb.W*sc/2,(q1-q0)*sc,S.pcb.W*sc);}
+    if(xf>x3){var s0=Math.max(x3,x0),s1=Math.min(xf,x1);if(s1>s0){g.fillStyle='rgba(30,58,95,.35)';g.fillRect(X(s0),yc-Wh*sc/2,(s1-s0)*sc,Wh*sc);}}
+  }
+  list.sort(function(a,b){return b.xf-a.xf;});
+  for(i=0;i<list.length;i++){
+    var it=list[i],xcn=it.xf-Lh/2;
+    if(xcn>x2+Lh/2)continue;
+    if(it.xf<x3){status='접근 중';}
+    else if(it.xr<x3){status='3D 스캔 중 '+Math.round(clamp((it.xf-x3)/Lh*100,0,100))+'%';}
+    else{
+      var ts=(it.xr-x3)/v;
+      if(xcn>=x2-3&&ts<tReady){status='⚠ 자세 보정 지연 — 2D 촬영 시점 도달 (NG)';}
+      else if(ts<tReady){status='3D 처리·헥사포드 자세 보정 중 ('+Math.round(ts*1000)+' / '+Math.round(tReady*1000)+' ms)';}
+      else if(Math.abs(xcn-x2)<=Math.max(v*0.12,3)){status='2D 촬영 (스트로브 노출 '+fm(c.exp,0)+' µs)';flash=true;}
+      else if(xcn<x2){status='보정 완료 · 2D 촬영 대기';}
+      else{status='촬영 완료';}
+    }
+    break;
+  }
+  if(flash){g.fillStyle='rgba(255,255,255,.55)';g.fillRect(X(x2-fx/2),yc-fh/2,fx*sc,fh);}
+  $('animStatus').innerHTML='상태: <b>'+status+'</b> <span>· 주기 '+fm(T,2)+' s</span>';
+}
+function animLoop(ts){
+  requestAnimationFrame(animLoop);
+  if(cur!=='tab3'||!animOn||!CVR){lastTs=ts;return;}
+  var dt=Math.min(0.1,(ts-lastTs)/1000)*animMul;lastTs=ts;
+  var T=S.conv.pitch/Math.max(S.conv.v,0.001);
+  tA=(tA+dt)%T;drawAnim();
+}
+$('btnPlay').addEventListener('click',function(){animOn=!animOn;this.textContent=animOn?'일시정지':'재생';});
+document.querySelectorAll('[data-sp]').forEach(function(b){b.addEventListener('click',function(){animMul=parseFloat(b.dataset.sp);toast('재생 속도 ×'+animMul);});});
+
+/* ---------- 탭④ ---------- */
+var INQ='';
+function renderSpec(){
+  var w=computeWS(S,false),r=computeConv(),WSd=w;
+  var needStroke=Math.ceil((w.gmax-Math.floor(w.gmin))*1.1),needLmin=Math.floor(w.gmin);
+  var thrust=w.fmax*S.sf,vreq=1.5*w.req/(S.conv.tmove/1000),rep=0.5*r.px*1000,jm=Math.max(w.jb,w.jp);
+  var rows=[
+    ['스트로크',needStroke+' mm 이상','작업영역 ±범위 + 10% 여유'],
+    ['최소(수축) 길이','조인트 중심간 '+needLmin+' mm 이하','역산 값. 로드엔드 포함 길이 확인'],
+    ['레그당 추력',fm(thrust,0)+' N 이상','탑재 '+fm(S.mass,1)+' kg · 안전계수 '+fm(S.sf,1)+' 포함'],
+    ['이동 속도',fm(vreq,0)+' mm/s 이상','이동 '+fm(S.conv.tmove,0)+' ms 사다리꼴 가정'],
+    ['반복정밀도(TCP)',fm(rep,0)+' µm 이하 목표','2D 0.5 px = '+fm(rep,0)+' µm'],
+    ['조인트 허용각',fm(jm+3,0)+'° 이상','해석 최대 '+fm(jm,1)+'° + 여유'],
+    ['설치 방향',S.inverted?'역설치(매달기)':'정립','역설치 시 정전 낙하 방지 브레이크 필수'],
+    ['통신·제어','EtherCAT/CANopen 등 6축 동기','동기 위치모드(CSP), 갱신주기 ≤1 ms 권장'],
+    ['수량','6 ea','동일 사양 · 양단 로드엔드(구면) 옵션']
+  ];
+  var h='<table class="tb"><thead><tr><th>항목</th><th>요구 값</th><th>비고</th></tr></thead><tbody>';
+  rows.forEach(function(x){h+='<tr><td>'+x[0]+'</td><td><b>'+x[1]+'</b></td><td>'+x[2]+'</td></tr>';});
+  $('specTbl').innerHTML=h+'</tbody></table>';
+  INQ='# 지능형 리니어 액추에이터 6축 헥사포드 적용 문의\n\n'
+   +'- 요청: 인시스 AI혁신 연구개발실 김양섭 이사 (ys.kim@in-sys.co.kr)\n'
+   +'- 수신: 대성산업 AnA Division\n\n'
+   +'## 1. 적용 개요\n'
+   +'PCB 납땜 비전검사기용 6축 헥사포드(스튜어트 플랫폼) 구성에 지능형 리니어 액추에이터 6ea 적용을 검토 중입니다. '
+   +'헥사포드에는 3D 라인스캔 카메라와 2D 검사 카메라가 탑재되며, 컨베이어 이송 PCB의 위치·기울기에 맞춰 카메라 자세를 보정합니다.\n\n'
+   +'## 2. 요구 사양 (해석 기준)\n'
+   +'- 스트로크: '+needStroke+' mm 이상\n'
+   +'- 최소(수축) 길이: 조인트 중심간 '+needLmin+' mm 이하\n'
+   +'- 레그당 추력: '+fm(thrust,0)+' N 이상 (탑재 '+fm(S.mass,1)+' kg, 안전계수 '+fm(S.sf,1)+')\n'
+   +'- 이동 속도: '+fm(vreq,0)+' mm/s 이상\n'
+   +'- 반복정밀도: '+fm(rep,0)+' µm 이하 목표\n'
+   +'- 양단 구면 조인트 허용각: '+fm(jm+3,0)+'° 이상\n'
+   +'- 설치: '+(S.inverted?'수직 역설치(매달기) — 정전 시 낙하 방지 브레이크 필요':'정립 설치')+'\n\n'
+   +'## 3. 확인 요청 사항\n'
+   +'1. 위 스트로크·추력에 해당하는 모델 라인업과 규격 (조인트 중심간 길이)\n'
+   +'2. 반복정밀도·백래시·엔코더 분해능\n'
+   +'3. 통신 방식(EtherCAT/CANopen/Modbus)과 동기 위치제어(CSP) 지원, 갱신주기\n'
+   +'4. 로드 회전 방지 구조 여부 (양단 구면 조인트 사용 시 로드 회전 허용 여부)\n'
+   +'5. 양단 로드엔드/구면 조인트 옵션과 조인트 허용각, 무백래시 프리로드 가능 여부\n'
+   +'6. 브레이크(무전원 유지) 옵션\n'
+   +'7. 횡하중·모멘트 허용치\n'
+   +'8. 중량·외형, 납기·단가(6ea)\n';
+  $('inqText').value=INQ;
+}
+$('btnCopyInq').addEventListener('click',function(){copyText(INQ,'문의서를 복사했습니다');});
+$('btnDlInq').addEventListener('click',function(){
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([INQ],{type:'text/markdown'}));a.download='대성_헥사포드_문의서.md';document.body.appendChild(a);a.click();document.body.removeChild(a);toast('문의서 .md 저장');
+});
+
+/* ---------- 공통 ---------- */
+var cur='tab1';
+function update(){
+  var g=geom(S),res=ik(S,g,S.pose,S.pivotOn),f=statics(S,res);
+  if(cur==='tab1'){draw3D(res);renderLegs(res,f);renderAlign(res);}
+  else if(cur==='tab2')renderWS();
+  else if(cur==='tab3')renderConv();
+  else if(cur==='tab4')renderSpec();
+}
+$('tabs').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  cur=b.dataset.tab;
+  document.querySelectorAll('#tabs button').forEach(function(x){x.classList.toggle('on',x===b);});
+  document.querySelectorAll('.tab').forEach(function(x){x.classList.toggle('on',x.id===cur);});
+  update();
+});
+$('devSeg').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  document.body.className=b.dataset.dev;
+  document.querySelectorAll('#devSeg button').forEach(function(x){x.classList.toggle('on',x===b);});
+  update();
+});
+$('btnZero').addEventListener('click',function(){S.pose={x:0,y:0,z:0,rx:0,ry:0,rz:0};syncInputs(null);update();});
+$('btnAlign').addEventListener('click',function(){
+  var p=S.pcb;S.pivotOn=true;S.pose={x:p.dx,y:p.dy,z:p.dz,rx:p.tx,ry:p.ty,rz:p.rz};syncInputs(null);update();
+  toast('3D 측정 자세로 2D 카메라를 정렬했습니다');
+});
+$('btnReset').addEventListener('click',function(){S=DEF();syncInputs(null);update();toast('초기값으로 복원했습니다');});
+$('btnCopyLink').addEventListener('click',function(){copyText(PAGE_URL,'페이지 링크를 복사했습니다');});
+window.addEventListener('resize',function(){update();});
+
+build();syncInputs(null);update();
+requestAnimationFrame(animLoop);
+window.__HEX={S:function(){return S;},VERSION:VERSION,computeWS:function(){return computeWS(S,false);},computeConv:computeConv,searchH0:function(){return searchH0(S);}};
+})();
+</script>
+</body>
+</html>
