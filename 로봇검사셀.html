@@ -121,10 +121,10 @@
 <header class="cover"><div class="nav-inner">
   <div class="hd-top">
     <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-    <span class="hd-ver" id="hVer">v1.7</span>
+    <span class="hd-ver" id="hVer">v1.8</span>
   </div>
   <h1>협동로봇 PCB 검사셀 시뮬레이터</h1>
-  <div class="hd-sub">두산 A0509 + Cognex IS3805CP · 컨베이어 없음 · 작업대 안착 검사</div>
+  <div class="hd-sub">협동로봇 + Cognex IS3805CP · 컨베이어 없음 · 작업대 안착 검사</div>
 </div></header>
 
 <div class="viewbar"><div class="nav-inner">
@@ -140,7 +140,7 @@
         <div class="card-h">동작 애니메이션</div>
         <div class="specline">
           <b>로봇 받침대</b> 500 × 500 × 750 mm &nbsp;·&nbsp;
-          <b>두산 A0509</b> 6축 / 가반 5 kg / 리치 900 mm / 반복정도 ±0.03 mm &nbsp;·&nbsp;
+          <b>협동로봇</b> 6축 / 가반 5 kg / 리치 900 mm / 반복정도 ±0.03 mm &nbsp;·&nbsp;
           <b>Cognex IS3805CP</b> 5 MP · 오토포커스 · Multi-Torch &nbsp;·&nbsp;
           <b>L38-300</b> 3D 라인스캔<br>
           <b>검사 대상</b> 타원형 PCB 150 × 75 mm 1매 + 샤크 안테나 케이스 1개(<b>아세탈 안착부</b> 안착 — 우측이 높은 <b>30° 경사</b>·고정) — 작업대에 <b>상하(전후) 방향 · 약 10° 기울기</b>로 로봇 바로 앞에 안착 &nbsp;·&nbsp;
@@ -238,7 +238,7 @@
 <script>
 (function(){
 "use strict";
-var VER='v1.7';
+var VER='v1.8';
 var $=function(id){return document.getElementById(id);};
 $('hVer').textContent=VER; $('fVer').textContent=VER;
 
@@ -458,6 +458,7 @@ var LOOP=1;
 var idx=0, running=false, waitSig=null, alarm=false, verdict='';
 var tIdx=0, done=0, okN=0, ngN=0;
 var lightOn=false, scanT=-1, shotT=-1, qrT=-1, aligned=false;
+var refZ=TBL_Z+PCB_T;                                   // 작업거리 기준면
 var armT={x:RB.x+HOME.r*Math.cos(1.35),y:RB.y+HOME.r*Math.sin(1.35),z:HOME.z,ta:0,tb:0};   // 현재 공구 목표
 var token=0, timer=null;
 var LOGS=[];
@@ -862,7 +863,7 @@ function drawRobot(){
   var fl=vadd(A.W,A.tool,6);
   o+=tube(A.W,fl,4.6,MAT.light,false,true);
 
-  // 청록 포인트 링 (두산 식별색)
+  // 청록 포인트 링
   (function(){
     var p0=vadd(sh,jx,7.4), p1=vadd(sh,jx,8.6);
     o+=tube(p0,p1,8.5,[64,186,196],false,false);
@@ -973,7 +974,7 @@ function updHUD(){
   var A=solveArm(armT.x,armT.y,armT.z,armT.ta,armT.tb);
   var t=TARGETS[tIdx];
   $('vT').textContent = running ? 'PCB 150×75 + 케이스 QR' : '-';
-  var wd=(armT.z-(TBL_Z+PCB_T))*U;
+  var wd=(armT.z-refZ)*U;
   $('vW').textContent = (wd>0&&wd<520) ? Math.round(wd)+' mm' : '-';
   $('vA').textContent = (aligned||scanT>=0) ? ('θ'+t.ta.toFixed(1)+'° φ'+t.tb.toFixed(1)+'°') : '-';
   $('vP').textContent = done+' 매';
@@ -1059,7 +1060,7 @@ function runState(){
     return;
   }
   if(st.t==='approach'){
-    aligned=false; verdict=''; setMes('wait');
+    aligned=false; verdict=''; setMes('wait'); refZ=TBL_Z+PCB_T;
     var SP=pcbFrame(t)(-SCANU,0,0);
     moveTo(SP.X,SP.Y,TBL_Z+PCB_T+WD+10,0,0,D.move,next);
     return;
@@ -1092,7 +1093,7 @@ function runState(){
   }
   if(st.t==='qr'){
     /* 로봇이 케이스 QR 상부로 이동 — 30° 경사면에 직각 보정 */
-    var QW=caseFrame()(-15,0,2.6);
+    var QW=caseFrame()(-15,0,2.6); refZ=QW.Z;
     moveTo(QW.X,QW.Y,QW.Z+WD,1.5,-29.9,D.move,function(){
       qrT=0;
       anim(D.act*1.3,function(p){ qrT=p; },function(){
@@ -1170,7 +1171,7 @@ $('bStop').addEventListener('click',function(){
 $('bReset').addEventListener('click',function(){
   running=false; waitSig=null; token++; clearTimeout(timer);
   idx=0; tIdx=0; done=0; okN=0; ngN=0; verdict=''; alarm=false;
-  lightOn=false; scanT=-1; shotT=-1; qrT=-1; aligned=false; partX=0;
+  lightOn=false; scanT=-1; shotT=-1; qrT=-1; aligned=false; partX=0; refZ=TBL_Z+PCB_T;
   var h=homePos(); armT={x:h.x,y:h.y,z:h.z,ta:0,tb:0};
   setMes('wait'); $('bRun').disabled=false; updSig();
   addLog('↺ 초기화'); draw(); renderSteps();
@@ -1200,7 +1201,7 @@ $('tabP').addEventListener('click',function(){ setView('p'); });
   var h=homePos(); armT={x:h.x,y:h.y,z:h.z,ta:0,tb:0};
   renderSpd(); setMes('wait'); draw(); renderSteps(); updSig();
   addLog('협동로봇 PCB 검사셀 시뮬레이터 '+VER+' 준비 완료.');
-  addLog('구성 : 두산 A0509 + Cognex IS3805CP(2D) + L38-300(3D) · 받침대 500×500×750 mm · 컨베이어 없음');
+  addLog('구성 : 협동로봇 + Cognex IS3805CP(2D) + L38-300(3D) · 받침대 500×500×750 mm · 컨베이어 없음');
   addLog('대상 : 타원형 PCB 100 × 50 mm 1매 + 샤크 안테나 케이스 1개 (조립 전 펼쳐진 상태)');
 })();
 })();
