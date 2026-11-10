@@ -121,7 +121,7 @@
 <header class="cover"><div class="nav-inner">
   <div class="hd-top">
     <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-    <span class="hd-ver" id="hVer">v1.9</span>
+    <span class="hd-ver" id="hVer">v2.0</span>
   </div>
   <h1>협동로봇 PCB 검사셀 시뮬레이터</h1>
   <div class="hd-sub">협동로봇 + Cognex IS3805CP · 컨베이어 없음 · 작업대 안착 검사</div>
@@ -144,7 +144,7 @@
           <b>Cognex IS3805CP</b> 5 MP · 오토포커스 · Multi-Torch &nbsp;·&nbsp;
           <b>L38-300</b> 3D 라인스캔<br>
           <b>검사 대상</b> 타원형 PCB 150 × 75 mm 1매 + 샤크 안테나 케이스 1개(<b>아세탈 안착부</b> 안착 — 우측이 높은 <b>30° 경사</b>·고정) — 작업대에 <b>상하(전후) 방향 · 약 10° 기울기</b>로 로봇 바로 앞에 안착 &nbsp;·&nbsp;
-          <b>검사 순서</b> ① PCB 기울기·위치 선측정 → ② 기울기에 맞춰 카메라 각도 보정 → ③ 보정 각도 유지하며 협동로봇 전구간 주행 스캔 &nbsp;·&nbsp; <b>동시 판독</b> PCB 외관 + 케이스 <b>QR 코드</b> 1회 촬영 &nbsp;·&nbsp;
+          <b>검사 순서</b> ① 광각 1회 촬영으로 PCB·케이스 전체 위치·기울기 산출 → ② 기울기에 맞춰 카메라 각도 보정 → ③ 보정 각도 유지하며 협동로봇 전구간 주행 스캔 &nbsp;·&nbsp; <b>동시 판독</b> PCB 외관 + 케이스 <b>QR 코드</b> 1회 촬영 &nbsp;·&nbsp;
           <b>흐름</b> 지그는 제자리 고정, PCB·케이스만 좌측 투입 → 검사 → 우측 배출 &nbsp;·&nbsp;
           <b>목표 택트</b> 10초 이내 &nbsp;·&nbsp; <b>15" 모니터</b> 받침대 전면 숏암 거치 (판정 + 3색 경광등 팝업)
         </div>
@@ -238,7 +238,7 @@
 <script>
 (function(){
 "use strict";
-var VER='v1.9';
+var VER='v2.0';
 var $=function(id){return document.getElementById(id);};
 $('hVer').textContent=VER; $('fVer').textContent=VER;
 
@@ -256,6 +256,8 @@ var HOME={r:46,z:TBL_Z+84};                     // 원점 (베이스 기준 수�
 
 var TARGETS=[ {x:40,y:152,rz:98,ta:2.2,tb:-1.6} ];
 var SCANU=44;                                           // 전수 스캔 주행 반경 (±220 mm)
+var WDW=90;                                             // 위치·기울기용 광각 작업거리 450 mm
+var WFU=58, WFV=30;                                     // 광각 화각 580 × 300 mm (PCB + 케이스 전체)
 var PCBU=32;                                            // 대상 프레임에서 PCB 중심 u
 var scanA=-44, scanB=44;                                // 현재 라인스캔 주행 구간    // 카메라 조준점 = PCB·QR 중간 (동시 판독)
 var PCBP={x:36,y:184,rz:260,ta:2.2,tb:-1.6};            // 타원형 PCB 100 × 50 mm · 1매 (상하 배치)
@@ -443,8 +445,8 @@ function ellOutline(hu,hv,N,tear){
 var STATES=[
   {ph:'대기',    t:'wait',   sig:'START', lb:'START 대기'},
   {ph:'투입',    t:'feed',   lb:'좌측 작업자 투입 → 검사 위치 이동·정지'},
-  {ph:'이동',    t:'approach',lb:'로봇 이동 → PCB 상부 측정 위치 진입'},
-  {ph:'기울기 측정',t:'detect', lb:'PCB 위치·기울기 선측정 (단거리 프로파일 80 mm)'},
+  {ph:'이동',    t:'approach',lb:'로봇 이동 → 전체 화각 확보 위치(WD 450 mm) 진입'},
+  {ph:'기울기 측정',t:'detect', lb:'광각 1회 촬영 → PCB + 케이스 전체 위치·기울기 산출'},
   {ph:'자세 보정',t:'align',  lb:'측정 기울기 반영 → 카메라 각도를 PCB 면에 직각 보정'},
   {ph:'전수 스캔',t:'scan3d', lb:'보정 각도 유지하며 협동로봇 주행 전구간 라인스캔'},
   {ph:'비전 검사',t:'light',  on:true,  lb:'Multi-Torch 조명 ON'},
@@ -460,7 +462,7 @@ var LOOP=1;
 
 var idx=0, running=false, waitSig=null, alarm=false, verdict='';
 var tIdx=0, done=0, okN=0, ngN=0;
-var lightOn=false, scanT=-1, shotT=-1, qrT=-1, aligned=false, measured=false;
+var lightOn=false, scanT=-1, shotT=-1, qrT=-1, wideT=-1, aligned=false, measured=false;
 var refZ=TBL_Z+PCB_T;                                   // 작업거리 기준면
 var armT={x:RB.x+HOME.r*Math.cos(1.35),y:RB.y+HOME.r*Math.sin(1.35),z:HOME.z,ta:0,tb:0};   // 현재 공구 목표
 var token=0, timer=null;
@@ -940,6 +942,23 @@ function drawVision(t){
     o+='<line x1="'+qa.x.toFixed(1)+'" y1="'+qa.y.toFixed(1)+'" x2="'+qb.x.toFixed(1)+'" y2="'+qb.y.toFixed(1)+'" stroke="#2FA8E8" stroke-width="1.9" opacity=".95"/>';
   }
 
+  /* 위치·기울기 광각 촬영 : PCB + 케이스 전체를 1회 촬영 */
+  if(wideT>=0){
+    var w4=[LP(-WFU,-WFV,PCB_T+0.25),LP(WFU,-WFV,PCB_T+0.25),LP(WFU,WFV,PCB_T+0.25),LP(-WFU,WFV,PCB_T+0.25)].map(PJ);
+    var fw=(wideT<0.32)?(1-wideT/0.32):0;
+    if(fw>0) o+='<polygon points="'+w4.map(pt).join(' ')+'" fill="#FFFFFF" opacity="'+(fw*0.50).toFixed(2)+'"/>';
+    o+='<polygon points="'+w4.map(pt).join(' ')+'" fill="#4FC3F7" opacity=".09" stroke="#2FA8E8" stroke-width="1.0" stroke-dasharray="5 3"/>';
+    for(var w=0;w<4;w++){
+      var w0=w4[w], w1=w4[(w+1)%4], w2=w4[(w+3)%4], wf=0.16;
+      o+='<path d="M'+(w0.x+(w1.x-w0.x)*wf).toFixed(1)+','+(w0.y+(w1.y-w0.y)*wf).toFixed(1)+
+         ' L'+w0.x.toFixed(1)+','+w0.y.toFixed(1)+
+         ' L'+(w0.x+(w2.x-w0.x)*wf).toFixed(1)+','+(w0.y+(w2.y-w0.y)*wf).toFixed(1)+
+         '" fill="none" stroke="#2FA8E8" stroke-width="2.0" stroke-linecap="round"/>';
+    }
+    var wc=PJ(LP(0,-WFV-5,PCB_T+0.25));
+    o+='<text x="'+wc.x.toFixed(1)+'" y="'+wc.y.toFixed(1)+'" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="5.2" font-weight="900" fill="#1C6FA8">전체 1회 촬영</text>';
+  }
+
   /* 2D 촬영 : PCB 검사 영역 마커 + 셔터 플래시 (케이스 QR 은 아래에서 별도 표시) */
   if(shotT>=0){
     var BP=pcbFrame(PCBP), FU=PCB_W/2+3.2, FV=PCB_D/2+3.2, HZ=PCB_T+0.3;
@@ -985,7 +1004,7 @@ function updHUD(){
 
   $('bScan').textContent = scanT>=0?'ON':'OFF';  $('cScan').classList.toggle('on',scanT>=0);
   $('bAlign').textContent = aligned?'⊥ 직각':'-'; $('cAlign').classList.toggle('on',aligned);
-  $('bShot').textContent = shotT>=0?'노광':'OFF'; $('cShot').classList.toggle('on',shotT>=0);
+  $('bShot').textContent = wideT>=0?'광각':(shotT>=0?'노광':'OFF'); $('cShot').classList.toggle('on',shotT>=0||wideT>=0);
   var qrOn=(qrT>=0)||!!verdict;
   $('bQr').textContent = qrOn?QRSN:'-'; $('cQr').classList.toggle('on',qrOn);
   $('bSen').textContent = String(done);
@@ -1064,23 +1083,19 @@ function runState(){
   }
   if(st.t==='approach'){
     aligned=false; measured=false; verdict=''; setMes('wait'); refZ=TBL_Z+PCB_T;
-    moveTo(PCBP.x,PCBP.y,TBL_Z+PCB_T+WD+10,0,0,D.move,next);
+    moveTo(t.x,t.y,TBL_Z+PCB_T+WDW+12,0,0,D.move,next);
     return;
   }
   if(st.t==='detect'){
-    /* ① 선측정 — PCB 위치·기울기 확인 (카메라 각도 보정 전, 짧은 구간) */
-    var FD=pcbFrame(t), DZ=TBL_Z+PCB_T+WD, DA=PCBU-8, DB=PCBU+8;
-    scanA=DA; scanB=DB; scanT=0;
-    addLog('[측정] PCB 기울기·위치 선측정 — 프로파일 '+Math.round((DB-DA)*U)+' mm');
-    anim(D.move*1.1,function(p){
-      scanT=p;
-      var q=FD(DA+(DB-DA)*p,0,0);
-      armT.x=q.X; armT.y=q.Y; armT.z=DZ; armT.ta=0; armT.tb=0;
-    },function(){
-      scanT=-1;
-      measured=true;
-      addLog('[측정] 측정 완료 — 기울기 θ'+t.ta.toFixed(1)+'° φ'+t.tb.toFixed(1)+'°, 위치편차 보정값 산출');
-      next();
+    /* ① 위치·기울기 카메라 — 스캔이 아니라 PCB + 케이스 전체를 1회 촬영 */
+    moveTo(t.x,t.y,TBL_Z+PCB_T+WDW,0,0,Math.round(D.move*0.7),function(){
+      wideT=0;
+      addLog('[측정] 광각 1회 촬영 — 화각 '+Math.round(2*WFU*U)+' × '+Math.round(2*WFV*U)+' mm (PCB + 케이스 전체)');
+      anim(D.act*1.6,function(p){ wideT=p; },function(){
+        wideT=-1; measured=true;
+        addLog('[측정] 영상 해석 완료 — 기울기 θ'+t.ta.toFixed(1)+'° φ'+t.tb.toFixed(1)+'°, 위치편차 보정값 산출');
+        next();
+      });
     });
     return;
   }
@@ -1195,13 +1210,13 @@ $('bRun').addEventListener('click',function(){
 });
 $('bStop').addEventListener('click',function(){
   running=false; waitSig=null; token++; clearTimeout(timer);
-  scanT=-1; shotT=-1; qrT=-1; lightOn=false;
+  scanT=-1; shotT=-1; qrT=-1; wideT=-1; lightOn=false;
   $('bRun').disabled=false; updSig(); addLog('■ 정지'); draw(); renderSteps();
 });
 $('bReset').addEventListener('click',function(){
   running=false; waitSig=null; token++; clearTimeout(timer);
   idx=0; tIdx=0; done=0; okN=0; ngN=0; verdict=''; alarm=false;
-  lightOn=false; scanT=-1; shotT=-1; qrT=-1; aligned=false; measured=false; partX=0; refZ=TBL_Z+PCB_T; scanA=-SCANU; scanB=SCANU;
+  lightOn=false; scanT=-1; shotT=-1; qrT=-1; wideT=-1; aligned=false; measured=false; partX=0; refZ=TBL_Z+PCB_T; scanA=-SCANU; scanB=SCANU;
   var h=homePos(); armT={x:h.x,y:h.y,z:h.z,ta:0,tb:0};
   setMes('wait'); $('bRun').disabled=false; updSig();
   addLog('↺ 초기화'); draw(); renderSteps();
