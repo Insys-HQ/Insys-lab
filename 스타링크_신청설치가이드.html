@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>스타링크 신청 및 설치 가이드 v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1f2937; --ink2:#374151; --blue:#1e3a5f; --blue2:#2c5282;
+  --line:#d5dde8; --bg:#f3f6fa; --card:#ffffff;
+  --pastel:#e6eef8; --pastel2:#eef3f9; --warn:#fdf3e1; --warnink:#6b4a0f;
+  --ok:#e5f2ea; --okink:#1d4d33; --bad:#fbeaea; --badink:#7a1f1f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--bg);line-height:1.5;font-size:1rem;-webkit-text-size-adjust:100%}
+@media (min-width:768px){ html{font-size:16px} body:not(.view-mobile){font-size:16px} }
+body.view-mobile{font-size:14px}
+
+.nav{background:var(--blue);color:#fff;position:sticky;top:0;z-index:20}
+.nav-inner{max-width:1100px;margin:0 auto;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+body.view-mobile .nav-inner,body.view-mobile .wrap,body.view-mobile footer{max-width:430px}
+.brand{font-weight:700;font-size:1rem;color:#fff}
+.ver{display:inline-block;background:#dbe7f5;color:var(--blue);font-weight:700;font-size:.8rem;border-radius:10px;padding:1px 8px;margin-left:6px}
+.seg{display:inline-flex;background:#dbe7f5;border-radius:8px;padding:2px}
+.seg button{border:0;background:transparent;color:var(--blue);font:inherit;font-size:.85rem;font-weight:500;padding:3px 10px;border-radius:6px;cursor:pointer}
+.seg button.on{background:var(--blue);color:#fff}
+
+.wrap{max-width:1100px;margin:0 auto;padding:8px 12px}
+.cover{background:var(--blue);color:#fff;border-radius:10px;padding:12px 16px;margin-bottom:8px}
+.cover h1{font-size:1.45rem;font-weight:900;line-height:1.3;margin-bottom:4px;color:#fff}
+.cover p{color:#e3ecf7;font-size:.95rem}
+.meta{margin-top:6px;font-size:.8rem;color:#c9d9ee}
+
+.tabs{display:flex;gap:4px;overflow-x:auto;margin-bottom:8px;padding-bottom:2px}
+.tabs button{flex:0 0 auto;border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit;font-size:.9rem;font-weight:500;padding:6px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--pastel);border-color:var(--blue2);color:var(--blue);font-weight:700}
+
+.panel{display:none}
+.panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.card h2{font-size:1.15rem;color:var(--blue);margin-bottom:6px;font-weight:700}
+.card h3{font-size:1rem;color:var(--blue2);margin:4px 0;font-weight:700}
+.card p,.card li{color:var(--ink2);font-size:1rem}
+.card ul,.card ol{padding-left:1.2rem}
+.card li{margin-bottom:2px}
+
+.grid{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:8px}
+@media (min-width:768px){ body:not(.view-mobile) .grid.c4{grid-template-columns:repeat(4,1fr)} body:not(.view-mobile) .grid.c2{grid-template-columns:1fr 1fr} }
+.stat{background:var(--pastel2);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.stat .k{font-size:.85rem;color:var(--ink2)}
+.stat .v{font-size:1.3rem;font-weight:900;color:var(--blue)}
+.stat .s{font-size:.8rem;color:var(--ink2)}
+
+.note{border-radius:8px;padding:6px 10px;margin:6px 0 0;font-size:.92rem}
+.note.warn{background:var(--warn);color:var(--warnink);border:1px solid #ecd9a8}
+.note.ok{background:var(--ok);color:var(--okink);border:1px solid #bfdcca}
+.note.info{background:var(--pastel);color:var(--blue);border:1px solid #c5d6ec}
+.note.bad{background:var(--bad);color:var(--badink);border:1px solid #e4bcbc}
+
+.step{display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.step:last-child{border-bottom:0}
+.step .n{flex:0 0 28px;height:28px;border-radius:50%;background:var(--pastel);color:var(--blue);font-weight:900;display:flex;align-items:center;justify-content:center;border:1px solid #b9cde6}
+.step .t{font-weight:700;color:var(--ink)}
+.step .d{color:var(--ink2);font-size:.97rem}
+
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top;color:var(--ink)}
+th{background:var(--pastel);color:var(--blue);font-weight:700}
+tr.hl td{background:#eef6ee}
+.tblwrap{overflow-x:auto}
+
+.flow{display:flex;flex-direction:column;gap:4px;align-items:stretch;margin:4px 0}
+@media (min-width:768px){ body:not(.view-mobile) .flow{flex-direction:row;align-items:center} }
+.box{background:var(--pastel);border:1px solid #b9cde6;color:var(--blue);border-radius:8px;padding:6px 10px;text-align:center;font-weight:500;font-size:.92rem;flex:1}
+.box.alt{background:#eaf3ec;border-color:#bfdcca;color:var(--okink)}
+.arrow{text-align:center;color:var(--blue2);font-weight:900}
+.arrow:before{content:"↓"}
+@media (min-width:768px){ body:not(.view-mobile) .arrow:before{content:"→"} }
+
+.chk label{display:flex;gap:8px;align-items:flex-start;padding:3px 0;cursor:pointer;color:var(--ink)}
+.chk input{width:18px;height:18px;margin-top:2px;accent-color:var(--blue2);flex:0 0 auto}
+.prog{height:8px;background:#e1e8f1;border-radius:6px;overflow:hidden;margin:4px 0}
+.prog i{display:block;height:100%;width:0;background:var(--blue2);transition:width .2s}
+
+.acc{border:1px solid var(--line);border-radius:8px;margin-bottom:4px;background:#fff}
+.acc button{width:100%;text-align:left;border:0;background:var(--pastel2);color:var(--blue);font:inherit;font-weight:700;padding:6px 10px;cursor:pointer;display:flex;justify-content:space-between;border-radius:8px}
+.acc .body{display:none;padding:6px 10px;color:var(--ink2);font-size:.97rem}
+.acc.open .body{display:block}
+
+a{color:var(--blue2);font-weight:500}
+.btn{border:1px solid var(--blue2);background:var(--pastel);color:var(--blue);font:inherit;font-size:.9rem;font-weight:700;padding:4px 12px;border-radius:8px;cursor:pointer}
+footer{max-width:1100px;margin:0 auto;padding:6px 12px 12px;color:var(--ink2);font-size:.85rem}
+.urlrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.urlrow code{background:#e8eef6;color:var(--ink);padding:2px 6px;border-radius:6px;word-break:break-all;font-size:.82rem}
+</style>
+</head>
+<body class="view-mobile">
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand">스타링크 신청·설치<span class="ver" id="verChip">v1.0</span></div>
+    <div class="seg" role="group" aria-label="화면 선택">
+      <button type="button" id="btnMobile" class="on" onclick="setView('mobile')">모바일</button>
+      <button type="button" id="btnPc" onclick="setView('pc')">PC</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="cover">
+    <h1>스타링크 신청 및 설치 가이드</h1>
+    <p>고객사 상주 현장 사무실(약 5명, 반영구 설치) 기준 · 사전 준비 → 신청 → 설치 → 운영</p>
+    <div class="meta">버전 <span id="verText">v1.0</span> · 작성일 2026-11-10 · 담당부서 인시스 AI혁신 연구개발실 · 작성자 ys.kim@in-sys.co.kr</div>
+  </section>
+
+  <nav class="tabs" id="tabs">
+    <button type="button" class="on" data-tab="t1">요약</button>
+    <button type="button" data-tab="t2">① 사전 준비</button>
+    <button type="button" data-tab="t3">② 신청</button>
+    <button type="button" data-tab="t4">③ 설치</button>
+    <button type="button" data-tab="t5">④ 공유기·운영</button>
+    <button type="button" data-tab="t6">참고·출처</button>
+  </nav>
+
+  <!-- 요약 -->
+  <section class="panel on" id="t1">
+    <div class="grid c4">
+      <div class="stat"><div class="k">할인 기간(주거용·로밍 신규)</div><div class="v">~11/30</div><div class="s">50% 할인, 비즈니스 제외</div></div>
+      <div class="stat"><div class="k">주거용 월 요금(화면 정가)</div><div class="v">93,000원</div><div class="s">무제한 데이터</div></div>
+      <div class="stat"><div class="k">로컬 프라이어리티 500GB</div><div class="v">223,000원</div><div class="s">우선순위·공인 IP·SLA</div></div>
+      <div class="stat"><div class="k">장비(Standard 키트)</div><div class="v">550,000원</div><div class="s">개통 시 보도 기준, 주문 시 확인</div></div>
+    </div>
+    <div class="card">
+      <h2>진행 순서</h2>
+      <div class="flow">
+        <div class="box">① 고객사 승인·요금제 결정</div><div class="arrow"></div>
+        <div class="box">② 법인 명의 신청</div><div class="arrow"></div>
+        <div class="box">③ 위치 선정·설치</div><div class="arrow"></div>
+        <div class="box alt">④ 개통·공유기·운영</div>
+      </div>
+      <div class="note warn">요금·할인 적용액·환불 조건은 주문 화면에서 최종 확인하세요. 이 가이드의 요금은 2026-11-10 화면 기준 정가이며 할인 적용 전 금액으로 보입니다.</div>
+    </div>
+    <div class="card">
+      <h2>이 가이드의 전제와 결정 포인트</h2>
+      <ul>
+        <li><b>전제:</b> 고객사 현장에 반영구 설치, 약 5명 사용, <b>법인 명의</b> 가입</li>
+        <li><b>요금제:</b> 비용 우선 → 주거용(93,000원, 할인 대상) / 안정성·공인 IP·SLA 필요 → 로컬 프라이어리티 500GB 이상</li>
+        <li><b>핵심 리스크:</b> 고객사 설치 승인, 주거용의 업무 사용(금지 조항은 확인되지 않음), 정지 시 대체 회선</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 사전 준비 -->
+  <section class="panel" id="t2">
+    <div class="card chk">
+      <h2>사전 준비 체크리스트 (주문 전 모두 완료)</h2>
+      <div class="prog"><i id="progBar"></i></div>
+      <div id="progTxt" style="font-size:.9rem;color:var(--ink2)">0 / 8 완료</div>
+      <label><input type="checkbox" class="ck"><span><b>고객사 설치 승인</b> – 부지 사용, 안테나 위치, 전원, 보안 정책을 서면(이메일)으로 확보</span></label>
+      <label><input type="checkbox" class="ck"><span><b>설치 위치 점검</b> – 하늘이 넓게 트인 곳. 앱 장애물 확인 도구로 사전 점검</span></label>
+      <label><input type="checkbox" class="ck"><span><b>법인 명의 가입 준비</b> – 사업자 정보, 법인카드, 업무용 공용 이메일, 계정 담당 임직원 지정</span></label>
+      <label><input type="checkbox" class="ck"><span><b>요금제 결정</b> – 아래 비교표 기준으로 주거용 / 로컬 프라이어리티 선택</span></label>
+      <label><input type="checkbox" class="ck"><span><b>월 데이터 사용량 추정</b> – 화상회의·클라우드·업데이트 포함. 50GB 플랜은 5명에게 부족할 수 있음</span></label>
+      <label><input type="checkbox" class="ck"><span><b>대체 회선 확보</b> – 휴대폰 핫스팟 등 장애·정지 대비</span></label>
+      <label><input type="checkbox" class="ck"><span><b>드론 사용 여부 확인</b> – 이 회선으로 드론 원격 제어 금지(AUP)</span></label>
+      <label><input type="checkbox" class="ck"><span><b>철수 계획 검토</b> – 현장 종료 시 반품·양도·주소 변경 조건 확인</span></label>
+    </div>
+    <div class="card">
+      <h2>요금제 비교 (2026-11-10 화면 기준)</h2>
+      <div class="tblwrap"><table>
+        <tr><th>플랜</th><th>월 요금</th><th>데이터</th><th>연 환산</th><th>특징</th></tr>
+        <tr><td>주거용 라이트</td><td>68,000원</td><td>무제한</td><td>816,000원</td><td>혼잡 시간대 속도 저하, 일부 지역 불가</td></tr>
+        <tr class="hl"><td><b>주거용</b></td><td><b>93,000원</b></td><td>무제한</td><td>1,116,000원</td><td>“가정용으로 적합”, 할인 대상</td></tr>
+        <tr><td>로컬 프라이어리티 50GB</td><td>79,000원</td><td>50GB</td><td>948,000원</td><td>초과 시 최대 1Mbps/0.5Mbps</td></tr>
+        <tr class="hl"><td><b>로컬 프라이어리티 500GB</b></td><td><b>223,000원</b></td><td>500GB</td><td>2,676,000원</td><td>우선순위, 공인 IP, SLA, 대시보드</td></tr>
+        <tr><td>로컬 프라이어리티 1TB</td><td>403,000원</td><td>1TB</td><td>4,836,000원</td><td>동일 기능</td></tr>
+      </table></div>
+      <div class="note info">로컬 프라이어리티는 할인 대상이 아닙니다. 데이터 블록은 50GB +36,000원, 500GB +180,000원으로 추가할 수 있습니다.</div>
+      <div class="note ok"><b>추천:</b> 비용 우선·단기 점검이면 법인 명의 주거용으로 30일 체험을 시작하고, 업무 연속성·공인 IP·SLA가 필수면 로컬 프라이어리티 500GB를 선택하세요.</div>
+    </div>
+    <div class="card">
+      <h2>주거용 업무 사용에 대한 확인 현황</h2>
+      <ul>
+        <li>이용약관(베트남판)·한국어 AUP·한국어 제한 보증 문서에서 <b>업무 사용을 금지하는 조항은 확인되지 않았습니다.</b></li>
+        <li>요금제 화면은 주거용을 “가정용으로 적합”이라고 안내합니다(권장 표현).</li>
+        <li>한국어 <b>서비스 플랜 설명 본문</b>은 아직 확인하지 못했고, 해외에서는 업무용 사용으로 판단되어 정지된 사례가 있습니다.</li>
+      </ul>
+      <div class="note warn">정지 위험을 줄이려면 스타링크 코리아(080-870-4150, StarlinkKorea@spacex.com)에 업무 사용 가능 여부를 문의하고 답변을 이메일로 보관하세요. 또한 요금제를 나중에 변경하면 할인액이 환수될 수 있는지 함께 확인하세요.</div>
+    </div>
+  </section>
+
+  <!-- 신청 -->
+  <section class="panel" id="t3">
+    <div class="card">
+      <h2>신청 순서 (starlink.com 주문 화면)</h2>
+      <div class="step"><div class="n">1</div><div><div class="t">주문 페이지에서 설치 주소 입력</div><div class="d"><a href="https://starlink.com/order?step=0" target="_blank" rel="noopener">starlink.com/order</a>에 접속해 <b>현장 주소</b>를 입력하고 서비스 가능 여부를 확인합니다. 주소는 이후 요금제·할인과 연결되므로 정확히 입력하세요.</div></div></div>
+      <div class="step"><div class="n">2</div><div><div class="t">요금제 선택</div><div class="d">서비스 플랜 화면에서 주거용 / 로밍 / 로컬 프라이어리티 중에서 선택합니다. 고정 사무실이므로 로밍은 필요하지 않습니다.</div></div></div>
+      <div class="step"><div class="n">3</div><div><div class="t">할인 적용 금액 확인</div><div class="d">50% 할인(10/31~11/30)은 주거용·로밍 신규 고객에게만 적용됩니다. 장비값과 월 요금 중 어디에, 몇 개월 적용되는지 주문서에서 확인합니다.</div></div></div>
+      <div class="step"><div class="n">4</div><div><div class="t">약관 확인 후 동의</div><div class="d"><a href="https://starlink.com/legal" target="_blank" rel="noopener">starlink.com/legal</a>에서 서비스 약관, 서비스 플랜 설명, 이용 목적 제한 방침(AUP), 제한 보증을 확인합니다.</div></div></div>
+      <div class="step"><div class="n">5</div><div><div class="t">법인 정보로 결제</div><div class="d">법인 명의 계정으로 법인카드를 사용합니다. 청구서의 세금 ID·상호·주소는 정확히 입력하세요(해외 약관에는 청구 정보 변경을 첫 청구서 수령 후 30일 이내로 제한한 조항이 있음, 한국 조건 확인 필요).</div></div></div>
+      <div class="step"><div class="n">6</div><div><div class="t">배송 수령</div><div class="d">서명이 필요할 수 있습니다. 수령인과 배송지를 미리 정하고, 수령 즉시 구성품을 확인합니다.</div></div></div>
+    </div>
+    <div class="card">
+      <h2>기한 관리 (해외 약관 기준 – 한국 조건 확인 필요)</h2>
+      <ul>
+        <li><b>환불:</b> 미손상·미개조 키트를 결제 기준일로부터 30일 이내 반품하면 전액 환불 가능(시야 문제로 연결이 안 되는 경우 포함).</li>
+        <li><b>할인 환수:</b> 지역·수요 할인 등이 걸린 주문은 서비스 주소 또는 요금제를 변경하거나 배송 후 30일 내 개통하지 않으면 원래 할인액을 청구할 수 있음.</li>
+        <li><b>월 요금 개시:</b> 개통일, 배송 7일 후 중 빠른 날부터 청구. 사용하지 않아도 월 요금이 발생.</li>
+        <li><b>양도:</b> 구매 후 120일 또는 개통 후 90일 이후에 가능(조건 충족 시).</li>
+      </ul>
+      <div class="note warn">위 내용은 베트남 약관 문서에서 확인한 것입니다. 한국 약관의 동일 조항은 주문 화면의 약관과 고객지원에서 확인하세요.</div>
+    </div>
+  </section>
+
+  <!-- 설치 -->
+  <section class="panel" id="t4">
+    <div class="card">
+      <h2>설치 순서</h2>
+      <div class="step"><div class="n">1</div><div><div class="t">구성품 확인</div><div class="d">안테나(킥스탠드 포함), 스타링크 케이블(약 15m), 공유기, 전원 공급 장치, AC 전원 케이블. 공유기 뒷면에 LAN 포트가 있는지 확인합니다(Bypass 시 필요).</div></div></div>
+      <div class="step"><div class="n">2</div><div><div class="t">설치 위치 최종 선정</div><div class="d">나뭇가지·기둥·지붕 같은 장애물이 없는 곳을 고릅니다. Starlink 앱의 <b>장애물 확인</b> 도구로 점검하세요.</div></div></div>
+      <div class="step"><div class="n">3</div><div><div class="t">앱 설치 및 로그인</div><div class="d">스마트폰에 Starlink 앱을 설치하고 법인 계정으로 로그인합니다.</div></div></div>
+      <div class="step"><div class="n">4</div><div><div class="t">안테나에 케이블 연결</div><div class="d">킥스탠드를 들어 올리고 케이블 한쪽 끝을 <b>케이블 잠금 기능이 위를 향하도록</b> 안테나에 꽂습니다. 플러그 면이 표면과 수평이 되도록 끝까지 삽입합니다.</div></div></div>
+      <div class="step"><div class="n">5</div><div><div class="t">공유기에 케이블 연결</div><div class="d">반대쪽 끝을 공유기 뒷면의 <b>안테나 모양 1번 포트</b>에 연결합니다.</div></div></div>
+      <div class="step"><div class="n">6</div><div><div class="t">전원 연결 후 앱으로 개통</div><div class="d">AC 케이블을 전원 공급 장치와 콘센트에 연결합니다. 안테나가 자동으로 방향을 잡으면 앱의 안내에 따라 개통하고 Wi-Fi 이름·비밀번호를 설정합니다.</div></div></div>
+    </div>
+    <div class="card">
+      <h2>반영구 고정 설치 시 주의</h2>
+      <ul>
+        <li><b>마운트:</b> 영구 설치는 마운트로 고정하고, 안테나는 수직 기준 5도 이내로 설치합니다. 옆면에 수평으로 달면 작동하지 않고 “Motors Stuck” 알림이 뜹니다.</li>
+        <li><b>덮개 금지:</b> 레이돔이나 덮개로 가리거나 도장 등 외관을 바꾸면 보증에서 제외됩니다.</li>
+        <li><b>안전:</b> 지붕·고소 작업이 위험하면 전문 설치 인력에게 맡깁니다. 강풍 대비 고정과 낙하 방지가 필요합니다.</li>
+        <li><b>낙뢰·전원:</b> 번개 등 자연재해로 인한 손상은 보증 제외입니다. 피뢰 대책과 안정적인 전원을 확보하세요.</li>
+        <li><b>이동 사용 금지:</b> 승인되지 않은 키트를 차량·선박에 설치해 이동 중 쓰면 안 됩니다. 사무실이 트레일러형이면 정차 후 사용인지 확인하세요.</li>
+        <li><b>눈:</b> 안테나에 내린 눈은 녹지만 주변에 쌓이면 시야를 가립니다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 공유기·운영 -->
+  <section class="panel" id="t5">
+    <div class="card">
+      <h2>5명 사무실 네트워크 구성</h2>
+      <h3>기본: 스타링크 공유기 그대로 사용</h3>
+      <div class="flow"><div class="box">안테나</div><div class="arrow"></div><div class="box">스타링크 공유기(Wi-Fi)</div><div class="arrow"></div><div class="box alt">노트북·휴대폰·프린터</div></div>
+      <h3>확장: 개인 공유기·스위치 허브 (유선 기기·고급 설정 필요 시)</h3>
+      <div class="flow"><div class="box">안테나</div><div class="arrow"></div><div class="box">스타링크 공유기(Bypass)</div><div class="arrow"></div><div class="box">개인 공유기(WAN)</div><div class="arrow"></div><div class="box alt">유선·무선 기기</div></div>
+      <div class="note info">Gen 3 공유기는 앱에서 <b>설정 &gt; 고급 &gt; Bypass</b>(메뉴명은 앱 버전에 따라 다를 수 있음)를 켜고 LAN 포트를 개인 공유기 WAN에 연결합니다. LAN 포트가 없는 Gen 2는 이더넷 어댑터가 필요합니다. 해제는 스타링크 공유기 공장 초기화입니다.</div>
+    </div>
+    <div class="card">
+      <h2>운영 시 지킬 점</h2>
+      <ul>
+        <li><b>데이터 관리:</b> 대용량 OS·소프트웨어 업데이트와 영상 업로드는 시간을 분산합니다. 로컬 프라이어리티는 한도를 소진하면 최대 1Mbps/0.5Mbps로 떨어집니다.</li>
+        <li><b>드론 금지:</b> 이 회선으로 공중 드론·무인 이동체를 원격 제어하지 않습니다(계약상 별도 허용이 없는 한).</li>
+        <li><b>재판매 금지:</b> 고객사 직원 등 제3자에게 인터넷 접속을 제공하는 행위는 재판매로 문제될 수 있으니 Wi-Fi 공유 범위를 사무실 인원으로 한정하세요.</li>
+        <li><b>정지 가능성:</b> 약관·AUP 위반으로 판단되면 사전 통지 없이 제한·정지될 수 있으니 대체 회선을 준비합니다.</li>
+        <li><b>핵심 업무 부적합:</b> 약관은 생명·안전·핵심 시스템 용도로는 적합하지 않다고 명시합니다.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>장애 대응 순서</h2>
+      <div class="step"><div class="n">1</div><div><div class="t">앱에서 상태 확인</div><div class="d">앱의 알림(장애물, 서비스 중단, Motors Stuck)을 확인합니다.</div></div></div>
+      <div class="step"><div class="n">2</div><div><div class="t">시야·케이블·전원 점검</div><div class="d">안테나 주변 장애물, 케이블 잠금 상태, 전원을 확인하고 재부팅합니다.</div></div></div>
+      <div class="step"><div class="n">3</div><div><div class="t">대체 회선으로 전환</div><div class="d">업무가 막히면 핫스팟 등 대체 회선으로 전환합니다.</div></div></div>
+      <div class="step"><div class="n">4</div><div><div class="t">고객지원 접수</div><div class="d">Starlink 고객 지원 포털 또는 080-870-4150으로 문의합니다. 보증 청구는 포털에서 하고, 승인되면 접수 후 30일 이내 교체됩니다(Standard 키트 보증 12개월, 구매일 기준).</div></div></div>
+    </div>
+    <div class="card">
+      <h2>FAQ</h2>
+      <div class="acc"><button type="button">현장이 끝나면 어떻게 하나요?<span>＋</span></button><div class="body">30일 이내라면 미손상 반품과 환불이 가능한지 확인하세요. 이후에는 다른 현장으로 주소를 변경하거나 양도를 검토합니다. 주소·요금제 변경 시 할인액 환수 가능성이 있으므로 변경 전에 고객지원에 문의하세요.</div></div>
+      <div class="acc"><button type="button">나중에 비즈니스로 바꿀 수 있나요?<span>＋</span></button><div class="body">가능한지와 할인 환수 여부는 한국 약관과 고객지원에서 확인해야 합니다. 요금제 변경은 할인액 청구 사유가 될 수 있다는 해외 약관 조항이 있습니다.</div></div>
+      <div class="acc"><button type="button">비가 오거나 눈이 오면 어떻게 되나요?<span>＋</span></button><div class="body">악천후에서는 속도 저하나 드문 끊김이 있을 수 있습니다. 안테나 주변에 눈이 쌓이지 않는 위치를 고르세요.</div></div>
+    </div>
+  </section>
+
+  <!-- 참고 -->
+  <section class="panel" id="t6">
+    <div class="card">
+      <h2>공식 링크·연락처</h2>
+      <ul>
+        <li><a href="https://starlink.com/order?step=0" target="_blank" rel="noopener">스타링크 주문 페이지</a></li>
+        <li><a href="https://starlink.com/legal" target="_blank" rel="noopener">스타링크 법률 문서(약관·AUP·보증)</a></li>
+        <li><a href="https://support.starlink.com" target="_blank" rel="noopener">스타링크 고객지원</a></li>
+        <li><a href="https://starlink.com/public-files/installation_guide_standard_kit_ko-KR.pdf" target="_blank" rel="noopener">Standard 키트 설치 가이드(PDF, 한국어)</a></li>
+        <li>스타링크 코리아: 080-870-4150 · StarlinkKorea@spacex.com</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>확인 현황 및 출처</h2>
+      <div class="tblwrap"><table>
+        <tr><th>항목</th><th>근거</th><th>상태</th></tr>
+        <tr><td>요금(주거용·로밍·로컬 프라이어리티)</td><td>스타링크 서비스 플랜 화면(2026-11-10 캡처)</td><td>확인(정가)</td></tr>
+        <tr><td>50% 할인(10/31~11/30)</td><td>스타링크 프로모션 배너</td><td>확인, 적용 범위는 주문서 확인</td></tr>
+        <tr><td>장비 550,000원</td><td>국내 개통 보도(2025-12)</td><td>주문 시 재확인</td></tr>
+        <tr><td>이용 목적 제한 방침</td><td>한국어 AUP 문서</td><td>확인</td></tr>
+        <tr><td>제한 보증(12개월)</td><td>한국어 제한 보증 문서</td><td>확인</td></tr>
+        <tr><td>환불·할인 환수·양도 조건</td><td>베트남 서비스 약관</td><td>한국 조건 미확인</td></tr>
+        <tr><td>주거용 업무 사용 가능 여부</td><td>서비스 플랜 설명 본문</td><td>미확인</td></tr>
+      </table></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="urlrow">
+    <span>페이지 주소</span>
+    <code id="pageUrl">https://insys-hq.github.io/Insys-lab/%EC%8A%A4%ED%83%80%EB%A7%81%ED%81%AC_%EC%8B%A0%EC%B2%AD%EC%84%A4%EC%B9%98%EA%B0%80%EC%9D%B4%EB%93%9C.html</code>
+    <button type="button" class="btn" id="copyBtn">링크 복사</button>
+    <span id="copyMsg"></span>
+  </div>
+  <div style="margin-top:4px">스타링크 신청 및 설치 가이드 <span id="verFoot">v1.0</span> · 담당부서 인시스 AI혁신 연구개발실</div>
+</footer>
+
+<script>
+(function(){
+  var VERSION = 'v1.0';
+  document.getElementById('verChip').textContent = VERSION;
+  document.getElementById('verText').textContent = VERSION;
+  document.getElementById('verFoot').textContent = VERSION;
+
+  window.setView = function(mode){
+    var b = document.body;
+    if(mode === 'pc'){ b.classList.remove('view-mobile'); } else { b.classList.add('view-mobile'); }
+    document.getElementById('btnMobile').classList.toggle('on', mode !== 'pc');
+    document.getElementById('btnPc').classList.toggle('on', mode === 'pc');
+  };
+
+  var tabBtns = document.querySelectorAll('#tabs button');
+  Array.prototype.forEach.call(tabBtns, function(btn){
+    btn.addEventListener('click', function(){
+      Array.prototype.forEach.call(tabBtns, function(x){ x.classList.remove('on'); });
+      btn.classList.add('on');
+      Array.prototype.forEach.call(document.querySelectorAll('.panel'), function(p){ p.classList.remove('on'); });
+      document.getElementById(btn.getAttribute('data-tab')).classList.add('on');
+      window.scrollTo(0, 0);
+    });
+  });
+
+  var cks = document.querySelectorAll('.ck');
+  function upd(){
+    var n = 0;
+    Array.prototype.forEach.call(cks, function(c){ if(c.checked) n++; });
+    document.getElementById('progBar').style.width = (n / cks.length * 100) + '%';
+    document.getElementById('progTxt').textContent = n + ' / ' + cks.length + ' 완료';
+  }
+  Array.prototype.forEach.call(cks, function(c){ c.addEventListener('change', upd); });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.acc > button'), function(btn){
+    btn.addEventListener('click', function(){
+      var acc = btn.parentNode;
+      var open = acc.classList.toggle('open');
+      btn.lastChild.textContent = open ? '－' : '＋';
+    });
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', function(){
+    var url = document.getElementById('pageUrl').textContent;
+    var msg = document.getElementById('copyMsg');
+    function ok(){ msg.textContent = '복사됨'; setTimeout(function(){ msg.textContent=''; }, 1500); }
+    function fallback(){
+      var t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select();
+      try { document.execCommand('copy'); ok(); } catch(e){ msg.textContent = '복사 실패'; }
+      document.body.removeChild(t);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(ok, fallback);
+    } else { fallback(); }
+  });
+})();
+</script>
+</body>
+</html>
