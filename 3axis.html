@@ -124,7 +124,7 @@
 <body>
 
 <header class="cover"><div class="inner">
-  <span class="hver" id="hVer">v3.4</span>
+  <span class="hver" id="hVer">v3.5</span>
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (Z·Rx·Ry 3축 헤드)</h1>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
@@ -136,7 +136,7 @@
   <div class="grid2">
     <div class="left-col">
     <section class="card">
-      <div class="card-header" data-i18n="ch_anim">동작 애니메이션 · Z축 직결 Z·Rx·Ry 3축 헤드</div>
+      <div class="card-header" data-i18n="ch_anim">동작 애니메이션 · Z축 직결 헥사포드 헤드 (Cognex IS3805 + ISL38-300)</div>
       <div class="card-body">
         <div id="stepMobile" class="step-mobile"><span class="no">1</span><span id="stepMobileText">START 대기</span></div>
         <div id="alarmBanner" class="alarm-banner" data-i18n="alarmban">⚠ NG 검사 중단 — NG품 제거 후 [검사 계속]</div>
@@ -154,6 +154,8 @@
           <span class="chip" id="chipLamp"><span data-i18n="cp_laser">레이저</span> <b id="lampVal">OFF</b></span>
           <span class="chip" id="chipSen"><span data-i18n="cp_sen">센서</span> <b id="senVal">OFF</b></span>
         </div>
+
+        <div class="hint" style="margin:0 0 6px;"><span data-i18n="hx_len">헥사포드 레그 L1~L6 (mm)</span> <b id="hexLen" style="color:var(--navy-dark);">-</b></div>
 
         <div class="verdict-box">
           <div class="verdict-lamp" id="verdictLamp">--</div>
@@ -222,7 +224,7 @@
   </section>
 </main>
 
-<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.4</span></footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.5</span></footer>
 
 <script>
   // ===== 3D 월드 (X:컨베이어, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
@@ -237,7 +239,8 @@
   const SKIRT_Z=0;                                           // 캐비닛이 바닥까지 (받침 구조 없음)
   const INSPECT_X=340, PCB_Z=BELT_Z+3, PCB_YC=(BELT_Y0+BELT_Y1)/2;
   const FOCUS=90, FOCUS_MM=300;          // 초점거리 300mm
-  const BRIDGE_Z=BELT_Z+176;             // Z 블록 바로 아래에 카메라가 오도록 최소화
+  const HEXB=38;                         // 헥사포드 베이스판 높이(피벗 기준, 127mm)
+  const BRIDGE_Z=BELT_Z+176+(HEXB-2);    // Z 블록 아래에 헥사포드가 들어가도록 상승
   const ZS=3;                            // Z축 유효 스트로크 = 10mm
   const GY_F=-34, GY_B=140;              // 갠트리 레일 Y(앞/뒤)
   const GX0=BELT_X0-6, GX1=BELT_X1+6;    // 레일 X 범위
@@ -271,16 +274,16 @@
   }
 
   // ===== 다국어 (한국어 / English) =====
-  const VER='v3.4';
+  const VER='v3.5';
   const I18N={
     ko:{
       title:'PCB 비전 검사 시뮬레이터 (3축 헤드)',
       h1:'PCB 비전 검사 시뮬레이터 (Z·Rx·Ry 3축 헤드)',
-      ch_anim:'동작 애니메이션 · Z축 직결 Z·Rx·Ry 3축 헤드',
+      ch_anim:'동작 애니메이션 · Z축 직결 헥사포드 헤드 (Cognex IS3805 + ISL38-300)',
       ch_ctrl:'운전 / 신호 제어', ch_flow:'전체 로직 플로우', ch_log:'동작 로그',
       alarmban:'⚠ NG 검사 중단 — NG품 제거 후 [검사 계속]',
       ax_z:'Z축 (승강)', ax_rx:'Rx축 (θ)', ax_ry:'Ry축 (φ)', ax_foc:'초점거리',
-      cp_tilt:'PCB 기울기', cp_align:'직각 정렬', cp_laser:'레이저', cp_sen:'센서',
+      cp_tilt:'PCB 기울기', cp_align:'직각 정렬', cp_laser:'레이저', cp_sen:'센서', hx_len:'헥사포드 레그 L1~L6 (mm)',
       lb_verdict:'판정', lb_demo:'데모', op_auto:'자동', op_ok:'항상 OK', op_ng:'항상 NG',
       lb_view:'시점', vw_front:'정면', vw_iso:'45°', vw_side:'측면',
       ct_done:'완료',
@@ -330,11 +333,11 @@
     en:{
       title:'PCB Vision Inspection Simulator (3-Axis Head)',
       h1:'PCB Vision Inspection Simulator (Z·Rx·Ry 3-Axis Head)',
-      ch_anim:'Motion Animation · Z-Axis Direct-Mount Z·Rx·Ry 3-Axis Head',
+      ch_anim:'Motion Animation · Z-Axis Direct-Mount Hexapod Head (Cognex IS3805 + ISL38-300)',
       ch_ctrl:'Operation / Signal Control', ch_flow:'Logic Flow', ch_log:'Operation Log',
       alarmban:'⚠ NG — Inspection Halted. Remove NG part, then [Resume]',
       ax_z:'Z Axis (Lift)', ax_rx:'Rx Axis (θ)', ax_ry:'Ry Axis (φ)', ax_foc:'Focus Dist.',
-      cp_tilt:'PCB Tilt', cp_align:'Normal Align', cp_laser:'Laser', cp_sen:'Sensor',
+      cp_tilt:'PCB Tilt', cp_align:'Normal Align', cp_laser:'Laser', cp_sen:'Sensor', hx_len:'Hexapod legs L1–L6 (mm)',
       lb_verdict:'Verdict', lb_demo:'Demo', op_auto:'Auto', op_ok:'Always OK', op_ng:'Always NG',
       lb_view:'View', vw_front:'Front', vw_iso:'45°', vw_side:'Side',
       ct_done:'Done',
@@ -757,6 +760,71 @@
       }
 
 
+    // ── 헥사포드(6축 병렬) : 베이스판(Z 램 하단) → 리니어 액추에이터 6개 → 이동 플랫폼 ──
+    //    플랫폼 브래킷에 Cognex IS3805(카메라) + ISL38-300(레이저 변위센서) 장착
+    const MH=(u,v,n)=>({X:ax+B.u.X*u+B.v.X*v-B.n.X*n, Y:ay+B.u.Y*u+B.v.Y*v-B.n.Y*n, Z:az+B.u.Z*u+B.v.Z*v-B.n.Z*n});
+    const MB=(x,y,z)=>({X:ax+x, Y:ay+y, Z:z});
+    const SB=35, WU=15;                                  // 센서 하면 = HEAD · 투/수광창 간격
+    const HX_RB=26, HX_RP=14, HX_DB=13, HX_DP=17;        // 베이스/플랫폼 조인트 반경(86/47mm)·각도 오프셋
+    const hexLegs=[];
+    for(let k=0;k<3;k++){
+      const bA=[120*k+HX_DB, 120*(k+1)-HX_DB], pA=[120*k+60-HX_DP, 120*k+60+HX_DP];
+      for(let j=0;j<2;j++){
+        const ab=bA[j]*Math.PI/180, ap=pA[j]*Math.PI/180;
+        hexLegs.push({ b:{X:ax+HX_RB*Math.cos(ab), Y:ay+HX_RB*Math.sin(ab), Z:az+HEXB},
+                       p:MH(HX_RP*Math.cos(ap), HX_RP*Math.sin(ap), -1.2) });
+      }
+    }
+    // IS3805 : 초점거리(FOCUS)에서 광축이 레이저 광축과 만나도록 안쪽으로 기울여 장착
+    const CAM_V=25, cSa=CAM_V/FOCUS, cCa=Math.sqrt(1-cSa*cSa), CAM_NF=SB+FOCUS-FOCUS*cCa;
+    const MC=(a,b,cc)=>MH(a, CAM_V+b*cCa+cc*cSa, CAM_NF+b*cSa-cc*cCa);
+    // (1) IS3805 렌즈부 (뒤쪽)
+    s+=cylSide(MC,7,0,18,MAT.sens2);
+    // (2) ISL38-300 본체 200.5×101×45mm · 하면 투/수광창
+    s+=solid(MH,-30.1,30.1,-15.15,15.15,SB-13.5,SB,MAT.sens);
+    s+=solid(MH,-30.1,30.1,-15.15,15.15,SB-13.5,SB-12.3,MAT.sens2);
+    { const fv=-15.6;
+      s+=quad(PJ(MH(-8,fv,SB-9)),PJ(MH(8,fv,SB-9)),PJ(MH(8,fv,SB-6)),PJ(MH(-8,fv,SB-6)),'#C0392F','#8E2820',.5);
+      [[-26,'#FF7A2F',0],[-22.5, lightOn?'#4ADE80':'#2F4436',1],[-19,'#8FA4BE',0]].forEach(([uu,cc,gl])=>{
+        const q=PJ(MH(uu,fv,SB-7.5));
+        s+=`<circle cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" r="1.5" fill="${cc}"${(gl&&lightOn)?' filter="url(#fGlow)"':''}/>`; }); }
+    [-1,1].forEach(sx=>{
+      s+=solid(MH,sx*WU-6,sx*WU+6,-4.5,4.5,SB-2.4,SB,MAT.sens2);
+      const w=[MH(sx*WU-5,-3.2,SB),MH(sx*WU+5,-3.2,SB),MH(sx*WU+5,3.2,SB),MH(sx*WU-5,3.2,SB)].map(PJ);
+      s+=quad(w[0],w[1],w[2],w[3],lightOn?'#5A2E18':'#14181D','#0A0D11',.7); });
+    // (3) 센서 브래킷판 + (4) IS3805 본체/클램프
+    s+=solid(MH,-33,33,-17,40,19.5,21.5,MAT.alu);
+    s+=solid(MC,-7.5,7.5,-7.5,7.5,18,37,MAT.black);
+    s+=solid(MC,-5,5,-7.9,-7.5,23,33,[45,92,153]);
+    s+=solid(MC,-8.6,8.6,-8.6,8.6,18.8,22.4,MAT.alu);
+    // (5) 브래킷 지지 기둥 + (6) 플랫폼 상판
+    s+=cylSide(MH,6,1.2,19.5,MAT.steel);
+    s+=cylSide(MH,18,-1.2,1.2,MAT.alu);
+    s+=disc(MH,18,-1.2,MAT.alu,1.02);
+    hexLegs.forEach(lg=>{ const q=PJ(lg.p);
+      s+=`<circle cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" r="1.9" fill="rgb(70,78,90)" stroke="rgb(30,36,44)" stroke-width=".6"/>`; });
+    // (7) 리니어 액추에이터 6개 (먼 것부터) — 본체(고정) + 로드(가동)
+    function legSvg(lg){
+      const dx=lg.p.X-lg.b.X, dy=lg.p.Y-lg.b.Y, dz=lg.p.Z-lg.b.Z, Ln=Math.hypot(dx,dy,dz);
+      const d={X:dx/Ln,Y:dy/Ln,Z:dz/Ln};
+      let e1={X:d.Y,Y:-d.X,Z:0}; let l1=Math.hypot(e1.X,e1.Y);
+      if(l1<1e-6){ e1={X:1,Y:0,Z:0}; l1=1; }
+      e1={X:e1.X/l1,Y:e1.Y/l1,Z:0};
+      const e2={X:d.Y*e1.Z-d.Z*e1.Y, Y:d.Z*e1.X-d.X*e1.Z, Z:d.X*e1.Y-d.Y*e1.X};
+      const M=(x,y,n)=>({X:lg.b.X+e1.X*x+e2.X*y+d.X*n, Y:lg.b.Y+e1.Y*x+e2.Y*y+d.Y*n, Z:lg.b.Z+e1.Z*x+e2.Z*y+d.Z*n});
+      const LB=Math.min(24,Ln*0.58);
+      let o=cylSide(M,1.5,LB-1,Ln-1.8,MAT.steel);
+      o+=cylSide(M,3.0,1.6,LB,MAT.dark);
+      const bq=PJ(lg.b);
+      o+=`<circle cx="${bq.x.toFixed(1)}" cy="${bq.y.toFixed(1)}" r="2.3" fill="rgb(70,78,90)" stroke="rgb(30,36,44)" stroke-width=".6"/>`;
+      return o; }
+    hexLegs.map(lg=>({lg, d:PJ({X:(lg.b.X+lg.p.X)/2,Y:(lg.b.Y+lg.p.Y)/2,Z:(lg.b.Z+lg.p.Z)/2}).d}))
+      .sort((a,b)=>b.d-a.d).forEach(o=>{ s+=legSvg(o.lg); });
+    // (8) 베이스판 (Z 램 하단 직결)
+    s+=cylSide(MB,32,az+HEXB,az+HEXB+3,MAT.alu);
+    s+=disc(MB,32,az+HEXB+3,MAT.alu,1.02);
+
+
     // ── Z축 리니어 액추에이터 (월드 수직) ──
     const MW=(x,y,z)=>({X:ax+x, Y:ay+y, Z:z});
     const zTopZ=BRIDGE_Z+XZ-6, zHousB=BRIDGE_Z-30;
@@ -776,67 +844,13 @@
       [[-11,-11],[11,-11],[-11,11],[11,11]].forEach(([bx,by])=>{         // 체결 볼트
         const q=P(ax+bx,ay+by,zTopZ+6.4);
         s+=`<circle cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" r="2" fill="rgb(126,136,150)" stroke="rgb(88,97,109)" stroke-width=".6"/>`; }); }
-    s+=solid(MW,-9.5,9.5,-9.5,9.5,az+14,zHousB+2,MAT.steel);             // 승강 램
+    s+=solid(MW,-9.5,9.5,-9.5,9.5,az+HEXB+3,zHousB+2,MAT.steel);             // 승강 램
 
-    // ── Rx·Ry 2축 짐벌 + 비전 카메라 ──
-    const MH=(u,v,n)=>({X:ax+B.u.X*u+B.v.X*v-B.n.X*n, Y:ay+B.u.Y*u+B.v.Y*v-B.n.Y*n, Z:az+B.u.Z*u+B.v.Z*v-B.n.Z*n});
+    // ── 광축 기준선 ──
     const pv=P(ax,ay,az);
     { const ti=PJ(MH(0,0,44)), vr=P(ax,ay,az-44);                        // 수직 기준 / 광축
       s+=`<line x1="${pv.x.toFixed(1)}" y1="${pv.y.toFixed(1)}" x2="${vr.x.toFixed(1)}" y2="${vr.y.toFixed(1)}" stroke="#9AA6B4" stroke-width="1" stroke-dasharray="3 3"/>`;
       s+=`<line x1="${pv.x.toFixed(1)}" y1="${pv.y.toFixed(1)}" x2="${ti.x.toFixed(1)}" y2="${ti.y.toFixed(1)}" stroke="#E5484D" stroke-width="1.4" opacity=".4"/>`; }
-    // ── Rx·Ry 2축 R스테이지 (고니오미터형 단일 유닛) ──
-    // 고정부 : Z 램에 직결 — 베이스 플랜지 + 스테이지 하우징 + 눈금 밴드
-    s+=disc(MW,8,az+3,MAT.steel,.6);                                     // 하우징 하단
-    s+=cylSide(MW,8,az+12,az+3,MAT.steel);
-    s+=disc(MW,8,az+12,MAT.steel,.98);                                   // 하우징 상단
-    s+=cylSide(MW,8.3,az+9.6,az+7.6,MAT.dark);                           // 눈금 밴드
-    s+=cylSide(MW,9.5,az+14,az+12,MAT.alu);
-    s+=disc(MW,9.5,az+14,MAT.alu,.98);                                   // 베이스 플랜지 상면
-    { for(let i=0;i<24;i++){ const a=2*Math.PI*i/24;                     // 각도 눈금
-        const q1=PJ(MW(8.6*Math.cos(a),8.6*Math.sin(a),az+9.4)), q2=PJ(MW(8.6*Math.cos(a),8.6*Math.sin(a),az+7.8));
-        if(Math.sin(a)*viewDir().y+Math.cos(a)*viewDir().x > -0.02) continue;
-        s+=`<line x1="${q1.x.toFixed(1)}" y1="${q1.y.toFixed(1)}" x2="${q2.x.toFixed(1)}" y2="${q2.y.toFixed(1)}" stroke="rgba(190,200,212,.55)" stroke-width=".8"/>`; } }
-    // Rx·Ry 조절 노브 2개 (90° 배치)
-    [[1,0,'#B23A30'],[0,-1,'#2D5C99']].forEach(([cu,cv,cc])=>{
-      const k0=MW(cu*7.6,cv*7.6,az+5.4), k1=MW(cu*11.6,cv*11.6,az+5.4);
-      s+=bar(PJ(k0),PJ(k1),2.8,'url(#gSteel)','#5F6975');
-      const kq=PJ(k1);
-      s+=`<circle cx="${kq.x.toFixed(1)}" cy="${kq.y.toFixed(1)}" r="2.1" fill="${cc}" stroke="rgb(40,46,55)" stroke-width=".6"/>`; });
-    // 가동부 : Rx·Ry 로 기울어지는 틸트 테이블 (센서 상면에 직결)
-    s+=disc(MH,9,3,MAT.alu,.6);
-    s+=cylSide(MH,9,-2.4,3,MAT.alu);
-    s+=disc(MH,9,-2.4,MAT.alu,1.0);
-    // ── 3D 레이저 변위센서 (흑색 스텝 하우징 · 투광/수광 2창) ──
-    const SB=35;                                                         // 바닥면 = HEAD
-    // 후방 인출 케이블 (본체보다 먼저 → 하우징에 가려짐)
-    { const c0=PJ(MH(6,13,10)), c1=PJ(MH(11,25,6)), c2=PJ(MH(5,34,0));
-      s+=`<path d="M${pt(c0)} Q${pt(c1)} ${pt(c2)}" stroke="#12161B" stroke-width="3.8" fill="none" stroke-linecap="round"/>`;
-      s+=`<path d="M${pt(c0)} Q${pt(c1)} ${pt(c2)}" stroke="#39424D" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".45"/>`; }
-    s+=solid(MH,-14,14,-13,13,3,SB,MAT.sens);                            // 본체 — Z축 좌우 중앙
-    s+=solid(MH,-22,-14,-13,13,9,SB,MAT.sens);                           // 어깨 스커트
-    // 경사 어깨면 + 적색 액센트 스트라이프
-    { const A=PJ(MH(-14,-13,3)), Bp=PJ(MH(-20,-13,9)), C=PJ(MH(-20,13,9)), D=PJ(MH(-14,13,3));
-      s+=quad(A,Bp,C,D,'rgb(58,63,72)','rgb(28,32,38)',.7);
-      const f1=.34, f2=.52;
-      const r1=PJ(MH(-14-6*f1,-13,3+6*f1)), r2=PJ(MH(-14-6*f2,-13,3+6*f2));
-      const r3=PJ(MH(-14-6*f2, 13,3+6*f2)), r4=PJ(MH(-14-6*f1, 13,3+6*f1));
-      s+=quad(r1,r2,r3,r4,'#C0392F','#8E2820',.5); }
-    // 전면 상태 표시부 (LED 3 + 라벨 + 방열 슬릿)
-    { const fv=-13.3;
-      s+=quad(PJ(MH(0,fv,9)),PJ(MH(12,fv,9)),PJ(MH(12,fv,15)),PJ(MH(0,fv,15)),'rgb(28,32,38)','rgb(18,21,26)',.5);
-      [[2.5,'#FF7A2F',0],[6, lightOn?'#4ADE80':'#2F4436',1],[9.5,'#8FA4BE',0]].forEach(([uu,cc,gl])=>{
-        const q=PJ(MH(uu,fv-.4,12));
-        s+=`<circle cx="${q.x.toFixed(1)}" cy="${q.y.toFixed(1)}" r="1.5" fill="${cc}"${(gl&&lightOn)?' filter="url(#fGlow)"':''}/>`; });
-      const n1=PJ(MH(1,fv-.4,19)), n2=PJ(MH(11,fv-.4,19));
-      s+=`<line x1="${n1.x.toFixed(1)}" y1="${n1.y.toFixed(1)}" x2="${n2.x.toFixed(1)}" y2="${n2.y.toFixed(1)}" stroke="rgb(140,150,164)" stroke-width="2.2" opacity=".5"/>`;
-      for(let k=0;k<5;k++){ const a=PJ(MH(0,fv-.2,24+k*2.1)), b2=PJ(MH(12,fv-.2,24+k*2.1));
-        s+=`<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b2.x.toFixed(1)}" y2="${b2.y.toFixed(1)}" stroke="rgba(120,132,148,.35)" stroke-width="1"/>`; } }
-    // 하단 투광창 / 수광창
-    const WU=8;
-    [-1,1].forEach(sx=>{
-      s+=solid(MH,sx*WU-4.6,sx*WU+4.6,-6,6,SB-3.5,SB,MAT.sens2);
-      const w=[MH(sx*WU-3.3,-4.6,SB),MH(sx*WU+3.3,-4.6,SB),MH(sx*WU+3.3,4.6,SB),MH(sx*WU-3.3,4.6,SB)].map(PJ);
-      s+=quad(w[0],w[1],w[2],w[3],lightOn?'#5A2E18':'#14181D','#0A0D11',.7); });
     // ── 엣지 신호 측정 표시 (비전 센서 → PCB 윤곽) ──
     if(measT>=0 && pcbOn){
       const tgt=P(c.X,c.Y,c.Z);
@@ -876,6 +890,8 @@
                               Z:PCB_Z+B4.u.Z*u*S4+B4.v.Z*v2*S4+B4.n.Z*hh*S4});
       const FU=18, FV=10.5, HZ=4.3;
       const c4=[FP(-FU,-FV,HZ),FP(FU,-FV,HZ),FP(FU,FV,HZ),FP(-FU,FV,HZ)];
+      { const cf=PJ(MH(0,CAM_V,CAM_NF));   // IS3805 렌즈 끝 → 화각 모서리
+        c4.forEach(q=>{ s+=`<line x1="${cf.x.toFixed(1)}" y1="${cf.y.toFixed(1)}" x2="${q.x.toFixed(1)}" y2="${q.y.toFixed(1)}" stroke="#FF5A5F" stroke-width=".9" stroke-dasharray="4 3" opacity=".55"/>`; }); }
       // 셔터 플래시 — 노광 초반에 번쩍
       const fl = scanT<0.28 ? (1-scanT/0.28) : 0;
       if(fl>0) s+=`<polygon points="${c4.map(pt).join(' ')}" fill="#FFFFFF" opacity="${(fl*0.7).toFixed(2)}"/>`;
@@ -924,6 +940,7 @@
     $('chipLamp').classList.toggle('on',lightOn);
     $('senVal').textContent = s_in?'ON':'OFF';
     $('chipSen').classList.toggle('on',s_in);
+    $('hexLen').textContent=hexLegs.map(l=>(Math.hypot(l.p.X-l.b.X,l.p.Y-l.b.Y,l.p.Z-l.b.Z)*U2MM).toFixed(0)).join(' / ');
   }
 
   const stepList=$('stepList');
