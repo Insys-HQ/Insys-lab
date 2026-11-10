@@ -17,6 +17,9 @@
   }
   *{box-sizing:border-box;}
   body{margin:0;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.45;}
+  .conf{background:#FFF4E5;color:#5A3200;border-bottom:1px solid #E8C99A;font-size:12px;line-height:1.4;padding:4px 16px;}
+  .conf .inner{max-width:1200px;margin:0 auto;}
+  .conf b{color:#8A1C1C;}
   header.cover{background:linear-gradient(135deg,var(--navy),var(--navy-dark));color:#F4F7FB;padding:9px 16px;}
   header.cover .inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:8px;}
   header.cover h1{font-size:18px;font-weight:900;margin:0;flex:1 1 auto;text-align:center;}
@@ -124,13 +127,14 @@
 <body>
 
 <header class="cover"><div class="inner">
-  <span class="hver" id="hVer">v3.5</span>
+  <span class="hver" id="hVer">v3.6</span>
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (Z·Rx·Ry 3축 헤드)</h1>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
     <button id="btnEn" type="button">English</button>
   </div>
 </div></header>
+<div class="conf" role="note"><div class="inner"><b>[대외비]</b> 본 자료는 인시스 AI혁신 연구개발실의 미공개 발명·기술 정보(특허출원 예정)입니다. 무단 열람·복제·배포·제3자 전달 및 목적 외 사용을 금지합니다. © 2026 INSYS. All rights reserved.</div></div>
 
 <main class="container">
   <div class="grid2">
@@ -224,7 +228,7 @@
   </section>
 </main>
 
-<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.5</span></footer>
+<footer><span data-i18n="ft_dept">인시스 AI혁신 연구개발실</span> · ys.kim@in-sys.co.kr · <span id="fVer">v3.6</span></footer>
 
 <script>
   // ===== 3D 월드 (X:컨베이어, Y:깊이, Z:높이) · 90 unit ≙ 300mm =====
@@ -274,7 +278,7 @@
   }
 
   // ===== 다국어 (한국어 / English) =====
-  const VER='v3.5';
+  const VER='v3.6';
   const I18N={
     ko:{
       title:'PCB 비전 검사 시뮬레이터 (3축 헤드)',
