@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>헥사포드 PCB 정렬 제어 설계</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#1E3A5F;--navy-dark:#122540;--text:#2B3648;--light:#5B6472;--bg:#F3F5F9;--card:#fff;--head:#E7EFFA;--bd:#E1E6ED;--ok:#E7F7EC;--okb:#A9DDB8;--warn:#FBF1DF;--warnb:#E6C79A;--ng:#FCEBEA;--ngb:#F4C6C3;}
+  *{box-sizing:border-box;}
+  html{font-size:14px;}
+  @media (min-width:768px){html{font-size:16px;}}
+  body{margin:0;font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);font-size:1rem;line-height:1.5;}
+  header.cover{background:linear-gradient(135deg,var(--navy),var(--navy-dark));color:#F4F7FB;padding:8px 0;}
+  .nav-inner{max-width:1100px;margin:0 auto;padding:0 14px;display:flex;align-items:center;gap:8px;}
+  header.cover h1{font-size:1.15rem;font-weight:900;margin:0;flex:1 1 auto;}
+  .ver{font-size:.8rem;font-weight:700;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.32);border-radius:20px;padding:2px 9px;white-space:nowrap;}
+  .toggle{display:flex;border:1px solid rgba(255,255,255,.34);border-radius:8px;overflow:hidden;}
+  .toggle button{font-family:inherit;font-size:.8rem;font-weight:700;padding:4px 10px;border:0;background:transparent;color:#D6E2F0;cursor:pointer;}
+  .toggle button.on{background:#F4F7FB;color:var(--navy-dark);}
+  main{max-width:1100px;margin:0 auto;padding:8px 14px 12px;transition:max-width .2s;}
+  main.mobile{max-width:430px;}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:8px;}
+  .card h2{margin:0;background:var(--head);padding:6px 12px;font-size:1rem;font-weight:700;color:var(--navy-dark);border-bottom:1px solid var(--bd);}
+  .body{padding:8px 12px;}
+  .box{border:1px solid var(--bd);border-radius:8px;padding:6px 10px;margin:4px 0;background:#F8FAFD;}
+  .ok{background:var(--ok);border-color:var(--okb);} .warn{background:var(--warn);border-color:var(--warnb);} .ng{background:var(--ng);border-color:var(--ngb);}
+  .big{font-size:1.05rem;font-weight:700;color:var(--navy-dark);}
+  table{width:100%;border-collapse:collapse;font-size:.92rem;}
+  th{background:#DCE8F7;color:var(--navy-dark);text-align:left;padding:4px 6px;border:1px solid var(--bd);font-weight:700;}
+  td{padding:4px 6px;border:1px solid var(--bd);vertical-align:top;}
+  tr.rec td{background:var(--ok);}
+  .scroll{overflow-x:auto;}
+  ul{margin:4px 0;padding-left:1.2rem;} li{margin:2px 0;}
+  a{color:#1D4F91;font-weight:700;}
+  code{background:#EEF2F8;padding:0 4px;border-radius:4px;font-size:.9em;}
+  .flow{display:flex;flex-direction:column;align-items:stretch;}
+  .st{border:1px solid #BCD3EF;background:#EAF1FB;border-radius:8px;padding:5px 10px;display:flex;gap:8px;align-items:flex-start;}
+  .st .n{flex:0 0 1.6rem;height:1.6rem;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center;}
+  .st.dec{background:var(--warn);border-color:var(--warnb);} .st.dec .n{background:#C2740A;}
+  .st.end{background:var(--ok);border-color:var(--okb);} .st.end .n{background:#16A34A;}
+  .arr{text-align:center;color:#6B7683;font-size:.9rem;line-height:1.1;}
+  .br{font-size:.85rem;color:#8A2A24;background:var(--ng);border:1px solid var(--ngb);border-radius:6px;padding:1px 8px;margin:2px 0 2px 2rem;}
+  .sys{display:grid;grid-template-columns:1fr;gap:4px;}
+  @media (min-width:768px){main:not(.mobile) .sys{grid-template-columns:repeat(4,1fr);}main:not(.mobile) .two{display:grid;grid-template-columns:1fr 1fr;gap:8px;}}
+  .sys .box{text-align:center;margin:0;}
+  .sys .box b{display:block;color:var(--navy-dark);}
+  .copy{font-family:inherit;font-size:.85rem;font-weight:700;padding:3px 9px;border-radius:7px;border:1px solid var(--bd);background:#F5F7FA;color:var(--navy-dark);cursor:pointer;}
+  footer{text-align:center;padding:6px 14px 12px;font-size:.8rem;color:var(--light);}
+</style>
+</head>
+<body>
+<header class="cover"><div class="nav-inner">
+  <span class="ver" id="verTop">v1.0</span>
+  <h1>헥사포드 PCB 정렬 제어 설계</h1>
+  <div class="toggle"><button id="bMob" class="on" type="button">모바일</button><button id="bPc" type="button">PC</button></div>
+</div></header>
+
+<main id="wrap" class="mobile">
+
+<section class="card"><h2>① 결론</h2><div class="body">
+  <div class="box ok"><span class="big">필요 구동 범위(액추에이터 스트로크): 약 150~210mm급</span><br>
+  조건: PCB 위치 반경 150mm · PCB 기울기 15°(합성각) · 높이 ±10mm · 센서는 PCB 직각 상단 300mm 유지</div>
+  <ul>
+    <li><b>이유</b> : 기울기만 바뀌어도 센서가 PCB 위 417mm(300+센서 117) 지점에 있어 옆으로 약 108mm 밀립니다. 이 값이 반경 150mm에 더해집니다.</li>
+    <li><b>XY를 별도 축(컨베이어·스테이지)으로 맞추면</b> 헥사포드는 기울기·높이만 담당해 스트로크 <b>약 60~75mm</b>로 줄어듭니다. 구조도 작아집니다.</li>
+    <li>현재 시뮬레이터(v3.5)의 헥사포드 형상은 반경 150mm 이동에는 부족합니다(필요 스트로크 약 230~290mm, 비권장).</li>
+  </ul>
+</div></section>
+
+<section class="card"><h2>② 형상별 필요 스트로크 (역기구학 계산)</h2><div class="body">
+  <div class="scroll"><table>
+    <tr><th>기울기</th><th>베이스~플랫폼 높이</th><th>필요 스트로크</th><th>레그 길이 범위</th><th>최적 형상(조인트 반경)</th></tr>
+    <tr><td>10°</td><td>200mm</td><td>171mm</td><td>168~340mm</td><td>베이스 100 / 플랫폼 100</td></tr>
+    <tr><td>10°</td><td>300mm</td><td>141mm</td><td>268~409mm</td><td>100 / 100</td></tr>
+    <tr><td>10°</td><td>400mm</td><td>121mm</td><td>367~489mm</td><td>100 / 100</td></tr>
+    <tr><td>15°</td><td>200mm</td><td>210mm</td><td>156~366mm</td><td>100 / 100</td></tr>
+    <tr><td>15°</td><td>300mm</td><td>176mm</td><td>254~430mm</td><td>100 / 100</td></tr>
+    <tr class="rec"><td>15°</td><td>400mm</td><td><b>152mm</b></td><td>362~514mm</td><td>100 / 60 (권장)</td></tr>
+    <tr><td>15°</td><td>500mm</td><td>134mm</td><td>462~596mm</td><td>100 / 60</td></tr>
+    <tr><td>15° (XY 별도축, 잔여 ±10mm)</td><td>250mm</td><td><b>74mm</b></td><td>245~319mm</td><td>80 / 150</td></tr>
+    <tr><td>10° (XY 별도축)</td><td>250mm</td><td>57mm</td><td>245~302mm</td><td>80 / 150</td></tr>
+  </table></div>
+  <div class="hint" style="font-size:.85rem;color:var(--light);margin-top:4px;">※ 위 값은 PCB 위치 반경 150mm 격자(75mm 간격)·높이 ±10mm·기울기 격자 전수 계산의 최솟값입니다. 같은 액추에이터 6개를 쓰므로 스트로크 = 전체 레그 최대−최소입니다. 실제 선정은 여유 20~25%를 더하세요. 높이가 높을수록 스트로크는 줄지만 구조가 커지고 횡강성이 낮아집니다.</div>
+</div></section>
+
+<section class="card"><h2>③ 시스템 구성</h2><div class="body">
+  <div class="sys">
+    <div class="box"><b>ISL38-300</b>프로파일 → 기울기·위치</div>
+    <div class="box"><b>제어 PC (Python)</b>평면추정 · 역기구학 · 궤적 · 상태머신</div>
+    <div class="box"><b>대성 액추에이터 ×6</b>6축 동기 위치 지령</div>
+    <div class="box"><b>IS3805</b>정렬 완료 후 촬영 트리거</div>
+  </div>
+  <ul>
+    <li>제어 PC ↔ 액추에이터: EtherCAT/CAN/RS485 중 대성 사양 확정 후 결정 (<code>ActuatorDriver</code> 구현부)</li>
+    <li>제어 PC ↔ ISL38-300 · IS3805: Ethernet (<code>LaserSensor</code> 구현부)</li>
+    <li>PCB 스캔 방향 이동은 컨베이어 엔코더(또는 별도 스테이지)로 구현 — 헥사포드로 스캔하면 스트로크가 늘어납니다.</li>
+  </ul>
+</div></section>
+
+<section class="card"><h2>④ 제어 흐름도</h2><div class="body"><div class="flow">
+  <div class="st"><span class="n">1</span><span><b>원점 복귀</b> — 6레그 홈 위치(자세 수직·높이 H0)</span></div><div class="arr">▼</div>
+  <div class="st"><span class="n">2</span><span><b>PCB 안착 신호</b> — 컨베이어 정지(검사위치)</span></div><div class="arr">▼</div>
+  <div class="st"><span class="n">3</span><span><b>프로파일 취득</b> — ISL38-300 슬라이스를 엔코더 간격으로 다수 취득</span></div><div class="arr">▼</div>
+  <div class="st"><span class="n">4</span><span><b>평면 추정</b> — RANSAC + 최소제곱으로 PCB 상면 평면 → <b>법선(기울기)</b>, 외곽 중앙(<b>위치</b>)</span></div><div class="arr">▼</div>
+  <div class="st dec"><span class="n">5</span><span><b>범위 판정</b> — 기울기 ≤ 15°, 위치 반경 ≤ 150mm ?</span></div>
+  <div class="br">아니오 → 알람(범위 초과, PCB 재안착)</div><div class="arr">▼ 예</div>
+  <div class="st"><span class="n">6</span><span><b>목표 자세</b> — 위치 = PCB 중심 + 법선 × 417mm, 자세 = 법선 정렬(요 0)</span></div><div class="arr">▼</div>
+  <div class="st"><span class="n">7</span><span><b>역기구학</b> — 레그 길이 L = |t + R·b − a|, 증분 지령 ΔL = IK(목표) − IK(현재)</span></div><div class="arr">▼</div>
+  <div class="st dec"><span class="n">8</span><span><b>한계 판정</b> — 스트로크 이내? 특이점(조건수) 이내?</span></div>
+  <div class="br">아니오 → 알람(스트로크 초과 레그 번호 표시)</div><div class="arr">▼ 예</div>
+  <div class="st"><span class="n">9</span><span><b>궤적 생성</b> — 5차 최소저크 보간, 6축 동기(가감속 제한)</span></div><div class="arr">▼</div>
+  <div class="st"><span class="n">10</span><span><b>구동</b> — 액추에이터 6축 동시 위치 지령</span></div><div class="arr">▼</div>
+  <div class="st"><span class="n">11</span><span><b>재측정(검증)</b> — 센서 좌표계에서 각도·거리·횡오차 계산</span></div><div class="arr">▼</div>
+  <div class="st dec"><span class="n">12</span><span><b>허용오차 판정</b> — 각도 ≤ 0.1°, 거리 ±0.5mm, 횡 ≤ 1mm ?</span></div>
+  <div class="br">아니오 → 7로 복귀(최대 3회) → 초과 시 알람(수렴 실패)</div><div class="arr">▼ 예</div>
+  <div class="st end"><span class="n">13</span><span><b>IS3805 촬영 트리거</b> → 검사 → 다음 PCB를 위해 홈 복귀</span></div>
+</div></div></section>
+
+<section class="card"><h2>⑤ 제어 프로그램 (Python · numpy만 사용)</h2><div class="body">
+  <div class="box ok">
+    <a href="https://github.com/Insys-HQ/Insys-lab/blob/main/hexapod_ctrl.py" target="_blank" rel="noopener">hexapod_ctrl.py v1.0 열기 (GitHub)</a><br>
+    실행: <code>python hexapod_ctrl.py</code> (시뮬레이션) · <code>--worst</code> (모서리 조건 128건)
+  </div>
+  <div class="scroll"><table>
+    <tr><th>구성 요소</th><th>역할</th></tr>
+    <tr><td><code>Cfg</code></td><td>형상·액추에이터·허용오차 설정(대성 사양 확정 시 값만 교체)</td></tr>
+    <tr><td><code>Hexapod</code></td><td>역기구학 ik · 순기구학 fk(뉴턴) · 한계검사 · 특이점 조건수</td></tr>
+    <tr><td><code>LaserSensor</code> / <code>ActuatorDriver</code></td><td>실장비 연결부 인터페이스(ISL38-300, 대성 액추에이터 구현 예정)</td></tr>
+    <tr><td><code>fit_plane_ransac</code> / <code>measure_plane</code></td><td>프로파일 → PCB 평면(법선)·중심. 벨트면 등 이상치 제거</td></tr>
+    <tr><td><code>target_pose</code> / <code>plan_trajectory</code></td><td>목표 자세 계산 · 최소저크 궤적(6축 동기)</td></tr>
+    <tr><td><code>AlignController</code></td><td>상태머신: 측정→계획→한계검사→구동→검증→촬영/알람</td></tr>
+    <tr><td><code>SimWorld</code></td><td>센서·액추에이터·조립오차(±0.05mm) 시뮬레이터(자체 검증용)</td></tr>
+  </table></div>
+  <div class="box" style="margin-top:6px;"><b>시뮬레이션 검증 결과</b> (센서 노이즈 0.01mm, 조립오차 ±0.05mm 포함)
+    <ul>
+      <li>무작위 100건(위치 반경 150mm · 기울기 ≤15° · 높이 ±10mm): <b>성공 100/100</b>, 각도오차 최대 0.10°, 거리오차 최대 0.24mm, 횡오차 최대 0.70mm</li>
+      <li>모서리 128조건(반경 150 × 기울기 15° × 8방향 × 높이 ±10): <b>성공 128/128</b>, 각도오차 최대 0.10°, 거리오차 최대 0.41mm, 이동시간 최대 2.5초, 사용 레그 383~509mm</li>
+    </ul>
+    <span style="font-size:.85rem;color:var(--light);">※ 가정 형상: 베이스 반경 100 · 플랫폼 반경 60 · 높이 400mm, 액추에이터 최단 340mm · 스트로크 190mm. 실제 장비 오차는 캘리브레이션 후 별도 시험이 필요합니다.</span>
+  </div>
+</div></section>
+
+<section class="card"><h2>⑥ GitHub 공유 자료 조사</h2><div class="body">
+  <div class="box warn"><b>ISL38-300 + 헥사포드 PCB 정렬을 함께 다룬 공개 자료는 찾지 못했습니다.</b> 아래는 헥사포드 부분 참고용으로 직접 열어 확인한 자료입니다.</div>
+  <ul>
+    <li><a href="https://github.com/Yeok-c/Stewart_Py" target="_blank" rel="noopener">Yeok-c/Stewart_Py</a> — 스튜어트 플랫폼 Python 구현·역기구학 설명 (MIT)</li>
+    <li><a href="https://github.com/henryymliu/StewartPlatform" target="_blank" rel="noopener">henryymliu/StewartPlatform</a> — 리니어 액추에이터 6개 구동, Arduino Due 제어 + GUI</li>
+    <li><a href="https://docs.cognex.com/isvs_2520/web/EN/L38/Content/Topics/introduction/about.htm" target="_blank" rel="noopener">Cognex In-Sight L38 공식 문서</a> — 제품 소개(센서 연동은 Cognex 문서 기준)</li>
+  </ul>
+  <div class="box"><b>링크 미확인 — 직접 검색 권장</b> (검색 결과에만 나타났고 직접 열람은 못 함)<br>
+  검색어: <code>conroy-cheers hexapod_kinematics</code> · <code>NicHub stewart-platform-esp32</code> · <code>LinuxCNC genhexkins</code></div>
+</div></section>
+
+<section class="card"><h2>⑦ 확인이 필요한 사항</h2><div class="body">
+  <div class="scroll"><table>
+    <tr><th>항목</th><th>내용</th></tr>
+    <tr><td>ISL38-300 측정 범위</td><td>데이터시트의 clearance distance는 180mm입니다. 센서-PCB 300mm가 측정 범위 안인지 Cognex 사양서로 확인이 필요합니다.</td></tr>
+    <tr><td>스캔 방향 이동</td><td>프로파일 1회는 선(2D)이라 기울기 2축은 PCB 또는 센서가 이동하며 여러 슬라이스를 취득해야 합니다. 컨베이어 엔코더 연동을 권장합니다.</td></tr>
+    <tr><td>대성 액추에이터 사양</td><td>스트로크, 통신 프로토콜(동기 지령), 반복정밀도, 로드 회전방지·횡하중 확인 후 <code>Cfg</code>와 <code>ActuatorDriver</code>를 확정합니다.</td></tr>
+    <tr><td>캘리브레이션</td><td>조인트 좌표·레그 영점·센서 장착 오프셋(핸드-아이) 보정이 정밀도를 좌우합니다. 코드의 증분 보정이 잔여 오차를 줄이지만 시험 측정이 필요합니다.</td></tr>
+    <tr><td>PCB 회전(요)</td><td>현재 기울기·위치만 보정합니다. PCB 방향 회전은 보정하지 않습니다(필요 시 외곽 직선으로 추가).</td></tr>
+    <tr><td>3axis 시뮬레이터 연계</td><td>현재 3axis.html(v3.5)의 헥사포드 형상은 가정값입니다. 위 권장 형상으로 교체할 수 있습니다.</td></tr>
+  </table></div>
+</div></section>
+
+<section class="card"><h2>⑧ 페이지 링크</h2><div class="body">
+  <a id="selfLink" href="https://insys-hq.github.io/Insys-lab/%ED%97%A5%EC%82%AC%ED%8F%AC%EB%93%9C_%EC%A0%9C%EC%96%B4%EC%84%A4%EA%B3%84.html">https://insys-hq.github.io/Insys-lab/헥사포드_제어설계.html</a>
+  <button class="copy" id="btnCopy" type="button">링크 복사</button>
+</div></section>
+
+</main>
+<footer>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr · <span id="verFoot">v1.0</span></footer>
+
+<script>
+(function(){
+  var VER='v1.0';
+  document.getElementById('verTop').textContent=VER; document.getElementById('verFoot').textContent=VER;
+  var wrap=document.getElementById('wrap'), bM=document.getElementById('bMob'), bP=document.getElementById('bPc');
+  function setMode(m){ wrap.className=(m==='mobile')?'mobile':''; bM.className=(m==='mobile')?'on':''; bP.className=(m==='pc')?'on':''; }
+  bM.addEventListener('click',function(){setMode('mobile');});
+  bP.addEventListener('click',function(){setMode('pc');});
+  var url=document.getElementById('selfLink').href;
+  document.getElementById('btnCopy').addEventListener('click',function(){
+    var b=this;
+    function done(t){ b.textContent=t; setTimeout(function(){b.textContent='링크 복사';},1500); }
+    try{ navigator.clipboard.writeText(url).then(function(){done('복사됨');},function(){done('복사 실패');}); }
+    catch(e){ done('복사 실패'); }
+  });
+})();
+</script>
+</body>
+</html>
