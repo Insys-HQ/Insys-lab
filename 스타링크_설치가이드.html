@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>스타링크 구입·설치·공유기 연결 가이드 v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1f2937; --ink2:#374151; --blue:#1e3a5f; --blue2:#2c5282;
+  --line:#d5dde8; --bg:#f3f6fa; --card:#ffffff;
+  --pastel:#e6eef8; --pastel2:#eef3f9; --warn:#fdf3e1; --warnink:#6b4a0f;
+  --ok:#e5f2ea; --okink:#1d4d33;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--bg);line-height:1.5;font-size:1rem;-webkit-text-size-adjust:100%}
+@media (min-width:768px){ body:not(.view-mobile){font-size:16px} html{font-size:16px} }
+body.view-mobile{font-size:14px}
+
+/* 상단 내비: 배경 전체폭, 내부는 본문 컨테이너와 동일 */
+.nav{background:var(--blue);color:#fff;position:sticky;top:0;z-index:20}
+.nav-inner{max-width:1100px;margin:0 auto;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+body.view-mobile .nav-inner,body.view-mobile .wrap{max-width:430px}
+.brand{font-weight:700;font-size:1rem;color:#fff}
+.ver{display:inline-block;background:#dbe7f5;color:var(--blue);font-weight:700;font-size:.8rem;border-radius:10px;padding:1px 8px;margin-left:6px}
+.seg{display:inline-flex;background:#dbe7f5;border-radius:8px;padding:2px}
+.seg button{border:0;background:transparent;color:var(--blue);font:inherit;font-size:.85rem;font-weight:500;padding:3px 10px;border-radius:6px;cursor:pointer}
+.seg button.on{background:var(--blue);color:#fff}
+
+.wrap{max-width:1100px;margin:0 auto;padding:8px 12px}
+.cover{background:var(--blue);color:#fff;border-radius:10px;padding:12px 16px;margin-bottom:8px}
+.cover h1{font-size:1.45rem;font-weight:900;line-height:1.3;margin-bottom:4px;color:#fff}
+.cover p{color:#e3ecf7;font-size:.95rem}
+.meta{margin-top:6px;font-size:.8rem;color:#c9d9ee}
+
+.tabs{display:flex;gap:4px;overflow-x:auto;margin-bottom:8px;padding-bottom:2px}
+.tabs button{flex:0 0 auto;border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit;font-size:.9rem;font-weight:500;padding:6px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--pastel);border-color:var(--blue2);color:var(--blue);font-weight:700}
+
+.panel{display:none}
+.panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.card h2{font-size:1.15rem;color:var(--blue);margin-bottom:6px;font-weight:700}
+.card h3{font-size:1rem;color:var(--blue2);margin:0 0 4px;font-weight:700}
+.card p,.card li{color:var(--ink2);font-size:1rem}
+.card ul,.card ol{padding-left:1.2rem}
+.card li{margin-bottom:2px}
+
+.grid{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:8px}
+@media (min-width:768px){ body:not(.view-mobile) .grid.c2{grid-template-columns:1fr 1fr} body:not(.view-mobile) .grid.c4{grid-template-columns:repeat(4,1fr)} body:not(.view-mobile) .grid.c3{grid-template-columns:repeat(3,1fr)} }
+.stat{background:var(--pastel2);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.stat .k{font-size:.85rem;color:var(--ink2)}
+.stat .v{font-size:1.3rem;font-weight:900;color:var(--blue)}
+.stat .s{font-size:.8rem;color:var(--ink2)}
+
+.note{border-radius:8px;padding:6px 10px;margin:6px 0 0;font-size:.92rem}
+.note.warn{background:var(--warn);color:var(--warnink);border:1px solid #ecd9a8}
+.note.ok{background:var(--ok);color:var(--okink);border:1px solid #bfdcca}
+.note.info{background:var(--pastel);color:var(--blue);border:1px solid #c5d6ec}
+
+.step{display:flex;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.step:last-child{border-bottom:0}
+.step .n{flex:0 0 28px;height:28px;border-radius:50%;background:var(--pastel);color:var(--blue);font-weight:900;display:flex;align-items:center;justify-content:center;border:1px solid #b9cde6}
+.step .t{font-weight:700;color:var(--ink)}
+.step .d{color:var(--ink2);font-size:.97rem}
+
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top;color:var(--ink)}
+th{background:var(--pastel);color:var(--blue);font-weight:700}
+.tblwrap{overflow-x:auto}
+
+.flow{display:flex;flex-direction:column;gap:4px;align-items:stretch;margin:4px 0}
+@media (min-width:768px){ body:not(.view-mobile) .flow{flex-direction:row;align-items:center} }
+.box{background:var(--pastel);border:1px solid #b9cde6;color:var(--blue);border-radius:8px;padding:6px 10px;text-align:center;font-weight:500;font-size:.92rem;flex:1}
+.box.alt{background:#eaf3ec;border-color:#bfdcca;color:var(--okink)}
+.arrow{text-align:center;color:var(--blue2);font-weight:900}
+@media (min-width:768px){ body:not(.view-mobile) .arrow:before{content:"→"} }
+body.view-mobile .arrow:before,.arrow:before{content:"↓"}
+@media (min-width:768px){ body:not(.view-mobile) .arrow:before{content:"→"} }
+
+.chk label{display:flex;gap:8px;align-items:center;padding:3px 0;cursor:pointer;color:var(--ink)}
+.chk input{width:18px;height:18px;accent-color:var(--blue2)}
+.prog{height:8px;background:#e1e8f1;border-radius:6px;overflow:hidden;margin:4px 0}
+.prog i{display:block;height:100%;width:0;background:var(--blue2);transition:width .2s}
+
+.acc{border:1px solid var(--line);border-radius:8px;margin-bottom:4px;background:#fff}
+.acc button{width:100%;text-align:left;border:0;background:var(--pastel2);color:var(--blue);font:inherit;font-weight:700;padding:6px 10px;cursor:pointer;display:flex;justify-content:space-between;border-radius:8px}
+.acc .body{display:none;padding:6px 10px;color:var(--ink2);font-size:.97rem}
+.acc.open .body{display:block}
+
+a{color:var(--blue2);font-weight:500}
+.btn{border:1px solid var(--blue2);background:var(--pastel);color:var(--blue);font:inherit;font-size:.9rem;font-weight:700;padding:4px 12px;border-radius:8px;cursor:pointer}
+footer{max-width:1100px;margin:0 auto;padding:6px 12px 12px;color:var(--ink2);font-size:.85rem}
+body.view-mobile footer{max-width:430px}
+.urlrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.urlrow code{background:#e8eef6;color:var(--ink);padding:2px 6px;border-radius:6px;word-break:break-all;font-size:.82rem}
+</style>
+</head>
+<body class="view-mobile">
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand">스타링크 가이드<span class="ver" id="verChip">v1.0</span></div>
+    <div class="seg" role="group" aria-label="화면 선택">
+      <button type="button" id="btnMobile" class="on" onclick="setView('mobile')">모바일</button>
+      <button type="button" id="btnPc" onclick="setView('pc')">PC</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="cover">
+    <h1>스타링크 구입 · 설치 · 공유기 연결 가이드</h1>
+    <p>주문부터 개통, 다수 기기 동시 사용을 위한 공유기 구성까지 한 번에 정리</p>
+    <div class="meta">버전 <span id="verText">v1.0</span> · 작성일 2026-11-10 · 요금·조건은 변동될 수 있어 주문 전 공식 사이트 확인 필수</div>
+  </section>
+
+  <nav class="tabs" id="tabs">
+    <button type="button" class="on" data-tab="t1">개요</button>
+    <button type="button" data-tab="t2">① 구입</button>
+    <button type="button" data-tab="t3">② 설치</button>
+    <button type="button" data-tab="t4">③ 공유기 연결</button>
+    <button type="button" data-tab="t5">FAQ·참고</button>
+  </nav>
+
+  <!-- 개요 -->
+  <section class="panel on" id="t1">
+    <div class="grid c4">
+      <div class="stat"><div class="k">장비(스탠다드 키트)</div><div class="v">550,000원</div><div class="s">안테나·공유기·케이블·전원장치</div></div>
+      <div class="stat"><div class="k">가정용 월 요금</div><div class="v">87,000원</div><div class="s">데이터 무제한</div></div>
+      <div class="stat"><div class="k">체험 기간</div><div class="v">30일</div><div class="s">불만족 시 환불(보도 기준)</div></div>
+      <div class="stat"><div class="k">평균 속도(보도)</div><div class="v">135 / 40</div><div class="s">다운 / 업로드 Mbps</div></div>
+    </div>
+    <div class="card">
+      <h2>전체 흐름</h2>
+      <div class="flow">
+        <div class="box">① 주소로 가능 여부 확인</div><div class="arrow"></div>
+        <div class="box">② 키트 주문·결제</div><div class="arrow"></div>
+        <div class="box">③ 설치 위치 선정·설치</div><div class="arrow"></div>
+        <div class="box">④ 앱 개통</div><div class="arrow"></div>
+        <div class="box alt">⑤ 공유기 구성</div>
+      </div>
+      <div class="note info">스타링크는 인터넷 회선만 제공합니다. 여러 대 동시 사용은 공유기가 처리하며, 속도는 접속한 기기들이 나눠 씁니다.</div>
+    </div>
+    <div class="card">
+      <h2>시작 전 판단 기준</h2>
+      <ul>
+        <li>하늘이 넓게 트인 설치 장소가 있는가 (건물·나무·지붕이 가리면 끊김)</li>
+        <li>전원(콘센트)과 공유기까지 케이블(약 15m)이 닿는가</li>
+        <li>다수 기기·CCTV·원격접속이 필요한가 → ③ 공유기 연결 탭 확인</li>
+        <li>가정용인가, 기업용인가 → 기업용은 SK텔링크·KT SAT 경유</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 구입 -->
+  <section class="panel" id="t2">
+    <div class="card">
+      <h2>구입 절차</h2>
+      <div class="step"><div class="n">1</div><div><div class="t">설치 주소로 서비스 가능 여부 확인</div><div class="d">공식 사이트에서 설치할 주소를 입력합니다. 지역에 따라 대기자 명단으로 안내될 수 있습니다.</div></div></div>
+      <div class="step"><div class="n">2</div><div><div class="t">가정용 / 기업용 선택</div><div class="d">가정용(B2C)은 공식 사이트에서 직접 신청합니다. 기업용(B2B)은 공식 계약 업체인 SK텔링크, KT SAT을 통해 공급됩니다.</div></div></div>
+      <div class="step"><div class="n">3</div><div><div class="t">키트 주문 및 결제</div><div class="d">장비 550,000원(일시불) + 월 87,000원(가정용 기준). 신규 가입자 30일 체험 후 불만족 시 환불이 가능하다고 보도되었으나, 최신 조건은 주문 화면에서 확인하세요.</div></div></div>
+      <div class="step"><div class="n">4</div><div><div class="t">배송 수령 및 구성품 확인</div><div class="d">배송 기간은 재고·지역에 따라 달라집니다(수 주 소요 사례 있음). 수령 후 아래 체크리스트로 확인하세요.</div></div></div>
+      <div class="note warn">요금·환불 조건은 2026-01 보도까지 확인된 내용입니다. 주문 직전 공식 사이트 금액과 약관을 반드시 다시 확인하세요.</div>
+    </div>
+    <div class="card chk">
+      <h2>수령 시 구성품 체크리스트</h2>
+      <div class="prog"><i id="progBar"></i></div>
+      <div id="progTxt" style="font-size:.9rem;color:var(--ink2)">0 / 6 확인</div>
+      <label><input type="checkbox" class="ck"> 스타링크 안테나(접시) + 킥스탠드</label>
+      <label><input type="checkbox" class="ck"> 스타링크 케이블 (약 15m)</label>
+      <label><input type="checkbox" class="ck"> 공유기 (Wi-Fi 내장)</label>
+      <label><input type="checkbox" class="ck"> 전원 공급 장치</label>
+      <label><input type="checkbox" class="ck"> AC 전원 케이블</label>
+      <label><input type="checkbox" class="ck"> 공유기 뒷면 LAN 포트 유무 확인 (Gen 3 여부 판단용)</label>
+    </div>
+    <div class="card">
+      <h2>추가로 필요할 수 있는 장비</h2>
+      <div class="tblwrap"><table>
+        <tr><th>품목</th><th>필요한 경우</th></tr>
+        <tr><td>이더넷 어댑터</td><td>Gen 2 공유기에 개인 공유기를 연결할 때(Bypass)</td></tr>
+        <tr><td>마운트(지붕·벽·폴)</td><td>고정 설치. 킥스탠드는 임시·지면용</td></tr>
+        <tr><td>유무선 공유기 / 스위치 허브</td><td>유선 기기가 많거나 기존 사내망에 연결할 때</td></tr>
+        <tr><td>연장·보호 부자재</td><td>케이블이 모자라거나 외부 노출 구간 보호가 필요할 때</td></tr>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- 설치 -->
+  <section class="panel" id="t3">
+    <div class="card">
+      <h2>설치 순서</h2>
+      <div class="step"><div class="n">1</div><div><div class="t">하늘이 잘 보이는 장소 찾기</div><div class="d">나뭇가지·기둥·지붕 같은 장애물이 있으면 연결이 끊길 수 있습니다. 스타링크 앱의 <b>장애물 확인</b> 도구로 설치 후보 위치를 먼저 점검합니다.</div></div></div>
+      <div class="step"><div class="n">2</div><div><div class="t">스타링크 앱 설치</div><div class="d">스마트폰에 Starlink 앱을 설치하고 계정으로 로그인합니다. 이후 설치 절차는 앱 안내를 따릅니다.</div></div></div>
+      <div class="step"><div class="n">3</div><div><div class="t">안테나에 케이블 연결</div><div class="d">킥스탠드를 들어 올리고 케이블 한쪽 끝을 <b>케이블 잠금 기능이 위를 향하도록</b> 안테나에 꽂습니다. 플러그 면이 표면과 수평이 되도록 끝까지 삽입합니다.</div></div></div>
+      <div class="step"><div class="n">4</div><div><div class="t">공유기에 케이블 연결</div><div class="d">반대쪽 끝을 공유기 뒷면의 안테나 모양이 표시된 <b>1번 포트</b>에 연결합니다.</div></div></div>
+      <div class="step"><div class="n">5</div><div><div class="t">전원 연결</div><div class="d">AC 전원 케이블을 전원 공급 장치와 콘센트에 연결합니다. 안테나는 자동으로 위성을 향해 방향을 조정합니다.</div></div></div>
+      <div class="step"><div class="n">6</div><div><div class="t">앱에서 개통 완료</div><div class="d">앱의 단계별 안내에 따라 개통하고, 스타링크 Wi-Fi 이름·비밀번호를 설정합니다.</div></div></div>
+    </div>
+    <div class="card">
+      <h2>고정(영구) 설치 시 주의</h2>
+      <ul>
+        <li>안테나는 수직 기준 <b>5도 이내</b>로 설치합니다. 굴뚝 옆면처럼 수평으로 달면 작동하지 않으며 앱에 “Motors Stuck” 알림이 뜹니다.</li>
+        <li>강풍 대비 마운트 고정과 낙하 방지 조치를 합니다.</li>
+        <li>눈은 안테나가 직접 녹이지만, 주변에 쌓이면 시야를 가립니다. 눈이 쌓이지 않는 위치를 고르세요.</li>
+        <li>고소·지붕 작업이 불안하면 전문 설치 인력에게 맡기세요.</li>
+      </ul>
+      <div class="note warn">악천후(폭우·폭설·강풍)에서는 속도 저하나 드문 끊김이 있을 수 있습니다.</div>
+    </div>
+  </section>
+
+  <!-- 공유기 -->
+  <section class="panel" id="t4">
+    <div class="card">
+      <h2>구성 방식 3가지</h2>
+      <h3>A. 스타링크 공유기 그대로 사용 (가장 간단)</h3>
+      <div class="flow"><div class="box">안테나</div><div class="arrow"></div><div class="box">스타링크 공유기(Wi-Fi)</div><div class="arrow"></div><div class="box alt">스마트폰·노트북</div></div>
+      <h3>B. 개인 공유기 사용 – Bypass 모드 (권장: 기기 많거나 기존 망이 있을 때)</h3>
+      <div class="flow"><div class="box">안테나</div><div class="arrow"></div><div class="box">스타링크 공유기(Bypass, 전원·중계만)</div><div class="arrow"></div><div class="box">개인 유무선 공유기(WAN)</div><div class="arrow"></div><div class="box alt">유선·무선 기기</div></div>
+      <h3>C. 개인 공유기를 AP로 추가 (Bypass 끔)</h3>
+      <div class="flow"><div class="box">스타링크 공유기</div><div class="arrow"></div><div class="box">개인 공유기(AP/브리지 모드)</div><div class="arrow"></div><div class="box alt">추가 유선·무선 기기</div></div>
+    </div>
+    <div class="card">
+      <h2>방식 비교</h2>
+      <div class="tblwrap"><table>
+        <tr><th>방식</th><th>장점</th><th>단점</th><th>추천 상황</th></tr>
+        <tr><td>A</td><td>추가 장비·설정 없음</td><td>LAN 포트·고급 설정 제한</td><td>소규모, 무선 위주</td></tr>
+        <tr><td>B</td><td>공유기 기능 전부 활용, 포트 많음</td><td>스타링크 Wi-Fi 비활성화, 설정 필요</td><td>사무실·현장·CCTV·유선 다수</td></tr>
+        <tr><td>C</td><td>Wi-Fi 범위 확장 쉬움</td><td>이중 라우팅 구조에 주의</td><td>넓은 공간 보완</td></tr>
+      </table></div>
+      <div class="note ok">추천: 소규모는 A, 기기가 많거나 유선·CCTV가 있으면 B(Bypass)로 구성하세요.</div>
+    </div>
+    <div class="card">
+      <h2>B 방식 Bypass 설정 순서</h2>
+      <div class="note info">먼저 공유기 뒷면에 LAN 포트가 있는지 확인하세요. 있으면 Gen 3(어댑터 불필요), 없으면 Gen 2(이더넷 어댑터 필요)입니다.</div>
+      <div class="step"><div class="n">1</div><div><div class="t">개인 공유기 준비</div><div class="d">펌웨어를 최신으로 업데이트하고, 인터넷(WAN) 설정을 <b>DHCP(자동)</b>로 둡니다.</div></div></div>
+      <div class="step"><div class="n">2</div><div><div class="t">물리 연결 – Gen 3 공유기</div><div class="d">후면 고무 덮개를 열고 LAN 포트에서 개인 공유기 WAN 포트로 랜선을 연결합니다.</div></div></div>
+      <div class="step"><div class="n">2'</div><div><div class="t">물리 연결 – Gen 2 공유기</div><div class="d">공유기에서 안테나 케이블을 뽑고 이더넷 어댑터 케이블을 꽂습니다. 안테나 케이블은 어댑터에 연결한 뒤, 어댑터 포트에서 개인 공유기 WAN 포트로 랜선을 연결합니다.</div></div></div>
+      <div class="step"><div class="n">3</div><div><div class="t">앱에서 Bypass 켜기</div><div class="d">스타링크 Wi-Fi에 접속한 상태로 앱에서 <b>설정(Settings) &gt; 고급(Advanced) &gt; Bypass 모드</b>를 켭니다. 앱 버전에 따라 메뉴 이름·위치가 다를 수 있습니다.</div></div></div>
+      <div class="step"><div class="n">4</div><div><div class="t">개인 공유기 Wi-Fi·DHCP 설정</div><div class="d">이후 Wi-Fi 이름·비밀번호·방화벽은 개인 공유기 관리 화면에서 설정합니다. 앱은 안테나 상태 확인용으로 계속 사용됩니다.</div></div></div>
+      <div class="step"><div class="n">5</div><div><div class="t">해제 방법</div><div class="d">개인 공유기를 분리하고 스타링크 공유기를 <b>공장 초기화</b>하면 원래 방식으로 돌아갑니다.</div></div></div>
+    </div>
+    <div class="card">
+      <h2>다수 기기 동시 사용 팁</h2>
+      <ul>
+        <li><b>속도 공유</b>: 접속 기기들이 속도를 나눠 씁니다. 영상·대용량 업로드가 많으면 체감이 떨어집니다.</li>
+        <li><b>유선 우선</b>: PC·NAS·CCTV 등 고정 기기는 스위치 허브로 유선 연결하면 안정적입니다.</li>
+        <li><b>외부 접속 제한</b>: 스타링크는 기본적으로 공인 IP를 주지 않는 방식(CGNAT)이라 포트포워딩이 안 될 수 있습니다. CCTV 원격 접속이나 서버 운영이 필요하면 공식 안내에서 고정 IP 옵션을 확인하세요.</li>
+        <li><b>지연시간</b>: 위성 특성상 약간의 지연이 있어 실시간 제어·고사양 화상회의는 광랜보다 불안정할 수 있습니다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="panel" id="t5">
+    <div class="card">
+      <h2>자주 묻는 질문</h2>
+      <div class="acc"><button type="button">공유기를 달면 여러 대 동시에 쓸 수 있나요?<span>＋</span></button><div class="body">네. 동시 접속은 공유기가 처리하므로 일반 인터넷 회선과 같습니다. 다만 스타링크 회선 속도를 접속 기기들이 나눠 씁니다.</div></div>
+      <div class="acc"><button type="button">꼭 개인 공유기를 사야 하나요?<span>＋</span></button><div class="body">아닙니다. 키트에 Wi-Fi 공유기가 포함되어 있어 그대로 써도 됩니다. 유선 포트가 더 필요하거나 기존 사내망이 있을 때 개인 공유기를 추가합니다.</div></div>
+      <div class="acc"><button type="button">실내(창문 안쪽)에 설치해도 되나요?<span>＋</span></button><div class="body">권장하지 않습니다. 안테나는 하늘이 직접 보여야 안정적으로 동작합니다. 앱의 장애물 확인 도구로 위치를 점검하세요.</div></div>
+      <div class="acc"><button type="button">비나 눈이 오면 어떻게 되나요?<span>＋</span></button><div class="body">악천후에서는 속도가 느려지거나 드물게 끊길 수 있습니다. 안테나에 직접 내린 눈은 녹이지만, 주변에 쌓이면 시야를 가리므로 쌓이지 않는 위치가 좋습니다.</div></div>
+      <div class="acc"><button type="button">기업·현장용으로 신청하려면?<span>＋</span></button><div class="body">기업용(B2B) 요금제는 공식 계약 업체인 SK텔링크, KT SAT을 통해 공급됩니다. 가정용 요금제와 조건이 다를 수 있어 업체에 직접 문의하세요.</div></div>
+    </div>
+    <div class="card">
+      <h2>참고 링크</h2>
+      <ul>
+        <li><a href="https://www.starlink.com" target="_blank" rel="noopener">스타링크 공식 사이트 (주문·가능 여부 확인)</a></li>
+        <li><a href="https://support.starlink.com" target="_blank" rel="noopener">스타링크 고객지원</a></li>
+        <li><a href="https://starlink.com/public-files/installation_guide_standard_kit_ko-KR.pdf" target="_blank" rel="noopener">Standard 키트 설치 가이드(PDF, 한국어)</a></li>
+        <li><a href="https://www.heraldk.com/article/2025120318330650960" target="_blank" rel="noopener">국내 요금·장비 가격 보도 (헤럴드경제)</a></li>
+      </ul>
+      <div class="note info">본 가이드의 가격·속도는 국내 개통(2025-12) 시점 보도와 2026-01 보도 기준이며, Bypass 메뉴명은 앱 버전에 따라 다를 수 있습니다.</div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="urlrow">
+    <span>페이지 주소</span>
+    <code id="pageUrl">https://insys-hq.github.io/Insys-lab/%EC%8A%A4%ED%83%80%EB%A7%81%ED%81%AC_%EC%84%A4%EC%B9%98%EA%B0%80%EC%9D%B4%EB%93%9C.html</code>
+    <button type="button" class="btn" id="copyBtn">링크 복사</button>
+    <span id="copyMsg"></span>
+  </div>
+  <div style="margin-top:4px">스타링크 구입·설치·공유기 연결 가이드 <span id="verFoot">v1.0</span></div>
+</footer>
+
+<script>
+(function(){
+  var VERSION = 'v1.0';
+  document.getElementById('verChip').textContent = VERSION;
+  document.getElementById('verText').textContent = VERSION;
+  document.getElementById('verFoot').textContent = VERSION;
+
+  window.setView = function(mode){
+    var b = document.body;
+    if(mode === 'pc'){ b.classList.remove('view-mobile'); } else { b.classList.add('view-mobile'); }
+    document.getElementById('btnMobile').classList.toggle('on', mode !== 'pc');
+    document.getElementById('btnPc').classList.toggle('on', mode === 'pc');
+  };
+
+  var tabBtns = document.querySelectorAll('#tabs button');
+  Array.prototype.forEach.call(tabBtns, function(btn){
+    btn.addEventListener('click', function(){
+      Array.prototype.forEach.call(tabBtns, function(x){ x.classList.remove('on'); });
+      btn.classList.add('on');
+      Array.prototype.forEach.call(document.querySelectorAll('.panel'), function(p){ p.classList.remove('on'); });
+      document.getElementById(btn.getAttribute('data-tab')).classList.add('on');
+      window.scrollTo(0, 0);
+    });
+  });
+
+  var cks = document.querySelectorAll('.ck');
+  function upd(){
+    var n = 0;
+    Array.prototype.forEach.call(cks, function(c){ if(c.checked) n++; });
+    document.getElementById('progBar').style.width = (n / cks.length * 100) + '%';
+    document.getElementById('progTxt').textContent = n + ' / ' + cks.length + ' 확인';
+  }
+  Array.prototype.forEach.call(cks, function(c){ c.addEventListener('change', upd); });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.acc > button'), function(btn){
+    btn.addEventListener('click', function(){
+      var acc = btn.parentNode;
+      var open = acc.classList.toggle('open');
+      btn.lastChild.textContent = open ? '－' : '＋';
+    });
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', function(){
+    var url = document.getElementById('pageUrl').textContent;
+    var msg = document.getElementById('copyMsg');
+    function ok(){ msg.textContent = '복사됨'; setTimeout(function(){ msg.textContent=''; }, 1500); }
+    function fallback(){
+      var t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select();
+      try { document.execCommand('copy'); ok(); } catch(e){ msg.textContent = '복사 실패'; }
+      document.body.removeChild(t);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(ok, fallback);
+    } else { fallback(); }
+  });
+})();
+</script>
+</body>
+</html>
