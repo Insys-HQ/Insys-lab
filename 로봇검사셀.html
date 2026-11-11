@@ -121,7 +121,7 @@
 <header class="cover"><div class="nav-inner">
   <div class="hd-top">
     <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-    <span class="hd-ver" id="hVer">v2.2</span>
+    <span class="hd-ver" id="hVer">v2.3</span>
   </div>
   <h1>협동로봇 PCB 검사셀 시뮬레이터</h1>
   <div class="hd-sub">협동로봇 + Cognex IS3805CP · 컨베이어 없음 · 작업대 안착 검사</div>
@@ -239,7 +239,7 @@
 <script>
 (function(){
 "use strict";
-var VER='v2.2';
+var VER='v2.3';
 var $=function(id){return document.getElementById(id);};
 $('hVer').textContent=VER; $('fVer').textContent=VER;
 
@@ -265,6 +265,9 @@ var PCBP={x:36,y:178,rz:260,ta:2.2,tb:-1.6};            // 타원형 PCB 100 × 
 var CASE={x:44,y:135,rz:93};                           // 케이스 (지그 안착 자세 · 좌측 45° 경사)
 var JIG ={x:44,y:135,rz:93};                           // 안착지그 — 고정 (이송하지 않음)                            // 샤크 안테나 케이스 240 × 80 mm · 1개 (QR 부착)
 var QRSN='A5030-261109-0137';                           // 케이스 QR 시리얼
+var MODEL='B175';                                       // MES 기종코드
+var PROCNO=40, PROCNM='외관검사';                        // MES 검사공정 순서
+var mesReg=false, mesSt='wait';                         // 기종·공정 등록 / 전송 상태
 var JHU=28, JHV=13;                                     // 아세탈 안착부 280 × 130 mm
 var JIG_LO=2.6;                                         // 좌측(낮은 쪽) 상면 13 mm
 var JIG_K=Math.tan(30*Math.PI/180);                     // 우측이 높은 30° 경사
@@ -447,12 +450,11 @@ var STATES=[
   {ph:'대기',    t:'wait',   sig:'START', lb:'START 대기'},
   {ph:'투입',    t:'feed',   lb:'좌측 작업자 투입 → 검사 위치 이동·정지'},
   {ph:'이동',    t:'approach',lb:'로봇 이동 → 라인스캔 시작단 진입'},
-  {ph:'1차 스캔',t:'scan3d', lb:'L38-300 레이저 라인스캔 주행 → 위치·각도 산출'},
+  {ph:'1차 스캔',t:'scan3d', lb:'전체 스캔 주행 → 위치·각도 산출 + 케이스 QR 판독 · MES 기종/공정 등록'},
   {ph:'자세 보정',t:'align',  lb:'산출값 수신 → IS3805 를 해당 위치·각도로 이동'},
   {ph:'2차 촬영',t:'light',  on:true,  lb:'Multi-Torch 조명 ON'},
   {ph:'2차 촬영',t:'shot',   lb:'IS3805 2D 원형 촬영 → 외관 이미지 취득'},
-  {ph:'2차 촬영',t:'qr',     lb:'로봇 이동 → 케이스 QR 판독 (경사 30° 직각 보정)'},
-  {ph:'판정',    t:'verdict', lb:'촬영 이미지 기반 양·불 판정 + MES 전송'},
+  {ph:'판정',    t:'verdict', lb:'촬영 이미지로 OK/NG 판정 → MES 결과 전송'},
   {ph:'판정',    t:'alarm',   cond:'ng', sig:'RESUME', lb:'NG 알람 · 제거 대기'},
   {ph:'복귀',    t:'light',   on:false, lb:'조명 OFF'},
   {ph:'배출',    t:'out',     lb:'검사 완료품 → 우측 다음 작업자에게 이동'},
@@ -777,46 +779,66 @@ function drawMonitor(){
     g+='<rect x="0" y="0" width="'+W+'" height="4.4" fill="#17304F"/>';
     g+='<circle cx="3" cy="2.2" r="1.25" fill="'+stat+'"/>';
     g+='<rect x="6" y="1.3" width="16" height="1.8" rx=".8" fill="#4E6C93"/>';
+    g+='<text x="'+(W-1.6)+'" y="3.0" text-anchor="end" font-family="\'Noto Sans KR\',sans-serif" font-size="2.3" font-weight="700" fill="#A9C2DD">총 '+done+' &#183; <tspan fill="#5FD67F">OK '+okN+'</tspan> &#183; <tspan fill="#FF8A80">NG '+ngN+'</tspan></text>';
 
     // ── 좌측 : 취득 PCB 영상 ──
-    g+='<rect x="1.6" y="6" width="28" height="23" fill="#0A1118" stroke="#26394C" stroke-width=".5"/>';
-    g+='<circle cx="15.6" cy="17.5" r="11" fill="#0F1A24" stroke="#1B2B3A" stroke-width=".4"/>';
-    g+='<ellipse cx="15.6" cy="17.5" rx="10.0" ry="4.6" fill="'+(shotT>=0?'#3E9E48':'#2E7D36')+'"/>';
+    g+='<rect x="1.6" y="6" width="28" height="21.4" fill="#0A1118" stroke="#26394C" stroke-width=".5"/>';
+    g+='<circle cx="15.6" cy="16.7" r="10.2" fill="#0F1A24" stroke="#1B2B3A" stroke-width=".4"/>';
+    g+='<ellipse cx="15.6" cy="16.7" rx="9.4" ry="4.3" fill="'+(shotT>=0?'#3E9E48':'#2E7D36')+'"/>';
     for(var r=0;r<3;r++) for(var c=0;c<5;c++){
-      var px=9.2+c*2.6, py=14.6+r*2.1;
-      var dx=(px-15.6)/10.0, dy=(py-17.5)/4.6;
+      var px=9.4+c*2.5, py=13.9+r*2.0;
+      var dx=(px-15.6)/9.4, dy=(py-16.7)/4.3;
       if(dx*dx+dy*dy>0.62) continue;
       g+='<rect x="'+px.toFixed(1)+'" y="'+py.toFixed(1)+'" width="1.45" height="1.0" rx=".2" fill="#C6AA5C"/>';
     }
     var op=(scanT>=0||shotT>=0)?'.95':'.3';
-    g+='<line x1="15.6" y1="6.5" x2="15.6" y2="28.5" stroke="#E8873A" stroke-width=".35" opacity="'+op+'"/>';
-    g+='<line x1="4.6" y1="17.5" x2="26.6" y2="17.5" stroke="#E8873A" stroke-width=".35" opacity="'+op+'"/>';
+    g+='<line x1="15.6" y1="6.4" x2="15.6" y2="27.0" stroke="#E8873A" stroke-width=".35" opacity="'+op+'"/>';
+    g+='<line x1="5.4" y1="16.7" x2="25.8" y2="16.7" stroke="#E8873A" stroke-width=".35" opacity="'+op+'"/>';
     if(shotT>=0 && shotT<0.3)
-      g+='<circle cx="15.6" cy="17.5" r="11" fill="#FFFFFF" opacity="'+((1-shotT/0.3)*0.55).toFixed(2)+'"/>';
-    g+='<circle cx="15.6" cy="17.5" r="11" fill="none" stroke="'+(shotT>=0?'#E8873A':'#2B4155')+'" stroke-width="'+(shotT>=0?.9:.5)+'"/>';
-    g+='<circle cx="15.6" cy="17.5" r="9.1" fill="none" stroke="'+(shotT>=0?'#E8873A':'#2B4155')+'" stroke-width=".3" opacity=".6"/>';
-    g+='<rect x="1.6" y="6" width="28" height="23" fill="none" stroke="#26394C" stroke-width=".5"/>';
+      g+='<circle cx="15.6" cy="16.7" r="10.2" fill="#FFFFFF" opacity="'+((1-shotT/0.3)*0.55).toFixed(2)+'"/>';
+    g+='<circle cx="15.6" cy="16.7" r="10.2" fill="none" stroke="'+(shotT>=0?'#E8873A':'#2B4155')+'" stroke-width="'+(shotT>=0?.9:.5)+'"/>';
+    g+='<circle cx="15.6" cy="16.7" r="8.4" fill="none" stroke="'+(shotT>=0?'#E8873A':'#2B4155')+'" stroke-width=".3" opacity=".6"/>';
+    g+='<rect x="1.6" y="6" width="28" height="21.4" fill="none" stroke="#26394C" stroke-width=".5"/>';
 
     // ── 좌측 하단 : 케이스 QR 동시 판독 결과 ──
-    var qrOn=(qrT>=0)||!!verdict;
-    g+='<rect x="1.6" y="30.2" width="28" height="6.2" rx=".6" fill="#0F1A24" stroke="'+(qrOn?'#3FBF63':'#26394C')+'" stroke-width=".5"/>';
+    var qrOn=(qrT>=0)||mesReg;
+    g+='<rect x="1.6" y="28.4" width="28" height="8.0" rx=".6" fill="#0F1A24" stroke="'+(qrOn?'#3FBF63':'#26394C')+'" stroke-width=".5"/>';
     (function(){
-      var QX=2.3, QY=30.8, M=0.46;
+      var QX=2.4, QY=29.3, M=0.57;
       g+='<rect x="'+QX+'" y="'+QY+'" width="'+(M*11+0.5)+'" height="'+(M*11+0.5)+'" rx=".2" fill="#F4F6F8"/>';
       g+=qrRects(QX+0.25,QY+0.25,M,qrOn?'#101418':'#8792A0');
     })();
-    g+='<text x="8.6" y="32.9" font-family="\'Noto Sans KR\',sans-serif" font-size="1.9" font-weight="700" fill="'+(qrOn?'#3FBF63':'#6B7683')+'">QR '+(qrOn?'DECODE OK':'WAIT')+'</text>';
-    g+='<text x="8.6" y="35.6" font-family="\'Noto Sans KR\',sans-serif" font-size="2.0" font-weight="900" fill="'+(qrOn?'#DCE6F2':'#44505E')+'">'+(qrOn?QRSN:'----------------')+'</text>';
+    g+='<text x="10.8" y="31.8" font-family="\'Noto Sans KR\',sans-serif" font-size="2.1" font-weight="700" fill="'+(qrOn?'#3FBF63':'#6B7683')+'">QR '+(qrOn?'DECODE OK':'WAIT')+'</text>';
+    g+='<text x="10.4" y="35.2" font-family="\'Noto Sans KR\',sans-serif" font-size="1.9" font-weight="900" fill="'+(qrOn?'#DCE6F2':'#44505E')+'">'+(qrOn?QRSN:'----------------')+'</text>';
 
-    // ── 중앙 : 판정 (크게) ──
-    g+='<rect x="31.5" y="6" width="17" height="17" rx="1.6" fill="'+vCol+'"/>';
-    g+='<text x="40" y="19.2" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="11.5" font-weight="900" fill="#FFFFFF">'+(verdict||'--')+'</text>';
-    // 카운터
-    [[done,'#93A4B8',31.5],[okN,'#3FBF63',37.3],[ngN,'#EF5A52',43.1]].forEach(function(b){
-      g+='<rect x="'+b[2]+'" y="25" width="5.4" height="9" rx=".8" fill="#132030" stroke="#26394C" stroke-width=".4"/>';
-      g+='<rect x="'+b[2]+'" y="25" width="5.4" height="1.4" rx=".6" fill="'+b[1]+'"/>';
-      g+='<text x="'+(b[2]+2.7)+'" y="31.8" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="4.2" font-weight="900" fill="'+b[1]+'">'+b[0]+'</text>';
-    });
+    // ── 중앙 상단 : 판정 (크게) ──
+    g+='<rect x="30.4" y="6" width="19" height="12.4" rx="1.4" fill="'+vCol+'"/>';
+    g+='<text x="39.9" y="16.1" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="8.8" font-weight="900" fill="#FFFFFF">'+(verdict||'--')+'</text>';
+
+    // ── 중앙 하단 : MES 연동 패널 ──
+    (function(){
+      var PX=30.4, PY=19.4, PW=19, PH=17.0;
+      var regC=mesReg?'#2FA8E8':'#26394C';
+      g+='<rect x="'+PX+'" y="'+PY+'" width="'+PW+'" height="'+PH+'" rx="1.2" fill="#0F1A24" stroke="'+regC+'" stroke-width=".5"/>';
+      g+='<rect x="'+PX+'" y="'+PY+'" width="'+PW+'" height="3.2" rx="1.2" fill="'+(mesReg?'#17557F':'#1B2B3A')+'"/>';
+      g+='<rect x="'+PX+'" y="'+(PY+2.0)+'" width="'+PW+'" height="1.2" fill="'+(mesReg?'#17557F':'#1B2B3A')+'"/>';
+      g+='<text x="'+(PX+1.5)+'" y="'+(PY+2.5)+'" font-family="\'Noto Sans KR\',sans-serif" font-size="2.2" font-weight="900" fill="#CFE4F5">MES 연동</text>';
+      var sv=(mesSt==='done')?('결과 '+verdict):((mesSt==='send')?'전송 중...':(mesReg?'등록 완료':'대기'));
+      var sc=(mesSt==='done')?(vOK?'#5FD67F':'#FF8A80'):((mesSt==='send')?'#FFC24D':(mesReg?'#8FD0F5':'#44505E'));
+      var rows=[['기종',mesReg?MODEL:'----',mesReg?'#FFFFFF':'#44505E',2.4],
+                ['공정',mesReg?(PROCNM+' #'+PROCNO):'----',mesReg?'#DCE6F2':'#44505E',2.0],
+                ['전송',sv,sc,2.1]];
+      for(var i=0;i<3;i++){
+        var ry=PY+6.2+i*3.6;
+        g+='<text x="'+(PX+1.4)+'" y="'+ry+'" font-family="\'Noto Sans KR\',sans-serif" font-size="1.9" font-weight="500" fill="#7D90A6">'+rows[i][0]+'</text>';
+        g+='<text x="'+(PX+PW-1.4)+'" y="'+ry+'" text-anchor="end" font-family="\'Noto Sans KR\',sans-serif" font-size="'+rows[i][3]+'" font-weight="900" fill="'+rows[i][2]+'">'+rows[i][1]+'</text>';
+        if(i<2) g+='<line x1="'+(PX+1.2)+'" y1="'+(ry+1.2)+'" x2="'+(PX+PW-1.2)+'" y2="'+(ry+1.2)+'" stroke="#1D2E3F" stroke-width=".25"/>';
+      }
+      if(mesSt==='done'){
+        g+='<rect x="'+(PX+1.2)+'" y="'+(PY+PH-3.2)+'" width="'+(PW-2.4)+'" height="2.3" rx=".6" fill="'+(vOK?'#14532D':'#5A1A1A')+'"/>';
+        g+='<text x="'+(PX+PW/2)+'" y="'+(PY+PH-1.5)+'" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="1.85" font-weight="700" fill="'+(vOK?'#5FD67F':'#FF8A80')+'">&#10003; MES 전송 완료</text>';
+      }
+    })();
 
     // ── 우측 : 경광등 팝업창 ──
     var PX=50.5, PY=5.2, PW=14.2, PH=30;
@@ -1008,7 +1030,7 @@ function updHUD(){
   $('bScan').textContent = scanT>=0?'ON':'OFF';  $('cScan').classList.toggle('on',scanT>=0);
   $('bAlign').textContent = aligned?'⊥ 직각':'-'; $('cAlign').classList.toggle('on',aligned);
   $('bShot').textContent = shotT>=0?'노광':'OFF'; $('cShot').classList.toggle('on',shotT>=0);
-  var qrOn=(qrT>=0)||!!verdict;
+  var qrOn=(qrT>=0)||mesReg;
   $('bQr').textContent = qrOn?QRSN:'-'; $('cQr').classList.toggle('on',qrOn);
   $('bSen').textContent = String(done);
   $('cSen').classList.toggle('alarm',alarm);
@@ -1085,7 +1107,7 @@ function runState(){
     return;
   }
   if(st.t==='approach'){
-    aligned=false; measured=false; verdict=''; setMes('wait'); refZ=TBL_Z+PCB_T;
+    aligned=false; measured=false; verdict=''; mesReg=false; setMes('wait'); refZ=TBL_Z+PCB_T;
     var SP=pcbFrame(t)(-SCANU,0,0);
     moveTo(SP.X,SP.Y,TBL_Z+PCB_T+WDS+10,0,0,D.move,next);
     return;
@@ -1103,14 +1125,24 @@ function runState(){
   if(st.t==='scan3d'){
     /* ① 1차 — L38-300 저출력 레이저 라인스캔 주행으로 위치·각도 산출 */
     var FR=pcbFrame(t), SZ=TBL_Z+PCB_T+WDS;
+    var QW=caseFrame()(-15,0,2.6), rzT=t.rz*Math.PI/180;
+    var QRU=(QW.X-t.x)*Math.cos(rzT)+(QW.Y-t.y)*Math.sin(rzT);   // 케이스 QR 의 주행축 위치
+    var qrRead=false;
     scanA=-SCANU; scanB=SCANU; scanT=0;
     addLog('[1차] L38-300 레이저 라인스캔 주행 — '+Math.round(2*SCANU*U)+' mm · 표준거리 '+(WDS*U)+' mm (저출력 · 육안 인지 수준 이하)');
     anim(D.move*2.4,function(p){
       scanT=p;
-      var q=FR(-SCANU+2*SCANU*p,0,0);
+      var u=-SCANU+2*SCANU*p;
+      var q=FR(u,0,0);
       armT.x=q.X; armT.y=q.Y; armT.z=SZ; armT.ta=0; armT.tb=0;
+      qrT = (Math.abs(u-QRU)<5) ? 0.5 : -1;                      // QR 통과 구간에 판독 마커
+      if(!qrRead && u>=QRU){
+        qrRead=true; mesReg=true; setMes('reg');
+        addLog('[QR] 케이스 코드 판독 — '+QRSN);
+        addLog('[MES] 기종 '+MODEL+' · 검사공정 #'+PROCNO+' '+PROCNM+' 등록');
+      }
     },function(){
-      scanT=-1; measured=true;
+      scanT=-1; qrT=-1; measured=true;
       addLog('[1차] 스캔 완료 — 위치·각도 산출 (θ'+t.ta.toFixed(1)+'° φ'+t.tb.toFixed(1)+'°)');
       next();
     });
@@ -1125,23 +1157,12 @@ function runState(){
     });
     return;
   }
-  if(st.t==='qr'){
-    /* 로봇이 케이스 QR 상부로 이동 — 30° 경사면에 직각 보정 */
-    var QW=caseFrame()(-15,0,2.6); refZ=QW.Z;
-    moveTo(QW.X,QW.Y,QW.Z+WD,1.5,-29.9,D.move,function(){
-      qrT=0;
-      anim(D.act*1.3,function(p){ qrT=p; },function(){
-        qrT=-1; addLog('[QR] 케이스 코드 판독 완료 — '+QRSN); next();
-      });
-    });
-    return;
-  }
   if(st.t==='verdict'){
     var sel=$('vSel').value;
     verdict = sel==='auto' ? (Math.random()<0.78?'OK':'NG') : sel;
     addLog('[판정] '+verdict);
     setMes('send'); draw();
-    pause(D.act+260,function(){ setMes('done'); addLog('[MES] '+verdict+' 전송 완료'); next(); });
+    pause(D.act+260,function(){ setMes('done'); addLog('[MES] 기종 '+MODEL+' · '+PROCNM+' #'+PROCNO+' · 결과 '+verdict+' 전송 완료'); next(); });
     return;
   }
   if(st.t==='alarm'){
@@ -1175,9 +1196,14 @@ function next(){
 }
 
 function setMes(m){
+  mesSt=m;
   var e=$('mes');
   e.className='mes'+(m==='send'?' send':(m==='done'?' done':''));
-  e.innerHTML='<span class="dot"></span>'+(m==='wait'?'MES 전송: 대기':(m==='send'?'MES 전송 중... ('+verdict+')':'MES 전송 완료 ('+verdict+')'));
+  var txt = (m==='wait') ? 'MES: 대기'
+          : (m==='reg')  ? ('MES: 기종 '+MODEL+' · '+PROCNM+' #'+PROCNO+' 등록')
+          : (m==='send') ? ('MES: '+verdict+' 전송 중...')
+          :                ('MES: '+MODEL+' · '+PROCNM+' #'+PROCNO+' · 결과 '+verdict+' 전송 완료');
+  e.innerHTML='<span class="dot"></span>'+txt;
 }
 function updSig(){
   $('sigStart').disabled = !(running && waitSig==='START');
@@ -1205,7 +1231,7 @@ $('bStop').addEventListener('click',function(){
 $('bReset').addEventListener('click',function(){
   running=false; waitSig=null; token++; clearTimeout(timer);
   idx=0; tIdx=0; done=0; okN=0; ngN=0; verdict=''; alarm=false;
-  lightOn=false; scanT=-1; shotT=-1; qrT=-1; aligned=false; measured=false; partX=0; refZ=TBL_Z+PCB_T; scanA=-SCANU; scanB=SCANU;
+  lightOn=false; scanT=-1; shotT=-1; qrT=-1; aligned=false; measured=false; mesReg=false; partX=0; refZ=TBL_Z+PCB_T; scanA=-SCANU; scanB=SCANU;
   var h=homePos(); armT={x:h.x,y:h.y,z:h.z,ta:0,tb:0};
   setMes('wait'); $('bRun').disabled=false; updSig();
   addLog('↺ 초기화'); draw(); renderSteps();
