@@ -20,6 +20,7 @@
   .conf{background:#FFF4E5;color:#5A3200;border-bottom:1px solid #E8C99A;font-size:12px;line-height:1.4;padding:4px 16px;}
   .conf .inner{max-width:1200px;margin:0 auto;}
   .conf b{color:#8A1C1C;}
+  .conf .conf-ask{display:block;margin-top:2px;color:#7A2B10;font-weight:500;}
   header.cover{background:linear-gradient(135deg,var(--navy),var(--navy-dark));color:#F4F7FB;padding:9px 16px;}
   header.cover .inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:8px;}
   header.cover h1{font-size:18px;font-weight:900;margin:0;flex:1 1 auto;text-align:center;}
@@ -127,14 +128,18 @@
 <body>
 
 <header class="cover"><div class="inner">
-  <span class="hver" id="hVer">v3.6</span>
+  <span class="hver" id="hVer">v3.7</span>
   <h1 data-i18n="h1">PCB 비전 검사 시뮬레이터 (Z·Rx·Ry 3축 헤드)</h1>
   <div class="langsw">
     <button id="btnKo" class="on" type="button">한국어</button>
     <button id="btnEn" type="button">English</button>
   </div>
 </div></header>
-<div class="conf" role="note"><div class="inner"><b>[대외비]</b> 본 자료는 인시스 AI혁신 연구개발실의 미공개 발명·기술 정보(특허출원 예정)입니다. 무단 열람·복제·배포·제3자 전달 및 목적 외 사용을 금지합니다. © 2026 INSYS. All rights reserved.</div></div>
+<div class="conf" role="note"><div class="inner">
+  <b data-i18n="conf_tag">[대외비 · 보안자료]</b> <span data-i18n="conf_body">본 자료는 인시스 AI혁신 연구개발실의 미공개 발명·기술 정보(특허출원 예정)입니다. 무단 열람·복제·배포·제3자 전달 및 목적 외 사용을 금지합니다.</span>
+  <span class="conf-ask" data-i18n="conf_ask">※ 열람하신 분께서는 보안자료로 취급하여 주시기 바랍니다 — 화면 캡처·링크 공유·사내외 재배포를 삼가시고, 공유가 필요한 경우 담당부서(인시스 AI혁신 연구개발실)의 사전 승인을 받아 주십시오.</span>
+  <span data-i18n="conf_cr">© 2026 INSYS. All rights reserved.</span>
+</div></div>
 
 <main class="container">
   <div class="grid2">
@@ -278,11 +283,15 @@
   }
 
   // ===== 다국어 (한국어 / English) =====
-  const VER='v3.6';
+  const VER='v3.7';
   const I18N={
     ko:{
       title:'PCB 비전 검사 시뮬레이터 (3축 헤드)',
       h1:'PCB 비전 검사 시뮬레이터 (Z·Rx·Ry 3축 헤드)',
+      conf_tag:'[대외비 · 보안자료]',
+      conf_body:'본 자료는 인시스 AI혁신 연구개발실의 미공개 발명·기술 정보(특허출원 예정)입니다. 무단 열람·복제·배포·제3자 전달 및 목적 외 사용을 금지합니다.',
+      conf_ask:'※ 열람하신 분께서는 보안자료로 취급하여 주시기 바랍니다 — 화면 캡처·링크 공유·사내외 재배포를 삼가시고, 공유가 필요한 경우 담당부서(인시스 AI혁신 연구개발실)의 사전 승인을 받아 주십시오.',
+      conf_cr:'© 2026 INSYS. All rights reserved.',
       ch_anim:'동작 애니메이션 · Z축 직결 헥사포드 헤드 (Cognex IS3805 + ISL38-300)',
       ch_ctrl:'운전 / 신호 제어', ch_flow:'전체 로직 플로우', ch_log:'동작 로그',
       alarmban:'⚠ NG 검사 중단 — NG품 제거 후 [검사 계속]',
@@ -337,6 +346,10 @@
     en:{
       title:'PCB Vision Inspection Simulator (3-Axis Head)',
       h1:'PCB Vision Inspection Simulator (Z·Rx·Ry 3-Axis Head)',
+      conf_tag:'[CONFIDENTIAL · RESTRICTED]',
+      conf_body:'This material contains unpublished invention and technical information of the INSYS AI Innovation R&D Office (patent pending). Unauthorized viewing, copying, distribution, transfer to third parties, and use for any other purpose are prohibited.',
+      conf_ask:'\u203B Please handle this document as restricted material — refrain from screen captures, link sharing, and redistribution inside or outside the company. If sharing is required, obtain prior approval from the INSYS AI Innovation R&D Office.',
+      conf_cr:'\u00A9 2026 INSYS. All rights reserved.',
       ch_anim:'Motion Animation · Z-Axis Direct-Mount Hexapod Head (Cognex IS3805 + ISL38-300)',
       ch_ctrl:'Operation / Signal Control', ch_flow:'Logic Flow', ch_log:'Operation Log',
       alarmban:'⚠ NG — Inspection Halted. Remove NG part, then [Resume]',
