@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>트레이 세척기 운영방식 비교 v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* 세척기_운영비교.html v1.0 (2026-11-12) — 인시스 AI혁신 연구개발실 */
+:root{
+  --ink:#1f2a37; --ink2:#44505f; --muted:#6b7280;
+  --navy:#1f3350; --page:#f4f6f9; --card:#ffffff; --line:#dde2ea; --soft:#eef2f7;
+  --grid:#e4e7ec; --axis:#b8bfc9;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+  --pw:#44505f; --lb:#aeb6c2;
+  --good:#006300; --wrap:1100px;
+}
+*{box-sizing:border-box}
+html{font-size:14px}
+@media (min-width:768px){ html{font-size:16px} }
+html.force-mobile{font-size:14px}
+body{margin:0;font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--page);line-height:1.5}
+.nav{background:var(--navy);color:#f3f6fa}
+.nav-inner,.wrap{max-width:var(--wrap);margin:0 auto;padding-left:12px;padding-right:12px}
+html.force-mobile{--wrap:430px}
+.nav-inner{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:10px;padding-bottom:10px}
+.nav h1{font-size:1.07rem;font-weight:700;margin:0;flex:1 1 200px;color:#f3f6fa}
+.nav .sub{display:block;font-size:.79rem;font-weight:400;color:#c9d4e3}
+.ver{font-size:.79rem;font-weight:700;background:#e8eef7;color:var(--navy);border-radius:10px;padding:2px 8px}
+.seg{display:inline-flex;border:1px solid #8fa3bf;border-radius:8px;overflow:hidden}
+.seg button{font:inherit;font-size:.86rem;padding:5px 12px;border:0;background:transparent;color:#e3eaf4;cursor:pointer}
+.seg button[aria-pressed="true"]{background:#e8eef7;color:var(--navy);font-weight:700}
+.wrap{padding-top:8px;padding-bottom:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:0 0 8px}
+.card h2{font-size:1rem;font-weight:700;margin:0 0 6px;color:var(--navy)}
+.card h3{font-size:.86rem;font-weight:700;margin:8px 0 4px;color:var(--ink2)}
+.note{font-size:.86rem;color:var(--ink2);margin:0 0 6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 10px}
+.fld label{display:block;font-size:.79rem;color:var(--ink2)}
+.fld .row{display:flex;align-items:center;gap:4px}
+.fld input[type=number]{width:100%;font:inherit;color:var(--ink);padding:5px 6px;border:1px solid var(--axis);border-radius:6px;background:#fff}
+.fld .unit{font-size:.79rem;color:var(--muted);white-space:nowrap}
+.chk{display:flex;align-items:flex-start;gap:6px;font-size:.86rem;color:var(--ink);margin:6px 0 0}
+.chk input{margin-top:4px}
+.presets{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.86rem;color:var(--ink2);margin:6px 0 0}
+.btn{font:inherit;font-size:.86rem;padding:4px 10px;border:1px solid var(--axis);border-radius:6px;background:#fff;color:var(--ink);cursor:pointer}
+.btn:hover{background:var(--soft)}
+.btn.on{background:var(--navy);color:#f3f6fa;border-color:var(--navy)}
+details summary{cursor:pointer;font-weight:700;font-size:.93rem;color:var(--navy);padding:4px 0}
+.dist{width:100%;border-collapse:collapse;font-size:.86rem}
+.dist th,.dist td{padding:3px 4px;text-align:left;border-bottom:1px solid var(--line)}
+.dist input{width:80px;font:inherit;color:var(--ink);padding:4px 6px;border:1px solid var(--axis);border-radius:6px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.kpi{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff}
+.kpi.best{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy)}
+.kpi .nm{display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:700;color:var(--ink)}
+.kpi .sb{font-size:.79rem;color:var(--ink2)}
+.kpi .val{font-size:1.43rem;font-weight:700;color:var(--ink);margin-top:2px}
+.kpi .val small{font-size:.79rem;font-weight:500;color:var(--ink2)}
+.kpi .per{font-size:.86rem;color:var(--ink2)}
+.badge{font-size:.72rem;font-weight:700;color:var(--good);border:1px solid var(--good);border-radius:10px;padding:0 6px;background:#f1f8f1}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;flex:0 0 12px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.86rem;color:var(--ink);margin:0 0 6px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend svg{flex:0 0 26px}
+.bars .b{margin:0 0 8px}
+.bars .lab{display:flex;justify-content:space-between;gap:8px;font-size:.86rem;color:var(--ink)}
+.bars .lab b{font-weight:700}
+.bars .track{display:flex;gap:2px;height:20px;margin-top:2px}
+.bars .seg2{height:100%;min-width:2px;cursor:default}
+.bars .seg2.pw{background:var(--pw)}
+.bars .seg2.lb{background:var(--lb);border-radius:0 4px 4px 0}
+.chartbox{position:relative}
+.chartbox svg{display:block;width:100%;height:auto;touch-action:pan-y}
+.tip{position:absolute;pointer-events:none;background:#fff;border:1px solid var(--axis);border-radius:8px;padding:6px 8px;font-size:.79rem;color:var(--ink);box-shadow:0 2px 8px rgba(31,42,55,.15);display:none;z-index:5;min-width:150px}
+.tip .t{font-weight:700;margin-bottom:2px}
+.tip .r{display:flex;align-items:center;gap:6px;justify-content:space-between}
+.tip .r span{display:inline-flex;align-items:center;gap:5px}
+.scroll{overflow-x:auto}
+table.t{width:100%;border-collapse:collapse;font-size:.86rem;min-width:560px}
+table.t th{background:#e8eef7;color:var(--navy);font-weight:700;text-align:right;padding:5px 6px;border-bottom:1px solid var(--axis);white-space:nowrap}
+table.t td{text-align:right;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap;color:var(--ink)}
+table.t th:first-child,table.t td:first-child{text-align:left}
+table.t td.min{font-weight:700;background:#f1f8f1}
+table.t td small{color:var(--ink2);font-size:.79rem}
+ul.ns{margin:0;padding-left:18px;font-size:.86rem;color:var(--ink2)}
+ul.ns li{margin:0 0 2px}
+.foot{font-size:.79rem;color:var(--ink2);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:4px 2px}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <h1>트레이 세척기 운영방식 비교<span class="sub">인텍코리아 안산공장 · 라인형 vs 단독형(스핀) 전력비·인건비</span></h1>
+    <span class="ver" id="verTop">v1.0</span>
+    <div class="seg" role="group" aria-label="화면 선택">
+      <button type="button" id="btnMobile" aria-pressed="true">모바일</button>
+      <button type="button" id="btnPc" aria-pressed="false">PC</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <h2>1. 결과 요약 — 월 운영비(전력비 + 인건비)</h2>
+    <p class="note" id="sumText"></p>
+    <div class="kpis" id="kpis"></div>
+  </section>
+
+  <section class="card">
+    <h2>2. 입력 조건</h2>
+    <div class="presets">라인형 처리능력
+      <button type="button" class="btn" data-cap="700">700매/h</button>
+      <button type="button" class="btn" data-cap="800">800매/h</button>
+      <button type="button" class="btn" data-cap="900">900매/h</button>
+      <button type="button" class="btn" id="btnReset">기본값으로</button>
+    </div>
+    <details open>
+      <summary>라인형 (SZGRTK 2채널 투입)</summary>
+      <div class="grid" id="fLine"></div>
+    </details>
+    <details open>
+      <summary>단독형 (KSU-ST-100H + 별도 건조기)</summary>
+      <div class="grid" id="fSpin"></div>
+      <label class="chk"><input type="checkbox" id="solo" checked> 세척기 1대만 가동하는 날은 1명이 투입·건조·정리를 겸임</label>
+    </details>
+    <details open>
+      <summary>공통 (전력 단가·인건비·가동시간)</summary>
+      <div class="grid" id="fCommon"></div>
+      <label class="chk"><input type="checkbox" id="redeploy" checked> 가동을 일찍 끝낸 날은 남는 시간에 작업자를 다른 공정에 배치 (인건비를 가동시간만큼만 반영)</label>
+    </details>
+    <details open>
+      <summary>월 물량 분포 (최대 물량 대비 %, 해당 일수)</summary>
+      <table class="dist">
+        <thead><tr><th>구분</th><th>물량 (%)</th><th>일수 (일)</th><th>일 물량</th></tr></thead>
+        <tbody id="distBody"></tbody>
+      </table>
+      <p class="note" id="distSum" style="margin-top:4px"></p>
+    </details>
+  </section>
+
+  <section class="card">
+    <h2>3. 운영방식별 월 비용</h2>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--pw)"></i>전력비</span>
+      <span><i class="sw" style="background:var(--lb)"></i>인건비</span>
+    </div>
+    <div class="chartbox"><div class="bars" id="bars"></div><div class="tip" id="tipBar"></div></div>
+  </section>
+
+  <section class="card">
+    <h2>4. 일 물량에 따른 하루 비용</h2>
+    <p class="note">가로축은 최대 물량 대비 그날의 물량(%), 세로축은 하루 비용(만 원)입니다. 그래프 위에 손가락이나 마우스를 올리면 값이 표시됩니다.</p>
+    <div class="legend" id="lineLegend"></div>
+    <div class="chartbox" id="lineBox"><svg id="lineSvg" role="img" aria-label="일 물량에 따른 운영방식별 하루 비용 선 그래프"></svg><div class="tip" id="tipLine"></div></div>
+  </section>
+
+  <section class="card">
+    <h2>5. 상세 표</h2>
+    <h3>일 물량별 하루 비용 (만 원)</h3>
+    <div class="scroll"><table class="t" id="tblDay"></table></div>
+    <h3>월간 비용 (만 원)</h3>
+    <div class="scroll"><table class="t" id="tblMonth"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>6. 계산 기준과 주의점</h2>
+    <ul class="ns">
+      <li>라인형 소비전력(기본 150kW)과 건조기 소비전력(기본 15kW)은 견적 회신 전 가정치입니다. 실제 사양을 받으면 입력값을 바꿔 다시 확인하십시오.</li>
+      <li>라인형 A는 물량과 무관하게 정해진 시간 내내 가동, 라인형 B는 정격 속도로 물량만 처리하고 종료하는 방식입니다.</li>
+      <li>단독형 A는 그날 물량에 필요한 대수만 정해진 시간 동안 가동, 단독형 B는 전 대수를 가동하고 일찍 종료하는 방식입니다.</li>
+      <li>단독형 필요 대수 = 라인형 처리능력 ÷ 대당 처리능력(올림), 건조기는 세척기 2대당 1대로 계산합니다.</li>
+      <li>조기 종료 방식에는 세척수 가열·건조로 승온 등 예열 손실이 포함되지 않았습니다. 가동시간이 짧은 날은 실제 비용이 더 높습니다.</li>
+      <li>설비 구입비·운송·설치비, 용수·보일러 가스비, 유지보수비는 포함하지 않았습니다.</li>
+      <li>입력값은 이 화면에서만 계산에 쓰이고 저장되지 않습니다.</li>
+    </ul>
+  </section>
+
+  <div class="foot"><span>인시스 AI혁신 연구개발실 · 2026-11-12</span><span id="verBottom">v1.0</span></div>
+</main>
+
+<script>
+'use strict';
+const VERSION = 'v1.0';
+
+const MODES = [
+  {id:'lineA', name:'라인형 A', sub:'전 시간 고정 가동', color:'#2a78d6', dash:''},
+  {id:'lineB', name:'라인형 B', sub:'물량만큼만 가동',   color:'#eb6834', dash:'7 4'},
+  {id:'spinA', name:'단독형 A', sub:'가동 대수 축소',     color:'#1baf7a', dash:'2 3'},
+  {id:'spinB', name:'단독형 B', sub:'전 대수·시간 단축',  color:'#eda100', dash:'9 3 2 3'}
+];
+
+const FIELDS = {
+  fLine: [
+    {k:'lineCap', label:'처리능력', unit:'매/h', def:900, step:10},
+    {k:'lineKw', label:'총 소비전력', unit:'kW', def:150, step:1},
+    {k:'linePersons', label:'운영 인원', unit:'명', def:2, step:1}
+  ],
+  fSpin: [
+    {k:'unitCap', label:'세척기 대당 처리능력', unit:'매/h', def:240, step:10},
+    {k:'washKw', label:'세척기 대당 전력', unit:'kW', def:17.75, step:0.25},
+    {k:'dryKw', label:'건조기 대당 전력', unit:'kW', def:15, step:1},
+    {k:'washPerDryer', label:'건조기 1대당 세척기', unit:'대', def:2, step:1},
+    {k:'washPerOp', label:'투입 1명당 세척기', unit:'대', def:2, step:1},
+    {k:'exitCap', label:'정리 1명당 처리량', unit:'매/h', def:750, step:10}
+  ],
+  fCommon: [
+    {k:'price', label:'전력 평균 단가', unit:'원/kWh', def:182.5, step:0.5},
+    {k:'tax', label:'부가세·기금', unit:'%', def:12.7, step:0.1},
+    {k:'load', label:'평균 부하율', unit:'%', def:85, step:5},
+    {k:'wage', label:'1인 월 인건비', unit:'만 원', def:300, step:10},
+    {k:'baseH', label:'월 기준 근무시간', unit:'시간', def:176, step:1},
+    {k:'H', label:'하루 가동시간', unit:'시간', def:8, step:0.5}
+  ]
+};
+const DIST_DEF = [{pct:100,days:10},{pct:75,days:6},{pct:50,days:4},{pct:25,days:2}];
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt = (n, d=0) => Number(n).toLocaleString('ko-KR', {minimumFractionDigits:d, maximumFractionDigits:d});
+const man = won => won / 10000;
+
+/* ---------- 입력 폼 ---------- */
+function buildForm(){
+  Object.keys(FIELDS).forEach(box => {
+    $(box).innerHTML = FIELDS[box].map(f =>
+      `<div class="fld"><label for="in_${f.k}">${esc(f.label)}</label><div class="row">` +
+      `<input type="number" id="in_${f.k}" value="${f.def}" step="${f.step}" min="0" inputmode="decimal">` +
+      `<span class="unit">${esc(f.unit)}</span></div></div>`).join('');
+  });
+  $('distBody').innerHTML = DIST_DEF.map((r, i) =>
+    `<tr><td>구간 ${i+1}</td>` +
+    `<td><input type="number" id="pct_${i}" value="${r.pct}" min="0" max="100" step="5" inputmode="decimal" aria-label="구간 ${i+1} 물량 퍼센트"></td>` +
+    `<td><input type="number" id="days_${i}" value="${r.days}" min="0" step="1" inputmode="numeric" aria-label="구간 ${i+1} 일수"></td>` +
+    `<td id="vol_${i}"></td></tr>`).join('');
+}
+function num(id, min){
+  const v = parseFloat($(id).value);
+  return Math.max(min, isFinite(v) ? v : min);
+}
+function readParams(){
+  const p = {};
+  Object.values(FIELDS).flat().forEach(f => { p[f.k] = num('in_' + f.k, 0); });
+  ['lineCap','unitCap','baseH','H','exitCap'].forEach(k => { p[k] = Math.max(p[k], 0.1); });
+  ['washPerDryer','washPerOp'].forEach(k => { p[k] = Math.max(1, Math.round(p[k])); });
+  p.solo = $('solo').checked;
+  p.redeploy = $('redeploy').checked;
+  p.dist = DIST_DEF.map((_, i) => ({pct: Math.min(100, num('pct_' + i, 0)), days: num('days_' + i, 0)}));
+  return p;
+}
+
+/* ---------- 계산 ---------- */
+function derive(p){
+  const d = {};
+  d.rate = p.price * (1 + p.tax / 100) * (p.load / 100);   // 정격 1kW·1시간당 전력비(원)
+  d.laborH = p.wage * 10000 / p.baseH;                     // 1인 시간당 인건비(원)
+  d.maxDay = p.lineCap * p.H;                              // 하루 최대 물량(매)
+  d.N = Math.max(1, Math.ceil(p.lineCap / p.unitCap - 1e-9)); // 단독형 필요 대수
+  d.dryers = n => Math.ceil(n / p.washPerDryer);
+  d.persons = n => (n === 1 && p.solo) ? 1 : Math.ceil(n / p.washPerOp) + Math.ceil(n * p.unitCap / p.exitCap - 1e-9);
+  d.spinKw = n => n * p.washKw + d.dryers(n) * p.dryKw;
+  return d;
+}
+function dayCost(mode, vol, p, d){
+  if (vol <= 0) return {power:0, labor:0, total:0, hours:0, units:0, persons:0};
+  let hours, kw, persons, units, paidH;
+  if (mode === 'lineA'){ hours = p.H; kw = p.lineKw; persons = p.linePersons; units = 1; paidH = p.H; }
+  else if (mode === 'lineB'){ hours = Math.min(p.H, vol / p.lineCap); kw = p.lineKw; persons = p.linePersons; units = 1; paidH = p.redeploy ? hours : p.H; }
+  else if (mode === 'spinA'){ units = Math.min(d.N, Math.max(1, Math.ceil(vol / p.H / p.unitCap - 1e-9))); hours = p.H; kw = d.spinKw(units); persons = d.persons(units); paidH = p.H; }
+  else { units = d.N; hours = Math.min(p.H, vol / (d.N * p.unitCap)); kw = d.spinKw(units); persons = d.persons(units); paidH = p.redeploy ? hours : p.H; }
+  const power = kw * hours * d.rate;
+  const labor = persons * paidH * d.laborH;
+  return {power, labor, total: power + labor, hours, units, persons};
+}
+function compute(p){
+  const d = derive(p);
+  const month = {}; let totalVol = 0, totalDays = 0;
+  MODES.forEach(m => { month[m.id] = {power:0, labor:0, total:0}; });
+  const rows = p.dist.map(r => {
+    const vol = d.maxDay * r.pct / 100;
+    const cells = {};
+    MODES.forEach(m => {
+      const c = dayCost(m.id, vol, p, d);
+      cells[m.id] = c;
+      month[m.id].power += c.power * r.days;
+      month[m.id].labor += c.labor * r.days;
+      month[m.id].total += c.total * r.days;
+    });
+    totalVol += vol * r.days; totalDays += r.days;
+    return {pct: r.pct, days: r.days, vol, cells};
+  });
+  const best = MODES.reduce((a, m) => month[m.id].total < month[a].total ? m.id : a, MODES[0].id);
+  return {d, rows, month, totalVol, totalDays, best};
+}
+
+/* ---------- 출력 ---------- */
+function swatch(m){ return `<i class="sw" style="background:${m.color}"></i>`; }
+
+function renderSummary(p, r){
+  const b = MODES.find(m => m.id === r.best);
+  const bestCost = r.month[r.best].total;
+  const lineBest = Math.min(r.month.lineA.total, r.month.lineB.total);
+  const spinBest = Math.min(r.month.spinA.total, r.month.spinB.total);
+  const gap = Math.abs(spinBest - lineBest);
+  const who = lineBest <= spinBest ? '라인형' : '단독형';
+  $('sumText').textContent = r.totalVol > 0
+    ? `월 ${fmt(r.totalDays)}일·${fmt(r.totalVol)}매 기준으로 ${b.name}(${b.sub})가 월 ${fmt(man(bestCost))}만 원으로 가장 낮습니다. ` +
+      `${who}이 다른 방식보다 월 ${fmt(man(gap))}만 원 낮고, 단독형은 세척기 ${r.d.N}대·건조기 ${r.d.dryers(r.d.N)}대가 필요합니다.`
+    : '물량 분포의 일수를 입력하면 결과가 표시됩니다.';
+  $('kpis').innerHTML = MODES.map(m => {
+    const c = r.month[m.id];
+    const per = r.totalVol > 0 ? c.total / r.totalVol : 0;
+    const isBest = m.id === r.best && r.totalVol > 0;
+    const diff = c.total - bestCost;
+    return `<div class="kpi${isBest ? ' best' : ''}">` +
+      `<div class="nm">${swatch(m)}${esc(m.name)}${isBest ? '<span class="badge">✓ 최저</span>' : ''}</div>` +
+      `<div class="sb">${esc(m.sub)}</div>` +
+      `<div class="val">${fmt(man(c.total))}<small> 만 원/월</small></div>` +
+      `<div class="per">매당 ${fmt(per)}원${isBest ? '' : ' · 최저 대비 +' + fmt(man(diff)) + '만'}</div></div>`;
+  }).join('');
+}
+
+function renderDist(p, r){
+  r.rows.forEach((row, i) => { $('vol_' + i).textContent = fmt(row.vol) + '매'; });
+  $('distSum').textContent = `합계 ${fmt(r.totalDays)}일 · 월 ${fmt(r.totalVol)}매 (하루 최대 ${fmt(r.d.maxDay)}매 = ${fmt(p.lineCap)}매/h × ${fmt(p.H, 1)}시간)`;
+}
+
+function renderBars(r){
+  const max = Math.max(1, ...MODES.map(m => r.month[m.id].total));
+  $('bars').innerHTML = MODES.map(m => {
+    const c = r.month[m.id];
+    const wp = c.power / max * 100, wl = c.labor / max * 100;
+    return `<div class="b"><div class="lab"><span>${swatch(m)} ${esc(m.name)} · ${esc(m.sub)}</span><b>${fmt(man(c.total))}만 원</b></div>` +
+      `<div class="track">` +
+      `<div class="seg2 pw" style="width:${wp}%" data-tip="${esc(m.name)}|전력비|${fmt(man(c.power))}"></div>` +
+      `<div class="seg2 lb" style="width:${wl}%" data-tip="${esc(m.name)}|인건비|${fmt(man(c.labor))}"></div>` +
+      `</div></div>`;
+  }).join('');
+}
+
+function niceMax(v){
+  if (v <= 0) return 1;
+  const e = Math.pow(10, Math.floor(Math.log10(v)));
+  const f = v / e;
+  return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * e;
+}
+
+let lineState = null;
+function renderLine(p, r){
+  const svg = $('lineSvg');
+  const W = Math.max(280, Math.round($('lineBox').clientWidth));
+  const H = W < 520 ? 250 : 340;
+  const M = {l:44, r:12, t:10, b:34};
+  const pw = W - M.l - M.r, ph = H - M.t - M.b;
+  const pts = [];
+  for (let x = 1; x <= 100; x++){
+    const vol = r.d.maxDay * x / 100, o = {x};
+    MODES.forEach(m => { o[m.id] = man(dayCost(m.id, vol, p, r.d).total); });
+    pts.push(o);
+  }
+  const yMax = niceMax(Math.max(...pts.map(o => Math.max(...MODES.map(m => o[m.id])))));
+  const sx = x => M.l + (x / 100) * pw;
+  const sy = y => M.t + ph - (y / yMax) * ph;
+  let g = '';
+  for (let i = 0; i <= 4; i++){
+    const y = yMax * i / 4, yy = sy(y);
+    g += `<line x1="${M.l}" x2="${W - M.r}" y1="${yy}" y2="${yy}" stroke="${i ? '#e4e7ec' : '#b8bfc9'}" stroke-width="1"/>`;
+    g += `<text x="${M.l - 6}" y="${yy + 4}" text-anchor="end" font-size="11" fill="#6b7280">${fmt(y, y < 10 ? 1 : 0)}</text>`;
+  }
+  [0, 25, 50, 75, 100].forEach(x => {
+    g += `<text x="${sx(x)}" y="${H - M.b + 16}" text-anchor="${x === 100 ? 'end' : x === 0 ? 'start' : 'middle'}" font-size="11" fill="#6b7280">${x}%</text>`;
+  });
+  g += `<text x="${M.l + pw / 2}" y="${H - 2}" text-anchor="middle" font-size="11" fill="#6b7280">일 물량 (최대 대비)</text>`;
+  MODES.forEach(m => {
+    const dAttr = pts.map((o, i) => (i ? 'L' : 'M') + sx(o.x).toFixed(1) + ' ' + sy(o[m.id]).toFixed(1)).join(' ');
+    g += `<path d="${dAttr}" fill="none" stroke="${m.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"${m.dash ? ` stroke-dasharray="${m.dash}"` : ''}/>`;
+  });
+  g += `<g id="hov" style="display:none"><line id="hovLine" y1="${M.t}" y2="${M.t + ph}" stroke="#6b7280" stroke-width="1"/>` +
+       MODES.map(m => `<circle id="dot_${m.id}" r="4.5" fill="${m.color}" stroke="#fff" stroke-width="2"/>`).join('') + `</g>`;
+  g += `<rect id="hit" x="${M.l}" y="${M.t}" width="${pw}" height="${ph}" fill="transparent"/>`;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('font-family', "'Noto Sans KR',sans-serif");
+  svg.innerHTML = g;
+  lineState = {pts, sx, sy, M, pw, W, maxDay: r.d.maxDay};
+  const hit = svg.querySelector('#hit');
+  hit.addEventListener('pointermove', onLineMove);
+  hit.addEventListener('pointerdown', onLineMove);
+  hit.addEventListener('pointerleave', () => { svg.querySelector('#hov').style.display = 'none'; $('tipLine').style.display = 'none'; });
+}
+function onLineMove(ev){
+  const s = lineState; if (!s) return;
+  const svg = $('lineSvg'), box = svg.getBoundingClientRect();
+  const scale = s.W / box.width;
+  const px = (ev.clientX - box.left) * scale;
+  const x = Math.min(100, Math.max(1, Math.round((px - s.M.l) / s.pw * 100)));
+  const o = s.pts[x - 1];
+  svg.querySelector('#hov').style.display = '';
+  const ln = svg.querySelector('#hovLine'); ln.setAttribute('x1', s.sx(x)); ln.setAttribute('x2', s.sx(x));
+  MODES.forEach(m => { const c = svg.querySelector('#dot_' + m.id); c.setAttribute('cx', s.sx(x)); c.setAttribute('cy', s.sy(o[m.id])); });
+  const min = Math.min(...MODES.map(m => o[m.id]));
+  const tip = $('tipLine');
+  tip.innerHTML = `<div class="t">물량 ${x}% · ${fmt(s.maxDay * x / 100)}매/일</div>` +
+    MODES.map(m => `<div class="r"><span>${swatch(m)}${esc(m.name)}</span><b>${fmt(o[m.id], 1)}만${o[m.id] === min ? ' ✓' : ''}</b></div>`).join('');
+  tip.style.display = 'block';
+  const cx = s.sx(x) / scale, tw = tip.offsetWidth, bw = box.width;
+  tip.style.left = Math.max(0, Math.min(bw - tw, cx > bw / 2 ? cx - tw - 10 : cx + 10)) + 'px';
+  tip.style.top = '6px';
+}
+function renderLegend(){
+  $('lineLegend').innerHTML = MODES.map(m =>
+    `<span><svg width="26" height="10" aria-hidden="true"><line x1="1" x2="25" y1="5" y2="5" stroke="${m.color}" stroke-width="2"${m.dash ? ` stroke-dasharray="${m.dash}"` : ''}/></svg>${esc(m.name)} · ${esc(m.sub)}</span>`).join('');
+}
+
+function renderTables(p, r){
+  const head = `<thead><tr><th>일 물량</th><th>일수</th>` + MODES.map(m => `<th>${esc(m.name)}</th>`).join('') + `<th>최저</th></tr></thead>`;
+  const body = r.rows.map(row => {
+    const tot = MODES.map(m => row.cells[m.id].total);
+    const min = Math.min(...tot);
+    const bestM = MODES[tot.indexOf(min)];
+    return `<tr><td>${fmt(row.vol)}매 <small>(${fmt(row.pct)}%)</small></td><td>${fmt(row.days)}일</td>` +
+      MODES.map(m => {
+        const c = row.cells[m.id];
+        const info = row.vol <= 0 ? '' : (m.id === 'spinA' ? `${c.units}대·${c.persons}명` : m.id === 'spinB' ? `${fmt(c.hours, 1)}h·${c.persons}명` : `${fmt(c.hours, 1)}h`);
+        return `<td class="${c.total === min && row.vol > 0 ? 'min' : ''}">${fmt(man(c.total), 1)} <small>${info}</small></td>`;
+      }).join('') + `<td>${row.vol > 0 ? esc(bestM.name) : '-'}</td></tr>`;
+  }).join('');
+  $('tblDay').innerHTML = head + `<tbody>${body}</tbody>`;
+
+  const bestCost = r.month[r.best].total;
+  $('tblMonth').innerHTML = `<thead><tr><th>운영방식</th><th>전력비</th><th>인건비</th><th>합계</th><th>매당(원)</th><th>최저 대비</th></tr></thead><tbody>` +
+    MODES.map(m => {
+      const c = r.month[m.id];
+      const isBest = m.id === r.best && r.totalVol > 0;
+      return `<tr><td>${esc(m.name)} <small>${esc(m.sub)}</small></td><td>${fmt(man(c.power))}</td><td>${fmt(man(c.labor))}</td>` +
+        `<td class="${isBest ? 'min' : ''}">${fmt(man(c.total))}</td><td>${r.totalVol > 0 ? fmt(c.total / r.totalVol) : '-'}</td>` +
+        `<td>${isBest ? '✓ 최저' : '+' + fmt(man(c.total - bestCost))}</td></tr>`;
+    }).join('') + `</tbody>`;
+}
+
+function syncPresets(p){
+  document.querySelectorAll('[data-cap]').forEach(b => b.classList.toggle('on', Number(b.dataset.cap) === p.lineCap));
+}
+
+function update(){
+  const p = readParams();
+  const r = compute(p);
+  renderSummary(p, r); renderDist(p, r); renderBars(r); renderLine(p, r); renderTables(p, r); syncPresets(p);
+}
+
+/* ---------- 이벤트 ---------- */
+function setView(mobile){
+  document.documentElement.classList.toggle('force-mobile', mobile);
+  $('btnMobile').setAttribute('aria-pressed', String(mobile));
+  $('btnPc').setAttribute('aria-pressed', String(!mobile));
+  update();
+}
+function resetAll(){
+  Object.values(FIELDS).flat().forEach(f => { $('in_' + f.k).value = f.def; });
+  DIST_DEF.forEach((r, i) => { $('pct_' + i).value = r.pct; $('days_' + i).value = r.days; });
+  $('solo').checked = true; $('redeploy').checked = true;
+  update();
+}
+function init(){
+  $('verTop').textContent = VERSION; $('verBottom').textContent = VERSION;
+  buildForm(); renderLegend();
+  document.querySelector('main').addEventListener('input', ev => { if (ev.target.matches('input')) update(); });
+  document.querySelectorAll('[data-cap]').forEach(b => b.addEventListener('click', () => { $('in_lineCap').value = b.dataset.cap; update(); }));
+  $('btnReset').addEventListener('click', resetAll);
+  $('btnMobile').addEventListener('click', () => setView(true));
+  $('btnPc').addEventListener('click', () => setView(false));
+  const bars = $('bars'), tipBar = $('tipBar');
+  bars.addEventListener('pointermove', ev => {
+    const el = ev.target.closest('[data-tip]');
+    if (!el){ tipBar.style.display = 'none'; return; }
+    const [n, k, v] = el.dataset.tip.split('|');
+    tipBar.innerHTML = `<div class="t">${esc(n)}</div><div class="r"><span>${esc(k)}</span><b>${esc(v)}만 원</b></div>`;
+    tipBar.style.display = 'block';
+    const box = bars.getBoundingClientRect();
+    tipBar.style.left = Math.max(0, Math.min(box.width - tipBar.offsetWidth, ev.clientX - box.left + 10)) + 'px';
+    tipBar.style.top = (ev.clientY - box.top + 12) + 'px';
+  });
+  bars.addEventListener('pointerleave', () => { tipBar.style.display = 'none'; });
+  let t; window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(update, 120); });
+  setView(true);
+}
+init();
+</script>
+</body>
+</html>
