@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* HRI-200_하이브리드망_구축가이드.html v1.7 (2026-10-26) */
+/* HRI-200_하이브리드망_구축가이드.html v1.8 (2026-10-26) */
 :root{--navy:#1f3a5f;--ink:#1e2a3a;--line:#c9d3e0;--bg:#f3f6fa;--card:#fff;--blue:#1d4ed8;--soft:#e4ecf7;--warnBg:#fff3d6;--warn:#7a4a00;--okBg:#e1f3e6;--ok:#1b5e34;--badBg:#fde7e7;--bad:#8a1c1c}
 *{box-sizing:border-box}
 small{font-size:1rem}
@@ -63,7 +63,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 </head>
 <body class="m">
 <div class="nav"><div class="nav-inner">
- <div><b>HRI-200 하이브리드 재난통신망 구축 가이드</b> <small>대한적십자사 서울특별시지사 재난대응봉사회</small> <span class="ver app-version">v1.7</span></div>
+ <div><b>HRI-200 하이브리드 재난통신망 구축 가이드</b> <small>대한적십자사 서울특별시지사 재난대응봉사회</small> <span class="ver app-version">v1.8</span></div>
  <div class="tg"><button id="bM" class="on" type="button">📱 모바일</button><button id="bP" type="button">🖥 PC</button></div>
 </div></div>
 <div class="wrap">
@@ -71,8 +71,9 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 <div class="cover">
  <h1>HRI-200 3대 도입 · 등록부터 운용까지</h1>
  <p>HL0FRC · DS0ARC/M · HL2TLS — PDN 방식에서 HRI-200 방식으로 전환</p>
- <p>작성 2026-10-26 · <span class="app-version">v1.7</span></p>
+ <p>작성 2026-10-26 · <span class="app-version">v1.8</span></p>
 </div>
+<div class="box bad"><b>📢 YAESU WIRES-X 웹사이트 일시 중단 (보안 점검)</b> — 등록·문의는 사이트 양식이 아니라 <b>공지 페이지의 이메일 링크</b>로 접수합니다. 소프트웨어·매뉴얼은 같은 페이지의 Download 링크에서 받습니다. 이전 사이트 주소(<code>…/regist/index.php</code> 등)는 열리지 않습니다. <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/" target="_blank" rel="noopener">📢 YAESU WIRES-X 공지 · 이메일 신청 링크</a></div>
 <div class="toc">
  <a href="#a">1 구성</a><a href="#b">2 등록 절차</a><a href="#c">3 국별 입력표</a><a href="#d">4 승인 메일 후</a><a href="#e">5 설치·설정</a><a href="#f">6 운용</a><a href="#g">7 점검·문제</a><a href="#h">8 링크</a>
 </div>
@@ -96,22 +97,18 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 </section>
 
 <section id="b">
- <h2>2 등록 절차 — S/N 전송부터 회신까지 (3대 각각 반복)</h2>
+ <h2>2 등록 절차 — 이메일 신청 (3대 각각)</h2>
  <ol class="st">
-  <li><b>S/N 확인</b> — HRI-200 본체 뒷면 스티커의 Serial Number(<b>영문·숫자 8자리, 2번째 글자는 영문</b>, 예: <code>0A000000</code>)를 메모. 숫자 0/영문 O, 숫자 1/영문 I 혼동 주의. <b>무전기 S/N이 아님</b> (3대 모두 → 3장 표)</li>
-  <li><b>등록 사이트 접속</b> — 아래 "멤버 등록" 링크를 열어 <b>등록용 이메일 주소를 입력하고 Send</b> 클릭 — 이 페이지에는 양식이 없고, <b>이메일로 온 URL</b>에서 양식을 입력합니다 (로그인 불필요)<br>
-   <a class="lk" href="https://yaesu.com/jp/en/wires-x/regist/index.php" target="_blank">📝 멤버 등록 (이메일 입력)</a>
-   <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/index.php" target="_blank" rel="noopener">WIRES-X 메인 → 좌측 Member registration</a>
-   <div class="box info">이 링크는 <b>이전 RC-NET 가이드의 등록 링크와 동일한 주소</b>입니다. 안 열리면 <a href="rcnet_guide.html" target="_blank">이전 가이드(rcnet_guide.html)</a>의 "멤버 등록" 링크를 누르거나, 위 "WIRES-X 메인"에서 <b>Member registration</b>으로 들어가세요.</div></li>
-  <li><b>등록 URL 메일 수신</b> — 자동 발송 메일. 안 오면 스팸함·이메일 오타 확인 후 <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/contact/index.php" target="_blank" rel="noopener">문의(Contact us)</a> (YAESU 페이지 안내)</li>
-  <li><b>메일의 URL 클릭 → 약관</b> — 라이선스 동의 체크 → <b>Agree and proceed</b></li>
-  <li><b>등록 양식 입력</b> — 모든 항목 입력, <code>HRI-200 Serial Number/RADIO ID</code> 칸에 <b>S/N 입력</b> (3번 입력표 참조) → Submit</li>
-  <li><b>회신 확인</b> — 제출 직후 접수 확인 메일이 오는지 확인 (없으면 7번 점검표)</li>
-  <li><b>회신 대기 2~3 영업일</b> — 승인 메일에 <b>Node ID · Room ID</b>가 옴. 보관 (4번 기록표)</li>
-  <li><b>로그인</b> — WIRES-X 사이트 우측 상단 Member Login → 소프트웨어 다운로드</li>
+  <li><b>S/N 확인</b> — HRI-200 본체 뒷면 스티커의 Serial Number(<b>영문·숫자 8자리, 2번째 글자는 영문</b>)를 메모. 0/O, 1/I 혼동 주의. 무전기 S/N이 아님</li>
+  <li><b>공지 페이지 열기</b> — 아래 링크 → <b>New Registration Request</b> 클릭 → 메일 작성창이 열리고 제목 <code>[WIRES-X web ENG] WIRES-X New Registration Request</code>와 양식이 채워짐<br><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/" target="_blank" rel="noopener">📢 YAESU WIRES-X 공지 · 이메일 신청 링크</a></li>
+  <li><b>양식 입력</b> — 3번 입력표대로 항목을 채우고 <b>추신(P.S.)</b>을 끝에 추가</li>
+  <li><b>발송</b> — 호출부호별로 1통씩(총 3통). <b>보낸편지함에서 발송 완료 확인</b></li>
+  <li><b>회신 대기</b> — 승인 메일에 <b>Node ID · Room ID</b>가 옴 (4번 기록표). 사이트 중단 중이라 지연될 수 있음</li>
+  <li><b>정정·추가 요청</b> — 오타 등은 같은 메일에 답장하거나 공지 페이지의 <b>Registration Information Change Request</b> 사용</li>
  </ol>
- <div class="box warn">🔒 <b>로그인 필요</b> : 등록 완료 후 받는 User ID/Password로 로그인해야 열리는 페이지(소프트웨어 다운로드 등)는 로그인하지 않으면 연결되지 않습니다. 먼저 Member Login 하세요. (등록 페이지 자체는 로그인 없이 열립니다.)</div>
- <div class="box info">출처 : YAESU WIRES-X 매뉴얼 "User Registration" — 이메일 전송 → 등록 URL → 약관 동의 → 입력 → 2~3 영업일 후 Node ID·Room ID 메일 수신. (<a href="https://www.manualslib.com/manual/1522951/Yaesu-Wires-X.html?page=7" target="_blank" rel="noopener">매뉴얼 7쪽</a>)</div>
+ <div class="box ok"><b>진행 현황</b> : 2026-10-26 신청 3건 발송 → 구입처 철자 정정 메일 발송 → 2026-11-12 현재 회신 없음. 재문의 필요(7번 점검표).</div>
+ <div class="box warn">로그인은 필요 없습니다. 기존 안내의 Member Login·User ID/Password 단계는 사이트 재개 후에만 해당합니다.</div>
+ <div class="box info">출처 : YAESU 공지 "Temporary Suspension of the WIRES-X Website" — 보안 점검 중, 요청·문의는 이메일로 접수(New Registration Request · Registration Information Change Request · Node Registration Cancellation Request · Contact Us).</div>
 </section>
 
 <section id="c">
@@ -147,7 +144,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 <section id="e">
  <h2>5 설치·설정 (승인 후)</h2>
  <ol class="st">
-  <li><b>HRI-200 드라이버 먼저 설치</b> → WIRES-X 소프트웨어 설치 → PC 재시작 → USB 연결 (Node owner 페이지 다운로드 <em class="l">🔒 로그인 후 이용</em>)</li>
+  <li><b>HRI-200 드라이버 먼저 설치</b> → WIRES-X 소프트웨어 설치 → PC 재시작 → USB 연결 (공지 페이지 하단 <b>WIRES-X Download Page</b> — 로그인 불필요)</li>
   <li><b>연결</b> — PC ↔ USB, RADIO 1 ↔ 무전기(CT-174 10핀 / FM 6핀은 CT-175)</li>
   <li><b>설정</b> — 아래 국별 설정표 입력</li>
   <li><b>시작</b> — 소프트웨어 먼저 실행 → 무전기 [D/X]+[GM] 누른 채 전원 ON(2초) → "HRI-200" 표시</li>
@@ -178,32 +175,26 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 <section id="g">
  <h2>7 점검 · 문제 해결</h2>
  <div class="tw"><table><tr><th style="width:30%">증상</th><th>조치</th></tr>
-  <tr><td class="k">등록 URL 메일이 안 옴</td><td>스팸함 확인 → 이메일 오타 확인 → 다시 Send</td></tr>
-  <tr><td class="k">이미 등록된 이메일이라고 나옴</td><td>다른 이메일로 등록하거나 문의 양식에 <b>콜사인 · HRI-200 S/N · 기존 Node ID(5자리)</b>를 적고 "이 S/N의 Node/Room ID 등록 링크"를 요청</td></tr>
+  <tr><td class="k">신청 후 회신이 없음</td><td>① 보낸편지함 발송 여부 ② 스팸함 확인 ③ 2주 이상이면 <b>보낸 메일을 전달</b>해 재문의 (3건 S/N 목록과 사이트 중단 중 처리 방법 문의)</td></tr>
+  <tr><td class="k">메일 작성창이 안 열림</td><td>PC에 기본 메일 프로그램이 없는 경우입니다. 링크 주소를 복사해 메일 앱에서 열거나, 제목·본문을 직접 작성해 YAESU 회신 주소로 발송</td></tr>
   <tr><td class="k">S/N 입력 오류</td><td>스티커와 대소문자까지 대조 (0/O, 1/I 주의)</td></tr>
-  <tr><td class="k">3일 지나도 승인 메일 없음 · 문의</td><td>스팸함 확인 후 <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/contact/index.php" target="_blank" rel="noopener">WIRES-X 문의(Contact us)</a> 양식 이용 — 이름·이메일 필수, 등록 완료한 경우 5자리 Node ID 입력란이 있음 (휴대폰 메일 주소는 사용 불가)</td></tr>
   <tr><td class="k">ONLINE이 안 됨</td><td>드라이버 먼저 설치했는지, COM port 선택, 소프트웨어를 무전기보다 먼저 시작했는지 확인</td></tr></table></div>
 </section>
 
 <section id="h">
  <h2>8 링크 모음</h2>
- <div class="tw"><table><tr><th>자료</th><th>접속</th></tr>
-  <tr><td><a class="lk" href="https://yaesu.com/jp/en/wires-x/regist/index.php" target="_blank">멤버 등록 (이메일 전송)</a></td><td>로그인 없이 열림 (이메일 입력)</td></tr>
-  <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/index.php" target="_blank" rel="noopener">WIRES-X 메인 · Member Login</a></td><td>🔒 로그인 후 이용</td></tr>
-  <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/regist/password.php" target="_blank" rel="noopener">비밀번호 찾기</a></td><td>바로 열림 (양식)</td></tr>
-  <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/regist/id.php" target="_blank" rel="noopener">회원 ID 찾기 (이메일+S/N 입력)</a></td><td>바로 열림 (양식)</td></tr>
-  <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/contact/index.php" target="_blank" rel="noopener">WIRES-X 문의 (Contact us)</a></td><td>바로 열림 (양식)</td></tr>
-  <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/node/index.php" target="_blank" rel="noopener">Node owner 페이지 (다운로드)</a></td><td>🔒 로그인 후 이용</td></tr>
-  <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/contact/pdf/HRI-200_Manual_ENG_2304-N.pdf" target="_blank" rel="noopener">HRI-200 매뉴얼 PDF (2304-N)</a></td><td>바로 열림</td></tr>
-  <tr><td><a class="lk" href="https://www.manualslib.com/manual/896221/Yaesu-Wires-X-Hri-200.html" target="_blank" rel="noopener">HRI-200 매뉴얼 (ManualsLib)</a></td><td>바로 열림</td></tr>
-  <tr><td><a class="lk" href="RCNET_FM노드_운용교육.html" target="_blank" rel="noopener">RC-NET FM 노드 운용 교육 슬라이드</a></td><td>바로 열림</td></tr></table></div>
- <div class="box warn">YAESU 사이트 링크는 이 환경에서 접속 확인이 되지 않았습니다. 열리지 않으면 알려 주세요.</div>
+ <div class="tw"><table><tr><th>자료</th><th>설명</th></tr>
+  <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/" target="_blank" rel="noopener">📢 YAESU WIRES-X 공지 · 이메일 신청 링크</a></td><td>New Registration / Information Change / Cancellation / Contact Us 이메일 링크, Download Page (로그인 불필요)</td></tr>
+  <tr><td><a class="lk" href="https://www.yaesu.com/jp/en/wires-x/contact/pdf/HRI-200_Manual_ENG_2304-N.pdf" target="_blank" rel="noopener">HRI-200 매뉴얼 PDF (2304-N)</a></td><td>설치·설정·DTMF 명령</td></tr>
+  <tr><td><a class="lk" href="https://www.manualslib.com/manual/896221/Yaesu-Wires-X-Hri-200.html" target="_blank" rel="noopener">HRI-200 매뉴얼 (ManualsLib)</a></td><td>쪽별 열람</td></tr>
+  <tr><td><a class="lk" href="RCNET_FM노드_운용교육.html" target="_blank" rel="noopener">RC-NET FM 노드 운용 교육 슬라이드</a></td><td>설정·교신 세부 화면</td></tr></table></div>
+ <div class="box warn">YAESU 공지 페이지는 사이트 재개 시 주소·내용이 바뀔 수 있습니다.</div>
 </section>
 
-<div class="foot">대한적십자사 서울특별시지사 재난대응봉사회 · <span class="app-version">v1.7</span> · 2026-10-26</div>
+<div class="foot">대한적십자사 서울특별시지사 재난대응봉사회 · <span class="app-version">v1.8</span> · 2026-10-26</div>
 </div>
 <script>
-var APP_VERSION='v1.7';
+var APP_VERSION='v1.8';
 document.querySelectorAll('.app-version').forEach(function(e){e.textContent=APP_VERSION;});
 (function(){
  var b=document.body,m=document.getElementById('bM'),p=document.getElementById('bP');
