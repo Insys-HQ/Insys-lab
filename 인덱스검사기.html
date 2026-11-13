@@ -100,7 +100,7 @@
   <div class="nav-inner">
     <div class="hd-top">
       <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-      <span class="hd-ver" id="hVer">v1.0</span>
+      <span class="hd-ver" id="hVer">v1.1</span>
     </div>
     <h1>인덱스 회전형 PCB 검사기 시뮬레이터</h1>
     <div class="hd-sub">알루미늄 3030 프레임 300 × 600 × 750 mm · 상판 10T · 4스테이션 90° 인덱스 · 하부 상향 비전</div>
@@ -127,8 +127,9 @@
   <div class="spec">
     <b>프레임</b> 알루미늄 3030 프로파일 · 외곽 폭 300 × 길이 600 × 높이 750 mm · 상판 10T 알루미늄 &nbsp;·&nbsp;
     <b>상판 가공</b> 앞에서 120 mm 지점 φ120 촬영홀 · 앞에서 230 mm 지점 감속기 고정부(φ40 + M5 4) &nbsp;·&nbsp;
-    <b>인덱스</b> 감속기 직결 축 · 안착지그 4개 90° 등배 · 회전반경 110 mm · <b>CCW</b> 1스텝 90° &nbsp;·&nbsp;
+    <b>인덱스</b> 유성기어박스(중공축 플랜지 + 직각 서보) 직결 · <b>2단 회전판</b> — 상단 PCB 지그 / 하단 케이스 받침 · 4개 90° 등배 · 회전반경 110 mm · <b>CCW</b> 1스텝 90° &nbsp;·&nbsp;
     <b>비전</b> 프레임 내부 Cognex IS3805 <b>상향 촬영</b> (하부 → 홀 통과) &nbsp;·&nbsp;
+    <b>하부</b> 반투명 PC 커버(후면·양측면) + 전면 정비도어(힌지·손잡이) · 컨트롤러 / 전원 제어박스 내장 &nbsp;·&nbsp;
     <b>스테이션</b> 9시 투입 → 6시 검사 → 3시 배출 (12시 대기)
   </div>
 
@@ -200,7 +201,7 @@
    인덱스 회전형 PCB 검사기 시뮬레이터
    인시스 AI혁신 연구개발실
    =================================================================== */
-var VER='v1.0';
+var VER='v1.1';
 
 /* ======================= 치수 (1 unit = 5 mm) ======================= */
 var U=5;
@@ -211,11 +212,14 @@ var PZ=FH, PZT=FH+PT;                // 상판 하면 / 상면
 var HOLE={x:FW/2, y:24, r:12};       // 앞에서 120 mm · φ120
 var RED ={x:FW/2, y:46, r:4};        // 앞에서 230 mm · 감속기 φ40
 var RIDX=RED.y-HOLE.y;               // 인덱스 반경 22 유닛 = 110 mm
-var JHU=12, JHV=7, JTH=4;            // 안착지그 120 × 70 × 20 mm
-var JZ0=PZT+2.4, JZ1=JZ0+JTH;        // 지그 하면 / 상면
+var JHU=12, JHV=7, JTH=4;            // 상단 PCB 안착지그 120 × 70 × 20 mm
+var LZ0=PZT+2.0, LZ1=LZ0+3;          // 하단 데크 (케이스 받침) 하면/상면
+var UZ0=168, UZ1=UZ0+JTH;            // 상단 데크 (PCB 지그) 하면/상면
+var CHU=8, CHV=5, CTH=7;             // 케이스 80 × 50 × 35 mm
+var CVOF=11;                         // 케이스 접선방향 오프셋 (광축 회피) 55 mm
 var PCB_W=20, PCB_D=10, PCB_T=0.6;   // 타원 PCB 100 × 50 mm
-var CAMZ0=84, CAMZ1=104, LENSZ=110;  // 내부 카메라 (상향)
-var WDU=(JZ1-LENSZ);                 // 작업거리 (유닛)
+var CAMZ0=96, CAMZ1=116, LENSZ=122;  // 내부 카메라 (상향)
+var WDU=(UZ1-LENSZ);                 // 작업거리 (유닛)
 var MON={x:FW/2, y:FL+4, z:FH+38};   // 뒷쪽 상단 모니터
 var MHW=26, MHH=16;                  // 12인치
 
@@ -401,6 +405,61 @@ function drawFrame(){
 }
 
 /* 내부 카메라 (상향) + 브래킷 */
+/* 하부 제어부 — 컨트롤러 · 전원 제어박스 */
+function drawControl(){
+  var o='';
+  o+=box(9,28, 14,46, PR+1, PR+22, [72,80,92],0.45);          // 컨트롤러(비전 PC)
+  o+=box(10.4,26.6, 13.6,13.9, PR+4, PR+19, [40,46,56],0.3);  // 전면 패널
+  for(var i=0;i<4;i++){
+    var q=P(12+i*4, 13.5, PR+16.5);
+    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.8" fill="'+(i<2?'#3FBF63':'#5B646F')+'"/>';
+  }
+  o+=box(32,52, 14,46, PR+1, PR+26, [96,104,116],0.45);       // 전원 제어박스
+  o+=box(33.4,50.6, 13.6,13.9, PR+3, PR+24, [120,128,140],0.3);
+  var h=P(51.0,13.4,PR+13.5);
+  o+='<circle cx="'+h.x.toFixed(1)+'" cy="'+h.y.toFixed(1)+'" r="1.5" fill="#D9A520" stroke="#8A6A12" stroke-width="0.4"/>';  // 메인 브레이커
+  var e=P(38,13.4,PR+21);
+  o+='<circle cx="'+e.x.toFixed(1)+'" cy="'+e.y.toFixed(1)+'" r="2.0" fill="#C0392B" stroke="#7E2318" stroke-width="0.5"/>';  // 비상정지
+  /* 배선 덕트 */
+  o+=box(9,52, 47,50, PR+1, PR+5, [168,176,188],0.35);
+  return o;
+}
+
+/* 하부 반투명 PC 커버 (뒷면·측면) + 전면 정비문 */
+function drawCover(part){
+  var o='', Z0=PR+1, Z1=FH-PR-1;
+  function pane(ps,op,st){
+    return '<polygon points="'+ps.map(pt).join(' ')+'" fill="#BFD6E8" opacity="'+op+'" stroke="'+(st||'#7E99B2')+'" stroke-width="0.6"/>';
+  }
+  if(part==='far'){
+    /* 뒷면 */
+    o+=pane([P(PR,FL-PR,Z0),P(FW-PR,FL-PR,Z0),P(FW-PR,FL-PR,Z1),P(PR,FL-PR,Z1)],0.34);
+    /* 우측면 */
+    o+=pane([P(FW-PR,PR,Z0),P(FW-PR,FL-PR,Z0),P(FW-PR,FL-PR,Z1),P(FW-PR,PR,Z1)],0.30);
+    return o;
+  }
+  /* 좌측면 */
+  o+=pane([P(PR,PR,Z0),P(PR,FL-PR,Z0),P(PR,FL-PR,Z1),P(PR,PR,Z1)],0.30);
+  /* 전면 정비문 */
+  o+=pane([P(PR,PR,Z0),P(FW-PR,PR,Z0),P(FW-PR,PR,Z1),P(PR,PR,Z1)],0.38,'#5E7D99');
+  /* 도어 프레임 */
+  var fr=[[PR,PR],[FW-PR,PR]];
+  o+='<polyline points="'+[P(PR+1,PR-0.2,Z0+1),P(FW-PR-1,PR-0.2,Z0+1),P(FW-PR-1,PR-0.2,Z1-1),P(PR+1,PR-0.2,Z1-1),P(PR+1,PR-0.2,Z0+1)].map(pt).join(' ')+'" fill="none" stroke="#5E7D99" stroke-width="0.8"/>';
+  /* 힌지 2개 (좌측 세로변) */
+  [Z0+16,Z1-16].forEach(function(hz){
+    o+=box(PR-0.6,PR+2.6, PR-1.6,PR+0.2, hz-2.2,hz+2.2, [150,158,170],0.35);
+  });
+  /* 손잡이 (우측) */
+  var hy=PR-2.2, hz0=(Z0+Z1)/2-7, hz1=(Z0+Z1)/2+7;
+  o+=tube({x:FW-PR-5,y:hy,z:hz0},{x:FW-PR-5,y:hy,z:hz1},0.9,MAT.steel,true,true);
+  o+=tube({x:FW-PR-5,y:PR-0.2,z:hz0},{x:FW-PR-5,y:hy,z:hz0},0.7,MAT.steel,false,false);
+  o+=tube({x:FW-PR-5,y:PR-0.2,z:hz1},{x:FW-PR-5,y:hy,z:hz1},0.7,MAT.steel,false,false);
+  /* 도어 라벨 */
+  var lb=P(FW/2,PR-0.4,Z1-10);
+  o+='<text x="'+lb.x.toFixed(1)+'" y="'+lb.y.toFixed(1)+'" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="4.6" font-weight="700" fill="#45607A">정비용 도어</text>';
+  return o;
+}
+
 function drawCamera(){
   var o='';
   o+=box(HOLE.x-13,HOLE.x+13, HOLE.y-11,HOLE.y+11, CAMZ0-3,CAMZ0, MAT.steel,0.45);   // 마운트 플레이트
@@ -467,13 +526,33 @@ function drawStations(){
   });
   return o;
 }
+/* 유성기어박스 — 중공축 로터리 플랜지 + 직각 서보모터 (상판 하면 부착) */
 function drawReducer(){
-  var o='';
-  o+=box(RED.x-9,RED.x+9, RED.y-9,RED.y+9, PZ-16,PZ, MAT.gear,0.45);                 // 감속기 바디
-  o+=tube({x:RED.x,y:RED.y,z:PZ-30},{x:RED.x,y:RED.y,z:PZ-16},4.4,MAT.dark,true,true); // 모터
-  o+=tube({x:RED.x,y:RED.y,z:PZT-0.4},{x:RED.x,y:RED.y,z:JZ0+1},2.2,MAT.steel,false,true); // 출력축
+  var o='', C={x:RED.x, y:RED.y};
+  /* ① 중공 출력 플랜지 (베어링 일체형) */
+  o+=tube({x:C.x,y:C.y,z:PZ-9},{x:C.x,y:C.y,z:PZ-0.3},9.6,[128,136,150],true,true);     // 외륜
+  o+=tube({x:C.x,y:C.y,z:PZ-8.4},{x:C.x,y:C.y,z:PZ-0.1},7.2,[158,166,180],false,true);  // 내륜
+  o+=tube({x:C.x,y:C.y,z:PZ-8.6},{x:C.x,y:C.y,z:PZ+0.1},4.2,[52,58,68],false,true);     // 중공 보어
+  /* 플랜지 볼트 */
+  for(var i=0;i<8;i++){
+    var a=Math.PI/8+Math.PI/4*i;
+    var q=P(C.x+8.5*Math.cos(a), C.y+8.5*Math.sin(a), PZ-0.2);
+    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.75" fill="#5B646F" stroke="#39414A" stroke-width="0.25"/>';
+  }
+  /* ② 기어박스 하우징 (L 형) */
+  o+=box(C.x-9,C.x+9, C.y-9,C.y+9, PZ-22,PZ-9, MAT.gear,0.45);
+  o+=box(C.x-6.5,C.x+6.5, C.y-16,C.y-9, PZ-22,PZ-11, shade8(MAT.gear,0.92),0.45);       // 모터측 연장부
+  /* ③ 직각 서보모터 (하향) */
+  var MX=C.x, MY=C.y-12.5;
+  o+=box(MX-5,MX+5, MY-5,MY+5, PZ-30,PZ-22, [74,80,92],0.45);                            // 어댑터 플랜지
+  o+=box(MX-4.4,MX+4.4, MY-4.4,MY+4.4, PZ-48,PZ-30, MAT.dark,0.45);                      // 모터 바디
+  o+=tube({x:MX,y:MY,z:PZ-54},{x:MX,y:MY,z:PZ-48},3.0,[38,42,50],true,true);             // 엔코더
+  o+=tube({x:MX,y:MY-4.6,z:PZ-45},{x:MX,y:MY-8.5,z:PZ-45},1.0,[46,52,62],true,true);     // 케이블 커넥터
+  /* ④ 출력축 → 상단 데크 */
+  o+=tube({x:C.x,y:C.y,z:PZT-0.4},{x:C.x,y:C.y,z:UZ0+1},2.6,MAT.steel,false,true);
   return o;
 }
+function shade8(b,k){ return [Math.round(b[0]*k),Math.round(b[1]*k),Math.round(b[2]*k)]; }
 
 /* 안착지그 로컬 프레임 (u : 반경방향, v : 접선방향) */
 function jigFrame(A){
@@ -482,54 +561,62 @@ function jigFrame(A){
   return function(u,v,z){ return {X:cx+u*ca-v*sa, Y:cy+u*sa+v*ca, Z:z}; };
 }
 
-/* 인덱스 테이블 (허브 + 암 4개 + 지그 4개 + PCB) */
+/* 인덱스 테이블 — 2단 회전판 (하단 : 케이스 받침 / 상단 : PCB 안착지그) */
 function drawIndex(){
   var o='', k;
-  /* 허브 */
-  o+=tube({x:RED.x,y:RED.y,z:JZ0-1},{x:RED.x,y:RED.y,z:JZ1+0.6},6.5,MAT.steel,false,true);
-  /* 암 + 지그 — 깊이순 정렬 */
+  /* 허브 (2단) */
+  o+=tube({x:RED.x,y:RED.y,z:LZ0-1},{x:RED.x,y:RED.y,z:LZ1+0.4},7.0,MAT.steel,false,true);
+  o+=tube({x:RED.x,y:RED.y,z:LZ1},{x:RED.x,y:RED.y,z:UZ0},3.0,MAT.steel,false,false);
+  o+=tube({x:RED.x,y:RED.y,z:UZ0-0.6},{x:RED.x,y:RED.y,z:UZ1+0.6},6.0,MAT.steel,false,true);
+
   var parts=[];
   for(k=0;k<4;k++){
     var A=jigAngle(k), p=jigPos(A);
-    var dep=P(p.x,p.y,JZ1).d;
-    parts.push({d:dep, k:k, A:A, p:p});
+    parts.push({d:P(p.x,p.y,UZ1).d, k:k, A:A, p:p});
   }
   parts.sort(function(a,b){return b.d-a.d;});
+
   for(var i=0;i<parts.length;i++){
     var q=parts[i], A=q.A, p=q.p, F=jigFrame(A);
-    /* 암 */
-    o+=tube({x:RED.x,y:RED.y,z:JZ0+1.4},{x:p.x,y:p.y,z:JZ0+1.4},2.0,MAT.steel,false,false);
-    /* 지그 블록 (아세탈) — 측면 + 상면 */
-    var out=[[JHU,JHV],[-JHU,JHV],[-JHU,-JHV],[JHU,-JHV]];
-    var vd=viewDir();
-    for(var e=0;e<4;e++){
-      var a0=out[e], b0=out[(e+1)%4];
-      var ex=b0[0]-a0[0], ey=b0[1]-a0[1], el=Math.hypot(ex,ey)||1;
-      var lu=ey/el, lv=-ex/el;
-      var ar=A*Math.PI/180;
-      var nx=lu*Math.cos(ar)-lv*Math.sin(ar), ny=lu*Math.sin(ar)+lv*Math.cos(ar);
-      if(nx*vd.x+ny*vd.y > -0.02) continue;
-      var lam=Math.max(0,nx*LGT.x+ny*LGT.y), kk=0.70+0.34*lam;
-      var qq=[F(a0[0],a0[1],JZ0),F(b0[0],b0[1],JZ0),F(b0[0],b0[1],JZ1),F(a0[0],a0[1],JZ1)].map(PJ);
-      o+=quad(qq[0],qq[1],qq[2],qq[3],shade(MAT.acetal,kk),shade(MAT.acetal,kk*0.88),0.4);
+    var vd=viewDir(), ar=A*Math.PI/180;
+
+    /* ── 하단 데크 : 케이스 받침 트레이 (광축 회피 — 접선 +측) ── */
+    o+=tube({x:RED.x,y:RED.y,z:(LZ0+LZ1)/2},{x:p.x,y:p.y,z:(LZ0+LZ1)/2},1.8,MAT.steel,false,false);
+    o+=prism(F,[[-JHU,-JHV-1.5],[JHU,-JHV-1.5],[JHU,CVOF+CHV+1.5],[-JHU,CVOF+CHV+1.5]],LZ0,LZ1,ar,[150,162,180],0.4);
+    /* 중앙 광축 개구 φ80 (하부 촬영) */
+    var oph=ellPts(8,8,32).map(function(c){ return PJ(F(c[0],c[1],LZ1+0.05)); });
+    o+='<polygon points="'+oph.map(pt).join(' ')+'" fill="#161D26" stroke="'+shade([150,162,180],0.74)+'" stroke-width="0.5"/>';
+    /* 케이스 */
+    if(slots[q.k] && slots[q.k].c){
+      o+=prism(F,[[-CHU,CVOF-CHV],[CHU,CVOF-CHV],[CHU,CVOF+CHV],[-CHU,CVOF+CHV]],LZ1,LZ1+CTH,ar,[104,112,126],0.4);
+      var ct=[F(-CHU+1.4,CVOF-CHV+1.0,LZ1+CTH+0.08),F(CHU-1.4,CVOF-CHV+1.0,LZ1+CTH+0.08),
+              F(CHU-1.4,CVOF+CHV-1.0,LZ1+CTH+0.08),F(-CHU+1.4,CVOF+CHV-1.0,LZ1+CTH+0.08)].map(PJ);
+      o+='<polygon points="'+ct.map(pt).join(' ')+'" fill="#50576620" stroke="#3A414D" stroke-width="0.4"/>';
     }
-    var top=out.map(function(c){ return PJ(F(c[0],c[1],JZ1)); });
-    o+='<polygon points="'+top.map(pt).join(' ')+'" fill="'+shade(MAT.acetal,1.08)+'" stroke="'+shade(MAT.acetal,0.84)+'" stroke-width="0.45"/>';
+    /* 2단 연결 포스트 */
+    [[-JHU+2.0,5.6],[JHU-2.0,5.6]].forEach(function(c){
+      var b1=F(c[0],c[1],LZ1), b2=F(c[0],c[1],UZ0);
+      o+=tube({x:b1.X,y:b1.Y,z:b1.Z},{x:b2.X,y:b2.Y,z:b2.Z},1.1,MAT.steel,false,false);
+    });
+    o+=tube({x:RED.x,y:RED.y,z:(UZ0+UZ1)/2},{x:p.x,y:p.y,z:(UZ0+UZ1)/2},2.0,MAT.steel,false,false);
+
+    /* ── 상단 데크 : PCB 안착지그 (아세탈) ── */
+    o+=prism(F,[[-JHU,-JHV],[JHU,-JHV],[JHU,JHV],[-JHU,JHV]],UZ0,UZ1,ar,MAT.acetal,0.4,1.08);
     /* 안착 포켓 */
-    var pk=ellPts(PCB_W/2+1.2,PCB_D/2+1.2,36).map(function(c){ return PJ(F(c[0],c[1],JZ1-0.12)); });
+    var pk=ellPts(PCB_W/2+1.2,PCB_D/2+1.2,36).map(function(c){ return PJ(F(c[0],c[1],UZ1-0.12)); });
     o+='<polygon points="'+pk.map(pt).join(' ')+'" fill="'+shade(MAT.acetal,0.88)+'" stroke="none"/>';
+    /* 광축 개구 (하부 촬영용) */
+    var ap=ellPts(PCB_W/2-3.4,PCB_D/2-2.0,32).map(function(c){ return PJ(F(c[0],c[1],UZ0-0.05)); });
+    o+='<polygon points="'+ap.map(pt).join(' ')+'" fill="#1B222B" opacity=".55" stroke="none"/>';
     /* 기준핀 2개 */
     [[-JHU+2.4,0],[JHU-2.4,0]].forEach(function(c){
-      var b1=F(c[0],c[1],JZ1), b2=F(c[0],c[1],JZ1+1.8);
+      var b1=F(c[0],c[1],UZ1), b2=F(c[0],c[1],UZ1+1.8);
       o+=tube({x:b1.X,y:b1.Y,z:b1.Z},{x:b2.X,y:b2.Y,z:b2.Z},0.7,MAT.steel,false,true);
     });
     /* PCB */
-    if(slots[q.k]){
-      var insp=(Math.abs(norm360(A-ST_INSP))<1);
-      o+=drawPcbOn(F, slots[q.k], insp);
-    }
+    if(slots[q.k]) o+=drawPcbOn(F, slots[q.k], Math.abs(norm360(A-ST_INSP))<1);
     /* 스테이션 표시등 */
-    var lz=PJ(F(0,JHV+3.0,JZ1+0.4));
+    var lz=PJ(F(0,-JHV-2.6,UZ1+0.4));
     var stA=norm360(A);
     var lcol=(stA===ST_IN)?'#2FA8E8':(stA===ST_INSP)?'#E8873A':(stA===ST_OUT)?'#3FBF63':'#9AA4B0';
     o+='<circle cx="'+lz.x.toFixed(1)+'" cy="'+lz.y.toFixed(1)+'" r="1.4" fill="'+lcol+'" opacity=".9"/>';
@@ -537,39 +624,58 @@ function drawIndex(){
   return o;
 }
 
+/* 로컬 프레임 기준 다각 기둥 (측면 + 상면) */
+function prism(F,outl,z0,z1,ar,base,sw,topK){
+  var o='', vd=viewDir(), i;
+  for(i=0;i<outl.length;i++){
+    var a0=outl[i], b0=outl[(i+1)%outl.length];
+    var ex=b0[0]-a0[0], ey=b0[1]-a0[1], el=Math.hypot(ex,ey)||1;
+    var lu=ey/el, lv=-ex/el;
+    var nx=lu*Math.cos(ar)-lv*Math.sin(ar), ny=lu*Math.sin(ar)+lv*Math.cos(ar);
+    if(nx*vd.x+ny*vd.y > -0.02) continue;
+    var lam=Math.max(0,nx*LGT.x+ny*LGT.y), kk=0.70+0.34*lam;
+    var qq=[F(a0[0],a0[1],z0),F(b0[0],b0[1],z0),F(b0[0],b0[1],z1),F(a0[0],a0[1],z1)].map(PJ);
+    o+=quad(qq[0],qq[1],qq[2],qq[3],shade(base,kk),shade(base,kk*0.86),sw||0.4);
+  }
+  var top=outl.map(function(c){ return PJ(F(c[0],c[1],z1)); });
+  o+='<polygon points="'+top.map(pt).join(' ')+'" fill="'+shade(base,topK||1.04)+'" stroke="'+shade(base,0.82)+'" stroke-width="0.45"/>';
+  return o;
+}
+
 function drawPcbOn(F,slot,insp){
   var o='', hu=PCB_W/2, hv=PCB_D/2;
   var base=ellPts(hu,hv,40);
-  var side=base.map(function(c){ return PJ(F(c[0],c[1],JZ1)); });
-  var top =base.map(function(c){ return PJ(F(c[0],c[1],JZ1+PCB_T)); });
-  /* 측면 */
+  var side=base.map(function(c){ return PJ(F(c[0],c[1],UZ1)); });
+  var top =base.map(function(c){ return PJ(F(c[0],c[1],UZ1+PCB_T)); });
   for(var i=0;i<base.length;i++){
     var j=(i+1)%base.length;
     o+=quad(side[i],side[j],top[j],top[i],shade(MAT.pcb,0.70),shade(MAT.pcb,0.56),0.3);
   }
   var pcol=slot.v==='NG'?[132,70,56]:MAT.pcb;
   o+='<polygon points="'+top.map(pt).join(' ')+'" fill="'+shade(pcol,1.05)+'" stroke="'+shade(pcol,0.72)+'" stroke-width="0.4"/>';
-  /* 패드 */
   for(var r=0;r<3;r++) for(var c=0;c<5;c++){
     var pu=-hu+3.0+c*3.6, pv=-hv+2.0+r*2.5;
     if((pu/hu)*(pu/hu)+(pv/hv)*(pv/hv)>0.62) continue;
-    var qq=[F(pu-1.0,pv-0.7,JZ1+PCB_T+0.05),F(pu+1.0,pv-0.7,JZ1+PCB_T+0.05),
-            F(pu+1.0,pv+0.7,JZ1+PCB_T+0.05),F(pu-1.0,pv+0.7,JZ1+PCB_T+0.05)].map(PJ);
+    var qq=[F(pu-1.0,pv-0.7,UZ1+PCB_T+0.05),F(pu+1.0,pv-0.7,UZ1+PCB_T+0.05),
+            F(pu+1.0,pv+0.7,UZ1+PCB_T+0.05),F(pu-1.0,pv+0.7,UZ1+PCB_T+0.05)].map(PJ);
     o+='<polygon points="'+qq.map(pt).join(' ')+'" fill="'+shade(MAT.gold,1.0)+'" stroke="none"/>';
   }
-  /* 커넥터 */
-  var cb=[F(hu-4.0,-2.0,JZ1+PCB_T),F(hu-1.4,-2.0,JZ1+PCB_T),F(hu-1.4,2.0,JZ1+PCB_T),F(hu-4.0,2.0,JZ1+PCB_T)];
-  var ct=cb.map(function(q){ return PJ({X:q.X,Y:q.Y,Z:q.Z+1.4}); });
-  o+='<polygon points="'+ct.map(pt).join(' ')+'" fill="'+shade(MAT.dark,1.1)+'" stroke="'+shade(MAT.dark,0.8)+'" stroke-width="0.35"/>';
-  /* 검사 화각 */
+  var cb=[F(hu-4.0,-2.0,UZ1+PCB_T),F(hu-1.4,-2.0,UZ1+PCB_T),F(hu-1.4,2.0,UZ1+PCB_T),F(hu-4.0,2.0,UZ1+PCB_T)];
+  var ct2=cb.map(function(q){ return PJ({X:q.X,Y:q.Y,Z:q.Z+1.4}); });
+  o+='<polygon points="'+ct2.map(pt).join(' ')+'" fill="'+shade(MAT.dark,1.1)+'" stroke="'+shade(MAT.dark,0.8)+'" stroke-width="0.35"/>';
+  /* PCB ↔ 케이스 연결 케이블 */
+  if(slot.c){
+    var a1=PJ(F(hu-2.0,1.6,UZ1+PCB_T+0.8)), a2=PJ(F(CHU-2,CVOF-CHV-0.5,LZ1+CTH));
+    o+='<path d="M'+a1.x.toFixed(1)+','+a1.y.toFixed(1)+' Q'+((a1.x+a2.x)/2+3).toFixed(1)+','+((a1.y+a2.y)/2+2).toFixed(1)+' '+a2.x.toFixed(1)+','+a2.y.toFixed(1)+'" fill="none" stroke="#3A4150" stroke-width="0.8" stroke-linecap="round"/>';
+  }
   if(insp && shotT>=0){
     var ring=[];
-    for(var a=0;a<40;a++){ var th=2*Math.PI*a/40; ring.push(PJ(F(13*Math.cos(th),13*Math.sin(th),JZ1+0.12))); }
+    for(var a=0;a<40;a++){ var th=2*Math.PI*a/40; ring.push(PJ(F(13*Math.cos(th),13*Math.sin(th),UZ1+0.12))); }
     var fl=(shotT<0.32)?(1-shotT/0.32):0;
     if(fl>0) o+='<polygon points="'+ring.map(pt).join(' ')+'" fill="#FFFFFF" opacity="'+(fl*0.55).toFixed(2)+'"/>';
     o+='<polygon points="'+ring.map(pt).join(' ')+'" fill="#E8873A" opacity=".08" stroke="#E8873A" stroke-width="1.3"/>';
-    var c1=PJ(F(-13,0,JZ1+0.12)), c2=PJ(F(13,0,JZ1+0.12));
-    var c3=PJ(F(0,-13,JZ1+0.12)), c4=PJ(F(0,13,JZ1+0.12));
+    var c1=PJ(F(-13,0,UZ1+0.12)), c2=PJ(F(13,0,UZ1+0.12));
+    var c3=PJ(F(0,-13,UZ1+0.12)), c4=PJ(F(0,13,UZ1+0.12));
     o+='<line x1="'+c1.x.toFixed(1)+'" y1="'+c1.y.toFixed(1)+'" x2="'+c2.x.toFixed(1)+'" y2="'+c2.y.toFixed(1)+'" stroke="#E8873A" stroke-width="0.55" opacity=".75"/>';
     o+='<line x1="'+c3.x.toFixed(1)+'" y1="'+c3.y.toFixed(1)+'" x2="'+c4.x.toFixed(1)+'" y2="'+c4.y.toFixed(1)+'" stroke="#E8873A" stroke-width="0.55" opacity=".75"/>';
   }
@@ -581,12 +687,12 @@ function drawSensor(){
   var o='';
   var p=jigPos(ST_IN);
   var sx=p.x-9, sy=p.y;
-  o+=tube({x:sx,y:sy,z:PZT},{x:sx,y:sy,z:PZT+14},1.1,MAT.steel,false,true);
-  o+=box(sx-2.2,sx+2.2, sy-1.6,sy+1.6, PZT+12,PZT+16, MAT.dark,0.4);
-  var q=P(sx+2.3,sy,PZT+14);
+  o+=tube({x:sx,y:sy,z:PZT},{x:sx,y:sy,z:PZT+18},1.1,MAT.steel,false,true);
+  o+=box(sx-2.2,sx+2.2, sy-1.6,sy+1.6, PZT+16,PZT+20, MAT.dark,0.4);
+  var q=P(sx+2.3,sy,PZT+18);
   o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="1.3" fill="'+(senOn?'#3FBF63':'#59636F')+'"/>';
   if(senOn){
-    var a=P(sx+2.4,sy,PZT+14), b=P(p.x-JHU+1,sy,JZ1+1.5);
+    var a=P(sx+2.4,sy,PZT+18), b=P(p.x-JHU+1,sy,UZ1+1.5);
     o+='<line x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'" stroke="#E8544A" stroke-width="0.7" opacity=".8" stroke-dasharray="2 1.4"/>';
   }
   return o;
@@ -704,11 +810,14 @@ function draw(){
   var s='';
   s+=drawFloor();
   s+=drawFrame();
+  s+=drawCover('far');
+  s+=drawControl();
   s+=drawCamera();
   s+=drawReducer();
   s+=drawPlate();
   s+=drawIndex();
   s+=drawSensor();
+  s+=drawCover('near');
   s+=drawStations();
   s+=drawMonitor();
   document.getElementById('scene').innerHTML=s;
@@ -792,8 +901,8 @@ function runState(){
     var k=jigAt(ST_IN);
     if(k>=0 && !slots[k]){
       serial++;
-      slots[k]={sn:'A5030-2611-'+('000'+serial).slice(-4), v:''};
-      addLog('[투입] 9시 스테이션 — PCB 안착 (SN '+slots[k].sn+')');
+      slots[k]={sn:'A5030-2611-'+('000'+serial).slice(-4), v:'', c:true};
+      addLog('[투입] 9시 스테이션 — 상단 PCB · 하단 케이스 동시 안착 (SN '+slots[k].sn+')');
     } else {
       addLog('[투입] 9시 스테이션 — 지그 점유, 대기');
     }
