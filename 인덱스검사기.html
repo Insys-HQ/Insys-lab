@@ -121,13 +121,15 @@
   <button class="vtab" id="bFront" type="button">정면</button>
   <button class="vtab" id="bIso" type="button">아이소</button>
   <button class="vtab" id="bTop" type="button">평면</button>
+  <button class="vtab" id="bDrv" type="button">구동부</button>
 </div></div>
 
 <main>
   <div class="spec">
     <b>프레임</b> 알루미늄 3030 프로파일 · 외곽 폭 300 × 길이 600 × 높이 750 mm · 상판 10T 알루미늄 &nbsp;·&nbsp;
-    <b>상판 가공</b> 앞에서 120 mm 지점 φ120 촬영홀 · 앞에서 230 mm 지점 감속기 고정부(φ40 + M5 4) &nbsp;·&nbsp;
-    <b>인덱스</b> 유성기어박스(중공축 플랜지 + 직각 서보) 직결 · <b>2단 회전판</b> — 상단 PCB 지그 / 하단 케이스 받침 · 4개 90° 등배 · 회전반경 110 mm · <b>CCW</b> 1스텝 90° &nbsp;·&nbsp;
+    <b>상판 가공</b> 앞에서 120 mm 지점 φ120 촬영홀 · 앞에서 230 mm 지점 테이블 관통 φ90 (M6 × 4 · BCD φ110) &nbsp;·&nbsp;
+    <b>인덱스 구동</b> <b>DG085-F-10</b> 중공 로터리 테이블 (테이블 φ85 · 허용토크 20 N·m · 허용 모멘트 27 N·m · 반복정밀도 ±5 arc-sec) + 유성기어박스 <b>감속비 40</b> + AC 서보 <b>100 W</b> · 상판 하면 직결 &nbsp;·&nbsp;
+    <b>부하</b> 회전부 2.5 kg · 관성 0.044 kg·m² · 소요토크 1.6 N·m (사용률 10%) · 1스텝 90° / 0.5초 (출력 60 r/min · 서보 2,400 r/min) · <b>2단 회전판</b> 상단 PCB 지그 / 하단 케이스 받침 · 4개 90° 등배 · 회전반경 110 mm · <b>CCW</b> &nbsp;·&nbsp;
     <b>비전</b> 프레임 내부 Cognex IS3805 <b>상향 촬영</b> (하부 → 홀 통과) &nbsp;·&nbsp;
     <b>하부</b> 반투명 PC 커버(후면·양측면) + 전면 정비도어(힌지·손잡이) · 컨트롤러 / 전원 제어박스 내장 &nbsp;·&nbsp;
     <b>스테이션</b> 9시 투입 → 6시 검사 → 3시 배출 (12시 대기)
@@ -201,7 +203,7 @@
    인덱스 회전형 PCB 검사기 시뮬레이터
    인시스 AI혁신 연구개발실
    =================================================================== */
-var VER='v1.1';
+var VER='v1.2';
 
 /* ======================= 치수 (1 unit = 5 mm) ======================= */
 var U=5;
@@ -210,8 +212,16 @@ var PR=6;                            // 3030 프로파일 30 mm
 var PT=2;                            // 상판 10T
 var PZ=FH, PZT=FH+PT;                // 상판 하면 / 상면
 var HOLE={x:FW/2, y:24, r:12};       // 앞에서 120 mm · φ120
-var RED ={x:FW/2, y:46, r:4};        // 앞에서 230 mm · 감속기 φ40
+var RED ={x:FW/2, y:46, r:9.0};      // 앞에서 230 mm · 테이블 관통홀 φ90
 var RIDX=RED.y-HOLE.y;               // 인덱스 반경 22 유닛 = 110 mm
+/* ── 인덱스 구동부 : DG085-F-10 중공 로터리 테이블 + 유성기어박스(i=40) + 100 W 서보 ── */
+var TBL_R=8.5;                       // 로터리 테이블 외경 φ85
+var TBL_Z0=PZ-3.0, TBL_Z1=PZT+1.0;   // 테이블 플랜지 하면 / 상면 (상판 상면 +5 mm)
+var BORE_R=3.0;                      // 중공 보어 φ30 (배선 관통)
+var HSG_W=11, HSG_H=14;              // 하우징 110 × 110 × 70 mm
+var BCD=11;                          // 하우징 체결 M6 × 4 (BCD φ110)
+var PGB_R=6.0, PGB_L=12;             // 유성기어박스 φ60 × 60 mm (감속비 40)
+var SV_H=4.0, SV_L=20;               // AC 서보 100 W — 40 × 40 × 100 mm
 var JHU=12, JHV=7, JTH=4;            // 상단 PCB 안착지그 120 × 70 × 20 mm
 var LZ0=PZT+2.0, LZ1=LZ0+3;          // 하단 데크 (케이스 받침) 하면/상면
 var UZ0=168, UZ1=UZ0+JTH;            // 상단 데크 (PCB 지그) 하면/상면
@@ -225,6 +235,7 @@ var MHW=26, MHH=16;                  // 12인치
 
 /* ======================= 투영 ======================= */
 var VIEW={yaw:32,pitch:24};
+var drvView=false;               // 구동부 투시 보기 (상판·회전판 반투명)
 var VCX=254, VCY=372, VOX=30, VOY=52;
 function P(X,Y,Z){
   var ty=VIEW.yaw*Math.PI/180, tp=VIEW.pitch*Math.PI/180;
@@ -349,7 +360,7 @@ var STATES=[
   {ph:'대기',    t:'wait',  lb:'START 대기 — 인덱스 원점'},
   {ph:'투입',    t:'load',  lb:'9시 스테이션 : 이전 공정 작업자가 PCB 안착'},
   {ph:'투입',    t:'sense', lb:'안착센서 감지 → 지그 안착 확인'},
-  {ph:'인덱스',  t:'index', lb:'감속기 구동 → 90° CCW 인덱스 회전'},
+  {ph:'인덱스',  t:'index', lb:'DG085-F-10 구동 → 90° CCW 인덱스 회전 (0.5초)'},
   {ph:'인덱스',  t:'settle',lb:'정위치 정지 · 인덱스 핀 클램프'},
   {ph:'검사',    t:'light', lb:'하부 링조명 ON (상판 φ120 홀 통과)'},
   {ph:'검사',    t:'shot',  lb:'6시 스테이션 : IS3805 상향 촬영'},
@@ -455,8 +466,10 @@ function drawCover(part){
   o+=tube({x:FW-PR-5,y:PR-0.2,z:hz0},{x:FW-PR-5,y:hy,z:hz0},0.7,MAT.steel,false,false);
   o+=tube({x:FW-PR-5,y:PR-0.2,z:hz1},{x:FW-PR-5,y:hy,z:hz1},0.7,MAT.steel,false,false);
   /* 도어 라벨 */
-  var lb=P(FW/2,PR-0.4,Z1-10);
-  o+='<text x="'+lb.x.toFixed(1)+'" y="'+lb.y.toFixed(1)+'" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="4.6" font-weight="700" fill="#45607A">정비용 도어</text>';
+  if(!drvView){
+    var lb=P(FW/2,PR-0.4,Z1-10);
+    o+='<text x="'+lb.x.toFixed(1)+'" y="'+lb.y.toFixed(1)+'" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="4.6" font-weight="700" fill="#45607A">정비용 도어</text>';
+  }
   return o;
 }
 
@@ -478,7 +491,7 @@ function drawCamera(){
   return o;
 }
 
-/* 상판 10T — φ120 홀 · 감속기 고정부 */
+/* 상판 10T — φ120 촬영홀 · 테이블 관통 φ90 */
 function drawPlate(){
   var o='';
   /* 측면(두께) */
@@ -497,15 +510,17 @@ function drawPlate(){
     var gl=circlePts(HOLE.x,HOLE.y,PZ-0.1,HOLE.r-0.6,44);
     o+=polyStr(gl)+'fill="#F7CE72" opacity="'+(shotT>=0?0.55:0.3)+'" stroke="none"/>';
   }
-  /* 감속기 고정부 : φ40 + M5 4개 */
-  var rOut=circlePts(RED.x,RED.y,PZT+0.06,RED.r+3.4,32);
+  /* 감속기 고정부 : 테이블 관통 φ90 + M6 탭 4개 (BCD φ110) */
+  var rOut=circlePts(RED.x,RED.y,PZT+0.06,BCD+2.2,36);
   o+=polyStr(rOut)+'fill="'+shade(MAT.plate,0.9)+'" stroke="'+shade(MAT.plateE,0.7)+'" stroke-width="0.5"/>';
-  var rIn=circlePts(RED.x,RED.y,PZT+0.07,RED.r,28);
-  o+=polyStr(rIn)+'fill="#1B222B" stroke="none"/>';
+  var rCut=circlePts(RED.x,RED.y,PZT+0.07,RED.r,36);
+  o+=polyStr(rCut)+'fill="'+shade(MAT.plateE,0.5)+'" stroke="'+shade(MAT.plateE,0.72)+'" stroke-width="0.55"/>';
+  var rIn=circlePts(RED.x,RED.y,PZ-0.05,RED.r,36);
+  o+=polyStr(rIn)+'fill="#141A22" stroke="none"/>';
   for(var i=0;i<4;i++){
     var a=Math.PI/4+Math.PI/2*i;
-    var q=P(RED.x+6.4*Math.cos(a), RED.y+6.4*Math.sin(a), PZT+0.08);
-    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.9" fill="#5B646F" stroke="#39414A" stroke-width="0.3"/>';
+    var q=P(RED.x+BCD*Math.cos(a), RED.y+BCD*Math.sin(a), PZT+0.08);
+    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="1.0" fill="#5B646F" stroke="#39414A" stroke-width="0.3"/>';
   }
   /* 모서리 고정 볼트 4개 */
   [[7,7],[FW-7,7],[7,FL-7],[FW-7,FL-7]].forEach(function(c){
@@ -516,9 +531,10 @@ function drawPlate(){
   return o;
 }
 
-/* 감속기 + 인덱스 축 */
+/* 스테이션 라벨 */
 function drawStations(){
   var o='';
+  if(drvView) return o;
   [[ST_IN,'9시 투입','#2FA8E8'],[ST_INSP,'6시 검사','#E8873A'],[ST_OUT,'3시 배출','#3FBF63'],[ST_WAIT,'12시 대기','#8A95A3']].forEach(function(s){
     var p=jigPos(s[0]);
     var q=P(RED.x+(p.x-RED.x)*1.78, RED.y+(p.y-RED.y)*1.78, PZT+0.6);
@@ -526,31 +542,95 @@ function drawStations(){
   });
   return o;
 }
-/* 유성기어박스 — 중공축 로터리 플랜지 + 직각 서보모터 (상판 하면 부착) */
-function drawReducer(){
-  var o='', C={x:RED.x, y:RED.y};
-  /* ① 중공 출력 플랜지 (베어링 일체형) */
-  o+=tube({x:C.x,y:C.y,z:PZ-9},{x:C.x,y:C.y,z:PZ-0.3},9.6,[128,136,150],true,true);     // 외륜
-  o+=tube({x:C.x,y:C.y,z:PZ-8.4},{x:C.x,y:C.y,z:PZ-0.1},7.2,[158,166,180],false,true);  // 내륜
-  o+=tube({x:C.x,y:C.y,z:PZ-8.6},{x:C.x,y:C.y,z:PZ+0.1},4.2,[52,58,68],false,true);     // 중공 보어
-  /* 플랜지 볼트 */
-  for(var i=0;i<8;i++){
-    var a=Math.PI/8+Math.PI/4*i;
-    var q=P(C.x+8.5*Math.cos(a), C.y+8.5*Math.sin(a), PZ-0.2);
-    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.75" fill="#5B646F" stroke="#39414A" stroke-width="0.25"/>';
+/* DG085-F-10 중공 로터리 테이블 + 유성기어박스(i=40) + AC 서보 100 W
+   part 'low' : 상판 하부 (하우징 · 기어박스 · 모터) / part 'tbl' : 상판 관통 출력 테이블 */
+function drawReducer(part){
+  var o='', C={x:RED.x, y:RED.y}, i, q, a;
+
+  if(part==='tbl'){
+    /* 중공 출력 테이블 φ85 — 상판 위로 5 mm 돌출 */
+    o+=tube({x:C.x,y:C.y,z:TBL_Z0},{x:C.x,y:C.y,z:TBL_Z1},TBL_R,[130,139,153],false,true);         // 외륜
+    o+=tube({x:C.x,y:C.y,z:TBL_Z0+0.4},{x:C.x,y:C.y,z:TBL_Z1+0.14},TBL_R-1.4,[170,178,192],false,true); // 테이블 상면
+    o+=tube({x:C.x,y:C.y,z:TBL_Z0+0.3},{x:C.x,y:C.y,z:TBL_Z1+0.26},BORE_R,[44,50,60],false,true);  // 중공 보어 φ30
+    /* 회전판 체결 탭 M5 × 8 */
+    for(i=0;i<8;i++){
+      a=Math.PI/8+Math.PI/4*i;
+      q=P(C.x+(TBL_R-2.5)*Math.cos(a), C.y+(TBL_R-2.5)*Math.sin(a), TBL_Z1+0.2);
+      o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.72" fill="#5B646F" stroke="#39414A" stroke-width="0.24"/>';
+    }
+    return o;
   }
-  /* ② 기어박스 하우징 (L 형) */
-  o+=box(C.x-9,C.x+9, C.y-9,C.y+9, PZ-22,PZ-9, MAT.gear,0.45);
-  o+=box(C.x-6.5,C.x+6.5, C.y-16,C.y-9, PZ-22,PZ-11, shade8(MAT.gear,0.92),0.45);       // 모터측 연장부
-  /* ③ 직각 서보모터 (하향) */
-  var MX=C.x, MY=C.y-12.5;
-  o+=box(MX-5,MX+5, MY-5,MY+5, PZ-30,PZ-22, [74,80,92],0.45);                            // 어댑터 플랜지
-  o+=box(MX-4.4,MX+4.4, MY-4.4,MY+4.4, PZ-48,PZ-30, MAT.dark,0.45);                      // 모터 바디
-  o+=tube({x:MX,y:MY,z:PZ-54},{x:MX,y:MY,z:PZ-48},3.0,[38,42,50],true,true);             // 엔코더
-  o+=tube({x:MX,y:MY-4.6,z:PZ-45},{x:MX,y:MY-8.5,z:PZ-45},1.0,[46,52,62],true,true);     // 케이블 커넥터
-  /* ④ 출력축 → 상단 데크 */
-  o+=tube({x:C.x,y:C.y,z:PZT-0.4},{x:C.x,y:C.y,z:UZ0+1},2.6,MAT.steel,false,true);
+
+  /* ① 하우징 110 × 110 × 70 — 상판 하면 밀착 */
+  o+=box(C.x-HSG_W, C.x+HSG_W, C.y-HSG_W, C.y+HSG_W, PZ-HSG_H, PZ-0.15, [126,135,150], 0.45);
+  /* 하우징 상면 체결 볼트 M6 × 4 */
+  for(i=0;i<4;i++){
+    a=Math.PI/4+Math.PI/2*i;
+    q=P(C.x+BCD*Math.cos(a), C.y+BCD*Math.sin(a), PZ-0.1);
+    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.85" fill="#6A7380" stroke="#414952" stroke-width="0.26"/>';
+  }
+  /* 하우징 하부 베어링 보스 */
+  o+=tube({x:C.x,y:C.y,z:PZ-HSG_H-2.4},{x:C.x,y:C.y,z:PZ-HSG_H+0.2},5.4,[108,116,130],true,true);
+
+  /* ② 유성기어박스 (F형 · 감속비 40) — 웜 입력축 동축 · 후방 수평 */
+  var gy0=C.y+HSG_W, gy1=gy0+PGB_L, gz=PZ-HSG_H/2;
+  o+=box(C.x-PGB_R-0.9, C.x+PGB_R+0.9, gy0, gy0+1.5, gz-PGB_R-0.9, gz+PGB_R+0.9, [98,106,120], 0.4);   // 어댑터 플랜지
+  o+=tube({x:C.x,y:gy0+1.3,z:gz},{x:C.x,y:gy1,z:gz},PGB_R,[146,154,168],false,true);                   // 기어박스 바디
+  o+=tube({x:C.x,y:gy1-3.0,z:gz},{x:C.x,y:gy1-2.2,z:gz},PGB_R+0.5,[116,124,138],false,false);            // 외주 리브
+
+  /* ③ AC 서보모터 100 W */
+  var sy0=gy1, sy1=sy0+SV_L;
+  o+=box(C.x-PGB_R+0.7, C.x+PGB_R-0.7, sy0, sy0+1.3, gz-PGB_R+0.7, gz+PGB_R-0.7, [94,101,114], 0.4);     // 모터 플랜지
+  o+=box(C.x-SV_H, C.x+SV_H, sy0+1.1, sy1, gz-SV_H, gz+SV_H, [72,79,92], 0.45);                         // 바디 40 × 40
+  o+=tube({x:C.x,y:sy1,z:gz},{x:C.x,y:sy1+3.6,z:gz},3.0,[38,42,50],false,true);                        // 절대치 엔코더
+  o+=tube({x:C.x-2.3,y:sy1+3.6,z:gz},{x:C.x-2.3,y:sy1+6.2,z:gz},1.0,[46,52,62],false,true);            // 동력 커넥터
+  o+=tube({x:C.x+2.3,y:sy1+3.6,z:gz},{x:C.x+2.3,y:sy1+6.2,z:gz},1.0,[46,52,62],false,true);            // 엔코더 커넥터
+
+  /* ④ 모델 라벨 (구동부 보기) */
+  if(drvView){
+    var lb=P(C.x, C.y+HSG_W*0.2, PZ-HSG_H-4.8);
+    o+='<text x="'+lb.x.toFixed(1)+'" y="'+lb.y.toFixed(1)+'" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="3.4" font-weight="900" fill="#16324B" stroke="#FBFCFE" stroke-width="1.0" paint-order="stroke">DG085-F-10</text>';
+  }
   return o;
+}
+/* 구동부 상세 — 상판 하면 DG085-F-10 직결 구조 */
+function drawDrive(){
+  var s='';
+  s+=drawReducer('low');
+  s+='<g opacity="0.30">'+drawPlate()+'</g>';
+  s+=drawReducer('tbl');
+  s+='<g opacity="0.30">'+drawIndex()+'</g>';
+  s+=drawDriveNote();
+  return s;
+}
+/* 구동부 상세 — 치수 지시 + 사양 */
+function drawDriveNote(){
+  var o='', C={x:RED.x,y:RED.y}, gz=PZ-HSG_H/2;
+  function note(p,dx,dy,t,col){
+    var q=PJ(p), tx=q.x+dx, ty=q.y+dy;
+    o+='<line x1="'+q.x.toFixed(1)+'" y1="'+q.y.toFixed(1)+'" x2="'+(tx-(dx>0?0.9:-0.9)).toFixed(1)+'" y2="'+ty.toFixed(1)+'" stroke="'+col+'" stroke-width="0.3" stroke-dasharray="1.1 0.8"/>';
+    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.55" fill="'+col+'"/>';
+    o+='<text x="'+tx.toFixed(1)+'" y="'+(ty+0.9).toFixed(1)+'" text-anchor="'+(dx>0?'start':'end')+'" font-family="\'Noto Sans KR\',sans-serif" font-size="2.7" font-weight="700" fill="'+col+'" stroke="#FBFCFE" stroke-width="0.85" paint-order="stroke">'+t+'</text>';
+  }
+  note({X:C.x,Y:C.y-TBL_R,Z:TBL_Z1},                    15,-15, '출력 테이블 φ85 · 상판 관통 φ90', '#2E4A66');
+  note({X:C.x,Y:C.y-BCD,Z:PZT},                         17, -5, 'M6 × 4 · BCD φ110', '#6B4A2E');
+  note({X:C.x,Y:C.y-HSG_W,Z:PZ-HSG_H},                  15, -3, '하우징 110 × 110 × 70', '#44566B');
+  note({X:C.x,Y:C.y+HSG_W+PGB_L*0.5,Z:gz-PGB_R},        -4, 13, '유성기어박스 i=40', '#1F6F8B');
+  note({X:C.x,Y:C.y+HSG_W+PGB_L+SV_L*0.5,Z:gz+SV_H},   -11,-11, 'AC 서보 100 W (40×40)', '#1F6F8B');
+  /* 사양 주기 — 하단 스트립 (화면 좌표 고정) */
+  var BX=178.0, BY=258.5, BW=137, BH=18;
+  var rows=[['DG085-F-10  중공 로터리 테이블 · 유성기어 i=40 · AC 서보 100 W','#16324B',3.0,900],
+            ['허용토크 20 N·m / 허용 모멘트 27 N·m / 허용 축하중 800 N · 반복정밀도 ±5 arc-sec','#3A4C5E',2.5,600],
+            ['회전부 2.5 kg · 관성 J 0.044 kg·m² · 90° / 0.5초 → 소요토크 1.6 N·m (사용률 10%)','#3A4C5E',2.5,600]];
+  o+='<rect x="'+BX+'" y="'+BY+'" width="'+BW+'" height="'+BH+'" rx="1.8" fill="#FFFFFF" opacity="0.96" stroke="#C3CEDA" stroke-width="0.4"/>';
+  o+='<rect x="'+BX+'" y="'+BY+'" width="1.8" height="'+BH+'" rx="0.9" fill="#2E4A66"/>';
+  for(var i=0;i<rows.length;i++){
+    o+='<text x="'+(BX+4.6)+'" y="'+(BY+4.8+i*4.7).toFixed(1)+'" font-family="\'Noto Sans KR\',sans-serif" font-size="'+rows[i][2]+'" font-weight="'+rows[i][3]+'" fill="'+rows[i][1]+'">'+rows[i][0]+'</text>';
+  }
+  return o;
+}
+function vTab(id){
+  ['bFront','bIso','bTop','bDrv'].forEach(function(k){ $(k).classList.toggle('on', k===id); });
 }
 function shade8(b,k){ return [Math.round(b[0]*k),Math.round(b[1]*k),Math.round(b[2]*k)]; }
 
@@ -806,15 +886,20 @@ function drawMonitor(){
   return o+g;
 }
 
+var VB_MAIN='152 148 194 266', VB_DRV='175.5 198 146 81';
 function draw(){
+  var el=document.getElementById('scene');
+  if(drvView){ el.setAttribute('viewBox',VB_DRV); el.innerHTML=drawDrive(); return; }
+  el.setAttribute('viewBox',VB_MAIN);
   var s='';
   s+=drawFloor();
   s+=drawFrame();
   s+=drawCover('far');
   s+=drawControl();
   s+=drawCamera();
-  s+=drawReducer();
+  s+=drawReducer('low');
   s+=drawPlate();
+  s+=drawReducer('tbl');
   s+=drawIndex();
   s+=drawSensor();
   s+=drawCover('near');
@@ -916,7 +1001,7 @@ function runState(){
   }
   if(st.t==='index'){
     var from=idxA, to=idxA+90;
-    addLog('[인덱스] 감속기 구동 — 90° CCW 회전');
+    addLog('[인덱스] DG085-F-10 구동 — 90° CCW 회전 (서보 2,400 r/min → 출력 60 r/min)');
     senOn=false;
     anim(D.move*1.5,function(p){ idxA=from+(to-from)*p; },function(){
       idxA=to; addLog('[인덱스] 회전 완료 — 테이블 '+Math.round(norm360(idxA))+'°'); next();
@@ -1011,9 +1096,10 @@ document.addEventListener('DOMContentLoaded',function(){
   $('tabP').addEventListener('click',function(){
     document.body.classList.remove('view-mobile'); $('tabP').classList.add('on'); $('tabM').classList.remove('on'); draw();
   });
-  $('bFront').addEventListener('click',function(){ VIEW.yaw=6; VIEW.pitch=16; draw(); });
-  $('bIso').addEventListener('click',function(){ VIEW.yaw=32; VIEW.pitch=24; draw(); });
-  $('bTop').addEventListener('click',function(){ VIEW.yaw=20; VIEW.pitch=62; draw(); });
+  $('bFront').addEventListener('click',function(){ drvView=false; VIEW.yaw=6; VIEW.pitch=16; vTab('bFront'); draw(); });
+  $('bIso').addEventListener('click',function(){ drvView=false; VIEW.yaw=32; VIEW.pitch=24; vTab('bIso'); draw(); });
+  $('bTop').addEventListener('click',function(){ drvView=false; VIEW.yaw=20; VIEW.pitch=62; vTab('bTop'); draw(); });
+  $('bDrv').addEventListener('click',function(){ drvView=true; VIEW.yaw=62; VIEW.pitch=22; vTab('bDrv'); draw(); });
 
   $('btnRun').addEventListener('click',function(){
     if(running) return;
@@ -1029,7 +1115,7 @@ document.addEventListener('DOMContentLoaded',function(){
   $('hVer').textContent=VER;
   renderSpd(); setMes('wait'); renderSteps(); updHUD(); draw();
   addLog('[시스템] 인덱스 회전형 PCB 검사기 시뮬레이터 '+VER);
-  addLog('구성 : 3030 프레임 300×600×750 · 상판 10T · φ120 촬영홀(앞 120) · 감속기(앞 230) · 지그 4 × 90° · IS3805 상향');
+  addLog('구성 : 3030 프레임 300×600×750 · 상판 10T · φ120 촬영홀(앞 120) · DG085-F-10 중공 로터리 테이블 φ90 관통(앞 230) · 유성기어 i=40 + 서보 100 W · 지그 4 × 90° · IS3805 상향');
 });
 </script>
 </body>
