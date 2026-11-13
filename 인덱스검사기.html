@@ -204,7 +204,7 @@
    인덱스 회전형 PCB 검사기 시뮬레이터
    인시스 AI혁신 연구개발실
    =================================================================== */
-var VER='v1.3';
+var VER='v1.4';
 
 /* ======================= 치수 (1 unit = 5 mm) ======================= */
 var U=5;
@@ -393,33 +393,37 @@ function drawFloor(){
 }
 
 /* 3030 알루미늄 프로파일 프레임 */
-function drawFrame(){
-  var o='';
+/* 프로파일 프레임 — part 'far' : 후방·측면 / 'near' : 전면 (내부 구조물을 가림) */
+function drawFrame(part){
+  var o='', i;
   var vx=[[0,PR],[FW-PR,FW]], vy=[[0,PR],[FL-PR,FL]];
-  var i,j;
-  /* 하부 가로 레일 (X 방향) */
-  for(j=0;j<2;j++) o+=box(0,FW, vy[j][0],vy[j][1], 0,PR, MAT.prof,0.5);
-  /* 하부 세로 레일 (Y 방향) */
-  for(i=0;i<2;i++) o+=box(vx[i][0],vx[i][1], PR,FL-PR, 0,PR, MAT.prof,0.5);
-  /* 기둥 4개 */
-  for(i=0;i<2;i++) for(j=0;j<2;j++)
-    o+=box(vx[i][0],vx[i][1], vy[j][0],vy[j][1], PR,FH-PR, MAT.profD,0.5);
-  /* 중간 보강 레일 */
-  for(j=0;j<2;j++) o+=box(PR,FW-PR, vy[j][0],vy[j][1], 70,76, MAT.prof,0.45);
-  /* 상부 가로 레일 */
-  for(j=0;j<2;j++) o+=box(0,FW, vy[j][0],vy[j][1], FH-PR,FH, MAT.prof,0.5);
-  /* 상부 세로 레일 */
-  for(i=0;i<2;i++) o+=box(vx[i][0],vx[i][1], PR,FL-PR, FH-PR,FH, MAT.prof,0.5);
-  /* 레벨링 풋 */
-  for(i=0;i<2;i++) for(j=0;j<2;j++){
-    var fx=vx[i][0]+PR/2, fy=vy[j][0]+PR/2;
-    o+=tube({x:fx,y:fy,z:-2.4},{x:fx,y:fy,z:0},1.1,MAT.steel,true,false);
+
+  if(part!=='near'){
+    o+=box(0,FW, vy[1][0],vy[1][1], 0,PR, MAT.prof,0.5);                       // 하부 가로 레일(후)
+    for(i=0;i<2;i++) o+=box(vx[i][0],vx[i][1], PR,FL-PR, 0,PR, MAT.prof,0.5);  // 하부 세로 레일
+    for(i=0;i<2;i++) o+=box(vx[i][0],vx[i][1], vy[1][0],vy[1][1], PR,FH-PR, MAT.profD,0.5); // 후방 기둥
+    o+=box(PR,FW-PR, vy[1][0],vy[1][1], 70,76, MAT.prof,0.45);                 // 중간 보강(후)
+    for(i=0;i<2;i++) o+=box(vx[i][0],vx[i][1], PR,FL-PR, 70,76, MAT.prof,0.45); // 중간 보강(좌·우)
+    o+=box(0,FW, vy[1][0],vy[1][1], FH-PR,FH, MAT.prof,0.5);                   // 상부 가로(후)
+    for(i=0;i<2;i++) o+=box(vx[i][0],vx[i][1], PR,FL-PR, FH-PR,FH, MAT.prof,0.5); // 상부 세로
+    for(i=0;i<2;i++){                                                          // 레벨링 풋(후)
+      var fx=vx[i][0]+PR/2, fy=vy[1][0]+PR/2;
+      o+=tube({x:fx,y:fy,z:-2.4},{x:fx,y:fy,z:0},1.1,MAT.steel,true,false);
+    }
+    return o;
+  }
+
+  /* 전면 프로파일 — 내부 구조물·도어보다 앞에 그려 외부에서 가려지도록 */
+  o+=box(0,FW, vy[0][0],vy[0][1], 0,PR, MAT.prof,0.5);                         // 하부 가로 레일(전)
+  for(i=0;i<2;i++) o+=box(vx[i][0],vx[i][1], vy[0][0],vy[0][1], PR,FH-PR, MAT.profD,0.5); // 전방 기둥
+  o+=box(0,FW, vy[0][0],vy[0][1], FH-PR,FH, MAT.prof,0.5);                     // 상부 가로(전)
+  for(i=0;i<2;i++){                                                            // 레벨링 풋(전)
+    var gx=vx[i][0]+PR/2, gy=vy[0][0]+PR/2;
+    o+=tube({x:gx,y:gy,z:-2.4},{x:gx,y:gy,z:0},1.1,MAT.steel,true,false);
   }
   return o;
 }
 
-/* 내부 카메라 (상향) + 브래킷 */
-/* 하부 제어부 — 컨트롤러 · 전원 제어박스 */
 function drawControl(){
   var o='';
   o+=box(9,28, 14,46, PR+1, PR+22, [72,80,92],0.45);          // 컨트롤러(비전 PC)
@@ -719,7 +723,7 @@ function drawSeatDatum(){
     var p1=PJ({X:RED.x+(RIDX+2.6)*Math.cos(a), Y:RED.y+(RIDX+2.6)*Math.sin(a), Z:SEAT_Z});
     o+='<line x1="'+p0.x.toFixed(1)+'" y1="'+p0.y.toFixed(1)+'" x2="'+p1.x.toFixed(1)+'" y2="'+p1.y.toFixed(1)+'" stroke="#1F6F8B" stroke-width="0.75" opacity="0.85"/>';
   }
-  q=PJ({X:RED.x-RIDX-9, Y:RED.y+RIDX+7, Z:SEAT_Z});
+  q=PJ({X:RED.x-RIDX-15, Y:RED.y+RIDX+10, Z:SEAT_Z});
   o+='<text x="'+q.x.toFixed(1)+'" y="'+q.y.toFixed(1)+'" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="4.0" font-weight="800" fill="#1F6F8B" stroke="#FBFCFE" stroke-width="1.1" paint-order="stroke">안착면 공통 H '+SEAT_MM+' mm</text>';
   return o;
 }
@@ -914,7 +918,7 @@ function draw(){
   el.setAttribute('viewBox', topView?VB_TOP:VB_MAIN);
   var s='';
   s+=drawFloor();
-  s+=drawFrame();
+  s+=drawFrame('far');
   s+=drawCover('far');
   s+=drawControl();
   s+=drawCamera();
@@ -924,6 +928,7 @@ function draw(){
   s+=drawIndex();
   s+=drawSensor();
   s+=drawCover('near');
+  s+=drawFrame('near');
   s+=drawStations();
   s+=drawMonitor();
   document.getElementById('scene').innerHTML=s;
