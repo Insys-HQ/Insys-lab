@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>인덱스 회전형 PCB 검사기 시뮬레이터</title>
+<title>인덱스 회전형 PCB 검사기 시뮬레이터 — 4지그 타입</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -100,10 +100,10 @@
   <div class="nav-inner">
     <div class="hd-top">
       <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-      <span class="hd-ver" id="hVer">v1.1</span>
+      <span class="hd-ver" id="hVer">v1.5</span>
     </div>
-    <h1>인덱스 회전형 PCB 검사기 시뮬레이터</h1>
-    <div class="hd-sub">알루미늄 3030 프레임 300 × 600 × 750 mm · 상판 10T · 4스테이션 90° 인덱스 · 하부 상향 비전</div>
+    <h1>인덱스 회전형 PCB 검사기 시뮬레이터 — 4지그 타입</h1>
+    <div class="hd-sub"><b>4지그 90° 등배</b> · 알루미늄 3030 프레임 300 × 600 × 750 mm · 상판 10T · 4스테이션(투입·검사·배출·대기) 90° 인덱스 · 하부 상향 비전</div>
   </div>
 </header>
 
@@ -204,7 +204,7 @@
    인덱스 회전형 PCB 검사기 시뮬레이터
    인시스 AI혁신 연구개발실
    =================================================================== */
-var VER='v1.4';
+var VER='v1.5';
 
 /* ======================= 치수 (1 unit = 5 mm) ======================= */
 var U=5;
@@ -542,10 +542,10 @@ function drawPlate(){
 function drawStations(){
   var o='';
   if(drvView) return o;
-  [[ST_IN,'9시 투입','#2FA8E8'],[ST_INSP,'6시 검사','#E8873A'],[ST_OUT,'3시 배출','#3FBF63'],[ST_WAIT,'12시 대기','#8A95A3']].forEach(function(s){
+  [[ST_IN,'9시 투입','#2FA8E8',10],[ST_INSP,'6시 검사','#E8873A',3],[ST_OUT,'3시 배출','#3FBF63',10],[ST_WAIT,'12시 대기','#8A95A3',10]].forEach(function(s){
     var p=jigPos(s[0]);
-    var q=P(RED.x+(p.x-RED.x)*1.78, RED.y+(p.y-RED.y)*1.78, PZT+0.6);
-    o+='<text x="'+q.x.toFixed(1)+'" y="'+q.y.toFixed(1)+'" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="5.2" font-weight="900" fill="'+s[2]+'" stroke="#FBFCFE" stroke-width="1.4" paint-order="stroke">'+s[1]+'</text>';
+    var q=P(RED.x+(p.x-RED.x)*2.0, RED.y+(p.y-RED.y)*2.0, PZT+0.6);
+    o+='<text x="'+q.x.toFixed(1)+'" y="'+(q.y+s[3]).toFixed(1)+'" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="5.2" font-weight="900" fill="'+s[2]+'" stroke="#FBFCFE" stroke-width="1.4" paint-order="stroke">'+s[1]+'</text>';
   });
   return o;
 }
@@ -723,8 +723,14 @@ function drawSeatDatum(){
     var p1=PJ({X:RED.x+(RIDX+2.6)*Math.cos(a), Y:RED.y+(RIDX+2.6)*Math.sin(a), Z:SEAT_Z});
     o+='<line x1="'+p0.x.toFixed(1)+'" y1="'+p0.y.toFixed(1)+'" x2="'+p1.x.toFixed(1)+'" y2="'+p1.y.toFixed(1)+'" stroke="#1F6F8B" stroke-width="0.75" opacity="0.85"/>';
   }
-  q=PJ({X:RED.x-RIDX-15, Y:RED.y+RIDX+10, Z:SEAT_Z});
-  o+='<text x="'+q.x.toFixed(1)+'" y="'+q.y.toFixed(1)+'" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="4.0" font-weight="800" fill="#1F6F8B" stroke="#FBFCFE" stroke-width="1.1" paint-order="stroke">안착면 공통 H '+SEAT_MM+' mm</text>';
+  if(!drvView){
+    var NY=(typeof topView!=='undefined' && topView)?193:148;
+    var NX=154.8, NW=52, NH=11.0;
+    o+='<rect x="'+NX+'" y="'+(NY+5)+'" width="'+NW+'" height="'+NH+'" rx="1.6" fill="#FFFFFF" opacity="0.94" stroke="#A9C3D4" stroke-width="0.45"/>';
+    o+='<rect x="'+NX+'" y="'+(NY+5)+'" width="1.6" height="'+NH+'" rx="0.8" fill="#1F6F8B"/>';
+    o+='<text x="'+(NX+4.4)+'" y="'+(NY+9.6)+'" font-family="\'Noto Sans KR\',sans-serif" font-size="3.3" font-weight="900" fill="#16324B">안착면 공통 기준 (datum)</text>';
+    o+='<text x="'+(NX+4.4)+'" y="'+(NY+13.8)+'" font-family="\'Noto Sans KR\',sans-serif" font-size="2.5" font-weight="600" fill="#1F6F8B">H '+SEAT_MM+' mm · 4개소 동일 · WD 250 mm</text>';
+  }
   return o;
 }
 
@@ -854,14 +860,14 @@ function drawMonitor(){
   (function(){
     var BX=1.4, BY=24.6, BW=22, BH=6.6;
     g+='<rect x="'+BX+'" y="'+BY+'" width="'+BW+'" height="'+BH+'" rx=".6" fill="#0F1A24" stroke="#26394C" stroke-width=".4"/>';
-    var labs=[['9시 투입',ST_IN,'#2FA8E8'],['6시 검사',ST_INSP,'#E8873A'],['3시 배출',ST_OUT,'#3FBF63']];
+    var labs=[['투입',ST_IN,'#2FA8E8'],['검사',ST_INSP,'#E8873A'],['배출',ST_OUT,'#3FBF63']];
     for(var i=0;i<3;i++){
       var kk=jigAt(labs[i][1]);
       var has=(kk>=0 && slots[kk]);
-      g+='<circle cx="'+(BX+2.2+i*7.2)+'" cy="'+(BY+2.4)+'" r="1.25" fill="'+(has?labs[i][2]:'#2A3744')+'" stroke="'+labs[i][2]+'" stroke-width=".3"/>';
-      g+='<text x="'+(BX+4.2+i*7.2)+'" y="'+(BY+3.1)+'" font-family="\'Noto Sans KR\',sans-serif" font-size="1.75" font-weight="700" fill="'+(has?'#D6E4F2':'#5E6C7A')+'">'+labs[i][0]+'</text>';
+      g+='<circle cx="'+(BX+1.9+i*6.9)+'" cy="'+(BY+2.4)+'" r="1.15" fill="'+(has?labs[i][2]:'#2A3744')+'" stroke="'+labs[i][2]+'" stroke-width=".3"/>';
+      g+='<text x="'+(BX+3.5+i*6.9)+'" y="'+(BY+3.05)+'" font-family="\'Noto Sans KR\',sans-serif" font-size="1.7" font-weight="700" fill="'+(has?'#D6E4F2':'#5E6C7A')+'">'+labs[i][0]+'</text>';
     }
-    g+='<text x="'+(BX+1.4)+'" y="'+(BY+5.6)+'" font-family="\'Noto Sans KR\',sans-serif" font-size="1.8" font-weight="500" fill="#7D90A6">인덱스 '+Math.round(norm360(idxA))+'&#176; &#183; CCW 90&#176; / step</text>';
+    g+='<text x="'+(BX+1.4)+'" y="'+(BY+5.6)+'" font-family="\'Noto Sans KR\',sans-serif" font-size="1.5" font-weight="500" fill="#7D90A6">9시·6시·3시 &#183; 인덱스 '+Math.round(norm360(idxA))+'&#176; &#183; 90&#176; CCW</text>';
   })();
 
   /* 중앙 : 판정 */
