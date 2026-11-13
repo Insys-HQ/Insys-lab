@@ -130,6 +130,7 @@
     <b>상판 가공</b> 앞에서 120 mm 지점 φ120 촬영홀 · 앞에서 230 mm 지점 테이블 관통 φ90 (M6 × 4 · BCD φ110) &nbsp;·&nbsp;
     <b>인덱스 구동</b> <b>DG085-F-10</b> 중공 로터리 테이블 (테이블 φ85 · 허용토크 20 N·m · 허용 모멘트 27 N·m · 반복정밀도 ±5 arc-sec) + 유성기어박스 <b>감속비 40</b> + AC 서보 <b>100 W</b> · 상판 하면 직결 &nbsp;·&nbsp;
     <b>부하</b> 회전부 2.5 kg · 관성 0.044 kg·m² · 소요토크 1.6 N·m (사용률 10%) · 1스텝 90° / 0.5초 (출력 60 r/min · 서보 2,400 r/min) · <b>2단 회전판</b> 상단 PCB 지그 / 하단 케이스 받침 · 4개 90° 등배 · 회전반경 110 mm · <b>CCW</b> &nbsp;·&nbsp;
+    <b>안착면</b> 4개소 <b>동일 높이</b> — 상판 상면 +100 mm (바닥 기준 860 mm) 공통 가공, 전 스테이션 촬영 작업거리 250 mm 일정 &nbsp;·&nbsp;
     <b>비전</b> 프레임 내부 Cognex IS3805 <b>상향 촬영</b> (하부 → 홀 통과) &nbsp;·&nbsp;
     <b>하부</b> 반투명 PC 커버(후면·양측면) + 전면 정비도어(힌지·손잡이) · 컨트롤러 / 전원 제어박스 내장 &nbsp;·&nbsp;
     <b>스테이션</b> 9시 투입 → 6시 검사 → 3시 배출 (12시 대기)
@@ -203,7 +204,7 @@
    인덱스 회전형 PCB 검사기 시뮬레이터
    인시스 AI혁신 연구개발실
    =================================================================== */
-var VER='v1.2';
+var VER='v1.3';
 
 /* ======================= 치수 (1 unit = 5 mm) ======================= */
 var U=5;
@@ -224,7 +225,9 @@ var PGB_R=6.0, PGB_L=12;             // 유성기어박스 φ60 × 60 mm (감속
 var SV_H=4.0, SV_L=20;               // AC 서보 100 W — 40 × 40 × 100 mm
 var JHU=12, JHV=7, JTH=4;            // 상단 PCB 안착지그 120 × 70 × 20 mm
 var LZ0=PZT+2.0, LZ1=LZ0+3;          // 하단 데크 (케이스 받침) 하면/상면
-var UZ0=168, UZ1=UZ0+JTH;            // 상단 데크 (PCB 지그) 하면/상면
+var UZ0=168, UZ1=UZ0+JTH;
+var SEAT_Z=UZ1;                      // 4개 지그 안착면 공통 높이 — 상판 상면 +100 mm (바닥 860 mm)
+var SEAT_MM=SEAT_Z*U, SEAT_OFF=(SEAT_Z-PZT)*U;            // 상단 데크 (PCB 지그) 하면/상면
 var CHU=8, CHV=5, CTH=7;             // 케이스 80 × 50 × 35 mm
 var CVOF=11;                         // 케이스 접선방향 오프셋 (광축 회피) 55 mm
 var PCB_W=20, PCB_D=10, PCB_T=0.6;   // 타원 PCB 100 × 50 mm
@@ -683,8 +686,8 @@ function drawIndex(){
     /* ── 상단 데크 : PCB 안착지그 (아세탈) ── */
     o+=prism(F,[[-JHU,-JHV],[JHU,-JHV],[JHU,JHV],[-JHU,JHV]],UZ0,UZ1,ar,MAT.acetal,0.4,1.08);
     /* 안착 포켓 */
-    var pk=ellPts(PCB_W/2+1.2,PCB_D/2+1.2,36).map(function(c){ return PJ(F(c[0],c[1],UZ1-0.12)); });
-    o+='<polygon points="'+pk.map(pt).join(' ')+'" fill="'+shade(MAT.acetal,0.88)+'" stroke="none"/>';
+    var pk=ellPts(PCB_W/2+0.7,PCB_D/2+0.7,36).map(function(c){ return PJ(F(c[0],c[1],SEAT_Z-0.1)); });
+    o+='<polygon points="'+pk.map(pt).join(' ')+'" fill="'+shade(MAT.acetal,0.88)+'" stroke="'+shade(MAT.acetal,0.70)+'" stroke-width="0.4"/>';
     /* 광축 개구 (하부 촬영용) */
     var ap=ellPts(PCB_W/2-3.4,PCB_D/2-2.0,32).map(function(c){ return PJ(F(c[0],c[1],UZ0-0.05)); });
     o+='<polygon points="'+ap.map(pt).join(' ')+'" fill="#1B222B" opacity=".55" stroke="none"/>';
@@ -701,6 +704,23 @@ function drawIndex(){
     var lcol=(stA===ST_IN)?'#2FA8E8':(stA===ST_INSP)?'#E8873A':(stA===ST_OUT)?'#3FBF63':'#9AA4B0';
     o+='<circle cx="'+lz.x.toFixed(1)+'" cy="'+lz.y.toFixed(1)+'" r="1.4" fill="'+lcol+'" opacity=".9"/>';
   }
+  o+=drawSeatDatum();
+  return o;
+}
+
+/* 4개 지그 안착면 공통 기준면 (datum) — 동일 높이 보증 표시 */
+function drawSeatDatum(){
+  var o='', i, a, q, ring=[];
+  for(i=0;i<=72;i++){ a=2*Math.PI*i/72; ring.push(PJ({X:RED.x+RIDX*Math.cos(a), Y:RED.y+RIDX*Math.sin(a), Z:SEAT_Z})); }
+  o+='<polyline points="'+ring.map(pt).join(' ')+'" fill="none" stroke="#1F6F8B" stroke-width="0.5" stroke-dasharray="2.2 1.6" opacity="0.72"/>';
+  for(i=0;i<4;i++){
+    a=(jigAngle(i))*Math.PI/180;
+    var p0=PJ({X:RED.x+(RIDX-2.6)*Math.cos(a), Y:RED.y+(RIDX-2.6)*Math.sin(a), Z:SEAT_Z});
+    var p1=PJ({X:RED.x+(RIDX+2.6)*Math.cos(a), Y:RED.y+(RIDX+2.6)*Math.sin(a), Z:SEAT_Z});
+    o+='<line x1="'+p0.x.toFixed(1)+'" y1="'+p0.y.toFixed(1)+'" x2="'+p1.x.toFixed(1)+'" y2="'+p1.y.toFixed(1)+'" stroke="#1F6F8B" stroke-width="0.75" opacity="0.85"/>';
+  }
+  q=PJ({X:RED.x-RIDX-9, Y:RED.y+RIDX+7, Z:SEAT_Z});
+  o+='<text x="'+q.x.toFixed(1)+'" y="'+q.y.toFixed(1)+'" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="4.0" font-weight="800" fill="#1F6F8B" stroke="#FBFCFE" stroke-width="1.1" paint-order="stroke">안착면 공통 H '+SEAT_MM+' mm</text>';
   return o;
 }
 
@@ -886,11 +906,12 @@ function drawMonitor(){
   return o+g;
 }
 
-var VB_MAIN='152 148 194 266', VB_DRV='175.5 198 146 81';
+var VB_MAIN='152 148 194 266', VB_DRV='175.5 198 146 81', VB_TOP='152 193 194 266';
+var topView=false;
 function draw(){
   var el=document.getElementById('scene');
   if(drvView){ el.setAttribute('viewBox',VB_DRV); el.innerHTML=drawDrive(); return; }
-  el.setAttribute('viewBox',VB_MAIN);
+  el.setAttribute('viewBox', topView?VB_TOP:VB_MAIN);
   var s='';
   s+=drawFloor();
   s+=drawFrame();
@@ -1096,10 +1117,10 @@ document.addEventListener('DOMContentLoaded',function(){
   $('tabP').addEventListener('click',function(){
     document.body.classList.remove('view-mobile'); $('tabP').classList.add('on'); $('tabM').classList.remove('on'); draw();
   });
-  $('bFront').addEventListener('click',function(){ drvView=false; VIEW.yaw=6; VIEW.pitch=16; vTab('bFront'); draw(); });
-  $('bIso').addEventListener('click',function(){ drvView=false; VIEW.yaw=32; VIEW.pitch=24; vTab('bIso'); draw(); });
-  $('bTop').addEventListener('click',function(){ drvView=false; VIEW.yaw=20; VIEW.pitch=62; vTab('bTop'); draw(); });
-  $('bDrv').addEventListener('click',function(){ drvView=true; VIEW.yaw=62; VIEW.pitch=22; vTab('bDrv'); draw(); });
+  $('bFront').addEventListener('click',function(){ topView=false; drvView=false; VIEW.yaw=6; VIEW.pitch=16; vTab('bFront'); draw(); });
+  $('bIso').addEventListener('click',function(){ topView=false; drvView=false; VIEW.yaw=32; VIEW.pitch=24; vTab('bIso'); draw(); });
+  $('bTop').addEventListener('click',function(){ topView=true; drvView=false; VIEW.yaw=20; VIEW.pitch=62; vTab('bTop'); draw(); });
+  $('bDrv').addEventListener('click',function(){ topView=false; drvView=true; VIEW.yaw=62; VIEW.pitch=22; vTab('bDrv'); draw(); });
 
   $('btnRun').addEventListener('click',function(){
     if(running) return;
@@ -1115,6 +1136,7 @@ document.addEventListener('DOMContentLoaded',function(){
   $('hVer').textContent=VER;
   renderSpd(); setMes('wait'); renderSteps(); updHUD(); draw();
   addLog('[시스템] 인덱스 회전형 PCB 검사기 시뮬레이터 '+VER);
+  addLog('안착면 : 4개 지그 전부 동일 높이 '+SEAT_MM+' mm (상판 +'+SEAT_OFF+' mm) · 전 스테이션 WD 250 mm 일정');
   addLog('구성 : 3030 프레임 300×600×750 · 상판 10T · φ120 촬영홀(앞 120) · DG085-F-10 중공 로터리 테이블 φ90 관통(앞 230) · 유성기어 i=40 + 서보 100 W · 지그 4 × 90° · IS3805 상향');
 });
 </script>
