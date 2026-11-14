@@ -6,12 +6,12 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>AI 숏폼 자동제작기 v1.3</title>
+<title>AI 숏폼 자동제작기 v1.4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* ===== AI 숏폼 자동제작기 v1.3 · 인시스 AI혁신 연구개발실 ===== */
+/* ===== AI 숏폼 자동제작기 v1.4 · 인시스 AI혁신 연구개발실 ===== */
 :root{--ink:#1f2a37;--navy:#1e3a5f;--sub:#4b5563;--line:#d9dee5;--bg:#f3f5f8;--card:#fff;--soft:#e8eef6;--ok:#1f6f43;--warn:#8a5a00;--err:#a12a2a}
 *{box-sizing:border-box}
 html{font-size:14px}
@@ -64,6 +64,12 @@ a.dl{display:inline-block;margin-top:6px;color:var(--navy);font-weight:700}
 .tag{display:inline-block;background:var(--soft);color:var(--navy);border-radius:6px;padding:0 6px;font-size:.78rem;margin-right:4px}
 .prog{height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:6px}
 .prog i{display:block;height:100%;width:0;background:var(--navy)}
+.pool{border:2px dashed #9fb3cc;border-radius:10px;padding:8px 10px;margin-bottom:8px;background:#f8fafc}
+.pool.drag{background:var(--soft);border-color:var(--navy)}
+.poolList{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.pi{position:relative;width:64px;height:64px;border-radius:6px;background:#fff center/contain no-repeat;border:1px solid var(--line)}
+.pi i{position:absolute;left:2px;top:2px;background:var(--navy);color:#fff;font-style:normal;font-size:.7rem;border-radius:4px;padding:0 4px}
+.pi button{position:absolute;right:-6px;top:-6px;width:20px;height:20px;border-radius:50%;border:0;background:var(--err);color:#fff;font-size:.75rem;cursor:pointer;line-height:20px;padding:0}
 .recBox{background:var(--soft);border-radius:10px;padding:8px 10px;margin-bottom:6px}
 .recBox label{margin-top:0}
 .rec{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:6px;cursor:pointer}
@@ -76,7 +82,7 @@ footer{text-align:center;font-size:.78rem;color:var(--sub);padding:8px 0 12px}
 </head>
 <body class="mobile">
 <nav><div class="nav-inner">
- <h1>🎬 AI 숏폼 자동제작기 <span class="ver" id="verTag">v1.3</span></h1>
+ <h1>🎬 AI 숏폼 자동제작기 <span class="ver" id="verTag">v1.4</span></h1>
  <div class="vt"><button id="vMobile" class="on" onclick="setView('mobile')">모바일</button><button id="vPc" onclick="setView('pc')">PC</button></div>
 </div></nav>
 
@@ -119,7 +125,7 @@ footer{text-align:center;font-size:.78rem;color:var(--sub);padding:8px 0 12px}
  <div class="row">
   <div><label>타깃 시청자</label><input type="text" id="target" placeholder="예) 출퇴근 직장인"></div>
   <div><label>톤</label><select id="tone">
-   <option>정보형(깔끔·신뢰)</option><option>후기형(직접 써본 느낌)</option><option>유머형(가볍고 재밌게)</option><option>긴급형(할인·한정 강조)</option><option>시니어 친화(쉽고 천천히)</option></select></div>
+   <option>공감형(일상 속 불편→해결)</option><option>정보형(깔끔·신뢰)</option><option>후기형(직접 써본 느낌)</option><option>유머형(가볍고 재밌게)</option><option>긴급형(할인·한정 강조)</option><option>시니어 친화(쉽고 천천히)</option></select></div>
  </div>
  <div class="row3">
   <div><label>목표 길이</label><select id="len"><option value="15">15초</option><option value="30" selected>30초</option><option value="45">45초</option><option value="60">60초</option></select></div>
@@ -133,6 +139,13 @@ footer{text-align:center;font-size:.78rem;color:var(--sub);padding:8px 0 12px}
 <!-- 3. 대본 -->
 <section class="card" id="cScript">
  <h2><span class="n">3</span>대본 · 장면</h2>
+ <div class="pool" id="pool">
+  <b>📷 상품 사진 넣기</b> <span class="tag" id="poolCnt">0장</span>
+  <p class="hint" style="margin:2px 0">쿠팡 상품 사진 <b>우클릭 → 이미지 복사</b> 후 이 화면에서 <b>Ctrl+V</b> · 사진을 여기로 끌어다 놓기 · 저장한 파일 선택 (최대 10장)</p>
+  <div class="btns" style="margin-top:4px"><button class="b s" onclick="$('poolFile').click()">📁 사진 파일 선택</button><button class="b s" onclick="pasteBtn()">📋 붙여넣기</button><button class="mini d" onclick="clearPool()">전체 삭제</button></div>
+  <input type="file" id="poolFile" accept="image/*" multiple hidden onchange="addPoolFiles(this.files);this.value=''">
+  <div class="poolList" id="poolList"></div>
+ </div>
  <div class="btns" style="margin-top:0">
   <button class="b" id="btnGen" onclick="genScript()">🤖 AI 대본 생성</button>
   <button class="b s" onclick="addScene()">＋ 장면 추가</button>
@@ -196,12 +209,12 @@ footer{text-align:center;font-size:.78rem;color:var(--sub);padding:8px 0 12px}
 </section>
 
 </div>
-<footer>AI 숏폼 자동제작기 <b id="verFoot">v1.3</b> · 인시스 AI혁신 연구개발실</footer>
+<footer>AI 숏폼 자동제작기 <b id="verFoot">v1.4</b> · 인시스 AI혁신 연구개발실</footer>
 </div>
 
 <script>
-/* ===== AI 숏폼 자동제작기 v1.3 ===== */
-var APP_VERSION='v1.3';
+/* ===== AI 숏폼 자동제작기 v1.4 ===== */
+var APP_VERSION='v1.4';
 var FIREBASE_CONFIG={apiKey:"AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",authDomain:"insys-work.firebaseapp.com",projectId:"insys-work",storageBucket:"insys-work.firebasestorage.app",messagingSenderId:"225275784859",appId:"1:225275784859:web:bd12815c6dc47c0c49e03e"};
 var COL='shortform_projects';
 var W=1080,H=1920;
@@ -248,33 +261,41 @@ function clearKeys(){
 /* ---------- 대본 생성 ---------- */
 function planInput(){
   return {topic:$('topic').value.trim(),feat:$('feat').value.trim(),target:$('target').value.trim(),tone:$('tone').value,
-    len:+$('len').value,n:+$('nScene').value,cta:$('cta').value};
+    len:+$('len').value,n:+$('nScene').value,cta:$('cta').value,nImg:POOL.length};
 }
 function buildPrompt(p){
   return '다음 조건으로 한국어 세로형 숏폼(쇼츠/릴스) 대본을 작성해줘.\n'+
   '- 상품/주제: '+p.topic+'\n- 핵심 특징:\n'+(p.feat||'(없음, 일반적인 장점으로 작성)')+'\n- 타깃: '+(p.target||'일반 시청자')+
   '\n- 톤: '+p.tone+'\n- 전체 길이: 약 '+p.len+'초 (한국어 내레이션 초당 약 6~7자 기준)\n- 장면 수: 정확히 '+p.n+'개\n'+
   '- 1번 장면은 3초 안에 시선을 잡는 강한 후킹, 마지막 장면은 "'+p.cta+'" 행동 유도\n'+
-  '- 과장·허위 효능, 최상급 단정 표현 금지\n\n'+
-  '반드시 아래 JSON 형식만 출력(설명·코드블록 금지):\n'+
-  '{"title":"영상 제목 30자 이내","hook":"화면 상단 고정 문구 14자 이내","scenes":[{"narration":"내레이션 문장","caption":"화면 큰 자막 16자 이내","visual":"이 장면에 어울리는 이미지 묘사(영어, 이미지 생성 프롬프트)"}],"hashtags":["#태그",...5~8개],"description":"설명란 문구 2~3문장"}';
+  '- 과장·허위 효능, 최상급 단정 표현 금지\n'+
+  (p.nImg?'- 첨부한 상품 사진 '+p.nImg+'장(번호 0~'+(p.nImg-1)+')을 직접 보고, 사진에 실제로 보이는 모습·구성·사용 장면을 대본에 녹여라\n'+
+   '- 구성: ①일상 속 불편한 순간(공감 후킹) → ②이 상품을 꺼내 쓰는 순간 → ③써보며 느끼는 디테일 → ④달라진 일상·기분 → ⑤마무리 행동\n'+
+   '- 내레이션은 실제 써본 사람이 친구에게 말하듯 1인칭 구어체, 시청자가 "어 이거 내 얘기네" 하도록 구체적인 생활 상황으로 묘사\n'+
+   '- 사진에 보이지 않는 성능 수치는 핵심 특징에 적힌 것만 사용\n'+
+   '- 각 장면 "img"에 그 장면에 가장 어울리는 사진 번호(정수), 같은 사진 연속 배치는 피하기\n':'')+
+  '\n반드시 아래 JSON 형식만 출력(설명·코드블록 금지):\n'+
+  '{"title":"영상 제목 30자 이내","hook":"화면 상단 고정 문구 14자 이내","scenes":[{"narration":"내레이션 문장","caption":"화면 큰 자막 16자 이내",'+(p.nImg?'"img":0,':'')+'"visual":"이 장면에 어울리는 이미지 묘사(영어, 이미지 생성 프롬프트)"}],"hashtags":["#태그",...5~8개],"description":"설명란 문구 2~3문장"}';
 }
 var SYS='너는 조회수 높은 한국어 쇼핑·정보 숏폼 전문 대본 작가다. 요청한 JSON만 출력한다.';
-function callAI(prompt){
-  var p=$('prov').value,key=$('aiKey').value.trim(),model=$('model').value.trim()||DEF_MODEL[p];
+function callAI(prompt,imgs){
+  var p=$('prov').value,key=$('aiKey').value.trim(),model=$('model').value.trim()||DEF_MODEL[p];imgs=imgs||[];
   if(!key)return Promise.reject(new Error('대본 AI API 키가 없습니다 (1번 설정).'));
   if(p==='claude'){
+    var cc=imgs.map(function(b){return {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b}};}).concat([{type:'text',text:prompt}]);
     return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:model,max_tokens:2500,system:SYS,messages:[{role:'user',content:prompt}]})})
+      body:JSON.stringify({model:model,max_tokens:2500,system:SYS,messages:[{role:'user',content:imgs.length?cc:prompt}]})})
       .then(apiJson).then(function(j){return j.content.map(function(c){return c.text||'';}).join('');});
   }
   if(p==='openai'){
+    var oc=imgs.map(function(b){return {type:'image_url',image_url:{url:'data:image/jpeg;base64,'+b}};}).concat([{type:'text',text:prompt}]);
     return fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'content-type':'application/json','authorization':'Bearer '+key},
-      body:JSON.stringify({model:model,response_format:{type:'json_object'},messages:[{role:'system',content:SYS},{role:'user',content:prompt}]})})
+      body:JSON.stringify({model:model,response_format:{type:'json_object'},messages:[{role:'system',content:SYS},{role:'user',content:imgs.length?oc:prompt}]})})
       .then(apiJson).then(function(j){return j.choices[0].message.content;});
   }
+  var gp=imgs.map(function(b){return {inline_data:{mime_type:'image/jpeg',data:b}};}).concat([{text:SYS+'\n\n'+prompt}]);
   return fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(model)+':generateContent?key='+encodeURIComponent(key),{method:'POST',headers:{'content-type':'application/json'},
-    body:JSON.stringify({contents:[{parts:[{text:SYS+'\n\n'+prompt}]}],generationConfig:{responseMimeType:'application/json'}})})
+    body:JSON.stringify({contents:[{parts:gp}],generationConfig:{responseMimeType:'application/json'}})})
     .then(apiJson).then(function(j){return j.candidates[0].content.parts.map(function(x){return x.text||'';}).join('');});
 }
 function apiJson(r){
@@ -298,7 +319,7 @@ function templateScript(p){
 }
 /* ---------- 인기상품 추천 (v1.3) ---------- */
 var REC=[];
-var TONES=['정보형(깔끔·신뢰)','후기형(직접 써본 느낌)','유머형(가볍고 재밌게)','긴급형(할인·한정 강조)','시니어 친화(쉽고 천천히)'];
+var TONES=['공감형(일상 속 불편→해결)','정보형(깔끔·신뢰)','후기형(직접 써본 느낌)','유머형(가볍고 재밌게)','긴급형(할인·한정 강조)','시니어 친화(쉽고 천천히)'];
 function recPrompt(cat){
   var d=new Date();var ym=d.getFullYear()+'년 '+(d.getMonth()+1)+'월';
   return '오늘은 '+ym+' '+d.getDate()+'일이다. 웹 검색으로 지금 한국 쿠팡에서 잘 팔리거나 검색이 늘고 있는 상품을 조사해서, 쇼핑 숏폼(쿠팡파트너스) 소개용으로 좋은 후보 8개를 추천해줘.\n'+
@@ -373,8 +394,8 @@ function genScript(){
   var p=planInput();if(!p.topic){st('scSt','상품명/주제를 먼저 입력하세요.','err');$('topic').focus();return;}
   var prov=$('prov').value;
   if(prov==='none'){applyScript(templateScript(p));st('scSt','템플릿 대본을 만들었습니다. (AI 키를 넣으면 더 자연스러운 대본 생성)','ok');return;}
-  $('btnGen').disabled=true;st('scSt','AI가 대본을 쓰는 중...');
-  callAI(buildPrompt(p)).then(function(t){applyScript(parseScript(t));st('scSt','AI 대본 생성 완료 ('+S.scenes.length+'장면)','ok');})
+  $('btnGen').disabled=true;st('scSt',p.nImg?'AI가 상품 사진 '+p.nImg+'장을 보고 공감 대본을 쓰는 중...':'AI가 대본을 쓰는 중...');
+  callAI(buildPrompt(p),POOL.map(function(x){return x.b64;})).then(function(t){applyScript(parseScript(t));st('scSt','AI 대본 생성 완료 ('+S.scenes.length+'장면'+(p.nImg?' · 장면별 사진 자동 배치':'')+')','ok');})
   .catch(function(e){st('scSt','대본 생성 실패: '+e.message,'err');})
   .then(function(){$('btnGen').disabled=false;});
 }
@@ -382,11 +403,51 @@ function applyScript(j){
   $('title').value=j.title||'';$('hook').value=j.hook||'';
   $('desc').value=j.description||'';$('tags').value=(j.hashtags||[]).join(' ');
   var old=S.scenes;
-  S.scenes=j.scenes.map(function(s,i){return {id:(old[i]&&old[i].id)||uid(),narration:s.narration||'',caption:s.caption||'',visual:s.visual||''};});
+  S.scenes=j.scenes.map(function(s,i){return {id:(old[i]&&old[i].id)||uid(),narration:s.narration||'',caption:s.caption||'',visual:s.visual||'',img:s.img};});
   // 기존 장면 이미지는 순서대로 유지, 음성은 문장이 바뀌므로 삭제
   S.scenes.forEach(function(s){delete ttsCache[s.id];});
+  // 상품 사진이 있으면 장면별 사진 배치 (AI 지정 번호 우선, 없으면 순서대로)
+  if(POOL.length){S.scenes.forEach(function(s,i){var k=parseInt(s.img,10);if(!(k>=0&&k<POOL.length))k=i%POOL.length;s.img=k;imgCache[s.id]=POOL[k].img;});}
   renderScenes();drawStill();
 }
+
+/* ---------- 상품 사진 보관함 (v1.4) ---------- */
+var POOL=[];
+function toB64(im){var m=768,sc=Math.min(1,m/Math.max(im.width,im.height));var c=document.createElement('canvas');c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);
+  var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);return c.toDataURL('image/jpeg',0.85).split(',')[1];}
+function addPoolFiles(files){
+  var fs=[].filter.call(files||[],function(f){return f.type&&f.type.indexOf('image/')===0;});
+  if(!fs.length){st('scSt','이미지 파일이 아닙니다.','err');return Promise.resolve();}
+  var room=10-POOL.length;if(room<=0){st('scSt','사진은 최대 10장까지 넣을 수 있습니다.','err');return Promise.resolve();}
+  return Promise.all(fs.slice(0,room).map(fileToImg)).then(function(ims){
+    ims.forEach(function(im){POOL.push({id:uid(),img:im,b64:toB64(im)});});renderPool();
+    st('scSt','상품 사진 '+ims.length+'장 추가 (총 '+POOL.length+'장) · "AI 대본 생성"을 누르면 사진을 보고 대본을 씁니다.','ok');
+  }).catch(function(e){st('scSt','사진 추가 실패: '+e.message,'err');});
+}
+function renderPool(){
+  $('poolCnt').textContent=POOL.length+'장';
+  $('poolList').innerHTML=POOL.map(function(x,i){return '<div class="pi" style="background-image:url('+x.img.src+')"><i>'+i+'</i><button title="삭제" onclick="rmPool(\''+x.id+'\')">×</button></div>';}).join('');
+}
+function rmPool(id){POOL=POOL.filter(function(x){return x.id!==id;});renderPool();}
+function clearPool(){POOL=[];renderPool();st('scSt','상품 사진을 모두 지웠습니다.','ok');}
+function pasteBtn(){
+  if(!(navigator.clipboard&&navigator.clipboard.read)){st('scSt','이 브라우저는 버튼 붙여넣기를 지원하지 않습니다. 화면을 클릭한 뒤 Ctrl+V를 눌러 주세요.','warn');return;}
+  navigator.clipboard.read().then(function(items){
+    var ps=[];items.forEach(function(it){var t=it.types.filter(function(x){return x.indexOf('image/')===0;})[0];if(t)ps.push(it.getType(t).then(function(b){return new File([b],'paste.png',{type:t});}));});
+    if(!ps.length){st('scSt','클립보드에 이미지가 없습니다. 쿠팡에서 사진 우클릭 → "이미지 복사"를 먼저 해 주세요.','warn');return;}
+    return Promise.all(ps).then(addPoolFiles);
+  }).catch(function(){st('scSt','붙여넣기 권한이 없습니다. 화면을 클릭한 뒤 Ctrl+V를 눌러 주세요.','warn');});
+}
+document.addEventListener('paste',function(e){
+  var t=e.target;if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;
+  var fs=[];[].forEach.call((e.clipboardData&&e.clipboardData.items)||[],function(it){if(it.kind==='file'&&it.type.indexOf('image/')===0)fs.push(it.getAsFile());});
+  if(fs.length){e.preventDefault();addPoolFiles(fs);}
+});
+(function(){var pl=$('pool');
+  ['dragenter','dragover'].forEach(function(ev){pl.addEventListener(ev,function(e){e.preventDefault();pl.classList.add('drag');});});
+  ['dragleave','drop'].forEach(function(ev){pl.addEventListener(ev,function(e){e.preventDefault();pl.classList.remove('drag');});});
+  pl.addEventListener('drop',function(e){var f=e.dataTransfer&&e.dataTransfer.files;if(f&&f.length)addPoolFiles(f);else st('scSt','웹페이지 사진은 끌어오기가 막혀 있습니다. 우클릭 → 이미지 복사 → Ctrl+V를 써 주세요.','warn');});
+})();
 
 /* ---------- 장면 편집 ---------- */
 function sceneDur(s){
@@ -476,7 +537,15 @@ var HUES=[212,198,224,190,230,205,218,186];
 function drawBg(s,idx,p,alpha){
   g.save();g.globalAlpha=alpha;
   var im=imgCache[s.id];
-  if(im){
+  if(im&&im.width/im.height>0.7){
+    // 정사각·가로형 상품 사진: 흐린 배경 + 상품 전체가 보이도록 카드 배치 (v1.4)
+    var ar=im.width/im.height,s0=Math.max(W/im.width,H/im.height)*1.15;
+    g.save();g.filter='blur(36px) brightness(0.55)';g.drawImage(im,(W-im.width*s0)/2,(H-im.height*s0)/2,im.width*s0,im.height*s0);g.restore();
+    var z=1+0.08*p,fw=W*0.88*z,fh=fw/ar;if(fh>H*0.52*z){fh=H*0.52*z;fw=fh*ar;}
+    var cx=W/2+(idx%2?-1:1)*14*p,cy=850,x0=cx-fw/2,y0=cy-fh/2;
+    g.save();g.shadowColor='rgba(0,0,0,.5)';g.shadowBlur=50;rr(x0,y0,fw,fh,26);g.fillStyle='#fff';g.fill();g.restore();
+    g.save();rr(x0,y0,fw,fh,26);g.clip();g.drawImage(im,x0,y0,fw,fh);g.restore();
+  }else if(im){
     var sc=Math.max(W/im.width,H/im.height)*(1.02+0.10*p);var w=im.width*sc,h=im.height*sc;
     var dx=(W-w)/2+(idx%2?-1:1)*20*p,dy=(H-h)/2-25*p;g.drawImage(im,dx,dy,w,h);
   }else{
@@ -511,7 +580,7 @@ function drawFrame(t,tl,tot){
   var bg2=g.createLinearGradient(0,H-900,0,H);bg2.addColorStop(0,'rgba(0,0,0,0)');bg2.addColorStop(1,'rgba(0,0,0,.7)');g.fillStyle=bg2;g.fillRect(0,H-900,W,900);
   var cap=c.s.caption||'';
   if(cap){var fs=+$('capSize').value;var pop=inT<0.18?0.85+0.15*(inT/0.18):1;
-    g.save();g.translate(W/2,1330);g.scale(pop,pop);g.font='900 '+fs+'px "Noto Sans KR"';g.textAlign='center';
+    g.save();g.translate(W/2,1420);g.scale(pop,pop);g.font='900 '+fs+'px "Noto Sans KR"';g.textAlign='center';
     var cl=wrap(cap,W-200).slice(0,3),lh=fs*1.28,bw=0;cl.forEach(function(l){bw=Math.max(bw,g.measureText(l).width);});
     var bh=cl.length*lh+50;rr(-bw/2-40,-bh/2,bw+80,bh,28);g.fillStyle='rgba(255,255,255,.95)';g.fill();
     g.fillStyle='#14233a';cl.forEach(function(l,n){g.fillText(l,0,-bh/2+25+lh*(n+0.78));});g.restore();}
@@ -653,7 +722,7 @@ function delProj(id){
 }
 function newProj(){
   stopAll();['topic','feat','target','title','hook','desc','tags'].forEach(function(k){$(k).value='';});
-  S={scenes:[],projId:null};imgCache={};ttsCache={};bgmBuf=null;$('bgm').value='';$('dlBox').innerHTML='';
+  S={scenes:[],projId:null};imgCache={};ttsCache={};bgmBuf=null;POOL=[];renderPool();$('bgm').value='';$('dlBox').innerHTML='';
   renderScenes();drawStill();st('fbSt','새 프로젝트를 시작합니다.','ok');
 }
 
