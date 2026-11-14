@@ -6,12 +6,12 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>AI 숏폼 자동제작기 v1.0</title>
+<title>AI 숏폼 자동제작기 v1.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* ===== AI 숏폼 자동제작기 v1.0 · 인시스 AI혁신 연구개발실 ===== */
+/* ===== AI 숏폼 자동제작기 v1.1 · 인시스 AI혁신 연구개발실 ===== */
 :root{--ink:#1f2a37;--navy:#1e3a5f;--sub:#4b5563;--line:#d9dee5;--bg:#f3f5f8;--card:#fff;--soft:#e8eef6;--ok:#1f6f43;--warn:#8a5a00;--err:#a12a2a}
 *{box-sizing:border-box}
 html{font-size:14px}
@@ -69,7 +69,7 @@ footer{text-align:center;font-size:.78rem;color:var(--sub);padding:8px 0 12px}
 </head>
 <body class="mobile">
 <nav><div class="nav-inner">
- <h1>🎬 AI 숏폼 자동제작기 <span class="ver" id="verTag">v1.0</span></h1>
+ <h1>🎬 AI 숏폼 자동제작기 <span class="ver" id="verTag">v1.1</span></h1>
  <div class="vt"><button id="vMobile" class="on" onclick="setView('mobile')">모바일</button><button id="vPc" onclick="setView('pc')">PC</button></div>
 </div></nav>
 
@@ -182,12 +182,12 @@ footer{text-align:center;font-size:.78rem;color:var(--sub);padding:8px 0 12px}
 </section>
 
 </div>
-<footer>AI 숏폼 자동제작기 <b id="verFoot">v1.0</b> · 인시스 AI혁신 연구개발실</footer>
+<footer>AI 숏폼 자동제작기 <b id="verFoot">v1.1</b> · 인시스 AI혁신 연구개발실</footer>
 </div>
 
 <script>
-/* ===== AI 숏폼 자동제작기 v1.0 ===== */
-var APP_VERSION='v1.0';
+/* ===== AI 숏폼 자동제작기 v1.1 ===== */
+var APP_VERSION='v1.1';
 var FIREBASE_CONFIG={apiKey:"AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",authDomain:"insys-work.firebaseapp.com",projectId:"insys-work",storageBucket:"insys-work.firebasestorage.app",messagingSenderId:"225275784859",appId:"1:225275784859:web:bd12815c6dc47c0c49e03e"};
 var COL='shortform_projects';
 var W=1080,H=1920;
@@ -439,7 +439,7 @@ function drawStill(){var tl=timeline();drawFrame(stillT,tl,total(tl)||1);}
 /* ---------- 재생·렌더 ---------- */
 var run=null;
 function stopAll(){
-  if(run){run.stop=true;(run.nodes||[]).forEach(function(n){try{n.stop();}catch(e){}});if(run.rec&&run.rec.state!=='inactive')run.rec.stop();}
+  if(run){run.stop=true;clearInterval(run.iv);(run.nodes||[]).forEach(function(n){try{n.stop();}catch(e){}});if(run.rec&&run.rec.state!=='inactive')run.rec.stop();}
   run=null;$('btnPlay').disabled=false;$('btnRender').disabled=false;
 }
 function schedule(ctx,tl,t0,out){
@@ -455,9 +455,11 @@ function play(rec){
   stopAll();var ctx=AC();var t0=ctx.currentTime+0.15;
   var r={stop:false,tl:tl,tot:tot};r.out=rec?ctx.createMediaStreamDestination():ctx.destination;r.nodes=schedule(ctx,tl,t0,r.out);
   run=r;$('btnPlay').disabled=true;$('btnRender').disabled=true;
-  function loop(){if(r.stop)return;var t=Math.max(0,ctx.currentTime-t0);drawFrame(Math.min(t,tot-0.001),tl,tot);$('pg').style.width=(100*Math.min(1,t/tot))+'%';
-    if(t>=tot){r.stop=true;if(r.onEnd)r.onEnd();return;}requestAnimationFrame(loop);}
-  r.begin=function(){requestAnimationFrame(loop);};
+  // 화면 갱신: rAF(보이는 탭) + 타이머(숨은 탭 대비) 병행, 시간은 오디오 시계 기준
+  function tick(){if(r.stop)return;var t=Math.max(0,ctx.currentTime-t0);drawFrame(Math.min(t,tot-0.001),tl,tot);$('pg').style.width=(100*Math.min(1,t/tot))+'%';
+    if(t>=tot){r.stop=true;clearInterval(r.iv);if(r.onEnd)r.onEnd();}}
+  function raf(){if(r.stop)return;tick();requestAnimationFrame(raf);}
+  r.begin=function(){r.iv=setInterval(tick,33);requestAnimationFrame(raf);};
   return r;
 }
 function preview(){
