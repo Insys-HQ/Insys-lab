@@ -6,12 +6,12 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>AI 숏폼 자동제작기 v1.2</title>
+<title>AI 숏폼 자동제작기 v1.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* ===== AI 숏폼 자동제작기 v1.2 · 인시스 AI혁신 연구개발실 ===== */
+/* ===== AI 숏폼 자동제작기 v1.3 · 인시스 AI혁신 연구개발실 ===== */
 :root{--ink:#1f2a37;--navy:#1e3a5f;--sub:#4b5563;--line:#d9dee5;--bg:#f3f5f8;--card:#fff;--soft:#e8eef6;--ok:#1f6f43;--warn:#8a5a00;--err:#a12a2a}
 *{box-sizing:border-box}
 html{font-size:14px}
@@ -64,12 +64,19 @@ a.dl{display:inline-block;margin-top:6px;color:var(--navy);font-weight:700}
 .tag{display:inline-block;background:var(--soft);color:var(--navy);border-radius:6px;padding:0 6px;font-size:.78rem;margin-right:4px}
 .prog{height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:6px}
 .prog i{display:block;height:100%;width:0;background:var(--navy)}
+.recBox{background:var(--soft);border-radius:10px;padding:8px 10px;margin-bottom:6px}
+.recBox label{margin-top:0}
+.rec{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-top:6px;cursor:pointer}
+.rec.on{border:2px solid var(--navy)}
+.rec b{color:var(--navy)}
+.rec .why{font-size:.85rem;color:var(--sub);margin:2px 0}
+.rec .ft{font-size:.82rem;color:var(--ink)}
 footer{text-align:center;font-size:.78rem;color:var(--sub);padding:8px 0 12px}
 </style>
 </head>
 <body class="mobile">
 <nav><div class="nav-inner">
- <h1>🎬 AI 숏폼 자동제작기 <span class="ver" id="verTag">v1.2</span></h1>
+ <h1>🎬 AI 숏폼 자동제작기 <span class="ver" id="verTag">v1.3</span></h1>
  <div class="vt"><button id="vMobile" class="on" onclick="setView('mobile')">모바일</button><button id="vPc" onclick="setView('pc')">PC</button></div>
 </div></nav>
 
@@ -99,6 +106,13 @@ footer{text-align:center;font-size:.78rem;color:var(--sub);padding:8px 0 12px}
 <!-- 2. 기획 -->
 <section class="card" id="cPlan">
  <h2><span class="n">2</span>기획 입력</h2>
+ <div class="recBox">
+  <div class="row"><div><label>추천 받을 분야</label><select id="recCat">
+   <option>전체</option><option>생활·주방</option><option>가전·디지털</option><option>뷰티·헬스</option><option>건강식품</option><option>패션잡화</option><option>캠핑·레저</option><option>자동차용품</option><option>반려동물</option><option>유아·출산</option><option>시니어·효도선물</option></select></div>
+  <div style="display:flex;align-items:flex-end"><button class="b" id="btnRec" style="width:100%" onclick="recommend()">🔍 인기상품 추천 받기</button></div></div>
+  <div class="st" id="recSt"></div>
+  <div id="recList"></div>
+ </div>
  <label>상품명 / 주제</label><input type="text" id="topic" placeholder="예) 접이식 무선 미니 선풍기">
  <label>핵심 특징·장점 (줄바꿈으로 구분)</label>
  <textarea id="feat" placeholder="예)&#10;무게 180g 초경량&#10;최대 12시간 사용&#10;3단 풍속, 저소음"></textarea>
@@ -182,12 +196,12 @@ footer{text-align:center;font-size:.78rem;color:var(--sub);padding:8px 0 12px}
 </section>
 
 </div>
-<footer>AI 숏폼 자동제작기 <b id="verFoot">v1.2</b> · 인시스 AI혁신 연구개발실</footer>
+<footer>AI 숏폼 자동제작기 <b id="verFoot">v1.3</b> · 인시스 AI혁신 연구개발실</footer>
 </div>
 
 <script>
-/* ===== AI 숏폼 자동제작기 v1.2 ===== */
-var APP_VERSION='v1.2';
+/* ===== AI 숏폼 자동제작기 v1.3 ===== */
+var APP_VERSION='v1.3';
 var FIREBASE_CONFIG={apiKey:"AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",authDomain:"insys-work.firebaseapp.com",projectId:"insys-work",storageBucket:"insys-work.firebasestorage.app",messagingSenderId:"225275784859",appId:"1:225275784859:web:bd12815c6dc47c0c49e03e"};
 var COL='shortform_projects';
 var W=1080,H=1920;
@@ -282,6 +296,79 @@ function templateScript(p){
   return {title:t+' 써보고 깜짝 놀란 이유',hook:(t.length>12?t.slice(0,12)+'…':t)+' 리얼 후기',scenes:sc,
     hashtags:['#'+t.replace(/\s+/g,''),'#쇼츠','#추천템','#살림템','#리뷰'],description:t+' 핵심만 '+p.len+'초로 정리했어요. 자세한 정보는 링크에서 확인하세요.'};
 }
+/* ---------- 인기상품 추천 (v1.3) ---------- */
+var REC=[];
+var TONES=['정보형(깔끔·신뢰)','후기형(직접 써본 느낌)','유머형(가볍고 재밌게)','긴급형(할인·한정 강조)','시니어 친화(쉽고 천천히)'];
+function recPrompt(cat){
+  var d=new Date();var ym=d.getFullYear()+'년 '+(d.getMonth()+1)+'월';
+  return '오늘은 '+ym+' '+d.getDate()+'일이다. 웹 검색으로 지금 한국 쿠팡에서 잘 팔리거나 검색이 늘고 있는 상품을 조사해서, 쇼핑 숏폼(쿠팡파트너스) 소개용으로 좋은 후보 8개를 추천해줘.\n'+
+  '- 분야: '+cat+'\n- 계절·시즌(명절, 연말, 날씨) 수요를 반영\n- 영상으로 보여주기 쉬운(사용 전후·기능이 눈에 보이는) 상품 우선\n- 특정 브랜드 단정 대신 상품 유형 중심, 가격대는 대략 범위로\n- 의약품·의료기기·성인용품·위험물 제외\n\n'+
+  '반드시 아래 JSON만 출력(설명·코드블록 금지):\n{"items":[{"name":"상품명(유형)","category":"분야","why":"지금 추천하는 이유 1문장","features":["특징1","특징2","특징3"],"target":"타깃 시청자","tone":"'+TONES.join('|')+' 중 하나","price":"가격대","hook":"첫 3초 후킹 문구"}]}';
+}
+function seasonFallback(){
+  var m=new Date().getMonth()+1;
+  var W=[['충전식 손난로','휴대용 보조배터리 겸용','3단 온도 조절','주머니 쏙 크기','출퇴근 직장인·학생','후기형(직접 써본 느낌)'],
+   ['탄소 전기요','전자파 걱정 줄인 탄소 열선','타이머·온도 조절','세탁 가능','난방비 아끼려는 가정','정보형(깔끔·신뢰)'],
+   ['초음파 가습기','대용량 물통','무드등 겸용','저소음 수면모드','건조한 실내 생활자','정보형(깔끔·신뢰)'],
+   ['방한 넥워머','기모 안감','귀까지 덮는 디자인','세탁 쉬움','야외 활동·출퇴근족','유머형(가볍고 재밌게)'],
+   ['차량용 성에 제거 스크래퍼','앞유리 성에 빠르게 제거','장갑 일체형','트렁크 보관 쉬움','겨울철 운전자','정보형(깔끔·신뢰)'],
+   ['보온 텀블러','6시간 이상 보온','원터치 뚜껑','차량 컵홀더 호환','직장인·등산객','후기형(직접 써본 느낌)'],
+   ['실내 빨래 건조대','접이식 공간 절약','대용량 거치','바퀴 이동','원룸·맞벌이 가정','정보형(깔끔·신뢰)'],
+   ['효도 안마 쿠션','목·허리 겸용','온열 기능','차량 사용 가능','부모님 선물 찾는 자녀','시니어 친화(쉽고 천천히)']];
+  var S=[['휴대용 미니 선풍기','초경량','장시간 사용','3단 풍속','출퇴근 직장인','후기형(직접 써본 느낌)'],
+   ['냉감 이불','시원한 촉감','세탁기 가능','사계절 커버','더위 타는 가정','정보형(깔끔·신뢰)'],
+   ['쿨토시','자외선 차단','땀 빠른 건조','팔 시원함','야외 활동족','유머형(가볍고 재밌게)'],
+   ['제습기','장마철 습기 제거','자동 습도 조절','저소음','원룸·반지하 거주자','정보형(깔끔·신뢰)'],
+   ['아이스 텀블러','얼음 오래 유지','대용량','빨대 포함','카페 음료 즐기는 직장인','후기형(직접 써본 느낌)'],
+   ['모기 퇴치기','무향 저소음','USB 충전','캠핑 겸용','여름 캠핑족','정보형(깔끔·신뢰)'],
+   ['방수 슬리퍼','물빠짐 구조','미끄럼 방지','가벼움','바캉스 가는 가족','유머형(가볍고 재밌게)'],
+   ['효도 안마 쿠션','목·허리 겸용','온열 기능','차량 사용 가능','부모님 선물 찾는 자녀','시니어 친화(쉽고 천천히)']];
+  var L=(m>=10||m<=3)?W:(m>=6&&m<=8?S:W.slice(5).concat(S.slice(0,5)));
+  return L.map(function(x){return {name:x[0],category:'시즌 추천',why:'계절 수요가 높은 품목 (기본 목록)',features:[x[1],x[2],x[3]],target:x[4],tone:x[5],price:'',hook:''};});
+}
+function callSearch(prompt){
+  var p=$('prov').value,key=$('aiKey').value.trim(),model=$('model').value.trim()||DEF_MODEL[p];
+  if(p==='claude'){
+    return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:model,max_tokens:4000,system:SYS,tools:[{type:'web_search_20250305',name:'web_search',max_uses:5}],messages:[{role:'user',content:prompt}]})})
+      .then(apiJson).then(function(j){return j.content.filter(function(c){return c.type==='text';}).map(function(c){return c.text;}).join('');});
+  }
+  if(p==='openai'){
+    return fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{'content-type':'application/json','authorization':'Bearer '+key},
+      body:JSON.stringify({model:model,tools:[{type:'web_search_preview'}],instructions:SYS,input:prompt})})
+      .then(apiJson).then(function(j){var t='';(j.output||[]).forEach(function(o){(o.content||[]).forEach(function(c){if(c.type==='output_text')t+=c.text;});});return t;});
+  }
+  return fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(model)+':generateContent?key='+encodeURIComponent(key),{method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({contents:[{parts:[{text:SYS+'\n\n'+prompt}]}],tools:[{google_search:{}}]})})
+    .then(apiJson).then(function(j){return j.candidates[0].content.parts.map(function(x){return x.text||'';}).join('');});
+}
+function parseItems(t){var a=t.indexOf('{'),b=t.lastIndexOf('}');if(a<0||b<a)throw new Error('JSON 없음');var j=JSON.parse(t.slice(a,b+1));if(!j.items||!j.items.length)throw new Error('추천 결과 없음');return j.items;}
+function recommend(){
+  var cat=$('recCat').value,p=$('prov').value;
+  if(p==='none'||!$('aiKey').value.trim()){REC=seasonFallback();showRec();st('recSt','AI 키가 없어 계절 기본 목록을 보여드립니다. 1번에 키를 넣으면 실시간 웹검색으로 추천합니다.','warn');return;}
+  $('btnRec').disabled=true;st('recSt','웹에서 요즘 잘 팔리는 상품을 찾는 중... (20~40초)');
+  var pr=recPrompt(cat);
+  callSearch(pr).then(function(t){REC=parseItems(t);showRec();st('recSt','웹검색 기반 추천 '+REC.length+'개 · 하나를 눌러 선택하세요. (쿠팡에서 실제 판매·리뷰 확인 권장)','ok');})
+  .catch(function(e){
+    st('recSt','웹검색 실패('+e.message.slice(0,60)+') → AI 지식 기반으로 다시 추천 중...','warn');
+    return callAI(pr.replace('웹 검색으로 ','')).then(function(t){REC=parseItems(t);showRec();st('recSt','AI 지식 기반 추천 '+REC.length+'개 (실시간 순위 아님) · 하나를 눌러 선택하세요.','warn');})
+    .catch(function(e2){REC=seasonFallback();showRec();st('recSt','AI 추천 실패('+e2.message.slice(0,60)+') → 계절 기본 목록을 보여드립니다.','err');});
+  }).then(function(){$('btnRec').disabled=false;});
+}
+function showRec(){
+  $('recList').innerHTML=REC.map(function(it,i){
+    return '<div class="rec" id="rec_'+i+'" onclick="pickRec('+i+')"><b>'+(i+1)+'. '+esc(it.name)+'</b>'+(it.price?' <span class="tag">'+esc(it.price)+'</span>':'')+
+    '<div class="why">'+esc(it.why||'')+'</div><div class="ft">'+esc((it.features||[]).join(' · '))+'</div>'+
+    '<div class="why">타깃: '+esc(it.target||'')+' · 톤: '+esc(it.tone||'')+'</div></div>';}).join('');
+}
+function pickRec(i){
+  var it=REC[i];if(!it)return;
+  $('topic').value=it.name||'';$('feat').value=(it.features||[]).join('\n');$('target').value=it.target||'';
+  var tn=TONES.filter(function(t){return it.tone&&(t===it.tone||t.indexOf(String(it.tone).split('(')[0])===0);})[0];if(tn)$('tone').value=tn;
+  [].forEach.call(document.querySelectorAll('.rec'),function(e){e.classList.remove('on');});$('rec_'+i).classList.add('on');
+  st('recSt','선택: '+it.name+' → 아래 칸에 자동 입력했습니다. 수정 후 3번 "AI 대본 생성"을 누르세요.','ok');
+}
+
 function genScript(){
   var p=planInput();if(!p.topic){st('scSt','상품명/주제를 먼저 입력하세요.','err');$('topic').focus();return;}
   var prov=$('prov').value;
