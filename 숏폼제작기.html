@@ -6,12 +6,12 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>AI 숏폼 자동제작기 v1.1</title>
+<title>AI 숏폼 자동제작기 v1.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* ===== AI 숏폼 자동제작기 v1.1 · 인시스 AI혁신 연구개발실 ===== */
+/* ===== AI 숏폼 자동제작기 v1.2 · 인시스 AI혁신 연구개발실 ===== */
 :root{--ink:#1f2a37;--navy:#1e3a5f;--sub:#4b5563;--line:#d9dee5;--bg:#f3f5f8;--card:#fff;--soft:#e8eef6;--ok:#1f6f43;--warn:#8a5a00;--err:#a12a2a}
 *{box-sizing:border-box}
 html{font-size:14px}
@@ -69,7 +69,7 @@ footer{text-align:center;font-size:.78rem;color:var(--sub);padding:8px 0 12px}
 </head>
 <body class="mobile">
 <nav><div class="nav-inner">
- <h1>🎬 AI 숏폼 자동제작기 <span class="ver" id="verTag">v1.1</span></h1>
+ <h1>🎬 AI 숏폼 자동제작기 <span class="ver" id="verTag">v1.2</span></h1>
  <div class="vt"><button id="vMobile" class="on" onclick="setView('mobile')">모바일</button><button id="vPc" onclick="setView('pc')">PC</button></div>
 </div></nav>
 
@@ -182,12 +182,12 @@ footer{text-align:center;font-size:.78rem;color:var(--sub);padding:8px 0 12px}
 </section>
 
 </div>
-<footer>AI 숏폼 자동제작기 <b id="verFoot">v1.1</b> · 인시스 AI혁신 연구개발실</footer>
+<footer>AI 숏폼 자동제작기 <b id="verFoot">v1.2</b> · 인시스 AI혁신 연구개발실</footer>
 </div>
 
 <script>
-/* ===== AI 숏폼 자동제작기 v1.1 ===== */
-var APP_VERSION='v1.1';
+/* ===== AI 숏폼 자동제작기 v1.2 ===== */
+var APP_VERSION='v1.2';
 var FIREBASE_CONFIG={apiKey:"AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",authDomain:"insys-work.firebaseapp.com",projectId:"insys-work",storageBucket:"insys-work.firebasestorage.app",messagingSenderId:"225275784859",appId:"1:225275784859:web:bd12815c6dc47c0c49e03e"};
 var COL='shortform_projects';
 var W=1080,H=1920;
@@ -444,6 +444,8 @@ function stopAll(){
 }
 function schedule(ctx,tl,t0,out){
   var nodes=[];
+  // 무음 유지 신호: 음성·배경음악이 없어도 오디오 트랙이 끊기지 않게 하여 영상 길이 잘림 방지
+  if(ctx.createConstantSource){var cs=ctx.createConstantSource(),cg=ctx.createGain();cg.gain.value=0;cs.connect(cg);cg.connect(out);cs.start(t0);cs.stop(t0+total(tl)+0.3);nodes.push(cs);}
   tl.forEach(function(o){var b=ttsCache[o.s.id];if(!b)return;var src=ctx.createBufferSource();src.buffer=b;src.connect(out);src.start(t0+o.start+0.1);nodes.push(src);});
   if(bgmBuf){var bs=ctx.createBufferSource();bs.buffer=bgmBuf;bs.loop=true;var gn=ctx.createGain();var v=Math.max(0,Math.min(100,+$('bgmVol').value||0))/100;var tot=total(tl);
     gn.gain.setValueAtTime(v,t0);gn.gain.setValueAtTime(v,t0+Math.max(0,tot-1));gn.gain.linearRampToValueAtTime(0,t0+tot);bs.connect(gn);gn.connect(out);bs.start(t0);bs.stop(t0+tot+0.05);nodes.push(bs);}
