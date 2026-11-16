@@ -100,7 +100,7 @@
   <div class="nav-inner">
     <div class="hd-top">
       <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-      <span class="hd-ver" id="hVer">v1.9</span>
+      <span class="hd-ver" id="hVer">v2.0</span>
     </div>
     <h1>인덱스 회전형 PCB 검사기 시뮬레이터 — 4지그 타입</h1>
     <div class="hd-sub"><b>4지그 90° 등배</b> · 알루미늄 3030 프레임 300 × 600 × 750 mm · 상판 10T · 4스테이션(투입·검사·배출·대기) 90° 인덱스 · 하부 상향 비전</div>
@@ -205,7 +205,7 @@
    인덱스 회전형 PCB 검사기 시뮬레이터
    인시스 AI혁신 연구개발실
    =================================================================== */
-var VER='v1.9';
+var VER='v2.0';
 
 /* ======================= 치수 (1 unit = 5 mm) ======================= */
 var U=5;
@@ -368,7 +368,7 @@ var STATES=[
   {ph:'투입',    t:'sense', lb:'안착센서 감지 → 지그 안착 확인'},
   {ph:'인덱스',  t:'index', lb:'DG085-F-10 구동 → 90° CCW 인덱스 회전 (0.5초)'},
   {ph:'인덱스',  t:'settle',lb:'정위치 정지 · 인덱스 핀 클램프'},
-  {ph:'검사',    t:'light', lb:'하부 링조명 ON (상판 φ120 홀 통과)'},
+  {ph:'검사',    t:'light', lb:'하부 링조명 ON → 안착면 원형 투광 φ130 (상판 φ120 홀 통과)'},
   {ph:'검사',    t:'shot',  lb:'6시 스테이션 : IS3805 상향 촬영'},
   {ph:'검사',    t:'judge', lb:'AI 외관검사 → OK / NG 판정'},
   {ph:'검사',    t:'alarm', cond:'ng', lb:'NG 알람 · 경광등 적색'},
@@ -497,6 +497,27 @@ function drawCamera(){
     var a=2*Math.PI*i/16;
     var q=P(HOLE.x+(HOLE.r+2.4)*Math.cos(a), HOLE.y+(HOLE.r+2.4)*Math.sin(a), rz);
     o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="1.0" fill="'+lc+'" stroke="#4A525C" stroke-width="0.3"/>';
+  }
+  return o;
+}
+
+/* 검사 광원 — 검사 스테이션에 지그가 정위치하면 원형 투광 (하부 링조명 → φ120 홀 → 안착면) */
+var LITR=13;                         // 투광 반경 65 mm (φ130) — PCB 100 × 50 포함
+function drawInspLight(){
+  if(!lightOn || jigAt(ST_INSP)<0) return '';
+  var o='', c=jigPos(ST_INSP), k=(shotT>=0)?1.0:0.68, i;
+  /* ① 하단 데크 광축 개구 통과광 φ80 */
+  o+=polyStr(circlePts(c.x,c.y,LZ1+0.08,8,44))+'fill="#F7CE72" opacity="'+(0.34*k).toFixed(2)+'" stroke="none"/>';
+  /* ② 안착면 원형 광원 — 외곽에서 중심으로 3단 (소프트 글로우) */
+  var rg=[[LITR,0.13],[LITR*0.78,0.17],[LITR*0.56,0.22]];
+  for(i=0;i<rg.length;i++)
+    o+=polyStr(circlePts(c.x,c.y,SEAT_Z+0.30+i*0.02,rg[i][0],52))+'fill="#FFE2A0" opacity="'+(rg[i][1]*k).toFixed(2)+'" stroke="none"/>';
+  /* ③ 광원 외곽 링 */
+  o+=polyStr(circlePts(c.x,c.y,SEAT_Z+0.40,LITR,52))+'fill="none" stroke="#F5C250" stroke-width="'+(shotT>=0?1.15:0.75)+'" opacity="'+(0.90*k).toFixed(2)+'"/>';
+  /* ④ 노광 순간 — 내측 섬광 링 */
+  if(shotT>=0 && shotT<0.3){
+    var fl=(1-shotT/0.3);
+    o+=polyStr(circlePts(c.x,c.y,SEAT_Z+0.46,LITR*0.92,52))+'fill="#FFFFFF" opacity="'+(fl*0.38).toFixed(2)+'" stroke="none"/>';
   }
   return o;
 }
@@ -949,6 +970,7 @@ function draw(){
   s+=drawReducer('tbl');
   s+=drawSensor('low');
   s+=drawIndex();
+  s+=drawInspLight();
   /* 깊이순 : 모니터 기둥(dep 61) → PC판(-9) → 센서 지주(-28) → 전면 프레임(-56) → 라벨 */
   s+=drawMonitor();
   s+=drawCover('near');
@@ -1063,7 +1085,7 @@ function runState(){
     pause(D.act,next); return;
   }
   if(st.t==='light'){
-    lightOn=true; addLog('[조명] 하부 링조명 ON');
+    lightOn=true; addLog('[조명] 하부 링조명 ON — 검사위치 안착면에 원형 투광 φ130');
     draw(); pause(D.act,next); return;
   }
   if(st.t==='shot'){
