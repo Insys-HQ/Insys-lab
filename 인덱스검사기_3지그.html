@@ -100,7 +100,7 @@
   <div class="nav-inner">
     <div class="hd-top">
       <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-      <span class="hd-ver" id="hVer">v1.5</span>
+      <span class="hd-ver" id="hVer">v1.6</span>
     </div>
     <h1>인덱스 회전형 PCB 검사기 시뮬레이터 — 3지그 타입</h1>
     <div class="hd-sub"><b>3지그 120° 등배</b> · 알루미늄 3030 프레임 300 × 600 × 750 mm · 상판 10T · 3스테이션(투입·검사·배출) 120° 인덱스 · 하부 상향 비전</div>
@@ -205,7 +205,7 @@
    인덱스 회전형 PCB 검사기 시뮬레이터
    인시스 AI혁신 연구개발실
    =================================================================== */
-var VER='v1.5';
+var VER='v1.6';
 
 /* ======================= 치수 (1 unit = 5 mm) ======================= */
 var U=5;
@@ -234,7 +234,11 @@ var CHU=5, CHV=8, CTH=7;             // 케이스 50(반경) × 80(접선) × 35
 var CUOF=10;                         // 케이스 반경방향 바깥 오프셋 50 mm (광축 회피 · 작업자측)
 var DCU=4, DA=13.5, DB=18;           // 하단 데크 타원 — 중심 u+20 mm · 반경 135 × 접선 180 mm
 var PCB_W=20, PCB_D=10, PCB_T=0.6;   // 타원 PCB 100 × 50 mm
-var CAMZ0=96, CAMZ1=116, LENSZ=122;  // 내부 카메라 (상향)
+var CAMZ0=92, CAMZ1=110, LENSZ=122;  // COGNEX In-Sight IS3805 — 광축 상향
+var CBW=5, CBD=7;                    // 바디 50 × 70 mm (M3 4개 · 38.5 × 58.5 패턴)
+var CLZ0=110, CLZ1=119;              // C마운트 렌즈 배럴 45 mm
+var CRZ0=119;                        // 일체형 링조명 15 mm → 광학 전면 = LENSZ
+var CRR=7.5, CLEDR=6.0, NLED=16;     // 링조명 외경 φ75 · LED 배치 반경 φ60 · 16개
 var WDU=(UZ1-LENSZ);                 // 작업거리 (유닛)
 var MON={x:FW/2, y:FL+4, z:FH+38};   // 뒷쪽 상단 모니터
 var MHW=26, MHH=16;                  // 12인치
@@ -369,7 +373,7 @@ var STATES=[
   {ph:'투입',    t:'sense', lb:'안착센서 감지 → 지그 안착 확인'},
   {ph:'인덱스',  t:'index', lb:'DG085-F-10 구동 → 120° CCW 인덱스 회전 (0.5초)'},
   {ph:'인덱스',  t:'settle',lb:'정위치 정지 · 인덱스 핀 클램프'},
-  {ph:'검사',    t:'light', lb:'하부 링조명 ON → 안착면 원형 투광 φ130 (상판 φ120 홀 통과)'},
+  {ph:'검사',    t:'light', lb:'IS3805 일체형 링조명 ON → 안착면 원형 투광 φ130 (상판 φ120 홀 통과)'},
   {ph:'검사',    t:'shot',  lb:'6시 스테이션 : IS3805 상향 촬영'},
   {ph:'검사',    t:'judge', lb:'AI 외관검사 → OK / NG 판정'},
   {ph:'검사',    t:'alarm', cond:'ng', lb:'NG 알람 · 경광등 적색'},
@@ -484,33 +488,74 @@ function drawCover(part){
   return o;
 }
 
+/* 조명 광량 — 촬영(노광) 순간 최대, 조명 ON 대기 시 약광 */
+function litK(){
+  if(jigAt(ST_INSP)<0) return 0;
+  if(shotT>=0) return 1.0;
+  return lightOn?0.30:0;
+}
+/* 광축 원뿔 (아래 원 → 위 원) */
+function cone(cx,cy,z0,r0,z1,r1,col,op){
+  var o='', n=30, i, A=[], B=[];
+  for(i=0;i<=n;i++){ var a=2*Math.PI*i/n;
+    A.push(P(cx+r0*Math.cos(a), cy+r0*Math.sin(a), z0));
+    B.push(P(cx+r1*Math.cos(a), cy+r1*Math.sin(a), z1)); }
+  for(i=0;i<n;i++)
+    o+='<polygon points="'+[A[i],A[i+1],B[i+1],B[i]].map(pt).join(' ')+'" fill="'+col+'" opacity="'+op.toFixed(3)+'" stroke="none"/>';
+  return o;
+}
+
 function drawCamera(){
-  var o='';
-  o+=box(HOLE.x-13,HOLE.x+13, HOLE.y-11,HOLE.y+11, CAMZ0-3,CAMZ0, MAT.steel,0.45);   // 마운트 플레이트
-  o+=tube({x:HOLE.x-11,y:HOLE.y,z:PR},{x:HOLE.x-11,y:HOLE.y,z:CAMZ0},1.5,MAT.steel,false,true);
-  o+=tube({x:HOLE.x+11,y:HOLE.y,z:PR},{x:HOLE.x+11,y:HOLE.y,z:CAMZ0},1.5,MAT.steel,false,true);
-  o+=box(HOLE.x-5,HOLE.x+5, HOLE.y-5,HOLE.y+5, CAMZ0,CAMZ1, MAT.cam,0.45);           // 카메라 바디
-  o+=tube({x:HOLE.x,y:HOLE.y,z:CAMZ1},{x:HOLE.x,y:HOLE.y,z:LENSZ},3.6,MAT.dark,false,true); // 렌즈
-  /* 링조명 (상판 바로 아래) */
-  var rz=PZ-3.4;
-  var lc=lightOn?'#F5C250':'#6E7682';
-  for(var i=0;i<16;i++){
-    var a=2*Math.PI*i/16;
-    var q=P(HOLE.x+(HOLE.r+2.4)*Math.cos(a), HOLE.y+(HOLE.r+2.4)*Math.sin(a), rz);
-    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="1.0" fill="'+lc+'" stroke="#4A525C" stroke-width="0.3"/>';
+  var o='', CX=HOLE.x, CY=HOLE.y, i, a, q, k=litK();
+  /* 마운트 플레이트 + 지주 2본 */
+  o+=box(CX-13,CX+13, CY-11,CY+11, CAMZ0-3,CAMZ0, MAT.steel,0.45);
+  o+=tube({x:CX-11,y:CY,z:PR},{x:CX-11,y:CY,z:CAMZ0},1.5,MAT.steel,false,true);
+  o+=tube({x:CX+11,y:CY,z:PR},{x:CX+11,y:CY,z:CAMZ0},1.5,MAT.steel,false,true);
+  /* 바디 (IS3805) 50 × 70 × 90 mm — 광축 상향 */
+  o+=box(CX-CBW,CX+CBW, CY-CBD,CY+CBD, CAMZ0,CAMZ1, MAT.cam,0.45);
+  /* 하면 커넥터부 (전원 I/O · ENET0/1 · USB-C) */
+  o+=box(CX-CBW+0.8,CX+CBW-0.8, CY-CBD-1.4,CY-CBD, CAMZ0+1.6,CAMZ0+6.4, [52,58,68],0.35);
+  for(i=0;i<3;i++){
+    q=P(CX-2.6+i*2.6, CY-CBD-1.5, CAMZ0+4.0);
+    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.55" fill="#2A313B" stroke="#454D58" stroke-width="0.22"/>';
   }
+  /* 상태 LED 3개 (바디 측면) */
+  var slc=['#3FBF63','#2FA8E8','#8A95A3'];
+  for(i=0;i<3;i++){
+    q=P(CX+CBW+0.1, CY-3.0+i*3.0, CAMZ1-3.0);
+    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.5" fill="'+slc[i]+'" opacity=".85"/>';
+  }
+  /* C마운트 렌즈 배럴 45 mm */
+  o+=tube({x:CX,y:CY,z:CLZ0},{x:CX,y:CY,z:CLZ1},3.4,MAT.dark,false,true);
+  o+=tube({x:CX,y:CY,z:CLZ1-1.6},{x:CX,y:CY,z:CLZ1-0.9},3.8,[46,52,62],false,false);   // 초점 링
+  /* 일체형 링조명 (전면 부착) φ75 × 15 mm */
+  o+=tube({x:CX,y:CY,z:CRZ0},{x:CX,y:CY,z:LENSZ},CRR,[64,72,84],false,true);
+  /* 전면 LED 16개 — 촬영 시간에 맞춰 점등 */
+  var on=(k>0.6), lc=on?'#FFF0C4':(k>0?'#F5C250':'#6E7682');
+  for(i=0;i<NLED;i++){
+    a=2*Math.PI*i/NLED;
+    q=P(CX+CLEDR*Math.cos(a), CY+CLEDR*Math.sin(a), LENSZ+0.06);
+    if(on) o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="2.1" fill="#F7CE72" opacity="0.30"/>';
+    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.95" fill="'+lc+'" stroke="#4A525C" stroke-width="0.26"/>';
+  }
+  /* 전면 렌즈 (중앙) */
+  o+=polyStr(circlePts(CX,CY,LENSZ+0.08,3.2,28))+'fill="'+(shotT>=0?'#7FD4FF':'#223240')+'" stroke="#3B4650" stroke-width="0.4"/>';
+  /* 광축 원뿔 — 링조명 전면 → 상판 홀 하면 */
+  if(k>0) o+=cone(CX,CY,LENSZ+0.2,CRR-0.6,PZ-0.2,HOLE.r-0.5,'#F7CE72',0.13*k);
   return o;
 }
 
 /* 검사 광원 — 검사 스테이션에 지그가 정위치하면 원형 투광 (하부 링조명 → φ120 홀 → 안착면) */
 var LITR=13;                         // 투광 반경 65 mm (φ130) — PCB 100 × 50 포함
 function drawInspLight(){
-  if(!lightOn || jigAt(ST_INSP)<0) return '';
-  var o='', c=jigPos(ST_INSP), k=(shotT>=0)?1.0:0.68, i;
+  var k=litK(); if(k<=0) return '';
+  var o='', c=jigPos(ST_INSP), i;
+  /* ⓪ 상판 홀 상면 → 안착면 광축 원뿔 */
+  o+=cone(c.x,c.y,PZT+0.2,HOLE.r-0.5,SEAT_Z+0.25,LITR,'#F7CE72',0.12*k);
   /* ① 하단 데크 광축 개구 통과광 φ80 */
   o+=polyStr(circlePts(c.x,c.y,LZ1+0.08,8,44))+'fill="#F7CE72" opacity="'+(0.34*k).toFixed(2)+'" stroke="none"/>';
   /* ② 안착면 원형 광원 — 외곽에서 중심으로 3단 (소프트 글로우) */
-  var rg=[[LITR,0.13],[LITR*0.78,0.17],[LITR*0.56,0.22]];
+  var rg=[[LITR,0.17],[LITR*0.78,0.22],[LITR*0.56,0.28]];
   for(i=0;i<rg.length;i++)
     o+=polyStr(circlePts(c.x,c.y,SEAT_Z+0.30+i*0.02,rg[i][0],52))+'fill="#FFE2A0" opacity="'+(rg[i][1]*k).toFixed(2)+'" stroke="none"/>';
   /* ③ 광원 외곽 링 */
@@ -1086,7 +1131,7 @@ function runState(){
     pause(D.act,next); return;
   }
   if(st.t==='light'){
-    lightOn=true; addLog('[조명] 하부 링조명 ON — 검사위치 안착면에 원형 투광 φ130');
+    lightOn=true; addLog('[조명] IS3805 일체형 링조명 ON — 촬영 시 LED 16개 점등 · 안착면 원형 투광 φ130');
     draw(); pause(D.act,next); return;
   }
   if(st.t==='shot'){
@@ -1189,7 +1234,7 @@ document.addEventListener('DOMContentLoaded',function(){
   renderSpd(); setMes('wait'); renderSteps(); updHUD(); draw();
   addLog('[시스템] 인덱스 회전형 PCB 검사기 시뮬레이터 '+VER);
   addLog('안착면 : 3개 지그 전부 동일 높이 '+SEAT_MM+' mm (상판 +'+SEAT_OFF+' mm) · 전 스테이션 WD 250 mm 일정');
-  addLog('구성 : 3030 프레임 300×600×750 · 상판 10T · φ120 촬영홀(앞 120) · DG085-F-10 중공 로터리 테이블 φ90 관통(앞 230) · 유성기어 i=30 + 서보 100 W · 지그 3 × 120° · IS3805 상향');
+  addLog('구성 : 3030 프레임 300×600×750 · 상판 10T · φ120 촬영홀(앞 120) · DG085-F-10 중공 로터리 테이블 φ90 관통(앞 230) · 유성기어 i=30 + 서보 100 W · 지그 3 × 120° · COGNEX IS3805 상향 (C마운트 + 일체형 링조명 φ75 · LED 16)');
 });
 </script>
 </body>
