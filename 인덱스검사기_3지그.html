@@ -100,7 +100,7 @@
   <div class="nav-inner">
     <div class="hd-top">
       <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-      <span class="hd-ver" id="hVer">v1.3</span>
+      <span class="hd-ver" id="hVer">v1.4</span>
     </div>
     <h1>인덱스 회전형 PCB 검사기 시뮬레이터 — 3지그 타입</h1>
     <div class="hd-sub"><b>3지그 120° 등배</b> · 알루미늄 3030 프레임 300 × 600 × 750 mm · 상판 10T · 3스테이션(투입·검사·배출) 120° 인덱스 · 하부 상향 비전</div>
@@ -205,7 +205,7 @@
    인덱스 회전형 PCB 검사기 시뮬레이터
    인시스 AI혁신 연구개발실
    =================================================================== */
-var VER='v1.3';
+var VER='v1.4';
 
 /* ======================= 치수 (1 unit = 5 mm) ======================= */
 var U=5;
@@ -950,11 +950,12 @@ function draw(){
   s+=drawReducer('tbl');
   s+=drawSensor('low');
   s+=drawIndex();
-  s+=drawSensor('high');
+  /* 깊이순 : 모니터 기둥(dep 61) → PC판(-9) → 센서 지주(-28) → 전면 프레임(-56) → 라벨 */
+  s+=drawMonitor();
   s+=drawCover('near');
+  s+=drawSensor('high');
   s+=drawFrame('near');
   s+=drawStations();
-  s+=drawMonitor();
   document.getElementById('scene').innerHTML=s;
 }
 
