@@ -100,7 +100,7 @@
   <div class="nav-inner">
     <div class="hd-top">
       <span class="hd-dept">인시스 AI혁신 연구개발실</span>
-      <span class="hd-ver" id="hVer">v2.1</span>
+      <span class="hd-ver" id="hVer">v2.2</span>
     </div>
     <h1>인덱스 회전형 PCB 검사기 시뮬레이터 — 4지그 타입</h1>
     <div class="hd-sub"><b>4지그 90° 등배</b> · 알루미늄 3030 프레임 300 × 600 × 750 mm · 상판 10T · 4스테이션(투입·검사·배출·대기) 90° 인덱스 · 하부 상향 비전</div>
@@ -205,7 +205,7 @@
    인덱스 회전형 PCB 검사기 시뮬레이터
    인시스 AI혁신 연구개발실
    =================================================================== */
-var VER='v2.1';
+var VER='v2.2';
 
 /* ======================= 치수 (1 unit = 5 mm) ======================= */
 var U=5;
@@ -235,10 +235,13 @@ var CUOF=10;                         // 케이스 반경방향 바깥 오프셋 
 var DCU=4, DA=13.5, DB=18;           // 하단 데크 타원 — 중심 u+20 mm · 반경 135 × 접선 180 mm
 var PCB_W=20, PCB_D=10, PCB_T=0.6;   // 타원 PCB 100 × 50 mm
 var CAMZ0=92, CAMZ1=110, LENSZ=122;  // COGNEX In-Sight IS3805 — 광축 상향
-var CBW=5, CBD=7;                    // 바디 50 × 70 mm (M3 4개 · 38.5 × 58.5 패턴)
-var CLZ0=110, CLZ1=119;              // C마운트 렌즈 배럴 45 mm
-var CRZ0=119;                        // 일체형 링조명 15 mm → 광학 전면 = LENSZ
-var CRR=7.5, CLEDR=6.0, NLED=16;     // 링조명 외경 φ75 · LED 배치 반경 φ60 · 16개
+var CAPZ0=92, CAPZ1=97;              // 후면 캡(흑) 40 × 40 × 25 mm — 커넥터측(하향)
+var CBZ0=97, CBZ1=107;               // 옐로 바디 50 × 50 × 50 mm
+var CMZ0=107, CMZ1=119;              // 전면 조명 모듈(흑) 60 × 60 × 60 mm
+var CBW=5, CMW=6, CAPW=4;            // 각 단 반치수
+var CRZ0=119;                        // 조명 개구 배럴 15 mm → 광학 전면 = LENSZ
+var CRR=5.0, CLEDR=3.8, NLED=16;     // 개구 φ50 · LED 배치 φ38 · 16개
+var YEL=[226,203,32], BLK=[44,48,55];// 코그넥스 옐로 / 블랙
 var WDU=(UZ1-LENSZ);                 // 작업거리 (유닛)
 var MON={x:FW/2, y:FL+4, z:FH+38};   // 뒷쪽 상단 모니터
 var MHW=26, MHH=16;                  // 12인치
@@ -372,7 +375,7 @@ var STATES=[
   {ph:'투입',    t:'sense', lb:'안착센서 감지 → 지그 안착 확인'},
   {ph:'인덱스',  t:'index', lb:'DG085-F-10 구동 → 90° CCW 인덱스 회전 (0.5초)'},
   {ph:'인덱스',  t:'settle',lb:'정위치 정지 · 인덱스 핀 클램프'},
-  {ph:'검사',    t:'light', lb:'IS3805 일체형 링조명 ON → 안착면 원형 투광 φ130 (상판 φ120 홀 통과)'},
+  {ph:'검사',    t:'light', lb:'IS3805 일체형 링조명 ON → 상판 φ120 홀 통과 · PCB 하단 투광'},
   {ph:'검사',    t:'shot',  lb:'6시 스테이션 : IS3805 상향 촬영'},
   {ph:'검사',    t:'judge', lb:'AI 외관검사 → OK / NG 판정'},
   {ph:'검사',    t:'alarm', cond:'ng', lb:'NG 알람 · 경광등 적색'},
@@ -505,67 +508,67 @@ function cone(cx,cy,z0,r0,z1,r1,col,op){
 }
 
 function drawCamera(){
-  var o='', CX=HOLE.x, CY=HOLE.y, i, a, q, k=litK();
+  var o='', CX=HOLE.x, CY=HOLE.y, i, ang, q, k=litK();
   /* 마운트 플레이트 + 지주 2본 */
-  o+=box(CX-13,CX+13, CY-11,CY+11, CAMZ0-3,CAMZ0, MAT.steel,0.45);
-  o+=tube({x:CX-11,y:CY,z:PR},{x:CX-11,y:CY,z:CAMZ0},1.5,MAT.steel,false,true);
-  o+=tube({x:CX+11,y:CY,z:PR},{x:CX+11,y:CY,z:CAMZ0},1.5,MAT.steel,false,true);
-  /* 바디 (IS3805) 50 × 70 × 90 mm — 광축 상향 */
-  o+=box(CX-CBW,CX+CBW, CY-CBD,CY+CBD, CAMZ0,CAMZ1, MAT.cam,0.45);
-  /* 하면 커넥터부 (전원 I/O · ENET0/1 · USB-C) */
-  o+=box(CX-CBW+0.8,CX+CBW-0.8, CY-CBD-1.4,CY-CBD, CAMZ0+1.6,CAMZ0+6.4, [52,58,68],0.35);
-  for(i=0;i<3;i++){
-    q=P(CX-2.6+i*2.6, CY-CBD-1.5, CAMZ0+4.0);
-    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.55" fill="#2A313B" stroke="#454D58" stroke-width="0.22"/>';
-  }
-  /* 상태 LED 3개 (바디 측면) */
-  var slc=['#3FBF63','#2FA8E8','#8A95A3'];
-  for(i=0;i<3;i++){
-    q=P(CX+CBW+0.1, CY-3.0+i*3.0, CAMZ1-3.0);
-    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.5" fill="'+slc[i]+'" opacity=".85"/>';
-  }
-  /* C마운트 렌즈 배럴 45 mm */
-  o+=tube({x:CX,y:CY,z:CLZ0},{x:CX,y:CY,z:CLZ1},3.4,MAT.dark,false,true);
-  o+=tube({x:CX,y:CY,z:CLZ1-1.6},{x:CX,y:CY,z:CLZ1-0.9},3.8,[46,52,62],false,false);   // 초점 링
-  /* 일체형 링조명 (전면 부착) φ75 × 15 mm */
-  o+=tube({x:CX,y:CY,z:CRZ0},{x:CX,y:CY,z:LENSZ},CRR,[64,72,84],false,true);
-  /* 전면 LED 16개 — 촬영 시간에 맞춰 점등 */
-  var on=(k>0.6), lc=on?'#FFF0C4':(k>0?'#F5C250':'#6E7682');
-  for(i=0;i<NLED;i++){
-    a=2*Math.PI*i/NLED;
-    q=P(CX+CLEDR*Math.cos(a), CY+CLEDR*Math.sin(a), LENSZ+0.06);
-    if(on) o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="2.1" fill="#F7CE72" opacity="0.30"/>';
-    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.95" fill="'+lc+'" stroke="#4A525C" stroke-width="0.26"/>';
-  }
-  /* 전면 렌즈 (중앙) */
-  o+=polyStr(circlePts(CX,CY,LENSZ+0.08,3.2,28))+'fill="'+(shotT>=0?'#7FD4FF':'#223240')+'" stroke="#3B4650" stroke-width="0.4"/>';
-  /* 광축 원뿔 — 링조명 전면 → 상판 홀 하면 */
-  if(k>0) o+=cone(CX,CY,LENSZ+0.2,CRR-0.6,PZ-0.2,HOLE.r-0.5,'#F7CE72',0.13*k);
-  return o;
-}
+  o+=box(CX-13,CX+13, CY-11,CY+11, CAPZ0-3,CAPZ0, MAT.steel,0.45);
+  o+=tube({x:CX-11,y:CY,z:PR},{x:CX-11,y:CY,z:CAPZ0},1.5,MAT.steel,false,true);
+  o+=tube({x:CX+11,y:CY,z:PR},{x:CX+11,y:CY,z:CAPZ0},1.5,MAT.steel,false,true);
 
-/* 검사 광원 — 검사 스테이션에 지그가 정위치하면 원형 투광 (하부 링조명 → φ120 홀 → 안착면) */
-var LITR=13;                         // 투광 반경 65 mm (φ130) — PCB 100 × 50 포함
-function drawInspLight(){
-  var k=litK(); if(k<=0) return '';
-  var o='', c=jigPos(ST_INSP), i;
-  /* ⓪ 상판 홀 상면 → 안착면 광축 원뿔 */
-  o+=cone(c.x,c.y,PZT+0.2,HOLE.r-0.5,SEAT_Z+0.25,LITR,'#F7CE72',0.12*k);
-  /* ① 하단 데크 광축 개구 통과광 φ80 */
-  o+=polyStr(circlePts(c.x,c.y,LZ1+0.08,8,44))+'fill="#F7CE72" opacity="'+(0.34*k).toFixed(2)+'" stroke="none"/>';
-  /* ② 안착면 원형 광원 — 외곽에서 중심으로 3단 (소프트 글로우) */
-  var rg=[[LITR,0.17],[LITR*0.78,0.22],[LITR*0.56,0.28]];
-  for(i=0;i<rg.length;i++)
-    o+=polyStr(circlePts(c.x,c.y,SEAT_Z+0.30+i*0.02,rg[i][0],52))+'fill="#FFE2A0" opacity="'+(rg[i][1]*k).toFixed(2)+'" stroke="none"/>';
-  /* ③ 광원 외곽 링 */
-  o+=polyStr(circlePts(c.x,c.y,SEAT_Z+0.40,LITR,52))+'fill="none" stroke="#F5C250" stroke-width="'+(shotT>=0?1.15:0.75)+'" opacity="'+(0.90*k).toFixed(2)+'"/>';
-  /* ④ 노광 순간 — 내측 섬광 링 */
-  if(shotT>=0 && shotT<0.3){
-    var fl=(1-shotT/0.3);
-    o+=polyStr(circlePts(c.x,c.y,SEAT_Z+0.46,LITR*0.92,52))+'fill="#FFFFFF" opacity="'+(fl*0.38).toFixed(2)+'" stroke="none"/>';
+  /* ① 후면 캡 (흑) — 사진의 상단 캡. 광축 상향이므로 하단에 위치 */
+  o+=box(CX-CAPW,CX+CAPW, CY-CAPW,CY+CAPW, CAPZ0,CAPZ1, BLK,0.4);
+  /* M12 이더넷 커넥터 (녹색) — 측면 인출 */
+  o+=tube({x:CX+CAPW,y:CY,z:CAPZ1-1.2},{x:CX+CAPW+2.6,y:CY,z:CAPZ1-1.2},0.85,[58,64,72],false,true);
+  q=P(CX+CAPW+2.7,CY,CAPZ1-1.2);
+  o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.95" fill="#3E9E48" stroke="#2A6B32" stroke-width="0.3"/>';
+
+  /* ② 옐로 바디 — 코그넥스 시그니처 */
+  o+=box(CX-CBW,CX+CBW, CY-CBD0(),CY+CBD0(), CBZ0,CBZ1, YEL,0.4);
+  /* 측면 세로 핀 (방열) */
+  for(i=0;i<4;i++){
+    o+=box(CX-CBW-0.12,CX-CBW+0.06, CY-3.6+i*2.4,CY-3.6+i*2.4+0.9, CBZ0+1.2,CBZ1-1.2, shade8(YEL,0.74),0.18);
   }
+  /* 전면 인디케이터 패널 (상태 LED + 버튼) */
+  o+=box(CX-3.2,CX+3.2, CY-CBD0()-0.16,CY-CBD0()+0.02, CBZ0+3.0,CBZ0+5.4, [38,42,48],0.25);
+  var pc=['#3FBF63','#C8E86A','#F5C250'];
+  for(i=0;i<3;i++){
+    q=P(CX-1.9+i*1.3, CY-CBD0()-0.2, CBZ0+4.2);
+    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.42" fill="'+pc[i]+'"/>';
+  }
+  for(i=0;i<2;i++){
+    q=P(CX-2.9+i*5.8, CY-CBD0()-0.2, CBZ0+4.2);
+    o+='<rect x="'+(q.x-0.55).toFixed(1)+'" y="'+(q.y-0.45).toFixed(1)+'" width="1.1" height="0.9" rx="0.2" fill="#6E757E"/>';
+  }
+  /* COGNEX 각인 */
+  q=P(CX+CBW+0.1, CY, CBZ1-1.8);
+  o+='<text x="'+q.x.toFixed(1)+'" y="'+q.y.toFixed(1)+'" text-anchor="middle" font-family="\'Noto Sans KR\',sans-serif" font-size="2.3" font-weight="900" fill="#2B2B22" opacity=".85">COGNEX</text>';
+
+  /* ③ 전면 조명 모듈 (흑) — 사진의 하단 모듈. 광축 상향이므로 상단 */
+  o+=box(CX-CMW,CX+CMW, CY-CMW,CY+CMW, CMZ0,CMZ1, BLK,0.4);
+  /* 가로 리브 3단 */
+  for(i=0;i<3;i++)
+    o+=box(CX-CMW-0.1,CX+CMW+0.1, CY-CMW-0.1,CY+CMW+0.1, CMZ0+2.2+i*2.6,CMZ0+2.9+i*2.6, shade8(BLK,0.82),0.16);
+
+  /* ④ 조명 개구 배럴 + 전면 LED (촬영 시간 동기 점등) */
+  o+=tube({x:CX,y:CY,z:CRZ0},{x:CX,y:CY,z:LENSZ},CRR,shade8(BLK,1.12),false,true);
+  var on=(k>0.6), lc=on?'#FFF3CE':(k>0?'#C9A33E':'#454B55');
+  for(i=0;i<NLED;i++){
+    ang=2*Math.PI*i/NLED;
+    q=P(CX+CLEDR*Math.cos(ang), CY+CLEDR*Math.sin(ang), LENSZ+0.06);
+    if(on) o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="1.5" fill="#F7CE72" opacity="0.34"/>';
+    o+='<circle cx="'+q.x.toFixed(1)+'" cy="'+q.y.toFixed(1)+'" r="0.62" fill="'+lc+'" stroke="#2E333B" stroke-width="0.2"/>';
+  }
+  /* 렌즈 (중앙 · 함몰) */
+  o+=polyStr(circlePts(CX,CY,LENSZ+0.02,2.6,28))+'fill="#12171D" stroke="#333A43" stroke-width="0.35"/>';
+  o+=polyStr(circlePts(CX,CY,LENSZ+0.06,1.9,24))+'fill="'+(shotT>=0?'#7FD4FF':'#1D2C38')+'" stroke="none"/>';
+
+  /* ⑤ 광축 — 조명 전면 → 상판 홀 하면 (상판이 가림) */
+  if(k>0) o+=cone(CX,CY,LENSZ+0.2,CRR-0.4,PZ-0.2,HOLE.r-0.5,'#F7CE72',0.14*k);
   return o;
 }
+function CBD0(){ return CBW; }
+
+/* 투광 상한 — PCB 하단에서 차단되므로 안착면 위로는 표시하지 않음 */
+var LITR=13;
 
 /* 상판 10T — φ120 촬영홀 · 테이블 관통 φ90 */
 function drawPlate(){
@@ -579,12 +582,13 @@ function drawPlate(){
   o+=polyStr(hIn) +'fill="#141A22" stroke="none"/>';
   /* 홀 안으로 보이는 렌즈 */
   var lens=circlePts(HOLE.x,HOLE.y,PZ-1.2,4.6,30);
-  o+=polyStr(lens)+'fill="'+(lightOn?'#2B3A46':'#1C242E')+'" stroke="#3B4650" stroke-width="0.5"/>';
+  o+=polyStr(lens)+'fill="'+(kp>0?'#2B3A46':'#1C242E')+'" stroke="#3B4650" stroke-width="0.5"/>';
   var lens2=circlePts(HOLE.x,HOLE.y,PZ-1.1,2.8,26);
   o+=polyStr(lens2)+'fill="'+(shotT>=0?'#7FD4FF':'#2A4254')+'" stroke="none"/>';
-  if(lightOn){
+  var kp=litK();
+  if(kp>0){
     var gl=circlePts(HOLE.x,HOLE.y,PZ-0.1,HOLE.r-0.6,44);
-    o+=polyStr(gl)+'fill="#F7CE72" opacity="'+(shotT>=0?0.55:0.3)+'" stroke="none"/>';
+    o+=polyStr(gl)+'fill="#F7CE72" opacity="'+(0.22+0.42*kp).toFixed(2)+'" stroke="none"/>';
   }
   /* 감속기 고정부 : 테이블 관통 φ90 + M6 탭 4개 (BCD φ110) */
   var rOut=circlePts(RED.x,RED.y,PZT+0.06,BCD+2.2,36);
@@ -741,8 +745,11 @@ function drawIndex(){
     var dko=ellPts(DA,DB,52).map(function(c){ return [c[0]+DCU, c[1]]; });
     o+=prism(F,dko,LZ0,LZ1,ar,[150,162,180],0.06);   // 다분할 — 스트로크 최소화로 매끄러운 타원면
     /* 중앙 광축 개구 φ80 (하부 촬영) */
+    var isI=(Math.abs(norm360(A-ST_INSP))<1||Math.abs(norm360(A-ST_INSP)-360)<1), kk=isI?litK():0;
     var oph=ellPts(8,8,32).map(function(c){ return PJ(F(c[0],c[1],LZ1+0.05)); });
-    o+='<polygon points="'+oph.map(pt).join(' ')+'" fill="#161D26" stroke="'+shade([150,162,180],0.74)+'" stroke-width="0.5"/>';
+    o+='<polygon points="'+oph.map(pt).join(' ')+'" fill="'+(kk>0?'#F7CE72':'#161D26')+'" opacity="'+(kk>0?(0.45+0.5*kk).toFixed(2):'1')+'" stroke="'+shade([150,162,180],0.74)+'" stroke-width="0.5"/>';
+    /* 2단 사이 광축 — 데크 개구 → 지그 개구 (PCB 하단에서 차단) */
+    if(kk>0) o+=cone(p.x,p.y,LZ1+0.12,7.6,UZ0-0.12,LITR*0.55,'#F7CE72',0.17*kk);
     /* 케이스 안착부 — 타원 포켓 (데크 상면) */
     var csk=ellPts(CHU+0.8,CHV+0.8,40).map(function(c){ return PJ(F(c[0]+CUOF,c[1],LZ1+0.06)); });
     o+='<polygon points="'+csk.map(pt).join(' ')+'" fill="'+shade([150,162,180],0.80)+'" stroke="'+shade([150,162,180],0.66)+'" stroke-width="0.42"/>';
@@ -763,7 +770,7 @@ function drawIndex(){
     o+='<polygon points="'+pk.map(pt).join(' ')+'" fill="'+shade(MAT.acetal,0.88)+'" stroke="'+shade(MAT.acetal,0.70)+'" stroke-width="0.4"/>';
     /* 광축 개구 (하부 촬영용) */
     var ap=ellPts(PCB_D/2-2.0,PCB_W/2-3.4,32).map(function(c){ return PJ(F(c[0],c[1],UZ0-0.05)); });
-    o+='<polygon points="'+ap.map(pt).join(' ')+'" fill="#1B222B" opacity=".55" stroke="none"/>';
+    o+='<polygon points="'+ap.map(pt).join(' ')+'" fill="'+(kk>0?'#F7CE72':'#1B222B')+'" opacity="'+(kk>0?(0.40+0.45*kk).toFixed(2):'.55')+'" stroke="none"/>';
     /* 기준핀 2개 */
     [[0,-JHV+1.1],[0,JHV-1.1]].forEach(function(c){
       var b1=F(c[0],c[1],UZ1), b2=F(c[0],c[1],UZ1+1.8);
@@ -850,8 +857,7 @@ function drawPcbOn(F,slot,insp){
   if(insp && shotT>=0){
     var ring=[];
     for(var a=0;a<40;a++){ var th=2*Math.PI*a/40; ring.push(PJ(F(13*Math.cos(th),13*Math.sin(th),UZ1+0.12))); }
-    var fl=(shotT<0.32)?(1-shotT/0.32):0;
-    if(fl>0) o+='<polygon points="'+ring.map(pt).join(' ')+'" fill="#FFFFFF" opacity="'+(fl*0.55).toFixed(2)+'"/>';
+    /* 노광 섬광 제거 — 빛은 PCB 하단에서 차단되므로 상면에 표시하지 않음 */
     o+='<polygon points="'+ring.map(pt).join(' ')+'" fill="#E8873A" opacity=".08" stroke="#E8873A" stroke-width="1.3"/>';
     var c1=PJ(F(-13,0,UZ1+0.12)), c2=PJ(F(13,0,UZ1+0.12));
     var c3=PJ(F(0,-13,UZ1+0.12)), c4=PJ(F(0,13,UZ1+0.12));
@@ -1015,13 +1021,12 @@ function draw(){
   s+=drawReducer('tbl');
   s+=drawSensor('low');
   s+=drawIndex();
-  s+=drawInspLight();
   /* 깊이순 : 모니터 기둥(dep 61) → PC판(-9) → 센서 지주(-28) → 전면 프레임(-56) → 라벨 */
   s+=drawMonitor();
   s+=drawCover('near');
   s+=drawSensor('high');
   s+=drawFrame('near');
-  s+=drawStations();
+  /* 스테이션 문구는 화면 가림으로 비표시 (지그 상태 LED 로 식별) */
   document.getElementById('scene').innerHTML=s;
 }
 
@@ -1130,7 +1135,7 @@ function runState(){
     pause(D.act,next); return;
   }
   if(st.t==='light'){
-    lightOn=true; addLog('[조명] IS3805 일체형 링조명 ON — 촬영 시 LED 16개 점등 · 안착면 원형 투광 φ130');
+    lightOn=true; addLog('[조명] IS3805 일체형 링조명 ON — 촬영 시 LED 16개 점등 · 광축은 PCB 하단에서 차단');
     draw(); pause(D.act,next); return;
   }
   if(st.t==='shot'){
