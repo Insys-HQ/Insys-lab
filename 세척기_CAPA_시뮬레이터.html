@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>세척기 CAPA 시뮬레이터 v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* 세척기_CAPA_시뮬레이터.html v1.0 (2026-11-17) — 인시스 AI혁신 연구개발실 */
+:root{
+  --ink:#1f2a37; --ink2:#44505f; --muted:#5f6b7a;
+  --navy:#1f3350; --page:#f4f6f9; --card:#fff; --line:#dde2ea; --soft:#eef2f7;
+  --grid:#e4e7ec; --axis:#b8bfc9;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+  --c-el:#1f3350; --c-gas:#5b7aa6; --c-lab:#aeb6c2; --c-ot:#c98a3c;
+  --bad:#a12a1f; --good:#006300; --wrap:1100px;
+}
+*{box-sizing:border-box}
+html{font-size:14px}
+@media (min-width:768px){ html{font-size:16px} }
+html.force-mobile{font-size:14px;--wrap:430px}
+body{margin:0;font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--page);line-height:1.5}
+.nav{background:var(--navy);color:#f3f6fa}
+.nav-inner,.wrap{max-width:var(--wrap);margin:0 auto;padding-left:12px;padding-right:12px}
+.nav-inner{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:10px;padding-bottom:10px}
+.nav h1{font-size:1.07rem;font-weight:700;margin:0;flex:1 1 220px;color:#f3f6fa}
+.nav .sub{display:block;font-size:.79rem;font-weight:400;color:#c9d4e3}
+.ver{font-size:.79rem;font-weight:700;background:#e8eef7;color:var(--navy);border-radius:10px;padding:2px 8px}
+.seg{display:inline-flex;border:1px solid #8fa3bf;border-radius:8px;overflow:hidden}
+.seg button{font:inherit;font-size:.86rem;padding:5px 12px;border:0;background:transparent;color:#e3eaf4;cursor:pointer}
+.seg button[aria-pressed="true"]{background:#e8eef7;color:var(--navy);font-weight:700}
+.seg.lt{border-color:var(--axis)}
+.seg.lt button{color:var(--ink2)}
+.seg.lt button[aria-pressed="true"]{background:var(--navy);color:#f3f6fa}
+.wrap{padding-top:8px;padding-bottom:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:0 0 8px}
+.card h2{font-size:1rem;font-weight:700;margin:0 0 6px;color:var(--navy)}
+.card h3{font-size:.93rem;font-weight:700;margin:8px 0 4px;color:var(--ink2)}
+.note{font-size:.86rem;color:var(--ink2);margin:0 0 6px}
+.lead{font-size:.93rem;color:var(--ink);margin:0 0 8px;font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 10px}
+.fld label{display:block;font-size:.86rem;color:var(--ink2)}
+.fld .row{display:flex;align-items:center;gap:4px}
+.fld input{width:100%;font:inherit;color:var(--ink);padding:5px 6px;border:1px solid var(--axis);border-radius:6px;background:#fff}
+.fld .unit{font-size:.86rem;color:var(--muted);white-space:nowrap}
+.chk{display:flex;align-items:flex-start;gap:6px;font-size:.86rem;color:var(--ink);margin:6px 0 0}
+.chk input{margin-top:4px}
+.btn{font:inherit;font-size:.86rem;padding:5px 10px;border:1px solid var(--axis);border-radius:6px;background:#fff;color:var(--ink);cursor:pointer}
+.btn:hover{background:var(--soft)}
+.btn.pri{background:var(--navy);color:#f3f6fa;border-color:var(--navy)}
+.btn.del{color:var(--bad);border-color:#e3b5b0}
+details{border-top:1px solid var(--line);padding-top:4px;margin-top:6px}
+details summary{cursor:pointer;font-weight:700;font-size:.93rem;color:var(--navy);padding:4px 0}
+.mgrid{display:grid;grid-template-columns:1fr;gap:8px}
+@media (min-width:768px){ html:not(.force-mobile) .mgrid{grid-template-columns:1fr 1fr} }
+.mbox{border:1px solid var(--line);border-radius:8px;padding:8px}
+.mbox h3{margin:0 0 6px}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media (min-width:768px){ html:not(.force-mobile) .kpis{grid-template-columns:repeat(4,1fr)} }
+.kpi{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff}
+.kpi.best{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy)}
+.kpi .nm{display:flex;align-items:center;gap:6px;font-size:.86rem;font-weight:700;color:var(--ink)}
+.kpi .val{font-size:1.36rem;font-weight:700;color:var(--ink);margin-top:2px}
+.kpi .val small{font-size:.79rem;font-weight:500;color:var(--ink2)}
+.kpi .per{font-size:.86rem;color:var(--ink2)}
+.badge{font-size:.72rem;font-weight:700;border-radius:10px;padding:0 6px;white-space:nowrap}
+.badge.ok{color:var(--good);border:1px solid var(--good);background:#f1f8f1}
+.badge.ng{color:var(--bad);border:1px solid var(--bad);background:#fbefee}
+.badge.wn{color:#7a4f00;border:1px solid #b07a1c;background:#fbf3e4}
+.badge.best{color:var(--navy);border:1px solid var(--navy);background:#e8eef7}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;flex:0 0 12px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.86rem;color:var(--ink);margin:0 0 6px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.chartbox{position:relative}
+.chartbox svg{display:block;width:100%;height:auto;touch-action:pan-y}
+.chartbox svg text{font-family:'Noto Sans KR',sans-serif}
+.tip{position:absolute;pointer-events:none;background:#fff;border:1px solid var(--axis);border-radius:8px;padding:6px 8px;font-size:.79rem;color:var(--ink);box-shadow:0 2px 8px rgba(31,42,55,.15);display:none;z-index:5;min-width:170px}
+.tip .t{font-weight:700;margin-bottom:2px}
+.tip .r{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.tip .r span{display:inline-flex;align-items:center;gap:5px}
+.scroll{overflow-x:auto}
+table.t{width:100%;border-collapse:collapse;font-size:.86rem;min-width:600px}
+table.t th{background:#e8eef7;color:var(--navy);font-weight:700;text-align:right;padding:5px 6px;border-bottom:1px solid var(--axis);white-space:nowrap}
+table.t td{text-align:right;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap;color:var(--ink)}
+table.t th:first-child,table.t td:first-child{text-align:left}
+table.t td.min{font-weight:700;background:#f1f8f1}
+.charts2{display:grid;grid-template-columns:1fr;gap:8px}
+@media (min-width:768px){ html:not(.force-mobile) .charts2{grid-template-columns:1fr 1fr} }
+.saved{list-style:none;margin:6px 0 0;padding:0}
+.saved li{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 0;border-bottom:1px solid var(--line);font-size:.86rem}
+.saved li .nm{flex:1 1 160px;font-weight:500}
+.saved li .dt{color:var(--muted);font-size:.79rem}
+.msg{font-size:.86rem;color:var(--ink2);margin-top:4px;min-height:1.2em}
+ul.ns{margin:0;padding-left:18px;font-size:.86rem;color:var(--ink2)}
+ul.ns li{margin:0 0 2px}
+.foot{font-size:.79rem;color:var(--ink2);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:4px 2px}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <h1>세척기 CAPA 시뮬레이터<span class="sub">인텍코리아 안산공장 · 1CH/2CH × 전기/가스 — CAPA·전력·인건비 비교</span></h1>
+    <span class="ver" id="verTop">v1.0</span>
+    <div class="seg" role="group" aria-label="화면 선택">
+      <button type="button" id="vMobile" aria-pressed="true">모바일</button>
+      <button type="button" id="vPc" aria-pressed="false">PC</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="card">
+    <h2>보기 대상</h2>
+    <div class="seg lt" role="group" aria-label="설비 선택" id="machSeg">
+      <button type="button" data-m="box" aria-pressed="false">박스</button>
+      <button type="button" data-m="tray" aria-pressed="false">트레이</button>
+      <button type="button" data-m="all" aria-pressed="true">합계</button>
+    </div>
+    <p class="lead" id="lead" style="margin-top:8px"></p>
+    <div class="kpis" id="kpis"></div>
+  </section>
+
+  <section class="card">
+    <h2>월 운영비 구성</h2>
+    <p class="note">전기료·가스료·정규 인건비·연장 인건비를 쌓은 월 합계입니다. 막대에 마우스를 올리거나 누르면 금액이 보입니다.</p>
+    <div class="legend" id="stackLegend"></div>
+    <div class="chartbox"><svg id="stackSvg" role="img" aria-label="방안별 월 운영비 구성 누적 막대"></svg><div class="tip" id="tipStack"></div></div>
+  </section>
+
+  <section class="card">
+    <h2>물량 변화에 따른 월 총비용</h2>
+    <p class="note">가로축은 목표 일 물량 대비 비율(%)입니다. 세로 점선이 현재 입력한 물량입니다. 일 최대 가동시간을 넘는 구간은 점선으로 표시됩니다(하루 안에 처리 불가).</p>
+    <div class="legend" id="lineLegend"></div>
+    <div class="chartbox"><svg id="lineSvg" role="img" aria-label="물량 비율에 따른 방안별 월 총비용 선 그래프"></svg><div class="tip" id="tipLine"></div></div>
+  </section>
+
+  <section class="charts2">
+    <div class="card" style="margin:0">
+      <h2>일 가동시간 (CAPA)</h2>
+      <p class="note">정규 근무시간(점선)을 넘는 만큼 연장근로가 생깁니다.</p>
+      <div class="chartbox"><svg id="hoursSvg" role="img" aria-label="방안별 일 가동시간 막대"></svg><div class="tip" id="tipHours"></div></div>
+    </div>
+    <div class="card" style="margin:0">
+      <h2>전기 설비용량 (kW)</h2>
+      <p class="note">계약전력·기본요금에 영향을 주는 정격 합계입니다. 가스안은 열원이 별도입니다.</p>
+      <div class="chartbox"><svg id="kwSvg" role="img" aria-label="방안별 전기 설비용량 막대"></svg><div class="tip" id="tipKw"></div></div>
+    </div>
+  </section>
+
+  <section class="card" style="margin-top:8px">
+    <h2>상세 비교표</h2>
+    <div class="scroll"><table class="t" id="tbl"></table></div>
+  </section>
+
+  <section class="card">
+    <h2>조건 입력</h2>
+    <p class="note">값을 바꾸면 그래프가 바로 바뀝니다. 기본값은 제작사 가안 도면(A260918A·A260919A)과 검토서 v1.2 기준입니다.</p>
+    <h3>공통 조건</h3>
+    <div class="grid" id="gCommon"></div>
+    <label class="chk"><input type="checkbox" id="fixedShift" checked> 물량이 적어도 정규 근무시간 인건비는 고정 지급</label>
+    <div class="mgrid" style="margin-top:8px">
+      <div class="mbox"><h3>박스 세척기</h3><div class="grid" id="gBox"></div></div>
+      <div class="mbox"><h3>트레이 세척기</h3><div class="grid" id="gTray"></div></div>
+    </div>
+    <div style="margin-top:8px"><button type="button" class="btn" id="btnReset">기본값으로 되돌리기</button></div>
+  </section>
+
+  <section class="card">
+    <h2>시나리오 저장 (Firebase)</h2>
+    <div class="grid">
+      <div class="fld"><label for="scName">시나리오 이름</label><input id="scName" maxlength="40" placeholder="예: 2CH 가스 · 시급 12,000"></div>
+    </div>
+    <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+      <button type="button" class="btn pri" id="btnSave">현재 조건 저장</button>
+      <button type="button" class="btn" id="btnReload">목록 새로고침</button>
+    </div>
+    <div class="msg" id="saveMsg"></div>
+    <ul class="saved" id="savedList"></ul>
+  </section>
+
+  <section class="card">
+    <details>
+      <summary>계산 방식</summary>
+      <ul class="ns">
+        <li>일 가동시간 = 일 물량 ÷ 시간당 처리능력</li>
+        <li>전기안: (히터 kW × 히터 가동률 + 동력 kW × 동력 부하율) × 가동시간 × 전기단가</li>
+        <li>가스안: 히터 열량(kWh × 3.6MJ) ÷ 보일러 종합효율 × 가스단가 + (동력 + 온수 순환펌프) 전기료</li>
+        <li>2CH: 히터 열부하 = 1CH × 열부하 배수, 동력 = 1CH × 동력 배수 (펌프·블로워 2배, 미스트 1.5배 추정)</li>
+        <li>인건비 = 인원 × 가동일 × 시급 × (정규시간 + 연장시간 × 연장 할증). 고정 지급 체크 시 정규시간은 항상 지급</li>
+        <li>기본요금 = 전기 설비용량 × 기본요금 단가 (기본값 0원 — 계약종별 단가 확인 후 입력)</li>
+        <li>단가 출처: 산업용 전기 평균 181.9원/kWh(2025), 경기 삼천리 산업용 적용 26.5588원/MJ(2026.09), 2026년 최저시급 10,320원</li>
+      </ul>
+    </details>
+  </section>
+
+  <div class="foot"><span>인시스 AI혁신 연구개발실 · 2026-11-17</span><span id="verBottom">v1.0</span></div>
+</main>
+
+<script type="module">
+/* Firebase는 동적 로드 — 로드 실패해도 계산·그래프는 동작 */
+let FB = null;
+
+const VERSION = 'v1.0';
+const $ = id => document.getElementById(id);
+
+/* ═══ 화면 모드 (초기: 모바일) ═══ */
+function setView(m){
+  document.documentElement.classList.toggle('force-mobile', m === 'mobile');
+  $('vMobile').setAttribute('aria-pressed', m === 'mobile');
+  $('vPc').setAttribute('aria-pressed', m === 'pc');
+  renderAll();
+}
+$('vMobile').onclick = () => setView('mobile');
+$('vPc').onclick = () => setView('pc');
+
+/* ═══ 입력 정의 ═══ */
+const COMMON = [
+  ['elec','전기단가',181.9,'원/kWh',0.1],
+  ['gas','가스단가',26.5588,'원/MJ',0.0001],
+  ['eff','보일러 종합효율',85,'%',1],
+  ['base','기본요금 단가',0,'원/kW·월',10],
+  ['lfH','히터 가동률',60,'%',1],
+  ['lfM','동력 부하율',80,'%',1],
+  ['days','월 가동일',22,'일',1],
+  ['wage','시급',10320,'원',10],
+  ['shift','정규 근무',8,'h/일',0.5],
+  ['otx','연장 할증',1.5,'배',0.1],
+  ['maxH','일 최대 가동',12,'h/일',0.5],
+];
+const MACH = [
+  ['day','목표 일 물량',null,'개/일',100],
+  ['cap1','1CH 처리능력',null,'개/h',10],
+  ['cap2','2CH 처리능력',null,'개/h',10],
+  ['heat','1CH 히터(열부하)',80.08,'kW',0.1],
+  ['mot','1CH 동력 합계',null,'kW',0.1],
+  ['hx','2CH 열부하 배수',1.5,'배',0.05],
+  ['mx','2CH 동력 배수',null,'배',0.01],
+  ['pp1','1CH 온수 순환펌프',1.5,'kW',0.1],
+  ['pp2','2CH 온수 순환펌프',2.0,'kW',0.1],
+  ['p1','1CH 운전 인원',1,'명',0.5],
+  ['p2','2CH 운전 인원',1,'명',0.5],
+];
+const DEF = {
+  box:{day:5600,cap1:500,cap2:700,heat:80.08,mot:22.515,hx:1.5,mx:1.93,pp1:1.5,pp2:2.0,p1:1,p2:1},
+  tray:{day:8000,cap1:700,cap2:1000,heat:80.08,mot:43.305,hx:1.5,mx:1.89,pp1:1.5,pp2:2.0,p1:1,p2:1},
+};
+const DEFC = Object.fromEntries(COMMON.map(c => [c[0], c[2]]));
+
+function field(id, label, val, unit, step){
+  return `<div class="fld"><label for="${id}">${label}</label><div class="row"><input type="number" id="${id}" value="${val}" step="${step}" min="0" inputmode="decimal"><span class="unit">${unit}</span></div></div>`;
+}
+$('gCommon').innerHTML = COMMON.map(c => field('c_'+c[0], c[1], c[2], c[3], c[4])).join('');
+$('gBox').innerHTML = MACH.map(c => field('box_'+c[0], c[1], DEF.box[c[0]], c[3], c[4])).join('');
+$('gTray').innerHTML = MACH.map(c => field('tray_'+c[0], c[1], DEF.tray[c[0]], c[3], c[4])).join('');
+
+function num(id){ const v = parseFloat($(id).value); return isFinite(v) && v >= 0 ? v : 0; }
+function readInputs(){
+  const c = {}; COMMON.forEach(x => c[x[0]] = num('c_'+x[0]));
+  c.fixedShift = $('fixedShift').checked;
+  const m = {}; ['box','tray'].forEach(k => { m[k] = {}; MACH.forEach(x => m[k][x[0]] = num(k+'_'+x[0])); });
+  return { c, m };
+}
+function writeInputs(s){
+  COMMON.forEach(x => { if (s.c && s.c[x[0]] != null) $('c_'+x[0]).value = s.c[x[0]]; });
+  if (s.c && typeof s.c.fixedShift === 'boolean') $('fixedShift').checked = s.c.fixedShift;
+  ['box','tray'].forEach(k => MACH.forEach(x => { if (s.m && s.m[k] && s.m[k][x[0]] != null) $(k+'_'+x[0]).value = s.m[k][x[0]]; }));
+}
+
+/* ═══ 방안 (색은 방안에 고정 — 순위와 무관) ═══ */
+const SC = [
+  { key:'2g', name:'2CH 가스', ch:2, gas:true,  color:'var(--s1)', hex:'#2a78d6' },
+  { key:'1e', name:'1CH 전기 (현 도면)', ch:1, gas:false, color:'var(--s2)', hex:'#eb6834' },
+  { key:'2e', name:'2CH 전기', ch:2, gas:false, color:'var(--s3)', hex:'#1baf7a' },
+  { key:'1g', name:'1CH 가스', ch:1, gas:true,  color:'var(--s4)', hex:'#eda100' },
+];
+const COMP = [
+  { key:'el',  name:'전기료',      color:'var(--c-el)' },
+  { key:'gs',  name:'가스료',      color:'var(--c-gas)' },
+  { key:'lab', name:'정규 인건비', color:'var(--c-lab)' },
+  { key:'ot',  name:'연장 인건비', color:'var(--c-ot)' },
+];
+
+/* ═══ 계산 ═══ */
+function calcMachine(c, mm, sc, volFactor){
+  const day = mm.day * volFactor;
+  const cap = sc.ch === 2 ? mm.cap2 : mm.cap1;
+  const h = cap > 0 ? day / cap : Infinity;
+  const heatKw = sc.ch === 2 ? mm.heat * mm.hx : mm.heat;
+  const motKw = sc.ch === 2 ? mm.mot * mm.mx : mm.mot;
+  const pumpKw = sc.gas ? (sc.ch === 2 ? mm.pp2 : mm.pp1) : 0;
+  const persons = sc.ch === 2 ? mm.p2 : mm.p1;
+  const hm = h * c.days;
+  const heatKwh = heatKw * c.lfH/100 * hm;
+  const motKwh = motKw * c.lfM/100 * hm;
+  const ratedKw = (sc.gas ? 0 : heatKw) + motKw + pumpKw;
+  const baseFee = ratedKw * c.base;
+  let el, gs = 0, mj = 0;
+  if (sc.gas){
+    mj = c.eff > 0 ? heatKwh * 3.6 / (c.eff/100) : 0;
+    gs = mj * c.gas;
+    el = (motKwh + pumpKw * hm) * c.elec + baseFee;
+  } else {
+    el = (heatKwh + motKwh) * c.elec + baseFee;
+  }
+  const regH = c.fixedShift ? c.shift : Math.min(h, c.shift);
+  const otH = Math.max(h - c.shift, 0);
+  const lab = persons * c.days * c.wage * regH;
+  const ot = persons * c.days * c.wage * c.otx * otH;
+  const kwh = sc.gas ? motKwh + pumpKw*hm : heatKwh + motKwh;
+  return { day, cap, h, ratedKw, kwh, mj, el, gs, lab, ot, total: el+gs+lab+ot, monthPcs: day*c.days, ok: h <= c.maxH };
+}
+function calcScenario(inp, sc, target, volFactor = 1){
+  const keys = target === 'all' ? ['box','tray'] : [target];
+  const parts = keys.map(k => calcMachine(inp.c, inp.m[k], sc, volFactor));
+  const sum = f => parts.reduce((a, p) => a + p[f], 0);
+  return {
+    sc, parts,
+    h: Math.max(...parts.map(p => p.h)), hList: parts.map(p => p.h),
+    ratedKw: sum('ratedKw'), kwh: sum('kwh'), mj: sum('mj'),
+    el: sum('el'), gs: sum('gs'), lab: sum('lab'), ot: sum('ot'), total: sum('total'),
+    monthPcs: sum('monthPcs'), ok: parts.every(p => p.ok),
+  };
+}
+
+/* ═══ 포맷 ═══ */
+const won = v => Math.round(v).toLocaleString('ko-KR');
+const man = v => (v/10000).toLocaleString('ko-KR', {maximumFractionDigits:0}) + '만원';
+const f1 = v => isFinite(v) ? v.toLocaleString('ko-KR', {maximumFractionDigits:1}) : '—';
+const swatch = col => `<span class="sw" style="background:${col}"></span>`;
+
+let target = 'all';
+document.querySelectorAll('#machSeg button').forEach(b => b.onclick = () => {
+  target = b.dataset.m;
+  document.querySelectorAll('#machSeg button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  renderAll();
+});
+
+/* ═══ 공통 SVG 도우미 ═══ */
+const NS = 'http://www.w3.org/2000/svg';
+function svgSize(svg, h){ const w = Math.max(320, svg.parentElement.clientWidth || 600); svg.setAttribute('viewBox', `0 0 ${w} ${h}`); return w; }
+function niceMax(v){ if (!(v > 0)) return 1; const p = Math.pow(10, Math.floor(Math.log10(v))); const n = v/p; return (n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p; }
+function showTip(tip, box, x, y, html){
+  tip.innerHTML = html; tip.style.display = 'block';
+  const bw = box.clientWidth, tw = tip.offsetWidth;
+  let left = x + 12; if (left + tw > bw) left = Math.max(0, x - tw - 12);
+  tip.style.left = left + 'px'; tip.style.top = Math.max(0, y - 10) + 'px';
+}
+function hideTip(tip){ tip.style.display = 'none'; }
+function rowsHtml(rows){ return rows.map(r => `<div class="r"><span>${r[0]}${r[1]}</span><b>${r[2]}</b></div>`).join(''); }
+
+/* ═══ KPI ═══ */
+function renderKpis(res){
+  const okRes = res.filter(r => r.ok);
+  const best = (okRes.length ? okRes : res).reduce((a, b) => b.total < a.total ? b : a);
+  $('kpis').innerHTML = res.map(r => {
+    const per = r.monthPcs > 0 ? r.total / r.monthPcs * 1000 : 0;
+    const shift = readInputs().c.shift;
+    const st = !r.ok ? '<span class="badge ng">일 최대 가동 초과</span>' : (r.h > shift ? `<span class="badge wn">연장 ${f1(r.h - shift)}h/일</span>` : '<span class="badge ok">정규시간 내 처리</span>');
+    const badge = (r === best ? '<span class="badge best">최저 비용</span> ' : '') + st;
+    return `<div class="kpi${r === best ? ' best' : ''}"><div class="nm">${swatch(r.sc.color)}${r.sc.name}</div>
+      <div class="val">${man(r.total)} <small>/월</small></div>
+      <div class="per">천 개당 ${won(per)}원 · ${f1(r.h)}h/일</div>
+      <div style="margin-top:4px">${badge}</div></div>`;
+  }).join('');
+  const cur = res.find(r => r.sc.key === '1e');
+  const diff = cur.total - best.total;
+  const tgtName = target === 'all' ? '박스·트레이 합계' : (target === 'box' ? '박스 세척기' : '트레이 세척기');
+  $('lead').textContent = best === cur
+    ? `${tgtName}: 현재 조건에서는 현 도면(1CH 전기)이 가장 저렴합니다.`
+    : `${tgtName}: ${best.sc.name} 방안이 현 도면(1CH 전기)보다 월 ${man(diff)} (연 ${man(diff*12)}) 저렴합니다.`;
+}
+
+/* ═══ 누적 막대: 월 운영비 구성 ═══ */
+function renderStack(res){
+  $('stackLegend').innerHTML = COMP.map(c => `<span>${swatch(c.color)}${c.name}</span>`).join('');
+  const svg = $('stackSvg'), tip = $('tipStack'), box = svg.parentElement;
+  const rowH = 46, top = 6, h = top + res.length * rowH + 26;
+  const w = svgSize(svg, h);
+  const labW = 0, padL = 4, padR = 70;
+  const max = niceMax(Math.max(...res.map(r => r.total)) * 1.02);
+  const X = v => padL + labW + v / max * (w - padL - labW - padR);
+  let s = '';
+  for (let i = 0; i <= 4; i++){
+    const v = max * i / 4, x = X(v);
+    s += `<line x1="${x}" x2="${x}" y1="${top}" y2="${h-22}" stroke="var(--grid)"/>`;
+    s += `<text x="${x}" y="${h-6}" font-size="11" fill="var(--muted)" text-anchor="${i===0?'start':i===4?'end':'middle'}">${Math.round(v/10000).toLocaleString('ko-KR')}만</text>`;
+  }
+  res.forEach((r, i) => {
+    const y = top + i * rowH;
+    s += `<text x="${padL}" y="${y+13}" font-size="12.5" font-weight="700" fill="var(--ink)">${r.sc.name}</text>`;
+    let acc = 0; const by = y + 19, bh = 18;
+    const segs = COMP.map(c => ({ c, v: r[c.key] })).filter(o => o.v > 0);
+    segs.forEach((o, j) => {
+      const x0 = X(acc), x1 = X(acc + o.v); acc += o.v;
+      const gap = j < segs.length - 1 ? 2 : 0;
+      const ww = Math.max(1, x1 - x0 - gap);
+      const last = j === segs.length - 1;
+      s += last
+        ? `<path d="M${x0},${by} h${Math.max(0,ww-4)} a4,4 0 0 1 4,4 v${bh-8} a4,4 0 0 1 -4,4 h${-Math.max(0,ww-4)} z" fill="${o.c.color}" data-i="${i}"/>`
+        : `<rect x="${x0}" y="${by}" width="${ww}" height="${bh}" fill="${o.c.color}" data-i="${i}"/>`;
+    });
+    s += `<text x="${X(r.total)+6}" y="${by+13}" font-size="12" font-weight="700" fill="var(--ink)">${man(r.total)}</text>`;
+    s += `<rect x="0" y="${y}" width="${w}" height="${rowH}" fill="transparent" class="hit" data-i="${i}"/>`;
+  });
+  svg.innerHTML = s;
+  svg.querySelectorAll('.hit').forEach(el => {
+    const r = res[+el.dataset.i];
+    const html = `<div class="t">${r.sc.name}</div>` + rowsHtml(COMP.map(c => [swatch(c.color), c.name, won(r[c.key])+'원'])) + `<div class="r" style="border-top:1px solid var(--line);margin-top:2px;padding-top:2px"><span>합계</span><b>${won(r.total)}원</b></div>`;
+    const mv = e => { const b = box.getBoundingClientRect(); showTip(tip, box, e.clientX - b.left, e.clientY - b.top, html); };
+    el.addEventListener('mousemove', mv); el.addEventListener('click', mv);
+    el.addEventListener('mouseleave', () => hideTip(tip));
+  });
+}
+
+/* ═══ 선 그래프: 물량 비율 vs 월 총비용 ═══ */
+function renderLine(inp){
+  $('lineLegend').innerHTML = SC.map(sc => `<span><svg width="26" height="10" aria-hidden="true"><line x1="1" x2="25" y1="5" y2="5" stroke="${sc.hex}" stroke-width="2"/><circle cx="13" cy="5" r="4" fill="${sc.hex}" stroke="#fff" stroke-width="2"/></svg>${sc.name}</span>`).join('');
+  const svg = $('lineSvg'), tip = $('tipLine'), box = svg.parentElement;
+  const h = 260; const w = svgSize(svg, h);
+  const padL = 52, padR = 12, padT = 10, padB = 28;
+  const xs = []; for (let p = 40; p <= 150; p += 5) xs.push(p);
+  const series = SC.map(sc => ({ sc, pts: xs.map(p => calcScenario(inp, sc, target, p/100)) }));
+  const max = niceMax(Math.max(...series.flatMap(s => s.pts.map(r => r.total))) * 1.02);
+  const X = p => padL + (p - 40) / 110 * (w - padL - padR);
+  const Y = v => padT + (1 - v / max) * (h - padT - padB);
+  let s = '';
+  for (let i = 0; i <= 4; i++){
+    const v = max * i / 4, y = Y(v);
+    s += `<line x1="${padL}" x2="${w-padR}" y1="${y}" y2="${y}" stroke="var(--grid)"/>`;
+    s += `<text x="${padL-6}" y="${y+4}" font-size="11" fill="var(--muted)" text-anchor="end">${Math.round(v/10000).toLocaleString('ko-KR')}만</text>`;
+  }
+  [40,60,80,100,120,150].forEach(p => s += `<text x="${X(p)}" y="${h-8}" font-size="11" fill="var(--muted)" text-anchor="middle">${p}%</text>`);
+  s += `<line x1="${X(100)}" x2="${X(100)}" y1="${padT}" y2="${h-padB}" stroke="var(--axis)" stroke-dasharray="4 3"/>`;
+  series.forEach(se => {
+    // 실선(처리 가능)·점선(시간 초과) 구간 분리
+    let solid = '', dash = '';
+    const P = i => `${X(xs[i]).toFixed(1)},${Y(se.pts[i].total).toFixed(1)}`;
+    for (let i = 1; i < se.pts.length; i++){
+      const segD = `M${P(i-1)} L${P(i)} `;
+      if (se.pts[i-1].ok && se.pts[i].ok) solid += segD; else dash += segD;
+    }
+    if (solid) s += `<path d="${solid.trim()}" fill="none" stroke="${se.sc.hex}" stroke-width="2" stroke-linecap="round"/>`;
+    if (dash) s += `<path d="${dash.trim()}" fill="none" stroke="${se.sc.hex}" stroke-width="2" stroke-dasharray="5 4" opacity=".75"/>`;
+    const cur = se.pts[xs.indexOf(100)];
+    s += `<circle cx="${X(100)}" cy="${Y(cur.total)}" r="4.5" fill="${se.sc.hex}" stroke="#fff" stroke-width="2"/>`;
+  });
+  s += `<line id="xh" x1="0" x2="0" y1="${padT}" y2="${h-padB}" stroke="var(--ink2)" stroke-width="1" style="display:none"/>`;
+  s += `<rect x="${padL}" y="${padT}" width="${w-padL-padR}" height="${h-padT-padB}" fill="transparent" id="lineHit"/>`;
+  svg.innerHTML = s;
+  const hit = svg.querySelector('#lineHit'), xh = svg.querySelector('#xh');
+  const mv = e => {
+    const b = svg.getBoundingClientRect(); const scale = w / b.width;
+    const mx = (e.clientX - b.left) * scale;
+    let i = Math.round((mx - padL) / (w - padL - padR) * (xs.length - 1)); i = Math.max(0, Math.min(xs.length - 1, i));
+    const x = X(xs[i]); xh.setAttribute('x1', x); xh.setAttribute('x2', x); xh.style.display = '';
+    const sorted = series.map(se => ({ se, r: se.pts[i] })).sort((a, b) => a.r.total - b.r.total);
+    const html = `<div class="t">목표 대비 ${xs[i]}%</div>` + rowsHtml(sorted.map(o => [swatch(o.se.sc.hex), o.se.sc.name + (o.r.ok ? '' : ' (초과)'), man(o.r.total)]));
+    showTip(tip, box, x / scale, e.clientY - b.top, html);
+  };
+  hit.addEventListener('mousemove', mv); hit.addEventListener('click', mv);
+  hit.addEventListener('mouseleave', () => { hideTip(tip); xh.style.display = 'none'; });
+}
+
+/* ═══ 가로 막대 (가동시간·설비용량) ═══ */
+function renderHBars(svgId, tipId, res, valFn, fmt, refLine, refLabel){
+  const svg = $(svgId), tip = $(tipId), box = svg.parentElement;
+  const rowH = 34, top = refLine ? 18 : 4, h = top + res.length * rowH + 24;
+  const w = svgSize(svg, h);
+  const padL = 4, padR = 64;
+  const vals = res.map(valFn).map(v => isFinite(v) ? v : 0);
+  const max = niceMax(Math.max(...vals, refLine || 0) * 1.05);
+  const X = v => padL + v / max * (w - padL - padR);
+  let s = '';
+  for (let i = 0; i <= 4; i++){
+    const v = max * i / 4, x = X(v);
+    s += `<line x1="${x}" x2="${x}" y1="${top}" y2="${h-20}" stroke="var(--grid)"/>`;
+    s += `<text x="${x}" y="${h-5}" font-size="11" fill="var(--muted)" text-anchor="${i===0?'start':i===4?'end':'middle'}">${f1(v)}</text>`;
+  }
+  res.forEach((r, i) => {
+    const y = top + i * rowH, v = vals[i], bw = Math.max(1, X(v) - padL);
+    s += `<text x="${padL}" y="${y+11}" font-size="12" fill="var(--ink)">${r.sc.name}</text>`;
+    s += `<path d="M${padL},${y+15} h${Math.max(0,bw-4)} a4,4 0 0 1 4,4 v6 a4,4 0 0 1 -4,4 h${-Math.max(0,bw-4)} z" fill="${r.sc.hex}"/>`;
+    s += `<text x="${X(v)+6}" y="${y+27}" font-size="12" font-weight="700" fill="var(--ink)">${fmt(v)}</text>`;
+    s += `<rect x="0" y="${y}" width="${w}" height="${rowH}" fill="transparent" class="hit" data-i="${i}"/>`;
+  });
+  if (refLine){
+    const x = X(refLine);
+    s += `<line x1="${x}" x2="${x}" y1="${top}" y2="${h-20}" stroke="var(--ink2)" stroke-dasharray="4 3"/>`;
+    s += `<text x="${x}" y="11" font-size="11" fill="var(--ink2)" text-anchor="middle">${refLabel}</text>`;
+  }
+  svg.innerHTML = s;
+  svg.querySelectorAll('.hit').forEach(el => {
+    const r = res[+el.dataset.i];
+    const extra = svgId === 'hoursSvg'
+      ? (target === 'all' ? `<div class="r"><span>박스 / 트레이</span><b>${f1(r.hList[0])} / ${f1(r.hList[1])}h</b></div>` : '') + `<div class="r"><span>연장 인건비</span><b>${won(r.ot)}원</b></div>`
+      : `<div class="r"><span>월 전력량</span><b>${won(r.kwh)}kWh</b></div>` + (r.mj ? `<div class="r"><span>월 가스</span><b>${won(r.mj)}MJ</b></div>` : '');
+    const html = `<div class="t">${r.sc.name}</div><div class="r"><span>값</span><b>${fmt(vals[+el.dataset.i])}</b></div>` + extra;
+    const mv = e => { const b = box.getBoundingClientRect(); showTip(tip, box, e.clientX - b.left, e.clientY - b.top, html); };
+    el.addEventListener('mousemove', mv); el.addEventListener('click', mv);
+    el.addEventListener('mouseleave', () => hideTip(tip));
+  });
+}
+
+/* ═══ 표 ═══ */
+function renderTable(res){
+  const rows = [
+    ['일 가동시간 (h)', r => r.h, f1, 'min'],
+    ['CAPA 판정', r => r.ok ? '충족' : '시간 초과', v => v, null],
+    ['전기 설비용량 (kW)', r => r.ratedKw, f1, 'min'],
+    ['월 전력량 (kWh)', r => r.kwh, won, 'min'],
+    ['월 가스 (MJ)', r => r.mj, won, null],
+    ['전기료 (원/월)', r => r.el, won, null],
+    ['가스료 (원/월)', r => r.gs, won, null],
+    ['에너지비 계 (원/월)', r => r.el + r.gs, won, 'min'],
+    ['정규 인건비 (원/월)', r => r.lab, won, null],
+    ['연장 인건비 (원/월)', r => r.ot, won, 'min'],
+    ['월 총비용 (원)', r => r.total, won, 'min'],
+    ['연 총비용 (원)', r => r.total * 12, won, 'min'],
+    ['천 개당 비용 (원)', r => r.monthPcs ? r.total / r.monthPcs * 1000 : 0, won, 'min'],
+  ];
+  let t = '<thead><tr><th>항목</th>' + res.map(r => `<th>${r.sc.name}</th>`).join('') + '</tr></thead><tbody>';
+  rows.forEach(([lab, fn, fmt, mode]) => {
+    const vals = res.map(fn);
+    const mn = mode === 'min' ? Math.min(...vals.filter(v => typeof v === 'number')) : null;
+    t += `<tr><td>${lab}</td>` + vals.map(v => `<td${mn !== null && v === mn ? ' class="min"' : ''}>${fmt(v)}</td>`).join('') + '</tr>';
+  });
+  $('tbl').innerHTML = t + '</tbody>';
+}
+
+/* ═══ 전체 렌더 ═══ */
+function renderAll(){
+  const inp = readInputs();
+  const res = SC.map(sc => calcScenario(inp, sc, target));
+  renderKpis(res);
+  renderStack(res);
+  renderLine(inp);
+  renderHBars('hoursSvg', 'tipHours', res, r => r.h, v => f1(v) + 'h', inp.c.shift, `정규 ${inp.c.shift}h`);
+  renderHBars('kwSvg', 'tipKw', res, r => r.ratedKw, v => f1(v) + 'kW', null, '');
+  renderTable(res);
+}
+document.querySelectorAll('input').forEach(el => el.addEventListener('input', renderAll));
+$('fixedShift').addEventListener('change', renderAll);
+$('btnReset').onclick = () => { writeInputs({ c: { ...DEFC, fixedShift: true }, m: DEF }); renderAll(); };
+let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(renderAll, 120); });
+
+/* ═══ Firebase: 시나리오 저장/불러오기 ═══ */
+const firebaseConfig = {
+  apiKey:            "AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",
+  authDomain:        "insys-work.firebaseapp.com",
+  projectId:         "insys-work",
+  storageBucket:     "insys-work.firebasestorage.app",
+  messagingSenderId: "225275784859",
+  appId:             "1:225275784859:web:bd12815c6dc47c0c49e03e"
+};
+const COL = 'washer_capa_sim';
+let db = null;
+async function initFirebase(){
+  try {
+    const app = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+    FB = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+    db = FB.getFirestore(app.initializeApp(firebaseConfig));
+  } catch (e) { console.warn('Firebase 로드 실패', e); }
+}
+const msg = t => $('saveMsg').textContent = t;
+let pendingDel = null;
+
+async function loadList(){
+  if (!db){ msg('Firebase 연결 불가 — 계산·그래프는 정상 동작합니다.'); return; }
+  try {
+    const snap = await FB.getDocs(FB.query(FB.collection(db, COL), FB.orderBy('createdAt', 'desc'), FB.limit(30)));
+    const items = []; snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+    $('savedList').innerHTML = items.length ? items.map(it => `<li data-id="${it.id}"><span class="nm">${escapeHtml(it.name || '(이름 없음)')}</span><span class="dt">${(it.createdAt || '').slice(0,16).replace('T',' ')}</span>
+      <button type="button" class="btn" data-act="load">불러오기</button><button type="button" class="btn del" data-act="del">삭제</button></li>`).join('') : '<li><span class="dt">저장된 시나리오가 없습니다.</span></li>';
+    $('savedList').querySelectorAll('button').forEach(b => b.onclick = () => onListBtn(b, items));
+  } catch (e) {
+    console.warn(e);
+    msg('목록을 불러오지 못했습니다 (Firestore 보안 규칙에 washer_capa_sim 컬렉션 허용 필요). 계산·그래프는 정상 동작합니다.');
+  }
+}
+async function onListBtn(b, items){
+  const li = b.closest('li'), id = li.dataset.id, it = items.find(x => x.id === id);
+  if (b.dataset.act === 'load'){ writeInputs(it.inputs || {}); renderAll(); msg(`"${it.name}" 조건을 불러왔습니다.`); return; }
+  if (pendingDel !== id){ pendingDel = id; b.textContent = '한 번 더 누르면 삭제'; msg('삭제하려면 같은 버튼을 한 번 더 누르세요.'); return; }
+  try { await FB.deleteDoc(FB.doc(db, COL, id)); pendingDel = null; msg('삭제했습니다.'); loadList(); }
+  catch (e) { console.warn(e); msg('삭제 실패 — 보안 규칙을 확인하세요.'); }
+}
+$('btnSave').onclick = async () => {
+  const name = $('scName').value.trim();
+  if (!name){ msg('시나리오 이름을 입력하세요.'); return; }
+  if (!db){ msg('Firebase 연결 불가'); return; }
+  try {
+    await FB.addDoc(FB.collection(db, COL), { name, inputs: readInputs(), version: VERSION, createdAt: new Date().toISOString() });
+    $('scName').value = ''; msg(`"${name}" 저장 완료`); loadList();
+  } catch (e) { console.warn(e); msg('저장 실패 — Firestore 보안 규칙에 washer_capa_sim 컬렉션 허용이 필요합니다.'); }
+};
+$('btnReload').onclick = loadList;
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+$('verTop').textContent = VERSION; $('verBottom').textContent = VERSION;
+setView('mobile');
+initFirebase().then(loadList);
+</script>
+</body>
+</html>
