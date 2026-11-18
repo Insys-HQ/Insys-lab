@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-/* HRI-200_하이브리드망_구축가이드.html v1.8 (2026-10-26) */
+/* HRI-200_하이브리드망_구축가이드.html v1.9 (2026-10-26) */
 :root{--navy:#1f3a5f;--ink:#1e2a3a;--line:#c9d3e0;--bg:#f3f6fa;--card:#fff;--blue:#1d4ed8;--soft:#e4ecf7;--warnBg:#fff3d6;--warn:#7a4a00;--okBg:#e1f3e6;--ok:#1b5e34;--badBg:#fde7e7;--bad:#8a1c1c}
 *{box-sizing:border-box}
 small{font-size:1rem}
@@ -63,7 +63,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 </head>
 <body class="m">
 <div class="nav"><div class="nav-inner">
- <div><b>HRI-200 하이브리드 재난통신망 구축 가이드</b> <small>대한적십자사 서울특별시지사 재난대응봉사회</small> <span class="ver app-version">v1.8</span></div>
+ <div><b>HRI-200 하이브리드 재난통신망 구축 가이드</b> <small>대한적십자사 서울특별시지사 재난대응봉사회</small> <span class="ver app-version">v1.9</span></div>
  <div class="tg"><button id="bM" class="on" type="button">📱 모바일</button><button id="bP" type="button">🖥 PC</button></div>
 </div></div>
 <div class="wrap">
@@ -71,7 +71,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 <div class="cover">
  <h1>HRI-200 3대 도입 · 등록부터 운용까지</h1>
  <p>HL0FRC · DS0ARC/M · HL2TLS — PDN 방식에서 HRI-200 방식으로 전환</p>
- <p>작성 2026-10-26 · <span class="app-version">v1.8</span></p>
+ <p>작성 2026-10-26 · <span class="app-version">v1.9</span></p>
 </div>
 <div class="box bad"><b>📢 YAESU WIRES-X 웹사이트 일시 중단 (보안 점검)</b> — 등록·문의는 사이트 양식이 아니라 <b>공지 페이지의 이메일 링크</b>로 접수합니다. 소프트웨어·매뉴얼은 같은 페이지의 Download 링크에서 받습니다. 이전 사이트 주소(<code>…/regist/index.php</code> 등)는 열리지 않습니다. <a class="lk" href="https://www.yaesu.com/jp/en/wires-x/" target="_blank" rel="noopener">📢 YAESU WIRES-X 공지 · 이메일 신청 링크</a></div>
 <div class="toc">
@@ -106,7 +106,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
   <li><b>회신 대기</b> — 승인 메일에 <b>Node ID · Room ID</b>가 옴 (4번 기록표). 사이트 중단 중이라 지연될 수 있음</li>
   <li><b>정정·추가 요청</b> — 오타 등은 같은 메일에 답장하거나 공지 페이지의 <b>Registration Information Change Request</b> 사용</li>
  </ol>
- <div class="box ok"><b>진행 현황</b> : 2026-10-26 신청 3건 발송 → 구입처 철자 정정 메일 발송 → 2026-11-12 현재 회신 없음. 재문의 필요(7번 점검표).</div>
+ <div class="box ok"><b>진행 현황</b> : 2026-10-26 신청 3건 발송 → 2026-11-12 재신청 → <b>2026-11-19 HL0FRC · DS0ARC/M 회신 도착(Node ID 발급)</b>. HL2TLS는 회신 대기.</div>
  <div class="box warn">로그인은 필요 없습니다. 기존 안내의 Member Login·User ID/Password 단계는 사이트 재개 후에만 해당합니다.</div>
  <div class="box info">출처 : YAESU 공지 "Temporary Suspension of the WIRES-X Website" — 보안 점검 중, 요청·문의는 이메일로 접수(New Registration Request · Registration Information Change Request · Node Registration Cancellation Request · Contact Us).</div>
 </section>
@@ -132,12 +132,14 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
 </section>
 
 <section id="d">
- <h2>4 승인 메일 수신 후 기록표</h2>
+ <h2>4 승인 결과 — 발급된 ID (YAESU 회신)</h2>
  <div class="tw"><table><tr><th>항목</th><th>HL0FRC</th><th>DS0ARC/M</th><th>HL2TLS</th></tr>
   <tr><td class="k">HRI-200 S/N</td><td><code>6I080012</code></td><td><code>6I080013</code></td><td><code>6I080005</code></td></tr>
-  <tr><td class="k">Node ID (5자리)</td><td>＿＿＿＿＿</td><td>＿＿＿＿＿</td><td>＿＿＿＿＿</td></tr>
-  <tr><td class="k">Room ID</td><td colspan="3">룸은 개설하지 않음 — 기존 <b>48182</b>(DS0ARC) 사용</td></tr>
-  <tr><td class="k">수신 일자</td><td>＿＿＿＿＿</td><td>＿＿＿＿＿</td><td>＿＿＿＿＿</td></tr></table></div>
+  <tr><td class="k">WIRES-X Node ID<br><small>(DTMF 노드 ID)</small></td><td><b><code>18069</code></b></td><td><b><code>18071</code></b></td><td>회신 대기</td></tr>
+  <tr><td class="k">WIRES-X Room ID<br><small>(DTMF 룸 ID)</small></td><td><code>28069</code></td><td><code>28071</code></td><td>회신 대기</td></tr>
+  <tr><td class="k">회신 수신</td><td>2026-11-19</td><td>2026-11-19</td><td>미수신</td></tr></table></div>
+ <div class="box info">Node ID는 소프트웨어의 <b>DTMF ID</b>에 입력합니다. 각 노드 전용 Room ID(28069 · 28071)가 함께 발급되었지만, 이 구성에서는 <b>룸을 새로 열지 않고</b> 기존 DS0ARC 룸 <code>48182</code>에 접속하므로 사용하지 않습니다. 두 번호는 참고용으로 보관합니다.</div>
+ <div class="box warn">HL2TLS(<code>6I080005</code>)는 아직 회신이 확인되지 않았습니다. 받는 대로 이 표에 추가합니다.</div>
  <div class="box bad">User ID · Password는 이 문서에 적지 않습니다. 개인별로 별도 보관하세요.</div>
 </section>
 
@@ -152,7 +154,7 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
  <div class="tw"><table><tr><th>설정 항목</th><th>HL0FRC</th><th>DS0ARC/M</th><th>HL2TLS</th></tr>
   <tr><td class="k">Serial/Radio ID</td><td><code>6I080012</code></td><td><code>6I080013</code></td><td><code>6I080005</code></td></tr>
   <tr><td class="k">CallSign</td><td>HL0FRC</td><td>DS0ARC/M</td><td>HL2TLS</td></tr>
-  <tr><td class="k">DTMF ID</td><td colspan="3">승인 메일의 각 국 Node ID (4번 기록표)</td></tr>
+  <tr><td class="k">DTMF ID (Node ID)</td><td><code>18069</code></td><td><code>18071</code></td><td>회신 대기</td></tr>
   <tr><td class="k">공통 설정값</td><td colspan="3">Modulation RX:FM–TX:FM · Return to Room <code>48182</code> · 룸 개설 안 함</td></tr></table></div>
  <p>세부 화면은 교육 슬라이드의 해당 장을 보세요 (중복 설명 생략).</p>
  <a class="lk" href="RCNET_FM노드_운용교육.html#s6" target="_blank" rel="noopener">B-1 연결·설치</a>
@@ -191,10 +193,10 @@ em.l{font-style:normal;background:var(--warnBg);color:var(--warn);border-radius:
  <div class="box warn">YAESU 공지 페이지는 사이트 재개 시 주소·내용이 바뀔 수 있습니다.</div>
 </section>
 
-<div class="foot">대한적십자사 서울특별시지사 재난대응봉사회 · <span class="app-version">v1.8</span> · 2026-10-26</div>
+<div class="foot">대한적십자사 서울특별시지사 재난대응봉사회 · <span class="app-version">v1.9</span> · 2026-10-26</div>
 </div>
 <script>
-var APP_VERSION='v1.8';
+var APP_VERSION='v1.9';
 document.querySelectorAll('.app-version').forEach(function(e){e.textContent=APP_VERSION;});
 (function(){
  var b=document.body,m=document.getElementById('bM'),p=document.getElementById('bP');
