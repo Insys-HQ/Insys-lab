@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>노래방 음량 최적화 시뮬레이터 v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1f2937; --navy:#1e3a5f; --blue:#2c5282; --mic:#9c4221; --line:#cbd5e1;
+  --bg:#f1f5f9; --card:#ffffff; --soft:#e8eef6; --ok:#276749; --okbg:#e6f4ea;
+  --warn:#8a5a00; --warnbg:#fff4d6; --bad:#9b2c2c; --badbg:#fde8e8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+@media (min-width:768px){html{font-size:16px}}
+body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--bg);line-height:1.45;font-size:1rem}
+.nav{background:var(--navy);color:#fff;width:100%}
+.nav-inner{margin:0 auto;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;transition:max-width .2s}
+.nav h1{font-size:1.1rem;font-weight:700}
+.ver{font-size:.8rem;background:#fff;color:var(--navy);border-radius:10px;padding:1px 8px;font-weight:700;margin-left:6px}
+.seg{display:inline-flex;border:1px solid #fff;border-radius:6px;overflow:hidden}
+.seg button{background:transparent;color:#fff;border:0;padding:4px 10px;font:inherit;font-size:.9rem;cursor:pointer}
+.seg button.on{background:#fff;color:var(--navy);font-weight:700}
+.wrap{margin:0 auto;padding:8px 12px;transition:max-width .2s}
+body.mobile .nav-inner,body.mobile .wrap{max-width:440px}
+body.pc .nav-inner,body.pc .wrap{max-width:1100px}
+.grid{display:grid;grid-template-columns:1fr;gap:8px}
+body.pc .grid{grid-template-columns:340px 1fr;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.card h2{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:6px}
+.row{margin-bottom:8px}
+.row label{display:flex;justify-content:space-between;font-weight:500;font-size:.95rem}
+.row label b{color:var(--navy)}
+input[type=range]{width:100%;height:28px;accent-color:var(--blue)}
+#mic{accent-color:var(--mic)}
+.btns{display:flex;flex-wrap:wrap;gap:6px}
+button.b{border:1px solid var(--navy);background:#fff;color:var(--navy);border-radius:6px;padding:6px 10px;font:inherit;font-size:.9rem;font-weight:500;cursor:pointer}
+button.b.pri{background:var(--navy);color:#fff}
+button.b:active{opacity:.8}
+.status{border-radius:8px;padding:8px 10px;font-weight:700;margin-bottom:8px;border:1px solid}
+.status.ok{background:var(--okbg);color:var(--ok);border-color:#9ae6b4}
+.status.warn{background:var(--warnbg);color:var(--warn);border-color:#f6d98a}
+.status.bad{background:var(--badbg);color:var(--bad);border-color:#feb2b2}
+.status small{display:block;font-weight:400;color:var(--ink);margin-top:2px}
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:6px}
+body.pc .metrics{grid-template-columns:repeat(4,1fr)}
+.m{background:var(--soft);border-radius:8px;padding:6px 8px}
+.m span{display:block;font-size:.8rem;color:#475569}
+.m b{font-size:1.15rem;color:var(--navy)}
+canvas{width:100%;display:block;background:#fff;border:1px solid var(--line);border-radius:8px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:.85rem;margin-top:4px}
+.legend i{display:inline-block;width:14px;height:8px;border-radius:2px;margin-right:4px;vertical-align:middle}
+.log{max-height:130px;overflow:auto;font-size:.85rem;background:var(--soft);border-radius:8px;padding:6px 8px}
+.log div{padding:1px 0;border-bottom:1px dashed #cbd5e1}
+.note{font-size:.85rem;color:#475569;margin-top:4px}
+.foot{text-align:center;font-size:.8rem;color:#475569;padding:6px 0 10px}
+.copy{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.copy a{color:var(--blue);word-break:break-all}
+</style>
+</head>
+<body class="mobile">
+<header class="nav"><div class="nav-inner" id="navInner">
+  <h1>🎤 노래방 음량 최적화 시뮬레이터<span class="ver" id="verTop">v1.0</span></h1>
+  <div class="seg" role="group" aria-label="화면 선택">
+    <button id="btnMobile" class="on" type="button">모바일</button>
+    <button id="btnPc" type="button">PC</button>
+  </div>
+</div></header>
+
+<main class="wrap"><div class="grid">
+  <section>
+    <div class="card">
+      <h2>① 음량 조절</h2>
+      <div class="row"><label>🎵 반주(MR) 음량 <b id="mrVal">75</b></label>
+        <input type="range" id="mr" min="0" max="100" value="75"></div>
+      <div class="row"><label>🎤 마이크 음량 <b id="micVal">30</b></label>
+        <input type="range" id="mic" min="0" max="100" value="30"></div>
+      <div class="row"><label>🔁 에코(리버브) <b id="echoVal">30</b></label>
+        <input type="range" id="echo" min="0" max="100" value="30"></div>
+      <div class="note">최적 기준: 마이크 평균이 반주보다 +3~+6dB, 에코 20~45, 합산 피크 -12~-3dB</div>
+    </div>
+    <div class="card">
+      <h2>② 시뮬레이션</h2>
+      <div class="btns">
+        <button class="b pri" id="btnAuto" type="button">자동 최적화 시작</button>
+        <button class="b" id="btnPlay" type="button">일시정지</button>
+        <button class="b" id="btnLow" type="button">마이크 작음</button>
+        <button class="b" id="btnHigh" type="button">마이크 큼(하울링)</button>
+        <button class="b" id="btnReset" type="button">초기화</button>
+      </div>
+      <div class="note">자동 최적화: 측정 → 판정 → 마이크를 1단계씩 조정하는 과정을 반복해 최적 구간을 찾습니다.</div>
+    </div>
+    <div class="card">
+      <h2>③ 조정 기록</h2>
+      <div class="log" id="log"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="status" id="status">측정 중…</div>
+    <div class="card">
+      <h2>④ 실시간 음량 그래프 (최근 20초)</h2>
+      <canvas id="cv"></canvas>
+      <div class="legend">
+        <span><i style="background:#2c5282"></i>반주(MR)</span>
+        <span><i style="background:#9c4221"></i>마이크</span>
+        <span><i style="background:rgba(39,103,73,.25);border:1px solid #276749"></i>마이크 최적 구간(MR+3~+6dB)</span>
+        <span><i style="background:#9b2c2c"></i>클리핑 한계</span>
+      </div>
+    </div>
+    <div class="card">
+      <h2>⑤ 레벨 미터 / 판정</h2>
+      <canvas id="cvBar"></canvas>
+      <div class="metrics" style="margin-top:6px">
+        <div class="m"><span>마이크−반주 차이</span><b id="mDiff">-</b></div>
+        <div class="m"><span>합산 피크</span><b id="mPeak">-</b></div>
+        <div class="m"><span>하울링 위험</span><b id="mFb">-</b></div>
+        <div class="m"><span>최적도 점수</span><b id="mScore">-</b></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>접속 링크</h2>
+      <div class="copy">
+        <a href="https://insys-hq.github.io/Insys-lab/노래방_음량_최적화.html" target="_blank" rel="noopener">https://insys-hq.github.io/Insys-lab/노래방_음량_최적화.html</a>
+        <button class="b" id="btnCopy" type="button">복사</button>
+      </div>
+    </div>
+  </section>
+</div></main>
+<div class="foot">노래방 음량 최적화 시뮬레이터 <span id="verFoot">v1.0</span></div>
+
+<script>
+(function(){
+'use strict';
+var VERSION='v1.0';
+document.getElementById('verTop').textContent=VERSION;
+document.getElementById('verFoot').textContent=VERSION;
+
+var $=function(id){return document.getElementById(id)};
+var mr=$('mr'),mic=$('mic'),echo=$('echo');
+var HIST=200, DT=100;           // 20초, 0.1초 간격
+var histMr=[],histMic=[];
+var running=true, auto=null, tSim=0;
+var peakMr=-60, peakMic=-60;
+
+function gainDb(v){return v<=0?-90:(v-80)*0.6;}     // 슬라이더 → dB 게인
+function mrAvg(){return -18+gainDb(+mr.value);}
+function micAvg(){return -20+gainDb(+mic.value);}
+function diff(){return micAvg()-mrAvg();}
+function p2db(x){return 10*Math.log10(Math.max(x,1e-12));}
+function peakMaster(){
+  var a=Math.pow(10,(mrAvg()+4)/10);
+  var b=Math.pow(10,(micAvg()+6)/10)*(1+(+echo.value)/100*0.6);
+  return p2db(a+b);
+}
+function fbRisk(){
+  var m=+mic.value,e=+echo.value;
+  var r=(m-70)*2.2+(e-50)*0.8;
+  return Math.max(0,Math.min(100,Math.round(r)));
+}
+function score(){
+  var d=diff(),s=100;
+  var dd=d<3?3-d:(d>6?d-6:0); s-=dd*9;
+  var e=+echo.value; if(e<20)s-=(20-e)*0.5; if(e>45)s-=(e-45)*0.8;
+  var pk=peakMaster(); if(pk>-3)s-=(pk+3)*10; if(pk<-18)s-=(-18-pk)*2;
+  s-=fbRisk()*0.4;
+  return Math.max(0,Math.min(100,Math.round(s)));
+}
+function judge(){
+  var d=diff(),pk=peakMaster(),fb=fbRisk(),e=+echo.value;
+  if(+mic.value<=0) return {c:'bad',t:'마이크 음소거 상태',s:'마이크 음량을 올려 주세요.'};
+  if(pk>-1) return {c:'bad',t:'클리핑(음 찌그러짐) 발생',s:'합산 피크가 한계를 넘었습니다. 반주나 마이크를 낮추세요.'};
+  if(fb>=60) return {c:'bad',t:'하울링 위험 높음',s:'마이크 음량 또는 에코를 낮추세요.'};
+  if(d<3) return {c:d<0?'bad':'warn',t:'마이크가 작음 (반주에 묻힘)',s:'마이크를 올리세요. 현재 차이 '+d.toFixed(1)+'dB, 목표 +3~+6dB'};
+  if(d>6) return {c:d>9?'bad':'warn',t:'마이크가 큼 (반주가 묻힘)',s:'마이크를 내리세요. 현재 차이 '+d.toFixed(1)+'dB, 목표 +3~+6dB'};
+  if(e>45) return {c:'warn',t:'에코 과다 (발음 뭉개짐)',s:'에코를 20~45 범위로 낮추세요.'};
+  if(e<20) return {c:'warn',t:'에코 부족 (소리가 건조함)',s:'에코를 20~45 범위로 올려 보세요.'};
+  if(pk>-3) return {c:'warn',t:'음량 비율은 적정, 전체 음량 높음',s:'반주·마이크를 함께 조금 낮추세요.'};
+  if(pk<-18) return {c:'warn',t:'음량 비율은 적정, 전체 음량 낮음',s:'반주·마이크를 함께 조금 올리세요.'};
+  return {c:'ok',t:'✅ 최적 상태',s:'마이크 +'+d.toFixed(1)+'dB, 합산 피크 '+pk.toFixed(1)+'dB, 에코 '+e};
+}
+
+// ---- 신호 시뮬레이션 (0.1초 샘플) ----
+function sample(){
+  tSim+=DT/1000;
+  var m=mrAvg()+3*Math.sin(2*Math.PI*tSim*2)+2*Math.sin(2*Math.PI*tSim*0.7)+(Math.random()-.5)*1.5;
+  var ph=tSim%4.5, singing=ph<3.6;
+  var v=singing? micAvg()+4*Math.sin(2*Math.PI*tSim*3.1)+3*Math.sin(2*Math.PI*tSim*1.3)+(Math.random()-.5)*2 : -60;
+  if(+mr.value<=0) m=-60;
+  if(+mic.value<=0) v=-60;
+  m=Math.max(-60,m); v=Math.max(-60,v);
+  histMr.push(m); histMic.push(v);
+  if(histMr.length>HIST){histMr.shift();histMic.shift();}
+  peakMr=Math.max(m,peakMr-0.6); peakMic=Math.max(v,peakMic-0.6);
+}
+
+// ---- 그래프 ----
+var cv=$('cv'),ctx=cv.getContext('2d'),cb=$('cvBar'),cx=cb.getContext('2d');
+function fit(c,h){
+  var dpr=window.devicePixelRatio||1,w=c.clientWidth;
+  c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);c.style.height=h+'px';
+  c.getContext('2d').setTransform(dpr,0,0,dpr,0,0);return w;
+}
+function ymap(db,h,top,bot){return top+(0-db)/60*(h-top-bot);}
+function drawGraph(){
+  var w=fit(cv,window.innerWidth>=768?280:220),h=parseFloat(cv.style.height);
+  var L=34,T=8,B=16,pw=w-L-6;
+  ctx.clearRect(0,0,w,h);ctx.font='11px Noto Sans KR';ctx.fillStyle='#475569';ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;
+  for(var d=0;d>=-60;d-=12){var y=ymap(d,h,T,B);ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(w-6,y);ctx.stroke();ctx.fillText(d+'',4,y+4);}
+  ctx.fillText('dB',4,10);
+  // 최적 구간 밴드 (반주 평균 기준 +3~+6)
+  var lo=mrAvg()+3,hi=mrAvg()+6;
+  var y1=ymap(Math.min(hi,0),h,T,B),y2=ymap(Math.max(lo,-60),h,T,B);
+  ctx.fillStyle='rgba(39,103,73,.22)';ctx.fillRect(L,y1,pw,Math.max(y2-y1,1));
+  ctx.strokeStyle='#276749';ctx.setLineDash([4,3]);ctx.strokeRect(L,y1,pw,Math.max(y2-y1,1));ctx.setLineDash([]);
+  // 클리핑 한계
+  var yc=ymap(-1,h,T,B);ctx.strokeStyle='#9b2c2c';ctx.setLineDash([2,3]);ctx.beginPath();ctx.moveTo(L,yc);ctx.lineTo(w-6,yc);ctx.stroke();ctx.setLineDash([]);
+  function line(arr,col){
+    ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();
+    for(var i=0;i<arr.length;i++){
+      var x=L+pw*(i+(HIST-arr.length))/(HIST-1),y=ymap(arr[i],h,T,B);
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }ctx.stroke();
+  }
+  line(histMr,'#2c5282');line(histMic,'#9c4221');
+}
+function drawBars(){
+  var w=fit(cb,92),h=92;cx.clearRect(0,0,w,h);cx.font='12px Noto Sans KR';
+  var items=[['반주',histMr.length?histMr[histMr.length-1]:-60,peakMr,'#2c5282'],['마이크',histMic.length?histMic[histMic.length-1]:-60,peakMic,'#9c4221']];
+  var L=52,bw=w-L-10;
+  // 눈금 영역 색: 초록(-18~-6), 노랑(-6~-1), 빨강(-1~0)
+  items.forEach(function(it,i){
+    var y=8+i*40;
+    cx.fillStyle='#475569';cx.fillText(it[0],4,y+16);
+    cx.fillStyle='#e8eef6';cx.fillRect(L,y,bw,24);
+    var x=function(db){return L+bw*(Math.max(-60,Math.min(0,db))+60)/60;};
+    cx.fillStyle='rgba(39,103,73,.12)';cx.fillRect(x(-30),y,x(-6)-x(-30),24);
+    cx.fillStyle='rgba(155,44,44,.15)';cx.fillRect(x(-1),y,x(0)-x(-1),24);
+    cx.fillStyle=it[3];cx.fillRect(L,y+4,x(it[1])-L,16);
+    cx.fillStyle='#1f2937';cx.fillRect(x(it[2])-1,y,2,24);
+  });
+  cx.fillStyle='#475569';
+  [-60,-40,-20,0].forEach(function(d){var xx=L+bw*(d+60)/60;cx.fillText(d,xx-8,h-2);});
+}
+
+// ---- UI 갱신 ----
+function setStatus(j){var s=$('status');s.className='status '+j.c;s.innerHTML=j.t+'<small>'+j.s+'</small>';}
+function refresh(){
+  $('mrVal').textContent=mr.value;$('micVal').textContent=mic.value;$('echoVal').textContent=echo.value;
+  var d=diff(),pk=peakMaster(),fb=fbRisk(),sc=score();
+  $('mDiff').textContent=(+mic.value<=0?'-':(d>=0?'+':'')+d.toFixed(1)+' dB');
+  $('mPeak').textContent=pk.toFixed(1)+' dB';
+  $('mFb').textContent=fb+'%';
+  $('mScore').textContent=sc+'점';
+  setStatus(judge());
+}
+function log(msg){
+  var l=$('log'),d=document.createElement('div');
+  var t=new Date();var hh=('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2)+':'+('0'+t.getSeconds()).slice(-2);
+  d.textContent='['+hh+'] '+msg;l.insertBefore(d,l.firstChild);
+  while(l.children.length>40)l.removeChild(l.lastChild);
+}
+
+// ---- 자동 최적화 ----
+function stopAuto(){if(auto){clearInterval(auto);auto=null;}$('btnAuto').textContent='자동 최적화 시작';}
+function startAuto(){
+  if(auto){stopAuto();log('자동 최적화를 중단했습니다.');return;}
+  $('btnAuto').textContent='최적화 중지';
+  log('자동 최적화 시작 (반주 '+mr.value+', 마이크 '+mic.value+', 에코 '+echo.value+')');
+  var guard=0;
+  auto=setInterval(function(){
+    guard++;
+    var d=diff(),e=+echo.value,m=+mic.value,r=+mr.value,changed=false;
+    if(e>45){echo.value=e-1;changed=true;}
+    else if(e<20){echo.value=e+1;changed=true;}
+    if(m<=0&&d<3){mic.value=1;changed=true;}
+    else if(d<3){
+      if(m>=100){ if(r>0){mr.value=r-1;changed=true;log('마이크 최대 → 반주를 1 낮춤');} }
+      else{mic.value=m+1;changed=true;}
+    } else if(d>6){mic.value=m-1;changed=true;}
+    var pk=peakMaster();
+    if(!changed&&pk>-3){mr.value=Math.max(0,r-1);mic.value=Math.max(0,m-1);changed=true;log('합산 피크 '+pk.toFixed(1)+'dB 높음 → 전체 1씩 낮춤');}
+    else if(!changed&&pk<-18){mr.value=Math.min(100,r+1);mic.value=Math.min(100,m+1);changed=true;}
+    refresh();
+    if(!changed||guard>200){
+      stopAuto();
+      var j=judge();
+      log('완료: 반주 '+mr.value+', 마이크 '+mic.value+', 에코 '+echo.value+' → '+j.t.replace('✅ ','')+' (점수 '+score()+')');
+    }
+  },90);
+}
+
+// ---- 이벤트 ----
+[mr,mic,echo].forEach(function(el){el.addEventListener('input',function(){if(auto){stopAuto();log('수동 조작으로 자동 최적화 중단');}refresh();});});
+$('btnAuto').addEventListener('click',startAuto);
+$('btnPlay').addEventListener('click',function(){running=!running;this.textContent=running?'일시정지':'재생';log(running?'시뮬레이션 재생':'시뮬레이션 일시정지');});
+$('btnLow').addEventListener('click',function(){stopAuto();mic.value=20;refresh();log('프리셋: 마이크 작음 (마이크 20)');});
+$('btnHigh').addEventListener('click',function(){stopAuto();mic.value=98;echo.value=75;refresh();log('프리셋: 마이크 큼/에코 과다 (마이크 98, 에코 75)');});
+$('btnReset').addEventListener('click',function(){stopAuto();mr.value=75;mic.value=30;echo.value=30;histMr=[];histMic=[];peakMr=peakMic=-60;refresh();log('초기화 (반주 75, 마이크 30, 에코 30)');});
+function setView(m){
+  document.body.className=m;
+  $('btnMobile').classList.toggle('on',m==='mobile');$('btnPc').classList.toggle('on',m==='pc');
+  setTimeout(draw,0);
+}
+$('btnMobile').addEventListener('click',function(){setView('mobile');});
+$('btnPc').addEventListener('click',function(){setView('pc');});
+$('btnCopy').addEventListener('click',function(){
+  var u='https://insys-hq.github.io/Insys-lab/노래방_음량_최적화.html',b=this;
+  function ok(){b.textContent='복사됨';setTimeout(function(){b.textContent='복사';},1200);}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(u).then(ok,function(){fallback();});}else fallback();
+  function fallback(){var t=document.createElement('textarea');t.value=u;document.body.appendChild(t);t.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(t);ok();}
+});
+window.addEventListener('resize',function(){draw();});
+
+function draw(){drawGraph();drawBars();}
+setInterval(function(){if(running){sample();draw();}},DT);
+for(var i=0;i<HIST;i++)sample();
+refresh();draw();
+log('시뮬레이터 시작 ('+VERSION+') — 마이크가 작은 상태에서 시작합니다.');
+})();
+</script>
+</body>
+</html>
