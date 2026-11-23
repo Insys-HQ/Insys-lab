@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>ERP AI 에이전트 도입 가이드 v1.1 — 인시스 AI혁신 연구개발실</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+<style>
+/* APP_VERSION v1.1 */
+:root{
+  --navy:#1e3a5f; --ink:#24303f; --sub:#4a5a6e; --line:#d6dde6;
+  --bg:#f4f6f9; --card:#ffffff; --pale:#eaf1f8; --pale2:#eef6f0; --warn:#fff4e5; --warnink:#7a4a00;
+  --accent:#2f6fae;
+}
+*{box-sizing:border-box}
+html{font-size:14px}
+@media (min-width:768px){html{font-size:16px}}
+body{margin:0;font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+a{color:var(--accent)}
+.wrap{max-width:1100px;margin:0 auto;padding:0 14px}
+body.view-mobile .wrap{max-width:480px}
+/* header */
+header{background:var(--navy);color:#fff}
+.nav-inner{max-width:1100px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+body.view-mobile .nav-inner{max-width:480px}
+.brand{font-weight:700;font-size:1rem}
+.brand small{display:block;font-weight:400;font-size:.8rem;color:#dbe6f3}
+.viewtog{display:flex;border:1px solid #9fb6d1;border-radius:6px;overflow:hidden}
+.viewtog button{background:transparent;color:#fff;border:0;padding:5px 10px;font:inherit;font-size:.85rem;cursor:pointer}
+.viewtog button.on{background:#fff;color:var(--navy);font-weight:700}
+/* tabs */
+.tabs{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.tabs .nav-inner{padding:0 14px;flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;gap:0}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:9px 11px;font:inherit;font-size:.9rem;color:var(--sub);white-space:nowrap;cursor:pointer}
+.tabs button.on{color:var(--navy);border-bottom-color:var(--navy);font-weight:700}
+/* content */
+main{padding:8px 0}
+.panel{display:none}
+.panel.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:8px 0}
+h1{font-size:1.25rem;color:var(--navy);margin:4px 0}
+h2{font-size:1.1rem;color:var(--navy);margin:2px 0 6px}
+h3{font-size:1rem;color:var(--navy);margin:8px 0 4px}
+p{margin:4px 0}
+ul,ol{margin:4px 0;padding-left:20px}
+li{margin:2px 0}
+.lead{background:var(--pale);border-left:4px solid var(--navy);padding:8px 12px;border-radius:4px;font-weight:500;color:var(--navy)}
+.note{background:var(--warn);color:var(--warnink);padding:8px 12px;border-radius:4px;font-size:.92rem}
+.ok{background:var(--pale2);color:#1f4d2e;padding:8px 12px;border-radius:4px}
+.tbl{width:100%;border-collapse:collapse;font-size:.9rem}
+.tblwrap{overflow-x:auto}
+.tbl th{background:var(--pale);color:var(--navy);font-weight:700;text-align:left;padding:6px 8px;border:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:6px 8px;border:1px solid var(--line);vertical-align:top}
+pre{background:#f7f9fb;border:1px solid var(--line);border-radius:6px;padding:10px;overflow-x:auto;font-size:.82rem;line-height:1.45;color:var(--ink);white-space:pre}
+.chat{background:#f7f9fb;border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:.92rem}
+.chat b{color:var(--navy)}
+.grid2{display:grid;grid-template-columns:1fr;gap:8px}
+body.view-pc .grid2{grid-template-columns:1fr 1fr}
+.tag{display:inline-block;background:var(--pale);color:var(--navy);border-radius:10px;padding:0 8px;font-size:.8rem;font-weight:500}
+/* form */
+.qmeta{display:grid;grid-template-columns:1fr;gap:8px}
+body.view-pc .qmeta{grid-template-columns:1fr 1fr 1fr}
+label.f{display:block;font-weight:500;color:var(--navy);font-size:.9rem;margin-bottom:2px}
+input[type=text],select,textarea{width:100%;font:inherit;font-size:1rem;color:var(--ink);border:1px solid #b9c5d3;border-radius:6px;padding:7px 9px;background:#fff}
+textarea{min-height:68px;resize:vertical}
+.q{border-top:1px solid var(--line);padding:8px 0}
+.q:first-of-type{border-top:0}
+.qt{font-weight:700;color:var(--navy);margin-bottom:2px}
+.qh{font-size:.85rem;color:var(--sub);margin-bottom:4px}
+.opts{display:flex;flex-wrap:wrap;gap:4px 12px;margin-bottom:4px}
+.opts label{font-size:.95rem;cursor:pointer}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.btn{font:inherit;font-size:.95rem;border-radius:6px;padding:8px 14px;cursor:pointer;border:1px solid var(--navy)}
+.btn.pri{background:var(--navy);color:#fff}
+.btn.sec{background:#fff;color:var(--navy)}
+.btn.del{background:#fff;color:#8a1f1f;border-color:#c99}
+.status{font-size:.85rem;color:var(--sub)}
+footer{border-top:1px solid var(--line);background:#fff;margin-top:8px}
+footer .nav-inner{color:var(--sub);font-size:.85rem}
+.ver{font-weight:700;color:var(--navy)}
+/* pdf report */
+#pdfStage{position:fixed;left:-10000px;top:0;width:760px;background:#fff}
+.rep{font-family:'Noto Sans KR',sans-serif;color:#1e2a38;padding:24px 28px;font-size:12px;line-height:1.6;width:760px}
+.rep h1{font-size:18px;color:#1e3a5f;margin:0 0 4px}
+.rep .meta{font-size:11px;color:#4a5a6e;border-bottom:2px solid #1e3a5f;padding-bottom:6px;margin-bottom:10px}
+.rep .rq{margin:0 0 9px;page-break-inside:avoid}
+.rep .rq .t{font-weight:700;color:#1e3a5f}
+.rep .rq .a{background:#f4f7fa;border:1px solid #d6dde6;border-radius:4px;padding:5px 8px;white-space:pre-wrap;min-height:18px}
+.rep .foot{font-size:10px;color:#4a5a6e;margin-top:12px;border-top:1px solid #d6dde6;padding-top:6px}
+@media print{
+  header,.tabs,footer,.btns,.noprint{display:none!important}
+  body{background:#fff}
+  .panel{display:none!important}
+  .panel.printme{display:block!important}
+}
+</style>
+</head>
+<body class="view-mobile">
+
+<header>
+  <div class="nav-inner">
+    <div class="brand">ERP AI 에이전트 도입 가이드 <span class="ver" style="color:#fff">v1.1</span>
+      <small>인시스 AI혁신 연구개발실 · 2026-11-24</small></div>
+    <div class="viewtog" role="group" aria-label="화면 선택">
+      <button type="button" id="vMobile" class="on">모바일</button>
+      <button type="button" id="vPc">PC</button>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="nav-inner" id="tabbar">
+    <button type="button" data-tab="sum" class="on">요약</button>
+    <button type="button" data-tab="arch">구조</button>
+    <button type="button" data-tab="conn">AWS·MS365 연결</button>
+    <button type="button" data-tab="dev">개발 요구사항</button>
+    <button type="button" data-tab="issue">오류 리포트</button>
+    <button type="button" data-tab="org">조직·결재선</button>
+    <button type="button" data-tab="role">역할별 가이드</button>
+    <button type="button" data-tab="plan">비용·로드맵</button>
+    <button type="button" data-tab="qs">직원 질문지</button>
+    <button type="button" data-tab="qd">개발자 질문지</button>
+  </div>
+</nav>
+
+<main>
+<div class="wrap">
+
+<!-- 요약 -->
+<section class="panel on" id="p-sum">
+  <div class="card">
+    <h1>직원이 ERP를 배우는 대신, AI가 ERP를 대신 다룬다</h1>
+    <p class="lead">직원은 말·사진·엑셀로 요청만 → AI 에이전트가 계열사·양식에 맞춰 임시저장 → 직원 확인 → 등록. 오류는 개발 AI에게 자동 리포트.</p>
+  </div>
+  <div class="card">
+    <h2>한눈에 보기</h2>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>항목</th><th>내용</th></tr>
+      <tr><td>문제</td><td>영상 90개·퀘스트가 이중 업무가 됨. 챗봇은 자기 기능도 설명 못함</td></tr>
+      <tr><td>방향</td><td>교육 중심 → <b>대행 중심</b>. 에이전트가 입력, 직원은 확인</td></tr>
+      <tr><td>엔진</td><td>ERP가 AWS에 있으므로 <b>Amazon Bedrock(서울 리전) Claude</b> 1순위</td></tr>
+      <tr><td>계정</td><td>MS365(Entra ID) 통합 로그인 → 요청자 정확히 식별</td></tr>
+      <tr><td>품질 순환</td><td>오류 → 이슈 리포트 → 개발 AI 수정 → 공지·지식 자동 갱신</td></tr>
+      <tr><td>선행 과제</td><td>27개 계열사 조직·결재선 단순화(직무 템플릿 + 담당자 매트릭스)</td></tr>
+      <tr><td>예상 비용</td><td>월 약 50만 원 내외(50명·1일 1,000건 가정, 시범 후 확정)</td></tr>
+    </table></div>
+  </div>
+  <div class="card">
+    <h2>직원이 체감하는 모습</h2>
+    <div class="chat"><b>직원:</b> (영수증 사진 3장) "어제 창원 거래처 미팅 식대야"<br>
+    <b>에이전트:</b> "사업자번호로 보아 (주)○○ 법인카드 건입니다. 계정과목 '접대비', 참석자를 알려주세요."<br>
+    <b>직원:</b> "김OO 부장, 거래처 이OO 과장"<br>
+    <b>에이전트:</b> (미리보기 표) "이대로 임시저장할까요?" → [확인] → 결재선 자동 지정 확인</div>
+    <p class="status" style="margin-top:6px">오류가 나면: "결재선 미지정 오류로 개발팀에 리포트 #142 접수했습니다. 처리되면 알려드릴게요."</p>
+  </div>
+  <div class="card">
+    <h2>현재 문제 진단</h2>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>증상</th><th>근본 원인</th></tr>
+      <tr><td>챗봇이 엉뚱한 답</td><td>낮은 성능 모델 + ERP 기능 지식 없음 + 현재 화면·권한 정보 없음</td></tr>
+      <tr><td>영상·퀘스트 볼 시간 없음</td><td>교육이 업무와 분리 → 이중 업무</td></tr>
+      <tr><td>결재가 엉뚱한 관리자에게</td><td>27개 법인 × 직무 × 사람을 사람별 설정 → 누락 시 기본 결재선 우회</td></tr>
+      <tr><td>개선 요청이 느림</td><td>말로 전달, 재현 정보 부족</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- 구조 -->
+<section class="panel" id="p-arch">
+  <div class="card">
+    <h2>전체 구조</h2>
+<pre>[직원] MS365 계정으로 ERP 로그인(Entra ID SSO)
+   │  ERP 화면 우측 챗봇 창
+   │  질문 + 현재 화면 + 사용자ID·권한·담당법인 자동 첨부
+   ▼
+[에이전트 서버]  ← AWS 안의 ERP 백엔드에 추가
+   ├ 시스템 프롬프트 : 역할·규칙·안전장치
+   ├ 지식 : 영상 90개 자막 / 위키 / 공지 / 메뉴 카탈로그
+   ├ 도구 : ERP 조회·임시저장 (API 또는 MCP 서버)
+   └ 로그 : 대화·도구 실행·오류 (감사로그)
+   ▼
+[LLM] Amazon Bedrock(서울) Claude  ← 1순위
+      (대안: Claude Platform on AWS / OpenAI API)
+   ▼
+[알림] Outlook 메일 · Teams
+   ▼
+[오류 시] 이슈 리포트 → 개발 AI 수정 → 배포
+          → 공지 자동 작성 → 에이전트 지식 갱신</pre>
+  </div>
+  <div class="card">
+    <h2>에이전트 3종</h2>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>역할</th><th>하는 일</th></tr>
+      <tr><td>① 안내</td><td>영상 자막·위키·공지 기반 답변, 필요 시 영상 해당 구간 제시</td></tr>
+      <tr><td>② 입력 대행</td><td>증빙에서 계열사 판별 → 양식 작성 → 직원 확인 → 임시저장</td></tr>
+      <tr><td>③ 오류 리포트</td><td>실패·이상 감지 시 개발 AI용 이슈 자동 작성</td></tr>
+    </table></div>
+    <p class="note" style="margin-top:6px">에이전트는 <b>임시저장까지만</b>. 결재 상신·승인·삭제는 사람이 버튼으로 수행. 권한은 요청한 직원의 권한을 그대로 따름.</p>
+  </div>
+</section>
+
+<!-- 연결 -->
+<section class="panel" id="p-conn">
+  <div class="card">
+    <h2>비즈니스 계정 ≠ API</h2>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>구분</th><th>용도</th><th>과금</th><th>ERP 연결</th></tr>
+      <tr><td>Claude Team·Enterprise / ChatGPT Business</td><td>직원이 웹 화면에서 직접 사용</td><td>1인당 월정액</td><td>불가</td></tr>
+      <tr><td><b>API</b> (Bedrock, Claude API, OpenAI API)</td><td>우리 시스템에 AI 내장</td><td>사용량</td><td><b>필요</b></td></tr>
+    </table></div>
+    <p class="status" style="margin-top:4px">Anthropic은 기업용(API) 입력·출력을 기본적으로 모델 학습에 쓰지 않음. OpenAI는 계약 전 별도 확인.</p>
+  </div>
+  <div class="card">
+    <h2>AWS에서 Claude 쓰는 3가지 경로</h2>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>경로</th><th>특징</th><th>적합도</th></tr>
+      <tr><td><b>① Amazon Bedrock</b></td><td>AWS 운영, 서울 리전 안에서만 처리 가능, AWS 요금 합산</td><td>1순위</td></tr>
+      <tr><td>② Claude Platform on AWS</td><td>Anthropic 운영·AWS 결제, 최신 기능 빠름(Managed Agents)</td><td>고급 기능 필요 시</td></tr>
+      <tr><td>③ Claude API 직접</td><td>별도 계약·API 키 관리</td><td>시범 테스트</td></tr>
+    </table></div>
+    <h3>모델 선택(Bedrock 서울)</h3>
+    <ul>
+      <li>개인정보 포함 가능 업무(경비·인사): <b>서울 리전 내 처리 Claude Sonnet 5</b></li>
+      <li>개인정보 없는 업무(사용법 안내): 최신 <b>Claude Sonnet 5.5</b>(글로벌 처리) 또는 Haiku</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>연결 절차 (AWS 관리자 + 개발자)</h2>
+    <ol>
+      <li><a href="https://console.aws.amazon.com/bedrock/" target="_blank" rel="noopener">AWS Bedrock 콘솔</a> → 우측 상단 리전을 <b>아시아 태평양(서울)</b>으로 선택</li>
+      <li>왼쪽 메뉴 <b>모델 액세스(Model access)</b> → Anthropic Claude 사용 신청</li>
+      <li><b>IAM 역할</b> 생성: ERP 서버에 <code>bedrock:InvokeModel</code> 권한만 부여 (API 키 없음 → 유출 위험 없음)</li>
+      <li><b>AWS Budgets</b>로 월 예산 알림(초기 50만 원, 80% 도달 시 메일)</li>
+      <li>개발자가 ERP 백엔드에 에이전트 서버 모듈 추가</li>
+      <li>(선택) OpenAI 비교 테스트 시 키는 AWS Secrets Manager에만 저장</li>
+    </ol>
+  </div>
+  <div class="card">
+    <h2>MS365 연동</h2>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>연동</th><th>내용</th></tr>
+      <tr><td>통합 로그인(Entra ID)</td><td>ERP를 MS365 계정으로 로그인. 퇴사자 일괄 차단, 요청자 식별</td></tr>
+      <tr><td>Outlook</td><td>결과·오류·결재 대기 알림. 영수증을 지정 메일함으로 보내면 에이전트가 임시저장</td></tr>
+      <tr><td>Teams</td><td>Teams 채팅에서 ERP 에이전트 호출(2단계 이후)</td></tr>
+      <tr><td>조직 동기화</td><td>Entra ID 부서·직책과 담당자 매트릭스 대조 → 권한 정리 누락 방지</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- 개발 요구사항 -->
+<section class="panel" id="p-dev">
+  <div class="card">
+    <h2>에이전트 서버</h2>
+    <ul>
+      <li>ERP 백엔드에 <code>/agent/chat</code> 엔드포인트(스트리밍)</li>
+      <li>자동 첨부: <code>user_id, role, companies, current_menu, locale</code></li>
+      <li>환경변수: <code>LLM_PROVIDER=bedrock|anthropic-aws|anthropic|openai</code>, <code>LLM_MODEL</code>, <code>AWS_REGION=ap-northeast-2</code></li>
+      <li>Bedrock 호출은 IAM 역할 인증, 장기 키 금지 / 사용자 식별은 Entra ID 토큰 기준</li>
+      <li>지식은 시스템 프롬프트 + 프롬프트 캐싱, 커지면 검색형(RAG) 전환</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>도구(Tool) 1차 목록</h2>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>도구명</th><th>기능</th><th>유형</th></tr>
+      <tr><td>search_guide</td><td>가이드·영상 자막·위키 검색</td><td>조회</td></tr>
+      <tr><td>get_my_context</td><td>내 권한·담당 법인·결재선</td><td>조회</td></tr>
+      <tr><td>find_company</td><td>사업자번호·상호로 계열사 판별</td><td>조회</td></tr>
+      <tr><td>get_form_schema</td><td>메뉴별 입력 항목·필수값</td><td>조회</td></tr>
+      <tr><td>create_draft_expense</td><td>법인카드 경비 임시저장</td><td>쓰기(임시)</td></tr>
+      <tr><td>create_draft_asset</td><td>자산 등록 임시저장</td><td>쓰기(임시)</td></tr>
+      <tr><td>check_approval_line</td><td>결재선 정상 여부 점검</td><td>조회</td></tr>
+      <tr><td>report_issue</td><td>오류 이슈 리포트 생성</td><td>쓰기</td></tr>
+    </table></div>
+    <p class="status" style="margin-top:4px">가능하면 MCP 서버로 묶어 공개 → Claude·OpenAI 어느 쪽이든 그대로 연결.</p>
+  </div>
+  <div class="card">
+    <h2>필수 안전장치</h2>
+    <ol>
+      <li>임시저장까지만, 결재·삭제·금액 확정은 사람</li>
+      <li>쓰기 전 미리보기 + 사용자 확인</li>
+      <li>감사로그(누가·언제·요청·도구·결과)</li>
+      <li>급여·평가·주민번호 조회 제외 또는 마스킹</li>
+      <li>업로드 문서·이미지 속 "지시문"은 실행하지 않음</li>
+      <li>1회 처리 건수·금액 한도</li>
+    </ol>
+  </div>
+  <div class="card">
+    <h2>지식 자동화</h2>
+    <ul>
+      <li>영상 90개 → 자막 추출 → 메뉴별 가이드 문서</li>
+      <li>공지(업데이트) 등록 시 지식 자동 반영</li>
+      <li>답 못한 질문 주간 리포트 → 가이드 보강</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 오류 리포트 -->
+<section class="panel" id="p-issue">
+  <div class="card">
+    <h2>자동 작성 조건</h2>
+    <ul>
+      <li>도구 호출 실패(서버·필수값·권한 오류)</li>
+      <li>결재선 미지정·이상 결재선 감지</li>
+      <li>직원이 👎 또는 "이거 안 돼요"라고 말한 경우</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>리포트 양식 (개발 AI가 바로 읽는 형식)</h2>
+<pre>[ERP-이슈] 법인카드 경비 임시저장 시 결재선 미지정
+- 발생일시/ID : 2026-11-24 10:32 / #142
+- 모듈·메뉴  : 경비관리 > 법인카드 > 사용내역 등록
+- 사용자 맥락 : 직무=회계담당, 담당법인=(주)A,(주)B
+- 재현 절차  : 1) … 2) … 3) …
+- 기대 결과  : 담당 → 실장 → 대표 결재선 자동 지정
+- 실제 결과  : 결재선 공란, 기본 관리자로 상신
+- 오류 로그  : (API 응답 원문)
+- 영향 범위  : 동일 조건 직원 n명 추정
+- 제안 방향  : 직무 템플릿 기반 결재선 조회 로직 점검
+- 우선순위   : 높음 / 중간 / 낮음</pre>
+  </div>
+  <div class="card">
+    <h2>처리 흐름</h2>
+    <ol>
+      <li>에이전트 리포트 → 관리자 검토함(중복·개인정보 확인)</li>
+      <li>관리자 승인 → GitHub Issue 등 개발 AI 작업 큐</li>
+      <li>개발 AI 수정 → 개발자 검토 → 배포</li>
+      <li>업데이트 공지 자동 작성 → 지식 갱신 → 직원에게 "해결됨" 알림</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 조직 -->
+<section class="panel" id="p-org">
+  <div class="card">
+    <p class="lead">에이전트는 권한·결재선 데이터를 그대로 따르므로, 이 데이터가 정리돼야 에이전트도 정확합니다.</p>
+    <h2 style="margin-top:8px">3개 축 분리</h2>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>축</th><th>의미</th><th>관리</th></tr>
+      <tr><td>법적 소속</td><td>급여·4대보험 기준 법인</td><td>인사 마스터</td></tr>
+      <tr><td>업무 담당</td><td>실제 처리하는 법인들</td><td><b>담당자 매트릭스</b></td></tr>
+      <tr><td>직무(역할)</td><td>회계·인사·총무·채용 등</td><td><b>직무 템플릿</b></td></tr>
+    </table></div>
+  </div>
+  <div class="card">
+    <h2>원칙</h2>
+    <ol>
+      <li>경영지원실·전략기획실은 조직도상 <b>공유서비스 조직 1개</b>로 표시</li>
+      <li>권한은 사람별이 아니라 <b>직무 템플릿</b>으로 부여</li>
+      <li>결재선은 <b>직무 × 법인 규칙</b>, 표준 3단계: 담당 → 실장 → 대표</li>
+      <li>결재선 미지정 시 임의 관리자로 보내지 않고 <b>"결재선 오류"로 멈춤 + 관리자 알림</b></li>
+      <li>담당자 매트릭스 1장(사람 × 법인 × 직무)을 원본으로 ERP에 일괄 반영</li>
+      <li>에이전트가 매주 매트릭스와 ERP 설정 불일치 점검</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 역할 -->
+<section class="panel" id="p-role">
+  <div class="grid2">
+    <div class="card"><h2>대표이사</h2><ul>
+      <li>비전: "말하면 ERP에 들어가는 회사"</li>
+      <li>결정: API 예산 승인, 퀘스트 선택 전환, 결재선 표준 3단계</li></ul></div>
+    <div class="card"><h2>직원</h2><ul>
+      <li>메뉴를 외우지 말고 챗봇에 말하거나 사진 업로드</li>
+      <li>미리보기는 반드시 확인 후 저장</li>
+      <li>이상하면 "이거 이상해" → 리포트 자동 접수</li>
+      <li>영상·퀘스트는 선택</li></ul></div>
+    <div class="card"><h2>관리자(연구개발실)</h2><ul>
+      <li>담당자 매트릭스·직무 템플릿 관리</li>
+      <li>주 1회: 이슈 검토, 답 못한 질문 보강, 비용 확인</li>
+      <li>에이전트 규칙 버전 관리</li></ul></div>
+    <div class="card"><h2>개발자(개발 AI)</h2><ul>
+      <li>개발 요구사항 구현, 이슈 양식 수용</li>
+      <li>배포마다 변경 내역을 공지 형식으로 기록</li></ul></div>
+  </div>
+</section>
+
+<!-- 비용·로드맵 -->
+<section class="panel" id="p-plan">
+  <div class="card">
+    <h2>비용 추정 (가정치)</h2>
+    <p class="status">50명 · 1일 1,000건 · 월 22일 = 22,000건 / Sonnet 5.5 / 건당 캐시 지식 3만 + 신규 입력 3천 + 출력 800 토큰</p>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>항목</th><th>계산</th><th>월(USD)</th></tr>
+      <tr><td>캐시 지식 읽기</td><td>660M × $0.10/M</td><td>약 $66</td></tr>
+      <tr><td>신규 입력</td><td>66M × $2/M</td><td>약 $132</td></tr>
+      <tr><td>출력</td><td>17.6M × $10/M</td><td>약 $176</td></tr>
+      <tr><td><b>합계</b></td><td></td><td><b>약 $374 (약 50만 원)</b></td></tr>
+    </table></div>
+    <p class="status" style="margin-top:4px">Bedrock 단가는 AWS 요금표 기준으로 차이 가능 → 시범 1개월 실측으로 확정. 출처: <a href="https://platform.claude.com/docs/en/about-claude/pricing" target="_blank" rel="noopener">Claude 가격표</a></p>
+  </div>
+  <div class="card">
+    <h2>로드맵</h2>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>단계</th><th>기간</th><th>내용</th><th>완료 기준</th></tr>
+      <tr><td>0</td><td>1~2주</td><td>매트릭스·직무 템플릿·결재선 정비, Bedrock 신청</td><td>결재선 오류 0건</td></tr>
+      <tr><td>1</td><td>2주</td><td>안내 에이전트(엔진 교체 + 지식화)</td><td>테스트 50문항 정답률 90%</td></tr>
+      <tr><td>2</td><td>3~4주</td><td>입력 대행 시범: 법인카드 경비</td><td>입력 시간 50% 단축</td></tr>
+      <tr><td>3</td><td>2주</td><td>오류 리포트 ↔ 개발 AI 연결</td><td>리포트→배포 평균 3일</td></tr>
+      <tr><td>4</td><td>지속</td><td>자산·문서관리·근태 확장</td><td>모듈별 동일 기준</td></tr>
+    </table></div>
+  </div>
+  <div class="card">
+    <h2>이번 주 할 일</h2>
+    <ol>
+      <li>퀘스트 필수 → 선택 전환 공지</li>
+      <li>AWS Bedrock(서울) Claude 액세스 신청 + 예산 알림</li>
+      <li>개발자에게 MS365 통합 로그인 적용 가능 여부 확인</li>
+      <li>직원·개발자 질문지 회수 (이 페이지 질문지 탭)</li>
+      <li>담당자 매트릭스 초안 작성</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 직원 질문지 -->
+<section class="panel" id="p-qs">
+  <div class="card">
+    <h2>직원 질문지 <span class="tag">경영지원실·전략기획실</span></h2>
+    <p class="status">ERP AI 에이전트 설계를 위한 현장 의견 조사입니다. 작성 후 <b>PDF 저장</b>을 눌러 파일을 담당자(ys.kim@in-sys.co.kr)에게 보내주세요. 입력 내용은 이 기기에만 임시 보관되며 서버로 전송되지 않습니다.</p>
+  </div>
+  <div class="card" id="form-staff"></div>
+  <div class="btns">
+    <button type="button" class="btn pri" data-pdf="staff">PDF 저장</button>
+    <button type="button" class="btn sec" data-print="staff">인쇄</button>
+    <button type="button" class="btn del" data-clear="staff">입력 지우기</button>
+    <span class="status" id="st-staff"></span>
+  </div>
+</section>
+
+<!-- 개발자 질문지 -->
+<section class="panel" id="p-qd">
+  <div class="card">
+    <h2>개발자 질문지 <span class="tag">ERP 개발·개발 AI 운영</span></h2>
+    <p class="status">에이전트 연결 가능 범위와 일정을 파악하기 위한 기술 확인 사항입니다. 모르는 항목은 "확인 필요"로 적어주세요. 작성 후 <b>PDF 저장</b>을 눌러 회신해 주세요.</p>
+  </div>
+  <div class="card" id="form-dev"></div>
+  <div class="btns">
+    <button type="button" class="btn pri" data-pdf="dev">PDF 저장</button>
+    <button type="button" class="btn sec" data-print="dev">인쇄</button>
+    <button type="button" class="btn del" data-clear="dev">입력 지우기</button>
+    <span class="status" id="st-dev"></span>
+  </div>
+</section>
+
+</div>
+</main>
+
+<footer>
+  <div class="nav-inner">
+    <span>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr</span>
+    <span class="ver" id="verLabel">v1.1</span>
+  </div>
+</footer>
+
+<div id="pdfStage"></div>
+
+<script>
+const APP_VERSION = 'v1.1';
+document.getElementById('verLabel').textContent = APP_VERSION;
+
+/* ---------- 질문 정의 ---------- */
+const FORMS = {
+  staff: {
+    title: 'ERP AI 에이전트 — 직원 질문지',
+    meta: [
+      {id:'name', label:'작성자(선택)', type:'text', ph:'이름 또는 생략'},
+      {id:'dept', label:'소속', type:'select', opts:['경영지원실','전략기획실','기타']},
+      {id:'role', label:'주요 직무', type:'text', ph:'예: 회계, 인사, 총무, 채용'}
+    ],
+    qs: [
+      {id:'s1', t:'담당하는 계열사(법인)는 몇 곳인가요?', type:'radio', opts:['1~3곳','4~7곳','8~15곳','16곳 이상']},
+      {id:'s2', t:'ERP에서 시간이 가장 많이 걸리는 입력 업무 3가지는?', h:'예: 법인카드 경비, 전표, 자산 등록, 근태 정정', type:'textarea'},
+      {id:'s3', t:'하루에 ERP 입력·조회에 쓰는 시간은?', type:'radio', opts:['30분 미만','30분~1시간','1~2시간','2~4시간','4시간 이상']},
+      {id:'s4', t:'자주 막히거나 헷갈리는 메뉴·기능은?', type:'textarea'},
+      {id:'s5', t:'결재선 오류를 겪은 적이 있나요? 어떤 문서가 어디로 갔나요?', type:'textarea'},
+      {id:'s6', t:'현재 챗봇에 물어봤는데 제대로 답하지 못한 질문 예시', type:'textarea'},
+      {id:'s7', t:'AI가 대신 해주면 가장 좋을 일은? (복수 선택)', type:'check', opts:['영수증·증빙 입력','엑셀 일괄 등록','계열사 자동 판별','결재선 확인','메뉴 위치 안내','마감 누락 알림','기타']},
+      {id:'s8', t:'증빙(영수증·세금계산서 등)은 주로 어떻게 받나요? (복수 선택)', type:'check', opts:['종이','이메일','카카오톡·문자','카드사·홈택스 다운로드','기타']},
+      {id:'s9', t:'사용법 영상·퀘스트를 얼마나 활용하나요?', type:'radio', opts:['거의 못 봄','필요할 때만','대부분 봄']},
+      {id:'s10', t:'AI가 ERP에 입력할 때 걱정되는 점은?', type:'textarea'},
+      {id:'s11', t:'Outlook·Teams를 업무에 얼마나 쓰나요?', type:'radio', opts:['거의 안 씀','메일만','메일+Teams 자주']},
+      {id:'s12', t:'기타 의견', type:'textarea'}
+    ]
+  },
+  dev: {
+    title: 'ERP AI 에이전트 — 개발자 질문지',
+    meta: [
+      {id:'name', label:'작성자', type:'text', ph:'이름'},
+      {id:'org', label:'소속', type:'text', ph:'회사·팀'},
+      {id:'date', label:'회신일', type:'text', ph:'2026-11-'}
+    ],
+    qs: [
+      {id:'d1', t:'현재 챗봇 구조: 사용 모델, 호출 방식, 시스템 프롬프트 유무', type:'textarea'},
+      {id:'d2', t:'ERP 기술 스택(프론트·백엔드·DB)과 AWS 구성(EC2·Lambda·RDS 등), 사용 리전', type:'textarea'},
+      {id:'d3', t:'외부에서 호출 가능한 API가 있나요? 인증 방식은?', type:'textarea'},
+      {id:'d4', t:'모듈별 "임시저장(draft)" 상태를 지원하나요? (경비·자산·전표 등)', type:'textarea'},
+      {id:'d5', t:'권한 모델 구조: 역할·직무·법인 매핑 방식', type:'textarea'},
+      {id:'d6', t:'결재선 결정 로직과 미지정 시 처리(fallback) 로직', type:'textarea'},
+      {id:'d7', t:'MS365(Entra ID) 통합 로그인 적용 가능 여부·예상 일정', type:'radio', opts:['이미 적용','가능(1~2주)','가능(1개월 이상)','어려움','확인 필요']},
+      {id:'d8', t:'감사로그·오류 로그 수집 현황(CloudWatch 등)', type:'textarea'},
+      {id:'d9', t:'사용 중인 개발 AI 도구, 작업 지시 방식(이슈·채팅), 코드 저장소 위치', type:'textarea'},
+      {id:'d10', t:'배포 주기와 테스트(스테이징) 환경 유무', type:'textarea'},
+      {id:'d11', t:'Amazon Bedrock 사용 가능 여부와 AWS 계정 권한 보유자', type:'textarea'},
+      {id:'d12', t:'영상 90개 원본·자막, 위키·공지 데이터 추출(export) 가능 여부', type:'textarea'},
+      {id:'d13', t:'ERP 기능을 MCP 서버(또는 도구 API)로 공개하는 작업의 예상 공수', type:'textarea'},
+      {id:'d14', t:'1차 시범(법인카드 경비 입력 대행) 구현 예상 기간', type:'radio', opts:['2주 이내','2~4주','1~2개월','2개월 이상','확인 필요']},
+      {id:'d15', t:'기술적 우려·제안 사항', type:'textarea'}
+    ]
+  }
+};
+
+const LS_KEY = k => 'erpAgentQ_' + k + '_v1';
+function lsGet(k){ try{ return JSON.parse(localStorage.getItem(LS_KEY(k)) || '{}'); }catch(e){ return {}; } }
+function lsSet(k,v){ try{ localStorage.setItem(LS_KEY(k), JSON.stringify(v)); return true; }catch(e){ return false; } }
+function lsDel(k){ try{ localStorage.removeItem(LS_KEY(k)); }catch(e){} }
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function fieldHtml(key, f, name){
+  const nm = key+'__'+f.id;
+  if(f.type==='text') return `<input type="text" name="${nm}" placeholder="${esc(f.ph||'')}">`;
+  if(f.type==='select') return `<select name="${nm}"><option value="">선택</option>${f.opts.map(o=>`<option>${esc(o)}</option>`).join('')}</select>`;
+  if(f.type==='textarea') return `<textarea name="${nm}"></textarea>`;
+  if(f.type==='radio') return `<div class="opts">${f.opts.map(o=>`<label><input type="radio" name="${nm}" value="${esc(o)}"> ${esc(o)}</label>`).join('')}</div>`;
+  if(f.type==='check') return `<div class="opts">${f.opts.map(o=>`<label><input type="checkbox" name="${nm}" value="${esc(o)}"> ${esc(o)}</label>`).join('')}</div><input type="text" name="${nm}__etc" placeholder="기타 내용(선택)">`;
+  return '';
+}
+
+function renderForm(key){
+  const F = FORMS[key];
+  const box = document.getElementById('form-'+key);
+  let h = `<div class="qmeta">${F.meta.map(m=>`<div><label class="f">${esc(m.label)}</label>${fieldHtml(key,m)}</div>`).join('')}</div>`;
+  h += F.qs.map((q,i)=>`<div class="q"><div class="qt">${i+1}. ${esc(q.t)}</div>${q.h?`<div class="qh">${esc(q.h)}</div>`:''}${fieldHtml(key,q)}</div>`).join('');
+  box.innerHTML = h;
+  restore(key);
+  box.addEventListener('input', ()=>save(key));
+  box.addEventListener('change', ()=>save(key));
+}
+
+function collect(key){
+  const box = document.getElementById('form-'+key);
+  const data = {};
+  box.querySelectorAll('input,select,textarea').forEach(el=>{
+    const n = el.name;
+    if(el.type==='radio'){ if(el.checked) data[n]=el.value; else if(!(n in data)) data[n]=data[n]||''; }
+    else if(el.type==='checkbox'){ data[n]=data[n]||[]; if(el.checked) data[n].push(el.value); }
+    else data[n]=el.value;
+  });
+  return data;
+}
+
+function restore(key){
+  const d = lsGet(key);
+  const box = document.getElementById('form-'+key);
+  box.querySelectorAll('input,select,textarea').forEach(el=>{
+    const v = d[el.name];
+    if(v==null) return;
+    if(el.type==='radio') el.checked = (v===el.value);
+    else if(el.type==='checkbox') el.checked = Array.isArray(v) && v.includes(el.value);
+    else el.value = v;
+  });
+}
+
+function save(key){
+  const ok = lsSet(key, collect(key));
+  const st = document.getElementById('st-'+key);
+  st.textContent = ok ? '임시 저장됨 ' + new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}) : '이 브라우저는 임시 저장을 지원하지 않습니다';
+}
+
+function answerText(key, f, d){
+  const nm = key+'__'+f.id;
+  let v = d[nm];
+  if(Array.isArray(v)){ v = v.join(', '); const etc = d[nm+'__etc']; if(etc) v += (v?' / ':'') + '기타: ' + etc; }
+  return (v && String(v).trim()) ? String(v) : '(미작성)';
+}
+
+function buildReport(key){
+  const F = FORMS[key]; const d = collect(key);
+  const today = new Date();
+  const ds = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  const metaLine = F.meta.map(m=>`${esc(m.label)}: ${esc(answerText(key,m,d))}`).join(' · ');
+  let h = `<div class="rep"><h1>${esc(F.title)}</h1><div class="meta">${metaLine}<br>작성일: ${ds} · 문서 ${APP_VERSION}</div>`;
+  h += F.qs.map((q,i)=>`<div class="rq"><div class="t">${i+1}. ${esc(q.t)}</div><div class="a">${esc(answerText(key,q,d))}</div></div>`).join('');
+  h += `<div class="foot">인시스 AI혁신 연구개발실 · 회신: ys.kim@in-sys.co.kr · ERP AI 에이전트 도입 가이드 ${APP_VERSION}</div></div>`;
+  const metaFirst = answerText(key, F.meta[0], d);
+  const who = metaFirst!=='(미작성)' ? '_' + metaFirst.replace(/[\\/:*?"<>|\s]/g,'') : '';
+  const fname = (key==='staff'?'ERP에이전트_직원질문지':'ERP에이전트_개발자질문지') + who + '_' + ds + '.pdf';
+  return {html:h, fname};
+}
+
+async function exportPdf(key){
+  const st = document.getElementById('st-'+key);
+  const {html, fname} = buildReport(key);
+  const stage = document.getElementById('pdfStage');
+  stage.innerHTML = html;
+  if(typeof html2pdf === 'undefined'){ st.textContent = 'PDF 모듈을 불러오지 못해 인쇄 창으로 엽니다'; printForm(key); return; }
+  st.textContent = 'PDF 만드는 중…';
+  try{
+    if(document.fonts && document.fonts.ready) await document.fonts.ready;
+    await html2pdf().set({
+      margin:[10,10,12,10], filename:fname,
+      image:{type:'jpeg',quality:0.95},
+      html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},
+      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+      pagebreak:{mode:['css','legacy'], avoid:'.rq'}
+    }).from(stage.firstElementChild).save();
+    st.textContent = 'PDF 저장 완료: ' + fname;
+  }catch(e){
+    console.warn('PDF 생성 실패, 인쇄로 전환', e);
+    st.textContent = 'PDF 생성 실패 → 인쇄 창에서 "PDF로 저장"을 선택하세요';
+    printForm(key);
+  }finally{
+    stage.innerHTML = '';
+  }
+}
+
+function printForm(key){
+  const {html} = buildReport(key);
+  const w = window.open('', '_blank');
+  if(!w){ document.getElementById('st-'+key).textContent = '팝업이 차단되었습니다. 팝업 허용 후 다시 눌러주세요'; return; }
+  const css = document.querySelector('style').textContent.match(/\.rep[\s\S]*?\.rep \.foot\{[^}]*\}/);
+  w.document.write(`<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${esc(FORMS[key].title)}</title><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet"><style>body{margin:0}${css?css[0]:''}.rep{width:auto}</style></head><body>${html}<script>window.onload=function(){setTimeout(function(){window.print()},400)}<\/script></body></html>`);
+  w.document.close();
+}
+
+function clearForm(key){
+  if(!confirm('이 질문지의 입력 내용을 모두 지울까요?')) return;
+  lsDel(key);
+  renderForm(key);
+  document.getElementById('st-'+key).textContent = '입력 내용을 지웠습니다';
+}
+
+/* ---------- 탭·화면 ---------- */
+function showTab(id){
+  document.querySelectorAll('#tabbar button').forEach(b=>b.classList.toggle('on', b.dataset.tab===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on', p.id==='p-'+id));
+  try{ history.replaceState(null,'','#'+id); }catch(e){}
+  window.scrollTo(0,0);
+}
+document.getElementById('tabbar').addEventListener('click', e=>{ const b=e.target.closest('button'); if(b) showTab(b.dataset.tab); });
+
+function setView(v){
+  document.body.classList.toggle('view-mobile', v==='m');
+  document.body.classList.toggle('view-pc', v==='p');
+  document.getElementById('vMobile').classList.toggle('on', v==='m');
+  document.getElementById('vPc').classList.toggle('on', v==='p');
+}
+document.getElementById('vMobile').addEventListener('click', ()=>setView('m'));
+document.getElementById('vPc').addEventListener('click', ()=>setView('p'));
+
+document.addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.pdf) exportPdf(b.dataset.pdf);
+  if(b.dataset.print) printForm(b.dataset.print);
+  if(b.dataset.clear) clearForm(b.dataset.clear);
+});
+
+renderForm('staff');
+renderForm('dev');
+setView('m');
+const h0 = (location.hash||'').slice(1);
+if(h0 && document.getElementById('p-'+h0)) showTab(h0);
+</script>
+</body>
+</html>
