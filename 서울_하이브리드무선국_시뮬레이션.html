@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>서울 하이브리드 무선국 시뮬레이션 v1.0</title>
+<title>서울 하이브리드 무선국 시뮬레이션 v1.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -36,7 +36,7 @@ p{margin:0 0 4px}
 .btn:hover{background:#e8eef6}
 .btn.on{background:var(--navy);color:#fff}
 .btn.pri{background:var(--navy);color:#fff}
-#mapbox{width:100%;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#f4f7fb}
+#mapbox{width:100%;max-width:900px;margin:0 auto;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#f4f7fb}
 #map{display:block;cursor:crosshair;outline:none}
 #map:focus-visible{outline:3px solid #2f6fba}
 .legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:1rem;color:var(--sub)}
@@ -75,7 +75,7 @@ footer{text-align:center;color:var(--sub);font-size:1rem;padding:4px 0 12px}
 </head>
 <body class="m">
 <header class="nav"><div class="nav-inner">
-  <div class="brand">서울 하이브리드 무선국 <span class="app-version">v1.0</span></div>
+  <div class="brand">서울 하이브리드 무선국 <span class="app-version">v1.1</span></div>
   <div class="tg"><button id="bM" class="on" type="button">모바일</button><button id="bP" type="button">PC</button></div>
 </div></header>
 <main class="wrap">
@@ -88,7 +88,7 @@ footer{text-align:center;color:var(--sub);font-size:1rem;padding:4px 0 12px}
 </section>
 
 <section class="card">
-  <h2>개략 지도 <span class="sub" style="font-weight:400">(축척 근사 · 위치는 구·동 수준)</span></h2>
+  <h2>개략 지도 <span class="sub" style="font-weight:400">(서울 전역 · 축척 근사 · 위치는 구·동 수준)</span></h2>
   <div id="mapbox"><svg id="map" tabindex="0" role="img" aria-label="서울 하이브리드 무선국 개략도. 방향키로 대응차를 이동할 수 있습니다."></svg></div>
   <div class="legend" id="legend"></div>
   <div class="row"><label><input type="checkbox" id="uvOn" checked> UV 리피터 표시</label><label style="min-width:auto"><input type="checkbox" id="vehOn" checked> 대응차 노드 켜기</label></div>
@@ -127,27 +127,27 @@ footer{text-align:center;color:var(--sub);font-size:1rem;padding:4px 0 12px}
   <h2>가정 및 한계</h2>
   <ul class="t">
     <li>FRC 주파수는 정해지지 않아 145.620으로 가정했습니다.</li>
-    <li>도달 반경은 가정값입니다. 지형·안테나·출력에 따라 달라지므로 현장 측정으로 조정하세요.</li>
-    <li>위치는 구·동 수준의 개략 좌표이고 거리는 직선거리 근사입니다. 실제 주소가 아닙니다.</li>
+    <li>도달 반경은 가정값이며 최대 30 km까지 조절할 수 있습니다. 지형·안테나·출력에 따라 달라지므로 현장 측정으로 조정하세요.</li>
+    <li>위치는 구·동 수준의 개략 좌표이고 거리는 직선거리 근사입니다. 서울 경계와 한강도 개략 표시이며 실제 주소가 아닙니다.</li>
     <li>채널 간격 기준 20 kHz는 가정값입니다. 허가 사항은 제외하고 기술적 간섭만 판정합니다.</li>
   </ul>
 </section>
-<footer>서울 하이브리드 무선국 시뮬레이션 <span class="app-version">v1.0</span> · <span id="appdate"></span></footer>
+<footer>서울 하이브리드 무선국 시뮬레이션 <span class="app-version">v1.1</span> · <span id="appdate"></span></footer>
 </main>
 
 <script>
 (function(){
 'use strict';
-var APP_VER='v1.0', APP_DATE='2026-11-23';
+var APP_VER='v1.1', APP_DATE='2026-11-23';
 var vs=document.querySelectorAll('.app-version'); for(var i=0;i<vs.length;i++) vs[i].textContent=APP_VER;
 document.getElementById('appdate').textContent=APP_DATE;
 
-var B={lon0:126.77,lon1:127.10,lat0:37.45,lat1:37.62}, KL=88.4, KT=111;
+var B={lon0:126.76,lon1:127.19,lat0:37.41,lat1:37.72}, KL=88.4, KT=111;
 var ST=[
- {id:'arc',name:'ARC 신월동',short:'ARC',lon:126.83,lat:37.525,f:145.640,r:5,color:'#1f4e8c',note:'HRI-200 FM 노드 (DS0ARC)',dx:0,dy:-16,anc:'middle'},
- {id:'lfc',name:'LFC 여의도',short:'LFC',lon:126.93,lat:37.525,f:145.620,r:5,color:'#0f766e',note:'WIRES-X 노드 · 436.140 UV 리피터 병설',dx:0,dy:-16,anc:'middle'},
- {id:'frc',name:'FRC 마장동',short:'FRC',lon:127.04,lat:37.565,f:145.620,r:5,color:'#6b46a3',note:'HL0FRC · 주파수 미정(145.620 가정)',dx:0,dy:-16,anc:'middle'},
- {id:'veh',name:'대응차 DS0ARC/M',short:'대응차',lon:126.845,lat:37.528,f:145.620,r:3,color:'#c2570c',note:'이동 · 주파수 가변 (지도에서 끌어 옮기기)',dx:14,dy:5,anc:'start',mobile:true,on:true}
+ {id:'arc',name:'ARC 신월동',short:'ARC',lon:126.83,lat:37.525,f:145.640,r:5,color:'#1f4e8c',note:'HRI-200 FM 노드 (DS0ARC)',dx:0,dy:-14,anc:'middle'},
+ {id:'lfc',name:'LFC 여의도',short:'LFC',lon:126.93,lat:37.525,f:145.620,r:5,color:'#0f766e',note:'WIRES-X 노드 · 436.140 UV 리피터 병설',dx:0,dy:-14,anc:'middle'},
+ {id:'frc',name:'FRC 마장동',short:'FRC',lon:127.04,lat:37.565,f:145.620,r:5,color:'#6b46a3',note:'HL0FRC · 주파수 미정(145.620 가정)',dx:0,dy:-14,anc:'middle'},
+ {id:'veh',name:'대응차 DS0ARC/M',short:'대응차',lon:126.845,lat:37.528,f:145.620,r:3,color:'#c2570c',note:'이동 · 주파수 가변 (지도에서 끌어 옮기기)',dx:0,dy:50,anc:'middle',mobile:true,on:true}
 ];
 var PRE=[
  {n:'ARC 인근 집결',lon:126.845,lat:37.528},
@@ -206,9 +206,12 @@ function stLevel(s,pairs){
 }
 
 function labelSvg(x,y,txt,fs,anc,color){
-  var w=tw(txt,fs), h=fs+8, x0= anc==='end'? x-w : (anc==='middle'? x-w/2 : x);
-  return '<rect x="'+x0.toFixed(1)+'" y="'+(y-fs-1).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+h+'" rx="5" fill="#fff" fill-opacity=".88" stroke="'+color+'" stroke-width="1"/>'+
-         '<text x="'+(x0+5).toFixed(1)+'" y="'+(y+2).toFixed(1)+'" font-size="'+fs+'" font-weight="700" fill="'+color+'">'+txt+'</text>';
+  var ls=txt.split('\n'), w=0, i, n=ls.length, lh=fs+3;
+  for(i=0;i<n;i++) w=Math.max(w,tw(ls[i],fs));
+  var x0= anc==='end'? x-w : (anc==='middle'? x-w/2 : x), top=y-(n-1)*lh-fs-1;
+  var out='<rect x="'+x0.toFixed(1)+'" y="'+top.toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+(n*lh+5)+'" rx="5" fill="#fff" fill-opacity=".88" stroke="'+color+'" stroke-width="1"/>';
+  for(i=0;i<n;i++) out+='<text x="'+(x0+5).toFixed(1)+'" y="'+(top+fs+3+i*lh).toFixed(1)+'" font-size="'+fs+'" font-weight="700" fill="'+color+'">'+ls[i]+'</text>';
+  return out;
 }
 
 function draw(){
@@ -217,13 +220,16 @@ function draw(){
   H=Math.round(W*((B.lat1-B.lat0)*KT)/((B.lon1-B.lon0)*KL));
   var fs=W>=700?16:14, k=kmpx(), s='', i, st;
   svg.setAttribute('width',W); svg.setAttribute('height',H); svg.setAttribute('viewBox','0 0 '+W+' '+H);
-  s+='<rect width="'+W+'" height="'+H+'" fill="#f4f7fb"/>';
+  s+='<rect width="'+W+'" height="'+H+'" fill="#e8edf3"/>';
+  var SEOUL=[[126.77,37.57],[126.80,37.60],[126.86,37.64],[126.92,37.67],[126.98,37.70],[127.05,37.70],[127.10,37.67],[127.12,37.62],[127.17,37.58],[127.18,37.54],[127.15,37.50],[127.16,37.46],[127.08,37.43],[126.99,37.42],[126.92,37.43],[126.86,37.45],[126.82,37.49],[126.79,37.52]], sd='';
+  for(i=0;i<SEOUL.length;i++){var q0=P(SEOUL[i][0],SEOUL[i][1]); sd+=(i?'L':'M')+q0.x.toFixed(1)+' '+q0.y.toFixed(1)+' ';}
+  s+='<path d="'+sd+'Z" fill="#f7f9fc" stroke="#8fa3b8" stroke-width="2" stroke-dasharray="8 5"/>';
   for(var x=0;x<W;x+=5*k) s+='<line x1="'+x.toFixed(1)+'" y1="0" x2="'+x.toFixed(1)+'" y2="'+H+'" stroke="#e1e8f1" stroke-width="1"/>';
   for(var y=0;y<H;y+=5*k) s+='<line x1="0" y1="'+y.toFixed(1)+'" x2="'+W+'" y2="'+y.toFixed(1)+'" stroke="#e1e8f1" stroke-width="1"/>';
-  var rv=[[126.74,37.600],[126.80,37.592],[126.86,37.572],[126.90,37.545],[126.935,37.532],[126.98,37.525],[127.03,37.520],[127.08,37.525],[127.14,37.535]], d='';
+  var rv=[[126.76,37.602],[126.80,37.592],[126.86,37.572],[126.90,37.545],[126.935,37.532],[126.98,37.525],[127.03,37.520],[127.08,37.525],[127.14,37.535],[127.19,37.55]], d='';
   for(i=0;i<rv.length;i++){var p=P(rv[i][0],rv[i][1]); d+=(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)+' ';}
   s+='<path d="'+d+'" fill="none" stroke="#bcd7ee" stroke-width="'+Math.max(8,2.2*k).toFixed(1)+'" stroke-linecap="round" stroke-linejoin="round"/>';
-  var rl=P(126.775,37.572); s+='<text x="'+rl.x.toFixed(1)+'" y="'+rl.y.toFixed(1)+'" font-size="'+fs+'" fill="#4f7aa3" font-weight="500">한강(개략)</text>';
+  var rl=P(126.785,37.570); s+='<text x="'+rl.x.toFixed(1)+'" y="'+rl.y.toFixed(1)+'" font-size="'+fs+'" fill="#4f7aa3" font-weight="500">한강(개략)</text>';
   var A=active();
   for(i=0;i<A.length;i++){
     st=A[i]; var c=P(st.lon,st.lat);
@@ -232,7 +238,7 @@ function draw(){
   if(showUV){
     var l=get('lfc'), lc=P(l.lon,l.lat);
     s+='<circle cx="'+lc.x.toFixed(1)+'" cy="'+lc.y.toFixed(1)+'" r="'+(uvR*k).toFixed(1)+'" fill="none" stroke="#5a6b7d" stroke-width="2" stroke-dasharray="3 6"/>';
-    s+=labelSvg(lc.x, Math.max(fs+8, lc.y-uvR*k-6), '436.140 UV 리피터(참고)', fs, 'middle', '#44566b');
+    s+=labelSvg(lc.x, Math.min(H-fs-14, lc.y+uvR*k+fs+4), '436.140 UV 리피터(참고)', fs, 'middle', '#44566b');
   }
   var pairs=allPairs();
   pairs.forEach(function(q){
@@ -244,12 +250,13 @@ function draw(){
     st=A[i]; var m=P(st.lon,st.lat);
     if(st.mobile){ s+='<rect x="'+(m.x-8).toFixed(1)+'" y="'+(m.y-8).toFixed(1)+'" width="16" height="16" rx="3" fill="'+st.color+'" stroke="#fff" stroke-width="2" transform="rotate(45 '+m.x.toFixed(1)+' '+m.y.toFixed(1)+')"/>'; }
     else { s+='<circle cx="'+m.x.toFixed(1)+'" cy="'+m.y.toFixed(1)+'" r="8" fill="'+st.color+'" stroke="#fff" stroke-width="2"/>'; }
-    s+=labelSvg(m.x+st.dx, m.y+st.dy, st.short+' '+fmt(st.f), fs, st.anc, st.color);
+    s+=labelSvg(m.x+st.dx, m.y+st.dy, st.short+'\n'+fmt(st.f), fs, st.anc, st.color);
   }
   pairs.forEach(function(q){
     if(!q.ov||!q.lvl) return;
     var a=P(q.a.lon,q.a.lat), b=P(q.b.lon,q.b.lat), col=q.lvl===2?'#8f1d14':'#6b4400';
-    s+=labelSvg((a.x+b.x)/2,(a.y+b.y)/2+fs+12, ICON[q.lvl]+' '+q.d.toFixed(1)+'km',fs,'middle',col);
+    var mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+    s+='<circle cx="'+mx.toFixed(1)+'" cy="'+my.toFixed(1)+'" r="14" fill="#fff" stroke="'+col+'" stroke-width="3"/><text x="'+mx.toFixed(1)+'" y="'+(my+5).toFixed(1)+'" font-size="'+fs+'" font-weight="700" fill="'+col+'" text-anchor="middle">'+ICON[q.lvl]+'</text>';
   });
   var sb=5*k, x1=W-10, x0=x1-sb; s+='<line x1="'+x0.toFixed(1)+'" y1="'+(H-14)+'" x2="'+x1.toFixed(1)+'" y2="'+(H-14)+'" stroke="#44566b" stroke-width="3"/>';
   s+='<text x="'+(x0-6).toFixed(1)+'" y="'+(H-9)+'" font-size="'+fs+'" fill="#44566b" text-anchor="end">5 km</text>';
@@ -290,12 +297,12 @@ function buildCtrl(){
   ST.forEach(function(s){
     h+='<div class="st"><div class="sh"><span class="dot" style="background:'+s.color+'"></span><b>'+s.name+'</b><span class="chip c0" id="chip-'+s.id+'">✔ 정상</span></div><div class="note">'+s.note+'</div>'+
        '<div class="row"><label for="f-'+s.id+'">주파수(MHz)</label><input type="number" id="f-'+s.id+'" step="0.005" min="144" max="146" value="'+fmt(s.f)+'"></div>'+
-       '<div class="row"><label for="r-'+s.id+'">도달 반경</label><input type="range" id="r-'+s.id+'" min="1" max="15" step="0.5" value="'+s.r+'"><output id="o-'+s.id+'">'+s.r+' km</output></div>';
+       '<div class="row"><label for="r-'+s.id+'">도달 반경</label><input type="range" id="r-'+s.id+'" min="1" max="30" step="0.5" value="'+s.r+'"><output id="o-'+s.id+'">'+s.r+' km</output></div>';
     if(s.mobile) h+='<div class="row"><button type="button" class="btn pri" id="recBtn">추천 주파수 적용</button><span class="note" id="recTxt"></span></div>';
     h+='</div>';
   });
   h+='<div class="st"><div class="sh"><span class="dot" style="background:#5a6b7d"></span><b>LFC UV 리피터 436.140</b></div><div class="note">참고 표시 · 145 MHz 판정에서 제외</div>'+
-     '<div class="row"><label for="r-uv">도달 반경</label><input type="range" id="r-uv" min="2" max="20" step="0.5" value="'+uvR+'"><output id="o-uv">'+uvR+' km</output></div></div>';
+     '<div class="row"><label for="r-uv">도달 반경</label><input type="range" id="r-uv" min="2" max="30" step="0.5" value="'+uvR+'"><output id="o-uv">'+uvR+' km</output></div></div>';
   $('ctrl').innerHTML=h;
   ST.forEach(function(s){
     $('f-'+s.id).addEventListener('input',function(e){var v=parseFloat(e.target.value); if(!isNaN(v)){s.f=v; refresh();}});
