@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>HL2TLS FM 노드 설정 가이드 v1.1</title>
+<title>HL2TLS FM 노드 설정 가이드 v1.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -66,328 +66,95 @@ body.m .wrap{max-width:480px}
 body.m header.cover{max-width:464px}
 body.m .nav-inner{max-width:480px}
 @media print{nav.nav{display:none}}
+.fig{margin:6px 0}.fig img{width:100%;height:auto;border:1px solid var(--line);border-radius:6px;display:block}.fig figcaption{color:#475569;font-size:.875rem;margin-top:2px}
+.go{display:inline-block;background:var(--hl);border-radius:4px;padding:0 6px;font-weight:700}
 </style>
 </head>
 <body class="m">
-<header class="cover">
-  <h1>HL2TLS FM 노드 설정 가이드</h1>
-  <p><span class="badge">v1.1</span>WIRES-X · HRI-200 · FTM-510D / 메뉴별 상세 설정 · 대한적십자사 서울특별시지사 재난대응봉사회 RC-NET</p>
-</header>
-<nav class="nav"><div class="nav-inner">
-  <a href="#s0">0 준비</a><a href="#s1">1 설치</a><a href="#s2">2 포트·연결</a><a href="#s3">3 설정 진입</a>
-  <a href="#s4">4 Personal</a><a href="#s5">5 Device</a><a href="#s6">6 HRI-200</a><a href="#s7">7 Call</a>
-  <a href="#s8">8 General</a><a href="#s9">9 오디오</a><a href="#s10">10 ONLINE</a><a href="#s11">11 문제해결</a><a href="#s12">12 체크</a>
-  <button class="tog" id="tog" type="button">PC 화면</button>
-</div></nav>
+<header class="cover"><h1>HL2TLS FM 노드 설정 가이드</h1><p><span class="badge">v1.2</span>WIRES-X · HRI-200 · FTM-510D / 실제 화면 기준 메뉴별 설정 · 대한적십자사 서울특별시지사 재난대응봉사회 RC-NET</p></header>
+<nav class="nav"><div class="nav-inner"><a href="#s0">0 준비</a><a href="#s2">2 포트</a><a href="#s3">3 진입</a><a href="#s4">4 Transceiver</a><a href="#s5">5 Preset</a><a href="#s6">6 Node</a><a href="#s7">7 Room</a><a href="#s8">8 Location</a><a href="#s9">9 HRI-200</a><a href="#s10">10 Call</a><a href="#s11">11 General</a><a href="#s12">12 Sound</a><a href="#s13">13 List</a><a href="#s14">14 Log</a><a href="#s15">15 오디오</a><a href="#s16">16 시험</a><a href="#s17">17 문제해결</a><a href="#s18">18 체크</a><button class="tog" id="tog" type="button">PC 화면</button></div></nav>
 <main class="wrap">
-
 <section class="card" id="s0">
 <h2>0. 준비물과 전제</h2>
-<div class="tbl"><table>
-<tr><th style="width:34%">항목</th><th>내용</th></tr>
-<tr><td>HRI-200</td><td>본체 뒷면 <b>S/N 스티커</b> 확인(등록 시 사용)</td></tr>
-<tr><td>케이블</td><td>CT-174(10핀) → RADIO 1 / USB 케이블 → PC</td></tr>
-<tr><td>무전기(전제)</td><td>FTM-510D (DS0ARC와 동일 구성 가정)</td></tr>
-<tr><td>승인 메일</td><td>YAESU에서 받은 <b>Node ID, Room ID</b> 메일</td></tr>
-<tr><td>배정 주파수</td><td>HL2TLS 노드용 FM 주파수 (<span class="fill">&nbsp;</span> MHz)</td></tr>
-<tr><td>PC</td><td>Windows 10/11, USB 포트 1개</td></tr>
-</table></div>
-<div class="warn"><b>Windows 11 주의:</b> 스마트 앱 컨트롤(Smart App Control)이 켜져 있으면 설치 중 “이 앱의 일부가 차단됨” 오류가 날 수 있습니다. 끄면 다시 켤 수 없으니 신중히 결정하세요.</div>
-<div class="note">이 문서의 Node ID·S/N은 <b>입력란</b>으로 비워 두었습니다. 본인 값은 12장 표에 적어 두세요.</div>
+<div class="tbl"><table><tr><th style="width:34%">항목</th><th>내용</th></tr><tr><td>HRI-200</td><td>본체 뒷면 <b>S/N 스티커</b> 확인</td></tr><tr><td>케이블</td><td>CT-174(10핀) → RADIO 1 / USB 케이블 → PC</td></tr><tr><td>무전기</td><td>FTM-510D (화면상 DST: JPN FW, F/W 1.03)</td></tr><tr><td>승인 메일</td><td>YAESU에서 받은 <b>Node ID(DTMF ID), Room ID</b></td></tr><tr><td>배정 주파수</td><td>HL2TLS 노드용 FM 주파수</td></tr><tr><td>PC</td><td>Windows 10/11, USB 포트 1개</td></tr></table></div><div class="warn"><b>Windows 11 주의:</b> 스마트 앱 컨트롤(Smart App Control)이 켜져 있으면 설치 중 “이 앱의 일부가 차단됨” 오류가 날 수 있습니다. 끄면 다시 켤 수 없으니 신중히 결정하세요.</div>
 </section>
-
 <section class="card" id="s1">
 <h2>1. 설치 순서</h2>
-<ol>
-<li><b>HRI-200 드라이버</b>를 먼저 설치합니다. (이 단계에서는 USB를 꽂지 않음)</li>
-<li><b>WIRES-X 소프트웨어</b>를 설치합니다.</li>
-<li>PC를 <b>재부팅</b>합니다.</li>
-<li>재부팅 후 HRI-200을 USB로 연결하고 CT-174로 무전기 RADIO 1에 연결합니다.</li>
-</ol>
-<div class="note">순서: <b>소프트웨어 먼저 → 무전기 나중</b>. 순서가 바뀌면 COM 포트가 잡히지 않을 수 있습니다.</div>
+<ol><li><b>HRI-200 드라이버</b> 먼저 설치 (USB는 아직 연결하지 않음)</li><li><b>WIRES-X 소프트웨어</b> 설치</li><li>PC <b>재부팅</b></li><li>재부팅 후 HRI-200을 USB로 연결하고 CT-174로 무전기에 연결</li></ol><div class="note">순서: <b>소프트웨어 먼저 → 무전기 나중</b>.</div>
 </section>
-
 <section class="card" id="s2">
 <h2>2. HRI-200 포트 연결과 실행</h2>
-<h3>2-1. HRI-200 뒷면 단자</h3>
-<div class="tbl"><table>
-<tr><th style="width:22%">단자</th><th>용도</th><th style="width:30%">HL2TLS</th></tr>
-<tr><td><b>RADIO 1</b></td><td><b>주 연결(음성 채널)</b>. 무전기 DATA 단자와 CT-174(10핀↔10핀)로 연결</td><td><b>여기에 연결</b></td></tr>
-<tr><td>RADIO 2</td><td>C4FM 디지털 <b>두 번째 무전기</b>(프리셋 검색용) 전용. 무전기 1대면 사용 안 함</td><td>비워 둠</td></tr>
-<tr><td>USB</td><td>PC 연결 겸 전원 공급(Type B 쪽이 HRI-200)</td><td>PC USB에 연결</td></tr>
-<tr><td>MONITOR</td><td>노드가 송신하는 소리를 이어폰·스피커로 듣는 3.5mm 잭</td><td>선택</td></tr>
-</table></div>
-<div class="ok"><b>정리:</b> 무전기 1대 구성은 <b>RADIO 1 ↔ 무전기 뒷면 DATA 단자(10핀)</b>, 케이블은 <b>CT-174</b>. 포트 1·2는 “1번=주 무전기, 2번=두 번째 무전기”입니다. RADIO 2에는 꽂지 않습니다.</div>
-<div class="note">무전기 쪽은 시리얼 포트가 아니라 뒷면 <b>DATA 단자</b>입니다. 6핀 DATA 단자의 아날로그 전용 기종은 CT-175를 씁니다. FTM-510D의 DATA 단자 핀 수는 실물에서 확인하세요(DS0ARC와 같은 CT-174 구성 가정). 연결 전 무전기 전원은 끄고, 무전기는 별도 DC 13.8V로 전원을 공급합니다.</div>
-<h3>2-2. 실행과 확인</h3>
-<ol>
-<li>무전기 전원을 켤 때 <span class="kbd">GM</span> + <span class="kbd">D/X</span> 키를 함께 누르고 있으면 연결 전용(HRI-200) 모드로 시작합니다. 화면에 <b>HRI-200</b>이 표시되면 정상입니다.</li>
-<li>PC에서 WIRES-X를 실행합니다.</li>
-<li>COM 포트 선택 창이 나오면 HRI-200 포트를 고릅니다. (장치 관리자 → 포트(COM & LPT)에서 확인)</li>
-</ol>
-<div class="ok"><b>확인:</b> 무전기 화면 “HRI-200” 표시 + WIRES-X 창이 열림.</div>
+<div class="tbl"><table><tr><th style="width:22%">단자</th><th style="width:56%">용도</th><th>HL2TLS</th></tr><tr><td><b>RADIO 1</b></td><td>주 연결(음성 채널). 무전기 뒷면 <b>DATA 단자</b>와 CT-174(10핀↔10핀)</td><td><b>여기에 연결</b></td></tr><tr><td>RADIO 2</td><td>C4FM 디지털 <b>두 번째 무전기</b>(프리셋 검색용) 전용</td><td>비워 둠</td></tr><tr><td>USB</td><td>PC 연결 겸 전원(Type B 쪽이 HRI-200)</td><td>PC에 연결</td></tr><tr><td>MONITOR</td><td>노드 송신음 확인용 3.5mm 잭</td><td>선택</td></tr></table></div><div class="ok">무전기 1대 구성: <b>RADIO 1 ↔ 무전기 DATA 단자(CT-174)</b>. RADIO 2는 사용하지 않습니다.</div><ol><li>무전기 전원을 켤 때 <span class="kbd">GM</span> + <span class="kbd">D/X</span>를 함께 눌러 <b>HRI-200</b> 표시 확인</li><li>PC에서 WIRES-X 실행 → COM 포트 선택 창이 나오면 HRI-200 포트 선택</li></ol><div class="note">무전기는 별도 DC 13.8V로 전원을 공급하고, 연결 전에 전원을 끕니다.</div>
 </section>
-
 <section class="card" id="s3">
-<h2>3. 설정 화면 들어가기 (공통 규칙)</h2>
-<div class="dlg"><div class="tb">WIRES-X</div><div class="bd">
-<div class="mu"><span class="sel">File</span><span>View</span><span>Help</span></div>
-<div class="row sel"><span class="k">File → Settings</span></div>
-</div></div>
-<p>왼쪽 메뉴에서 항목을 고르고 값을 입력한 뒤 <b>Apply → OK</b> 순서로 저장합니다. 항목마다 저장이 필요합니다.</p>
-<div class="tbl"><table><tr><th style="width:26%">대분류</th><th>포함 항목 (이 문서 장)</th></tr><tr><td>Personal settings</td><td>WIRES ID information · Location settings · Round QSO room settings (4장)</td></tr><tr><td>Device settings</td><td>Transceiver — Voice CH · Preset Search CH (5장)</td></tr><tr><td>Property</td><td>HRI-200 setup (6장) · Call settings (7장) · General · Announcement · Sound · Digital ID · Make list file · Log file (8장)</td></tr></table></div><div class="note">메뉴 이름은 소프트웨어 버전에 따라 조금 다를 수 있습니다. 모든 항목의 기능은 YAESU HRI-200 영문 매뉴얼(2205-M판) 기준입니다.</div>
+<h2>3. 설정 화면 들어가기</h2>
+<p><span class="go">File → Settings</span> 를 엽니다. 왼쪽 트리에서 항목을 고르고 값을 바꾼 뒤 <b>Apply</b>, 모두 끝나면 <b>OK</b>.</p><div class="tbl"><table><tr><th style="width:26%">대분류</th><th>하위 항목 (이 문서 장)</th></tr><tr><td>Device settings</td><td>Transceiver (4장) · Transceiver settings (Preset CH) (5장)</td></tr><tr><td>Personal settings</td><td>Node settings (6장) · Round QSO room settings (7장) · Location settings (8장)</td></tr><tr><td>Property</td><td>HRI-200 setup (9장) · Call settings (10장) · General settings (11장) · Sound settings (12장) · Make list file (13장) · Log file settings (14장)</td></tr></table></div><div class="note">장 번호 순서대로 하나씩 진행하세요. 각 장의 사진은 실제 HL2TLS 화면이며, 장비 시리얼 번호는 가렸습니다. 처음 실행할 때 나오는 <b>WIRES ID Activation</b> 창(Serial/Radio ID, DTMF ID Node/Room, CallSign, User ID, City/State/Country)은 승인 메일 값을 입력하고 ID Entry를 누르면 되며, 이 값이 6장 Node settings에 표시됩니다.</div><div class="bad"><b>“Serial number/Radio ID and DTMF ID do not match”</b> → ① S/N 오타(0과 O) ② Node ID가 이 S/N으로 등록된 번호인지 메일 확인 ③ 다른 장비 번호가 아닌지 ④ 그래도 안 되면 YAESU에 등록 정보 확인 요청</div>
 </section>
-
 <section class="card" id="s4">
-<h2>4. Personal settings (개인 설정) — 노드 정보</h2>
-<div class="note">경로: File → Settings → Personal settings. 아래 3개 항목이 들어 있습니다: <b>WIRES ID information</b>(노드 등록 정보) · <b>Location settings</b>(위치) · <b>Round QSO room settings</b>(라운드 QSO 룸).</div>
-
-<h3>4-1. WIRES ID information (노드 ID 정보)</h3>
-<div class="tbl"><table>
-<tr><th style="width:26%">항목</th><th>기능</th><th style="width:30%">HL2TLS 설정</th></tr>
-<tr><td>Serial No.</td><td>HRI-200 시리얼 번호. 자동 표시. 등록된 번호와 같아야 함</td><td>스티커와 대조만</td></tr>
-<tr><td>DTMF ID</td><td>아날로그 접속용 5자리 번호(Node ID). 핸디에서 #+번호로 부를 때 사용</td><td>YAESU 승인 메일의 Node ID</td></tr>
-<tr><td>CallSign</td><td>노드 호출부호. 노드 목록에 표시</td><td>HL2TLS</td></tr>
-<tr><td>User ID</td><td>디지털 접속용 이름(최대 10자). 하단 <b>User ID change</b> 버튼으로 변경</td><td>호출부호 계열로 입력</td></tr>
-<tr><td>City / State / Country</td><td>설치 지역. 서버 노드 목록에 표시</td><td>등록 메일과 동일하게</td></tr>
-<tr><td>Comment</td><td>노드 목록에 표시되는 설명 글</td><td>Korean Red Cross Seoul NDRT</td></tr>
-<tr><td>Confidential ID</td><td>체크 시 서버 목록에서 이 노드를 숨김(비공개)</td><td>☐ 체크 안 함</td></tr>
-<tr><td>QSL exchange</td><td>QSL 카드 이미지를 주고받는 기능. […]로 이미지 파일 선택</td><td>사용 안 함(기본)</td></tr>
-<tr><td>Get info. text</td><td>상대가 Get Info 기능으로 조회할 때 보이는 안내 문구</td><td>비워도 무방</td></tr>
-</table></div>
-<h3>User ID change 창</h3>
-<div class="tbl"><table>
-<tr><th style="width:26%">항목</th><th>기능</th></tr>
-<tr><td>Serial No. / DTMF ID</td><td>표시만 됨, 변경 불가</td></tr>
-<tr><td>User ID</td><td>최대 10자</td></tr>
-<tr><td>Style</td><td><b>Open</b>(기본) / <b>GM</b>(GM 사용자 중심 운용)</td></tr>
-<tr><td>News setting</td><td><b>ALL OK</b>(기본) 모두 허용 / Download only 받기만 / QSO only 교신만</td></tr>
-</table></div>
-<div class="bad"><b>“Serial number/Radio ID and DTMF ID do not match”</b> → ① S/N 오타(0과 O) ② Node ID가 이 S/N으로 등록된 번호인지 메일 확인 ③ 다른 장비의 번호가 아닌지 ④ 그래도 안 되면 YAESU에 등록 정보 확인 요청</div>
-<div class="note">입력 후 <b>ID Entry</b> 버튼 → 완료 확인 → Apply → OK. (ID Entry 화면이 먼저 뜨는 소프트웨어 버전도 있음)</div>
-
-<h3>4-2. Location settings (위치)</h3>
-<div class="tbl"><table>
-<tr><th style="width:26%">항목</th><th>기능</th><th style="width:30%">HL2TLS 설정</th></tr>
-<tr><td>Latitude / Longitude</td><td>노드 위치(WGS-84 좌표). 서버 목록·지도에 사용</td><td>설치 장소 좌표(선택)</td></tr>
-<tr><td>Read GPS data</td><td>GPS 내장 무전기에서 현재 위치를 읽어 옴</td><td>고정국은 불필요</td></tr>
-<tr><td>Show position data</td><td>체크 시 위치를 서버 목록과 연결된 디지털 노드에 공개</td><td>공개 여부는 운용자 판단(미체크 가능)</td></tr>
-</table></div>
-
-<h3>4-3. Round QSO room settings (라운드 QSO 룸)</h3>
-<div class="note"><b>룸을 직접 여는 노드만</b> 쓰는 항목입니다. RC-NET에서는 DS0ARC가 룸(48182)을 개설하므로 <b>HL2TLS는 설정하지 않습니다.</b></div>
-<div class="tbl"><table>
-<tr><th style="width:26%">항목</th><th>기능</th></tr>
-<tr><td>Setup 버튼</td><td>Room Open 창을 엶</td></tr>
-<tr><td>User ID / DTMF ID</td><td>룸 ID(최대 16자) / 룸 DTMF 번호</td></tr>
-<tr><td>Room Name · Comment</td><td>룸 이름·설명(목록 표시)</td></tr>
-<tr><td>Confidential ID · QSL exchange · Room information</td><td>룸 비공개 / QSL 교환 / 룸 정보 문구</td></tr>
-<tr><td>Room Open: Room Active</td><td>체크 시 룸 활성화</td></tr>
-<tr><td>Room Open: Room Activation</td><td>룸 정보를 서버에 전송</td></tr>
-<tr><td>Room Open: Style</td><td>Open(누구나) / Closed(제한) / GM(디지털 모드 필요)</td></tr>
-<tr><td>Room Open: News setting</td><td>ALL OK / Download only / QSO only</td></tr>
-</table></div>
+<h2>4. Device settings → Transceiver</h2>
+<figure class="fig"><a href="hl2tls_img/xcvr.jpg" target="_blank" rel="noopener"><img src="hl2tls_img/xcvr.jpg" alt="Transceiver 화면"></a><figcaption>Transceiver 화면 (누르면 크게 보임)</figcaption></figure><div class="tbl"><table><tr><th style="width:30%">항목</th><th style="width:22%">설정</th><th>기능</th></tr><tr><td>Transceiver / DST / F/W version</td><td>FTM-510D / JPN FW / 1.03</td><td>연결된 무전기 기종·펌웨어 표시(수정 불가)</td></tr><tr><td>Modulation</td><td><b>RX:FM – TX:FM</b></td><td>아날로그 FM 운용. 회색이면 ONLINE 중이라 잠긴 상태</td></tr><tr><td>Narrow Deviation</td><td>☐</td><td>협대역 변조. 사용 안 함</td></tr><tr><td>C4FM detect</td><td>비움</td><td>디지털 운용 때 신호 감지 방식. 아날로그는 사용 안 함</td></tr><tr><td>Power</td><td><b>Low</b></td><td>송신 출력. 휴대용 박스는 저출력</td></tr><tr><td>Hide frequency</td><td>☐</td><td>체크하면 노드 목록에서 주파수를 숨김</td></tr><tr><td>Frequency</td><td><b>배정 주파수</b> (화면: 145.620)</td><td>노드 운용 주파수. 무전기와 같아야 함</td></tr><tr><td>DG-ID</td><td>00 (회색)</td><td>디지털 그룹 ID. 아날로그에서는 사용 안 함</td></tr><tr><td>Analog SQL</td><td><b>NoTone</b></td><td>NoTone / Tone SQL / DCS 중 선택. 톤 없이 운용</td></tr><tr><td>Tone SQL (88.5)</td><td>NoTone이면 무시</td><td>Tone SQL을 고를 때만 적용되는 톤 주파수</td></tr><tr><td>DCS (023)</td><td>NoTone이면 무시</td><td>DCS를 고를 때만 적용되는 코드</td></tr><tr><td>Offset / Reverse</td><td>비움 / ☐</td><td>리피터용 오프셋. 단신(simplex)은 비움</td></tr><tr><td>Uplink(Rx) / Downlink(Tx)</td><td>같은 값 (145.620 / 145.620)</td><td>수신·송신 주파수. 같으면 단신 운용</td></tr></table></div><div class="warn">ONLINE 중에는 Modulation을 바꿀 수 없습니다. OFFLINE → File → Exit → 무전기 전원 OFF → 재시작 후 변경하세요.</div><div class="note">HL2TLS와 LFC(여의도)가 같은 145.620이면 통달 범위가 겹칠 때 간섭이 납니다. 배정 주파수를 확인하세요.</div>
 </section>
-
 <section class="card" id="s5">
-<h2>5. Device settings (장치 설정) — Transceiver</h2>
-<div class="note">경로: File → Settings → Device settings → Transceiver. 무전기와 HRI-200이 주고받는 방식을 정합니다.</div>
-<h3>5-1. Voice CH Transceiver operation mode</h3>
-<div class="tbl"><table>
-<tr><th style="width:26%">선택</th><th>의미</th></tr>
-<tr><td>Digital</td><td>RX:DIGITAL – TX:DIGITAL (C4FM 디지털 운용)</td></tr>
-<tr><td><b>Analog</b></td><td>RX:FM – TX:FM (아날로그 FM 운용) ← <b>HL2TLS 선택</b></td></tr>
-</table></div>
-<h3>5-2. Voice CH (음성 채널)</h3>
-<div class="tbl"><table>
-<tr><th style="width:26%">항목</th><th>기능</th><th style="width:30%">HL2TLS 설정</th></tr>
-<tr><td>Transceiver / DST / F/W version</td><td>연결된 무전기 기종·버전 표시(수정 불가)</td><td>FTM-510D 표시 확인</td></tr>
-<tr><td>Modulation</td><td>현재 변조 방식 표시</td><td>FM</td></tr>
-<tr><td>Frequency (MHz)</td><td>운용 주파수. 무전기와 같게 입력</td><td>배정 주파수</td></tr>
-<tr><td>Narrow deviation</td><td>협대역 변조. RX/TX 따로 지정 불가</td><td>체크 안 함(기본)</td></tr>
-<tr><td>DG-ID (디지털) / Analog SQL (아날로그)</td><td>디지털: 00~99(00=오픈 노드). 아날로그: <b>NoTone</b> / ToneSQL(67.0~254.1 Hz) / DCS(023~754)</td><td><b>NoTone</b></td></tr>
-<tr><td>Power</td><td>송신 출력</td><td>현장 규정에 맞게(저출력 권장)</td></tr>
-<tr><td>Reverse</td><td>체크 시 오프셋 방향 반대(기본은 오프셋을 뺌)</td><td>단신(오프셋 없음)이면 체크 안 함</td></tr>
-<tr><td>Hide frequency settings</td><td>주파수 설정을 숨김(기본 체크)</td><td>기본값</td></tr>
-</table></div>
-<h3>5-3. Preset Search CH (프리셋 검색 채널)</h3>
-<div class="note">무전기 2대(또는 듀얼 수신)로 다른 채널을 탐색하는 기능입니다. HL2TLS는 무전기 1대·단일 채널이므로 <b>OFF</b>.</div>
-<div class="tbl"><table>
-<tr><th style="width:26%">항목</th><th>기능</th></tr>
-<tr><td>Operation mode</td><td>OFF / ON(무전기 2대) / Dual Rcv(무전기 1대 듀얼수신) → <b>OFF</b></td></tr>
-<tr><td>Dual Receive Timing</td><td>1~15초(보통 1)</td></tr>
-<tr><td>Transceiver / DST / F/W</td><td>표시만</td></tr>
-<tr><td>Frequency · Narrow deviation · DG-ID · Power</td><td>검색 채널의 주파수·협대역·DG-ID·출력</td></tr>
-</table></div>
-<div class="warn">ONLINE 상태에서는 Modulation(운용 모드)을 바꿀 수 없습니다. OFFLINE → File → Exit → 무전기 OFF → 재시작 후 변경하세요.</div>
+<h2>5. Device settings → Transceiver settings (Preset CH)</h2>
+<figure class="fig"><a href="hl2tls_img/preset.jpg" target="_blank" rel="noopener"><img src="hl2tls_img/preset.jpg" alt="Preset CH 화면"></a><figcaption>Preset CH 화면 (누르면 크게 보임)</figcaption></figure><div class="tbl"><table><tr><th style="width:30%">항목</th><th style="width:22%">설정</th><th>기능</th></tr><tr><td>Operation mode</td><td><b>OFF</b></td><td>다른 채널을 함께 탐색하는 기능(무전기 2대 또는 듀얼수신). 쓰지 않음</td></tr><tr><td>Dual Receive</td><td>1sec (회색)</td><td>듀얼수신 전환 주기. Dual Rcv일 때만 사용</td></tr><tr><td>Transceiver / DST / F/W version</td><td>비움</td><td>프리셋용 무전기 정보(표시만)</td></tr><tr><td>C4FM detect · Narrow Deviation · Power</td><td>회색</td><td>프리셋 채널용. 사용 안 함</td></tr><tr><td>Frequency Information</td><td>145.620 / DG-ID 00 (회색)</td><td>OFF일 때는 무시</td></tr></table></div><div class="ok">이 화면은 <b>Operation mode = OFF</b>만 확인하고 넘어갑니다.</div>
 </section>
-
 <section class="card" id="s6">
-<h2>6. Property — HRI-200 setup (CH.1)</h2>
-<div class="note">경로: File → Settings → Property → HRI-200 setup. <b>FTM 시리즈(10핀)는 기본값을 바꾸지 않습니다.</b> 아래는 각 항목의 의미입니다.</div>
-<div class="tbl"><table>
-<tr><th style="width:24%">항목</th><th>기능</th><th style="width:14%">기본</th></tr>
-<tr><td>SQL Active</td><td>스켈치 열림 신호의 극성. 스켈치가 닫혔는데 LOCAL 표시등이 계속 켜지면 Low로</td><td>High</td></tr>
-<tr><td>RXin Select</td><td>수신 입력 단자 선택 RX12/RX96. 디지털 운용에서는 RX96 금지</td><td>RX12</td></tr>
-<tr><td>RX12 Input / RX96 Input</td><td>해당 입력의 레벨 Low/High. 디지털끼리 교신에는 영향 없음</td><td>High</td></tr>
-<tr><td>PTT Active</td><td>송신 신호 극성. 송신 안 하는데 ON-AIR가 계속 초록이면 High로</td><td>Low</td></tr>
-<tr><td>TXout Gain</td><td>송신 출력 단자 TX12/TX96</td><td>TX12</td></tr>
-<tr><td>De-emphasis</td><td>수신 음성 고역 감쇠</td><td>☐</td></tr>
-<tr><td>RX Filter</td><td>수신 음성 필터</td><td>☐</td></tr>
-<tr><td>Audio Mute SW (SQL)</td><td>SQL 단자와 수신 음성 스위치 연동</td><td>☐</td></tr>
-<tr><td>MIC BOOST (MAMP)</td><td>매우 작은 입력용 증폭. 음이 깨질 수 있음</td><td>☐</td></tr>
-<tr><td>Pre-emphasis</td><td>송신 음성 고역 강조</td><td>☐</td></tr>
-<tr><td>Tx Filter</td><td>송신 음성 필터</td><td>☐</td></tr>
-</table></div>
-<h3>DTMF 구역</h3>
-<div class="tbl"><table>
-<tr><th style="width:24%">항목</th><th>기능</th><th style="width:14%">기본</th></tr>
-<tr><td>Mute mode</td><td>OFF / Audio mute(DTMF 감지 중 아날로그 소리 차단, PTT 유지)</td><td>OFF</td></tr>
-<tr><td>DTMF detect Gain</td><td>내장 DTMF 디코더 입력 감도 Low/High</td><td>Low</td></tr>
-<tr><td>DTMF Call cancel</td><td>버튼별 선택. 선택 안 한 버튼은 무시됨</td><td>전체 선택</td></tr>
-<tr><td>[HRI-200 Information]</td><td>HRI-200 내부(EEPROM) 값을 읽음</td><td>—</td></tr>
-<tr><td>[Write]</td><td>설정을 HRI-200 EEPROM에 쓰고 다시 읽어 확인</td><td>—</td></tr>
-</table></div>
+<h2>6. Personal settings → Node settings</h2>
+<figure class="fig"><a href="hl2tls_img/node.jpg" target="_blank" rel="noopener"><img src="hl2tls_img/node.jpg" alt="Node settings 화면(시리얼 번호 가림)"></a><figcaption>Node settings 화면(시리얼 번호 가림) (누르면 크게 보임)</figcaption></figure><div class="tbl"><table><tr><th style="width:30%">항목</th><th style="width:22%">설정</th><th>기능</th></tr><tr><td>Serial/Radio ID</td><td>자동 표시(수정 불가)</td><td>HRI-200 시리얼 번호. 스티커와 같은지만 확인</td></tr><tr><td>DTMF ID</td><td>자동 표시(수정 불가)</td><td>메일의 Node ID(5자리). 핸디에서 #+번호로 이 노드를 부를 때 사용</td></tr><tr><td>CallSign</td><td><b>HL2TLS</b></td><td>노드 호출부호. 목록에 표시</td></tr><tr><td>User ID</td><td>HL2TLS-ND2</td><td>디지털 접속용 이름. 바꾸려면 <b>User ID change</b> 버튼 (Style: Open/GM, News setting: ALL OK/Download only/QSO only)</td></tr><tr><td>City / State / Country</td><td>Bucheon-si / Gyeonggi-do / Korea</td><td>설치 지역. 목록에 표시</td></tr><tr><td>Comment</td><td><b>Korean Red Cross Seoul NDRT</b> 입력</td><td>목록에 표시되는 설명(현재 비어 있음)</td></tr><tr><td>Confidential ID</td><td>☐</td><td>체크하면 서버 목록에서 노드를 숨김</td></tr><tr><td>QSL exchange</td><td>☐</td><td>QSL 카드 이미지(320×240 bmp) 교환. 사용 안 함</td></tr><tr><td>Get info. text</td><td>비움(선택)</td><td>상대가 Get Info로 조회할 때 보이는 문구(최대 200자)</td></tr></table></div><div class="note">Comment를 입력했으면 <b>Apply</b>를 누르세요.</div>
 </section>
-
 <section class="card" id="s7">
-<h2>7. Property — Call settings (호출 설정)</h2>
-<div class="tbl"><table>
-<tr><th style="width:30%">항목</th><th>기능</th><th style="width:12%">기본</th><th style="width:20%">HL2TLS</th></tr>
-<tr><td>Round QSO Room connection</td><td>ON: 요청이 오면 인터넷 룸에 연결. OFF: 거부</td><td>ON</td><td>☑</td></tr>
-<tr><td>Accept calls while in Round QSO Rooms</td><td>룸 접속 중 다른 노드 요청이 오면 룸을 끊고 받음. 룸 내 교신 중에는 거부</td><td>OFF</td><td>☐</td></tr>
-<tr><td>Back to Round QSO after disconnect</td><td>위 인터럽트 종료 후 이전 룸으로 복귀</td><td>OFF</td><td>☐</td></tr>
-<tr><td>Return to Room</td><td>소프트웨어 시작 때마다 지정 룸에 자동 접속(24시간 상시, 30초 끊김 감지, 해당 룸은 Unlimited TOT 무시). #55555로도 변경</td><td>OFF</td><td>☑</td></tr>
-<tr><td>Room ID</td><td>접속할 룸(User ID 또는 DTMF ID). Return to Room이 ON일 때만 입력 가능</td><td>—</td><td>48182</td></tr>
-<tr><td>DTMF #55555</td><td>#55555 명령 허용(지정 룸 상시 접속 전환)</td><td>OFF</td><td>☑</td></tr>
-</table></div>
+<h2>7. Personal settings → Round QSO room settings</h2>
+<figure class="fig"><a href="hl2tls_img/t01.jpg" target="_blank" rel="noopener"><img src="hl2tls_img/t01.jpg" alt="Round QSO room settings 화면"></a><figcaption>Round QSO room settings 화면 (누르면 크게 보임)</figcaption></figure><div class="tbl"><table><tr><th style="width:30%">항목</th><th style="width:22%">설정</th><th>기능</th></tr><tr><td>Room ID / DTMF ID</td><td>HL2TLS-ROOM2 / 배정 번호(그대로)</td><td>이 노드에 배정된 룸 정보. 수정하지 않음</td></tr><tr><td><b>Setup</b> 버튼</td><td><b>누르지 않음</b></td><td>누르면 HL2TLS 자체 룸을 엽니다(Room Active)</td></tr><tr><td>Room Name / Comment</td><td>비움</td><td>룸 목록에 표시되는 이름·설명</td></tr><tr><td>Confidential ID</td><td>☐</td><td>룸 비공개</td></tr><tr><td>QSL exchange / Room information</td><td>☐ / 비움</td><td>룸 QSL 이미지 / 룸 안내(최대 200자)</td></tr></table></div><div class="warn">RC-NET은 DS0ARC 룸(48182)에 접속하는 방식입니다. HL2TLS는 이 화면을 <b>바꾸지 않고</b> 다음으로 넘어갑니다.</div>
 </section>
-
 <section class="card" id="s8">
-<h2>8. Property — General / Announcement / Sound / Digital ID / Make list / Log</h2>
-<h3>8-1. General settings</h3>
-<div class="tbl"><table>
-<tr><th style="width:30%">항목</th><th>기능</th></tr>
-<tr><td>Unlimited TOT</td><td>체크: 연결 시간 제한 없음. 해제: 타이머 작동(기본 해제). Return to Room 룸은 무시</td></tr>
-<tr><td>TOT</td><td>자동 끊김까지 시간. Unlimited TOT 해제 시에만 유효. 통화 중이면 종료 후 20초까지 유지</td></tr>
-</table></div>
-<h3>8-2. Announcement (안내 방송, 아날로그 전용)</h3>
-<div class="tbl"><table>
-<tr><th style="width:30%">항목</th><th>기능</th><th style="width:20%">HL2TLS</th></tr>
-<tr><td>Connect request message</td><td>접속 중 요청이 오면 “Connect request from” + 노드 번호 안내</td><td>기본값</td></tr>
-<tr><td>Room IN/OUT</td><td>룸에 노드가 들어오고 나갈 때 안내</td><td>기본값</td></tr>
-<tr><td>Room logon node info</td><td>룸 접속 안내에 접속 노드 수를 추가. #66666 응답에도 영향</td><td>기본값</td></tr>
-<tr><td>DTMF #66666</td><td>#66666 수신 시 ID 안내 송신</td><td>☑</td></tr>
-<tr><td>DTMF #55555 (안내)</td><td>#55555 응답 안내 송신. 꺼도 명령은 동작(Call settings가 켜져 있으면)</td><td>기본값</td></tr>
-<tr><td>DTMF * Disconnect</td><td>*를 #99999와 같이 접속 해제로 처리(아날로그 전용)</td><td>☑</td></tr>
-<tr><td>Remote control</td><td>WIRESMON-X(원격 감시) 접속 허용</td><td>☐ 사용 안 함</td></tr>
-<tr><td>Password</td><td>WIRESMON-X 접속 암호. Remote control ON일 때만 유효</td><td>—</td></tr>
-</table></div>
-<h3>8-3. Sound settings (아날로그 전용)</h3>
-<div class="tbl"><table>
-<tr><th style="width:30%">항목</th><th>기능</th><th style="width:20%">기본</th></tr>
-<tr><td>Connect response</td><td>노드·룸 접속 시 재생하는 소리</td><td>—</td></tr>
-<tr><td>ID</td><td>OFF / WAVE FILE(.wav) / CW(모스) / VOICE(음성). [Test]/[Stop]은 접속 중 사용 불가</td><td>—</td></tr>
-<tr><td>ID Interval time</td><td>ID 송출 간격 5~60분</td><td>—</td></tr>
-<tr><td>CW Speed / Volume / Pitch</td><td>속도 WPM / 음량 / 음높이 Hz</td><td>30 / 50 / 700</td></tr>
-<tr><td>Voice / Speed / Volume</td><td>음성 종류(OS별) / 속도 / 음량</td><td>— / 0 / 90</td></tr>
-</table></div>
-<h3>8-4. Digital ID settings (디지털 전용 — 아날로그 노드는 사용 안 함)</h3>
-<div class="tbl"><table>
-<tr><th style="width:30%">항목</th><th>기능</th></tr>
-<tr><td>ID TX</td><td>디지털 ID를 주기적으로 송신(Voice CH / Preset Search CH 각각)</td></tr>
-<tr><td>Interval Time</td><td>1~60분. ID TX 체크 시만 유효</td></tr>
-<tr><td>[TEST]</td><td>ID 1회 송신(접속 중 불가)</td></tr>
-</table></div>
-<h3>8-5. Make list file (목록 파일 만들기)</h3>
-<div class="note">노드 목록을 HTML/XML 파일로 저장하는 부가 기능입니다. <b>일반 운용에는 필요 없음(사용 안 함).</b> 탭: Group window / Active ID / Room ID / MyRoom logon ID(내 룸이 활성일 때만).</div>
-<div class="tbl"><table>
-<tr><th style="width:30%">항목</th><th>기능</th></tr>
-<tr><td>Enable list out</td><td>파일 출력 활성화</td></tr>
-<tr><td>XML Style</td><td>ON=XML(UTF-8), OFF=HTML</td></tr>
-<tr><td>HTML/XML File name</td><td>출력 파일명(.html/.xml). 탭마다 달라야 함</td></tr>
-<tr><td>HTML/XML Header / Footer</td><td>파일 앞/뒤에 넣을 태그·스타일시트 연결</td></tr>
-<tr><td>Table layout</td><td>ON=표, OFF=탭 구분. XML Style ON이면 미사용</td></tr>
-<tr><td>Save CSV format</td><td>같은 이름의 탭 구분 .csv도 저장</td></tr>
-<tr><td>Notify window title</td><td>다른 프로그램이 갱신을 감지하게 함. 보통 비움</td></tr>
-</table></div>
-<h3>8-6. Log file settings (로그 파일)</h3>
-<div class="tbl"><table>
-<tr><th style="width:30%">항목</th><th>기능</th></tr>
-<tr><td>Node log-file save</td><td>노드 운용 이력 전체 저장. […]로 저장 위치</td></tr>
-<tr><td>News log-file save</td><td>뉴스 접근 이력 저장</td></tr>
-<tr><td>Room log-file save</td><td>룸 운용 이력 저장</td></tr>
-<tr><td>[Open log folder]</td><td>로그 폴더 열기</td></tr>
-</table></div>
-<div class="warn"><b>Logo file setting:</b> 인용한 매뉴얼(2205-M판)에서 이 이름의 항목은 찾지 못했습니다(QSL 이미지 선택 항목이 가장 가깝습니다). 사용 중인 소프트웨어 화면에 있다면 캡처를 보내 주시면 추가하겠습니다.</div>
+<h2>8. Personal settings → Location settings</h2>
+<figure class="fig"><a href="hl2tls_img/t02.jpg" target="_blank" rel="noopener"><img src="hl2tls_img/t02.jpg" alt="Location settings 화면"></a><figcaption>Location settings 화면 (누르면 크게 보임)</figcaption></figure><div class="tbl"><table><tr><th style="width:30%">항목</th><th style="width:22%">설정</th><th>기능</th></tr><tr><td>Latitude (Degree/Minute/Second, North/South)</td><td>설치 장소 좌표(선택)</td><td>노드 위도. 화면은 임시값 1°1′1″ North</td></tr><tr><td>Longitude (Degree/Minute/Second, East/West)</td><td>설치 장소 좌표(선택)</td><td>노드 경도. 화면은 임시값 1°1′1″ East</td></tr><tr><td>Read GPS Data</td><td>필요 시</td><td>GPS 내장 무전기에서 현재 위치를 읽어옴(고정국은 불필요)</td></tr><tr><td>Show position data</td><td><b>☐</b></td><td>체크하면 위치가 서버 목록과 연결된 디지털 노드에 공개됨</td></tr></table></div><div class="note">위치 공개가 필요 없으면 <b>Show position data는 체크하지 않습니다.</b> 좌표는 그대로 두어도 됩니다.</div>
 </section>
-
 <section class="card" id="s9">
-<h2>9. 오디오 조정 (View → Audio adjustment)</h2>
-<div class="warn">접속(ONLINE) 전에만 조정할 수 있습니다.</div>
-<ol>
-<li>Windows <b>소리 설정 → 녹음</b>에서 HRI-200 마이크 속성을 엽니다. 음소거가 꺼져 있어야 합니다.</li>
-<li>WIRES-X <b>View → Audio adjustment</b>를 엽니다.</li>
-<li>핸디에서 <b>DTMF “1”</b>을 송신하며 레벨 막대를 봅니다.</li>
-<li>막대가 <b>점선을 넘지 않도록</b> 마이크 레벨을 낮춥니다. 넘으면 소리가 깨집니다.</li>
-<li>스피커 쪽 소리가 너무 작거나 크면 믹서에서 조절합니다.</li>
-</ol>
-<div class="ok"><b>확인:</b> 말할 때 막대가 점선 아래에서 움직이고, 소리가 깨지지 않음.</div>
+<h2>9. Property → HRI-200 setup</h2>
+<figure class="fig"><a href="hl2tls_img/t03.jpg" target="_blank" rel="noopener"><img src="hl2tls_img/t03.jpg" alt="HRI-200 setup 화면"></a><figcaption>HRI-200 setup 화면 (누르면 크게 보임)</figcaption></figure><div class="ok">FTM 시리즈(10핀)는 <b>화면의 기본값 그대로</b> 둡니다. 아래는 각 항목의 의미입니다.</div><div class="tbl"><table><tr><th style="width:32%">항목</th><th style="width:16%">기본(현재)</th><th>기능</th></tr><tr><td>SQL Active</td><td>High</td><td>스켈치 신호 극성. 스켈치가 닫혔는데 LOCAL 표시등이 계속 켜지면 Low</td></tr><tr><td>RXin Select</td><td>RX12</td><td>수신 입력 단자 선택(RX12/RX96)</td></tr><tr><td>RX12 Input / RX96 Input</td><td>High / High</td><td>입력 레벨</td></tr><tr><td>PTT Active</td><td>Low</td><td>송신 신호 극성. 송신 안 하는데 ON-AIR가 계속 초록이면 High</td></tr><tr><td>TXout Gain</td><td>TX12</td><td>송신 출력 단자(TX12/TX96)</td></tr><tr><td>De-emphasis · RX Filter</td><td>☐</td><td>수신 음성 고역 감쇠 · 필터</td></tr><tr><td>Audio Mute SW(SQL)</td><td>☐</td><td>SQL 단자와 수신 음성 스위치 연동</td></tr><tr><td>MIC BOOST(MAMP)</td><td>☐</td><td>아주 작은 입력용 증폭. 소리가 깨질 수 있음</td></tr><tr><td>Pre-emphasis · Tx Filter</td><td>☐</td><td>송신 음성 고역 강조 · 필터</td></tr><tr><td>DTMF Mute mode</td><td>OFF</td><td>DTMF 감지 중 아날로그 소리 차단 여부</td></tr><tr><td>DTMF detect Gain</td><td>Low</td><td>DTMF 인식 감도. #55555가 인식 안 되면 High</td></tr><tr><td>DTMF Call cancel (1~9, 0, *, #, A~D)</td><td>전체 선택</td><td>선택하지 않은 버튼은 DTMF 입력으로 인식하지 않음</td></tr><tr><td>HRI-200 Information</td><td>—</td><td>HRI-200 내부 설정값을 읽음</td></tr><tr><td>Write</td><td>—</td><td>바꾼 값을 HRI-200에 기록. <b>값을 바꿨을 때만</b> 누름</td></tr></table></div>
 </section>
-
 <section class="card" id="s10">
-<h2>10. ONLINE 전환과 첫 교신 시험</h2>
-<ol>
-<li>WIRES-X에서 <b>OFFLINE → ONLINE</b>으로 전환합니다.</li>
-<li>핸디(FM, 톤 없음, 배정 주파수)에서 PTT를 누르고 <b>#55555</b>를 보냅니다.</li>
-<li>약 <b>10초</b> 기다리면 룸에 접속됩니다.</li>
-<li>접속 후에는 <b>PTT만 눌러</b> 말합니다. DTMF를 다시 보내지 않습니다.</li>
-<li>끝낼 때 <b>#99999</b> 또는 <b>*</b>로 해제합니다.</li>
-</ol>
-<div class="note">처음에는 DS0ARC 운용자와 시간을 맞춰 시험하세요.</div>
+<h2>10. Property → Call settings</h2>
+<figure class="fig"><a href="hl2tls_img/t05.jpg" target="_blank" rel="noopener"><img src="hl2tls_img/t05.jpg" alt="Call settings 화면"></a><figcaption>Call settings 화면 (누르면 크게 보임)</figcaption></figure><div class="tbl"><table><tr><th style="width:30%">항목</th><th style="width:22%">설정</th><th>기능</th></tr><tr><td>Round QSO Room connection</td><td><b>☑</b></td><td>ON: 요청이 오면 인터넷 룸에 연결, OFF: 거부</td></tr><tr><td>Accept calls while in Round QSO Rooms</td><td>☐</td><td>룸 접속 중 다른 노드 요청이 오면 룸을 끊고 받음</td></tr><tr><td>Back to Round QSO after disconnect</td><td>회색</td><td>위 항목이 ☐이면 회색(정상). 인터럽트 종료 후 이전 룸 복귀</td></tr><tr><td>Return to Room</td><td><b>☑</b></td><td>소프트웨어 시작 때마다 지정 룸에 자동 접속(상시 연결 유지)</td></tr><tr><td>Room ID</td><td><b>48182</b></td><td>자동 접속할 룸 번호(DS0ARC 룸)</td></tr><tr><td>DTMF #55555 (Return Room cancel) command</td><td><b>☑</b></td><td>핸디에서 #55555 → 자동복귀 <b>취소</b>(다른 곳과 연결할 때), 한 번 더 보내면 복귀</td></tr></table></div><div class="warn"><b>#55555는 접속 명령이 아니라 “복귀 취소” 명령입니다.</b> 평소에는 Return to Room 때문에 자동으로 룸에 연결되어 있습니다.</div>
 </section>
-
 <section class="card" id="s11">
-<h2>11. 문제 해결</h2>
-<div class="tbl"><table>
-<tr><th style="width:28%">증상</th><th>원인 → 조치</th></tr>
-<tr><td>ID와 DTMF ID 불일치</td><td>S/N 오타, Node ID 불일치 → 4장 오류 해결 순서</td></tr>
-<tr><td>설치 중 DLL/차단 오류</td><td>Windows 11 스마트 앱 컨트롤 → 0장 주의 확인</td></tr>
-<tr><td>무전기에 HRI-200 안 뜸</td><td>GM+DX 2초 다시, CT-174 결선 확인, 소프트웨어 설치 순서 확인</td></tr>
-<tr><td>소리가 깨짐</td><td>9장 마이크 레벨 낮춤</td></tr>
-<tr><td>Modulation 변경 불가</td><td>5장: OFFLINE → Exit → 무전기 OFF → 재시작</td></tr>
-<tr><td>룸 접속 안 됨</td><td>인터넷 연결, Return to Room ID(48182), DTMF 송신 설정, 룸 개설 여부(DS0ARC)</td></tr>
-</table></div>
+<h2>11. Property → General settings</h2>
+<figure class="fig"><a href="hl2tls_img/t06.jpg" target="_blank" rel="noopener"><img src="hl2tls_img/t06.jpg" alt="General settings 화면"></a><figcaption>General settings 화면 (누르면 크게 보임)</figcaption></figure><div class="tbl"><table><tr><th style="width:30%">항목</th><th style="width:22%">설정</th><th>기능</th></tr><tr><td>Unlimited TOT</td><td>☐</td><td>체크하면 연결 시간 제한 없음</td></tr><tr><td>TOT (TimeOut Timer)</td><td>10 min (5~60)</td><td>자동 끊김까지의 시간. Return to Room 룸에는 적용되지 않음</td></tr><tr><td>Connect request message</td><td>☐</td><td>접속 중 요청이 오면 안내방송</td></tr><tr><td>Room IN/OUT</td><td>☐</td><td>룸에 노드가 들어오고 나갈 때 안내방송</td></tr><tr><td>Room logon node info</td><td>☐</td><td>룸 접속 안내에 접속 노드 수를 추가</td></tr><tr><td>DTMF#66666</td><td><b>☑ 권장</b></td><td>#66666를 받으면 상태 안내를 송신</td></tr><tr><td>DTMF#55555</td><td><b>☑ 권장</b></td><td>#55555를 받으면 취소·복귀 안내를 송신(귀로 상태 확인)</td></tr><tr><td>DTMF * Disconnect</td><td><b>☑ 권장</b></td><td>*를 #99999와 같이 접속 해제로 처리</td></tr><tr><td>Remote control / Password</td><td>☐ / 비움</td><td>원격 감시 프로그램(WIRESMON-X) 접속 허용 여부와 암호</td></tr></table></div><div class="note">안내 음성은 영어 합성음(Sound settings의 Voice)입니다. 체크를 바꿨으면 <b>Apply</b>.</div>
 </section>
-
 <section class="card" id="s12">
-<h2>12. 완료 체크와 내 값</h2>
-<ul class="chk">
-<li>드라이버 → 소프트웨어 → 재부팅 순서로 설치</li>
-<li>무전기 화면에 HRI-200 표시</li>
-<li>Personal settings: ID 등록 완료 (오류 없음)</li>
-<li>Device settings: Analog / 배정 주파수 / NoTone / Preset Search OFF</li>
-<li>Call settings: Return to Room 48182, #55555</li>
-<li>Announcement: #66666, * 해제</li>
-<li>오디오 레벨 점선 이내</li>
-<li>핸디로 룸 접속·해제 시험 성공</li>
-</ul>
-<div class="tbl"><table>
-<tr><th style="width:34%">내 값</th><th>기록</th></tr>
-<tr><td>HRI-200 S/N</td><td>&nbsp;</td></tr>
-<tr><td>Node ID</td><td>&nbsp;</td></tr>
-<tr><td>배정 주파수</td><td>&nbsp;</td></tr>
-<tr><td>설치 장소(City/State)</td><td>&nbsp;</td></tr>
-</table></div>
-<p>참고 링크:
-<a href="https://www.yaesu.com/jp/en/wires-x/" target="_blank" rel="noopener">YAESU WIRES-X</a> ·
-<a href="https://www.yaesu.com/jp/en/wires-x/contact/pdf/HRI-200_Manual_ENG_2304-N.pdf" target="_blank" rel="noopener">HRI-200 매뉴얼(영문)</a></p>
+<h2>12. Property → Sound settings</h2>
+<figure class="fig"><a href="hl2tls_img/t07.jpg" target="_blank" rel="noopener"><img src="hl2tls_img/t07.jpg" alt="Sound settings 화면"></a><figcaption>Sound settings 화면 (누르면 크게 보임)</figcaption></figure><div class="tbl"><table><tr><th style="width:30%">항목</th><th style="width:22%">설정</th><th>기능</th></tr><tr><td>Connect response</td><td><b>OFF</b></td><td>노드·룸 접속 때 재생하는 소리(OFF / WAVE FILE / CW / VOICE). Test·Stop 버튼은 접속 중 사용 불가</td></tr><tr><td>ID</td><td><b>OFF</b></td><td>주기적 ID 송출. 방식은 위와 같음</td></tr><tr><td>Interval time</td><td>10 min (5~60)</td><td>ID 송출 간격(ID를 쓸 때만 적용)</td></tr><tr><td>Calibrate – CW Speed / Volume / Pitch</td><td>30 / 50 / 700</td><td>모스 속도 / 음량 / 음높이(Hz)</td></tr><tr><td>Calibrate – Voice</td><td>Microsoft Zira Desktop</td><td>안내 음성 종류(OS에 따라 다름)</td></tr><tr><td>Voice Speed / Volume</td><td>0 / 90</td><td>음성 속도 / 음량</td></tr></table></div><div class="ok">기본값 그대로 둡니다.</div>
+</section>
+<section class="card" id="s13">
+<h2>13. Property → Make list file</h2>
+<figure class="fig"><a href="hl2tls_img/t08.jpg" target="_blank" rel="noopener"><img src="hl2tls_img/t08.jpg" alt="Make list file 화면"></a><figcaption>Make list file 화면 (누르면 크게 보임)</figcaption></figure><div class="note">노드 목록을 HTML/XML 파일로 저장하는 부가 기능입니다. <b>사용하지 않으므로 그대로 둡니다.</b> 탭: Group window / Active ID / Room ID.</div><div class="tbl"><table><tr><th style="width:30%">항목</th><th style="width:22%">설정</th><th>기능</th></tr><tr><td>Enable list out</td><td><b>☐</b></td><td>체크해야 아래 항목이 활성화됨</td></tr><tr><td>XML Style</td><td>회색</td><td>ON=XML, OFF=HTML</td></tr><tr><td>HTML File name</td><td>비움</td><td>출력 파일명([…]로 선택). 탭마다 달라야 함</td></tr><tr><td>HTML Header / Footer</td><td>비움</td><td>파일 앞·뒤에 넣을 태그</td></tr><tr><td>Table layout</td><td>☑(기본)</td><td>표 형식 출력(OFF는 탭 구분)</td></tr><tr><td>Save CSV format</td><td>회색</td><td>같은 이름의 .csv도 저장</td></tr><tr><td>Notify window title</td><td>비움</td><td>다른 프로그램이 갱신을 감지하게 하는 창 제목</td></tr></table></div>
+</section>
+<section class="card" id="s14">
+<h2>14. Property → Log file settings</h2>
+<figure class="fig"><a href="hl2tls_img/t09.jpg" target="_blank" rel="noopener"><img src="hl2tls_img/t09.jpg" alt="Log file settings 화면"></a><figcaption>Log file settings 화면 (누르면 크게 보임)</figcaption></figure><div class="tbl"><table><tr><th style="width:30%">항목</th><th style="width:22%">설정</th><th>기능</th></tr><tr><td>Node log-file save</td><td>☐</td><td>노드 운용 이력 저장([…]로 저장 위치)</td></tr><tr><td>News log-file save</td><td>☐</td><td>뉴스 접근 이력 저장</td></tr><tr><td>Room log-file save</td><td>☐</td><td>룸 운용 이력 저장</td></tr><tr><td>Open log folder</td><td>—</td><td>저장된 로그 폴더 열기</td></tr></table></div><div class="note">평소에는 ☐. 문제 추적이 필요할 때만 Node log-file save를 체크하세요.</div><div class="ok"><b>설정 끝:</b> 마지막으로 <b>Apply → OK</b>를 누릅니다.</div>
+</section>
+<section class="card" id="s15">
+<h2>15. 오디오 조정 (View → Audio adjustment)</h2>
+<div class="warn">접속(ONLINE) 전에만 조정할 수 있습니다.</div><ol><li>Windows <b>소리 설정 → 녹음</b>에서 HRI-200 마이크 속성을 열고 음소거가 꺼져 있는지 확인</li><li>WIRES-X <b>View → Audio adjustment</b> 열기</li><li>핸디에서 <b>DTMF “1”</b>을 송신하며 레벨 막대 확인</li><li>막대가 <b>점선을 넘지 않게</b> 마이크 레벨을 낮춤(넘으면 소리가 깨짐)</li></ol>
+</section>
+<section class="card" id="s16">
+<h2>16. ONLINE 전환과 첫 교신 시험</h2>
+<ol><li>WIRES-X를 <b>ONLINE</b>으로 전환 → Return to Room 설정으로 룸 48182에 자동 접속(제목줄에 Room … member N nodes 표시)</li><li>핸디(FM, 톤 없음, 배정 주파수)에서 PTT를 누르고 말해 룸과 교신</li><li>다른 곳과 연결하려면 PTT에서 <b>#55555</b>(복귀 취소) → 연결 → 끝나면 다시 <b>#55555</b>(복귀)</li><li>접속 해제는 <b>#99999</b> 또는 <b>*</b></li><li>상태 확인은 <b>#66666</b></li></ol><div class="note">DTMF는 아날로그 운용에서만 동작합니다. 핸디의 DTMF 송신이 켜져 있어야 합니다.</div>
+</section>
+<section class="card" id="s17">
+<h2>17. 문제 해결</h2>
+<div class="tbl"><table><tr><th style="width:28%">증상</th><th>원인 → 조치</th></tr><tr><td>ID와 DTMF ID 불일치</td><td>3장 오류 해결 순서</td></tr><tr><td>설치 중 DLL/차단 오류</td><td>Windows 11 스마트 앱 컨트롤 확인(0장)</td></tr><tr><td>무전기에 HRI-200 안 뜸</td><td>GM+D/X 다시, CT-174가 RADIO 1·DATA 단자인지, 설치 순서 확인</td></tr><tr><td>소리가 깨짐</td><td>15장 마이크 레벨 낮춤</td></tr><tr><td>Modulation 변경 불가</td><td>4장: OFFLINE → Exit → 무전기 OFF → 재시작</td></tr><tr><td>#55555가 반응 없음</td><td>9장 DTMF detect Gain을 High로 바꾸고 Write</td></tr><tr><td>룸 접속 안 됨</td><td>인터넷, 10장 Return to Room ☑·48182, 룸 개설 여부(DS0ARC)</td></tr></table></div>
+</section>
+<section class="card" id="s18">
+<h2>18. 완료 체크와 내 값</h2>
+<ul class="chk"><li>RADIO 1 ↔ DATA 단자, USB 연결</li><li>4장 Transceiver: FM / 배정 주파수 / NoTone / Low</li><li>5장 Preset CH: OFF</li><li>6장 Node settings: Comment 입력, Confidential ☐</li><li>7장 Round QSO room: Setup 누르지 않음</li><li>8장 Show position data ☐</li><li>9장 HRI-200 setup: 기본값</li><li>10장 Call settings: Return to Room ☑ 48182 / #55555 ☑</li><li>11장 General: #66666 ☑ · #55555 ☑ · * 해제 ☑</li><li>오디오 레벨 점선 이내</li><li>핸디로 룸 교신 시험 성공</li></ul><div class="tbl"><table><tr><th style="width:34%">내 값</th><th>기록</th></tr><tr><td>HRI-200 S/N</td><td>&nbsp;</td></tr><tr><td>Node ID(DTMF ID)</td><td>&nbsp;</td></tr><tr><td>배정 주파수</td><td>&nbsp;</td></tr></table></div><p>참고: <a href="https://www.yaesu.com/jp/en/wires-x/" target="_blank" rel="noopener">YAESU WIRES-X</a> · <a href="https://ia601407.us.archive.org/5/items/HRI-200_Manual_ENG_2205-M/HRI-200_Manual_ENG_2205-M.pdf" target="_blank" rel="noopener">HRI-200 매뉴얼(영문 2205-M)</a></p>
 </section>
 </main>
-<footer>HL2TLS FM 노드 설정 가이드 · <span id="ver">v1.1</span> · 대한적십자사 서울특별시지사 재난대응봉사회 기술팀</footer>
+<footer>HL2TLS FM 노드 설정 가이드 · <span id="ver">v1.2</span> · 대한적십자사 서울특별시지사 재난대응봉사회 기술팀</footer>
 <script>
 (function(){
-  var VER='v1.1';
+  var VER='v1.2';
   var b=document.body,t=document.getElementById('tog');
   document.getElementById('ver').textContent=VER;
   function set(m){b.className=m;t.textContent=(m==='m')?'PC 화면':'모바일 화면';try{localStorage.setItem('hl2tls_view',m)}catch(e){}}
