@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>서울 하이브리드 무선국 시뮬레이션 v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1f3a5f;--ink:#243447;--sub:#44566b;--line:#d5dde8;--bg:#eef2f7;--card:#fff}
+*{box-sizing:border-box}
+html{font-size:14px}
+@media (min-width:768px){html{font-size:16px}}
+body{margin:0;font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--bg);line-height:1.5;font-weight:400}
+.nav{background:var(--navy);color:#fff}
+.nav-inner{margin:0 auto;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.m .nav-inner,.m .wrap{max-width:430px}
+.p .nav-inner,.p .wrap{max-width:1100px}
+.brand{font-weight:700;font-size:1rem}
+.app-version{display:inline-block;margin-left:6px;padding:0 8px;border-radius:10px;background:#fff;color:var(--navy);font-weight:700;font-size:1rem}
+.tg{display:flex;gap:4px}
+.tg button{font:inherit;font-size:1rem;padding:4px 12px;border-radius:8px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer}
+.tg button.on{background:#fff;color:var(--navy);font-weight:700}
+.wrap{margin:0 auto;padding:8px 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+h1{font-size:1.3rem;margin:0 0 4px;color:var(--navy);font-weight:900}
+h2{font-size:1.05rem;margin:0 0 6px;color:var(--navy);font-weight:700}
+p{margin:0 0 4px}
+.sub{color:var(--sub)}
+.btns{display:flex;flex-wrap:wrap;gap:6px}
+.btn{font:inherit;font-size:1rem;padding:6px 12px;border-radius:8px;border:1px solid var(--navy);background:#fff;color:var(--navy);cursor:pointer;font-weight:500}
+.btn:hover{background:#e8eef6}
+.btn.on{background:var(--navy);color:#fff}
+.btn.pri{background:var(--navy);color:#fff}
+#mapbox{width:100%;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#f4f7fb}
+#map{display:block;cursor:crosshair;outline:none}
+#map:focus-visible{outline:3px solid #2f6fba}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:1rem;color:var(--sub)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.chip{display:inline-block;padding:1px 10px;border-radius:12px;font-size:1rem;font-weight:700;white-space:nowrap}
+.c0{background:#e3f4ea;color:#14532d}
+.c1{background:#fff0c9;color:#6b4400}
+.c2{background:#fde4e1;color:#8f1d14}
+ul.pl{list-style:none;margin:0;padding:0}
+ul.pl li{border-left:5px solid;padding:4px 8px;margin:4px 0;background:#f8fafc;border-radius:0 6px 6px 0}
+ul.pl li.l0{border-color:#2e8b57}
+ul.pl li.l1{border-color:#d49a00}
+ul.pl li.l2{border-color:#c0392b}
+ul.pl .s{color:var(--sub);font-size:1rem}
+.advice{margin-top:6px;padding:8px 10px;border-radius:8px;background:#eaf1fa;border:1px solid #bcd0e8}
+.grid{display:grid;grid-template-columns:1fr;gap:8px}
+.p .grid{grid-template-columns:repeat(2,1fr)}
+.st{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fbfcfe}
+.sh{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+.note{color:var(--sub);font-size:1rem;margin-bottom:4px}
+.row{display:flex;align-items:center;gap:8px;margin:4px 0;flex-wrap:wrap}
+.row label{min-width:5.5rem;font-weight:500}
+input[type=number]{font:inherit;width:8rem;padding:4px 8px;border:1px solid #8ea3bb;border-radius:6px;color:var(--ink)}
+input[type=range]{flex:1;min-width:120px}
+output{min-width:3.2rem;font-weight:700;color:var(--navy)}
+table{border-collapse:collapse;width:100%;font-size:1rem}
+th,td{border:1px solid var(--line);padding:4px 8px;text-align:left;vertical-align:top}
+td:first-child{white-space:nowrap}
+th{background:#e6edf6;color:var(--navy)}
+.warn{background:#fff7e6;border:1px solid #e5c37a;border-radius:8px;padding:8px 10px}
+ol,ul.t{margin:4px 0 0 1.2rem;padding:0}
+footer{text-align:center;color:var(--sub);font-size:1rem;padding:4px 0 12px}
+</style>
+</head>
+<body class="m">
+<header class="nav"><div class="nav-inner">
+  <div class="brand">서울 하이브리드 무선국 <span class="app-version">v1.0</span></div>
+  <div class="tg"><button id="bM" class="on" type="button">모바일</button><button id="bP" type="button">PC</button></div>
+</div></header>
+<main class="wrap">
+<noscript><div class="card">이 페이지는 JavaScript가 필요합니다.</div></noscript>
+
+<section class="card">
+  <h1>서울 하이브리드 무선국 시뮬레이션</h1>
+  <p class="sub">ARC·LFC·FRC 고정국과 이동하는 대응차의 FM 주파수가 서로 겹치는지 보여 줍니다. 대응차를 지도에서 끌거나 눌러 옮겨 보세요.</p>
+  <div class="btns" style="margin-top:6px" id="presets"></div>
+</section>
+
+<section class="card">
+  <h2>개략 지도 <span class="sub" style="font-weight:400">(축척 근사 · 위치는 구·동 수준)</span></h2>
+  <div id="mapbox"><svg id="map" tabindex="0" role="img" aria-label="서울 하이브리드 무선국 개략도. 방향키로 대응차를 이동할 수 있습니다."></svg></div>
+  <div class="legend" id="legend"></div>
+  <div class="row"><label><input type="checkbox" id="uvOn" checked> UV 리피터 표시</label><label style="min-width:auto"><input type="checkbox" id="vehOn" checked> 대응차 노드 켜기</label></div>
+</section>
+
+<section class="card" id="verdict"></section>
+
+<section class="card">
+  <h2>국별 설정</h2>
+  <div class="grid" id="ctrl"></div>
+  <div class="row" style="margin-top:8px"><label for="minSp">최소 채널 간격</label><input type="number" id="minSp" value="20" min="5" max="50" step="5"> <span>kHz (이 값보다 가까우면 인접 채널 주의)</span></div>
+</section>
+
+<section class="card">
+  <h2>국별 현황</h2>
+  <table>
+    <tr><th>국 (위치)</th><th>주파수</th><th>비고</th></tr>
+    <tr><td>ARC (신월동)</td><td>145.640</td><td>HRI-200 FM 노드</td></tr>
+    <tr><td>LFC (여의도)</td><td>145.620 (WIRES-X 송신)<br>436.140 (UV 리피터)</td><td>리피터는 별도 대역 장치로 보고 145 MHz 판정에서 제외, 참고 표시</td></tr>
+    <tr><td>FRC (마장동)</td><td>미정 → 145.620 가정</td><td>HL0FRC. 정해지면 위에서 바꿔 보세요</td></tr>
+    <tr><td>대응차 (이동)</td><td>그때그때 변경</td><td>DS0ARC/M. 추천 주파수로 선택</td></tr>
+  </table>
+</section>
+
+<section class="card">
+  <h2>운용 요령 (겹칠 때)</h2>
+  <ol>
+    <li>집결·점검처럼 고정국 가까이에 있을 때: 대응차 <b>출력을 낮추고</b>, 필요하면 한쪽 노드의 <b>룸 연결을 분리</b>합니다.</li>
+    <li>현장 출동 후: 근처 고정국과 겹치지 않는 주파수를 <b>추천 주파수</b>로 골라 바꿉니다.</li>
+    <li>겹침을 피할 수 없을 때: 노드별 <b>톤(CTCSS) 분리</b> 또는 주파수 변경을 검토합니다.</li>
+  </ol>
+  <p class="sub" style="margin-top:4px">같은 룸에 연결된 노드가 같은 주파수로 겹치면 음성이 이중으로 송출되거나 에코가 생길 수 있습니다. (동작 원리에 따른 추정이며 현장 확인이 필요합니다.)</p>
+</section>
+
+<section class="card warn">
+  <h2>가정 및 한계</h2>
+  <ul class="t">
+    <li>FRC 주파수는 정해지지 않아 145.620으로 가정했습니다.</li>
+    <li>도달 반경은 가정값입니다. 지형·안테나·출력에 따라 달라지므로 현장 측정으로 조정하세요.</li>
+    <li>위치는 구·동 수준의 개략 좌표이고 거리는 직선거리 근사입니다. 실제 주소가 아닙니다.</li>
+    <li>채널 간격 기준 20 kHz는 가정값입니다. 허가 사항은 제외하고 기술적 간섭만 판정합니다.</li>
+  </ul>
+</section>
+<footer>서울 하이브리드 무선국 시뮬레이션 <span class="app-version">v1.0</span> · <span id="appdate"></span></footer>
+</main>
+
+<script>
+(function(){
+'use strict';
+var APP_VER='v1.0', APP_DATE='2026-11-23';
+var vs=document.querySelectorAll('.app-version'); for(var i=0;i<vs.length;i++) vs[i].textContent=APP_VER;
+document.getElementById('appdate').textContent=APP_DATE;
+
+var B={lon0:126.77,lon1:127.10,lat0:37.45,lat1:37.62}, KL=88.4, KT=111;
+var ST=[
+ {id:'arc',name:'ARC 신월동',short:'ARC',lon:126.83,lat:37.525,f:145.640,r:5,color:'#1f4e8c',note:'HRI-200 FM 노드 (DS0ARC)',dx:0,dy:-16,anc:'middle'},
+ {id:'lfc',name:'LFC 여의도',short:'LFC',lon:126.93,lat:37.525,f:145.620,r:5,color:'#0f766e',note:'WIRES-X 노드 · 436.140 UV 리피터 병설',dx:0,dy:-16,anc:'middle'},
+ {id:'frc',name:'FRC 마장동',short:'FRC',lon:127.04,lat:37.565,f:145.620,r:5,color:'#6b46a3',note:'HL0FRC · 주파수 미정(145.620 가정)',dx:0,dy:-16,anc:'middle'},
+ {id:'veh',name:'대응차 DS0ARC/M',short:'대응차',lon:126.845,lat:37.528,f:145.620,r:3,color:'#c2570c',note:'이동 · 주파수 가변 (지도에서 끌어 옮기기)',dx:14,dy:5,anc:'start',mobile:true,on:true}
+];
+var PRE=[
+ {n:'ARC 인근 집결',lon:126.845,lat:37.528},
+ {n:'LFC 인근',lon:126.945,lat:37.528},
+ {n:'FRC 인근',lon:127.03,lat:37.56},
+ {n:'현장(예: 남서쪽)',lon:126.79,lat:37.47}
+];
+var CANDS=[145.620,145.640,145.600,145.660,145.580,145.680,145.560,145.700];
+var uvR=8, minSp=20, showUV=true;
+var W=360, H=240;
+var ICON=['✔','⚠','✖'], LVT=['정상','주의','충돌'];
+
+function $(id){return document.getElementById(id);}
+function get(id){for(var i=0;i<ST.length;i++) if(ST[i].id===id) return ST[i];}
+function active(){return ST.filter(function(s){return !s.mobile||s.on;});}
+function kmpx(){return W/((B.lon1-B.lon0)*KL);}
+function P(lon,lat){return {x:(lon-B.lon0)/(B.lon1-B.lon0)*W, y:(B.lat1-lat)/(B.lat1-B.lat0)*H};}
+function INV(x,y){return {lon:B.lon0+x/W*(B.lon1-B.lon0), lat:B.lat1-y/H*(B.lat1-B.lat0)};}
+function dist(a,b){var dx=(a.lon-b.lon)*KL, dy=(a.lat-b.lat)*KT; return Math.sqrt(dx*dx+dy*dy);}
+function fmt(f){return Number(f).toFixed(3);}
+function tw(t,fs){var w=0; for(var i=0;i<t.length;i++){w+=t.charCodeAt(i)>255?fs:fs*0.6;} return w+10;}
+
+function pairStatus(a,b){
+  var d=dist(a,b), ov=d<(a.r+b.r);
+  var df=Math.round(Math.abs(a.f-b.f)*10000)/10; // kHz
+  var lvl=0,msg;
+  if(df<0.5){
+    if(ov){lvl=2;msg='같은 주파수이고 도달 범위가 겹칩니다.';} else {msg='같은 주파수지만 도달 범위가 떨어져 있습니다.';}
+  } else if(df<minSp){
+    if(ov){lvl=1;msg='도달 범위가 겹치고 채널 간격('+df+' kHz)이 기준보다 좁습니다.';} else {msg='채널 간격은 좁지만 도달 범위가 떨어져 있습니다.';}
+  } else {
+    msg=ov?'도달 범위는 겹치지만 주파수가 충분히 떨어져 있습니다.':'도달 범위가 떨어져 있습니다.';
+  }
+  return {a:a,b:b,d:d,ov:ov,df:df,lvl:lvl,msg:msg};
+}
+function allPairs(){
+  var A=active(), out=[];
+  for(var i=0;i<A.length;i++) for(var j=i+1;j<A.length;j++) out.push(pairStatus(A[i],A[j]));
+  return out;
+}
+function recommend(){
+  var v=get('veh'), fixed=ST.filter(function(s){return !s.mobile;});
+  function ok(f){
+    var t={lon:v.lon,lat:v.lat,r:v.r,f:f};
+    for(var i=0;i<fixed.length;i++){ if(pairStatus(t,fixed[i]).lvl>0) return false; }
+    return true;
+  }
+  if(ok(v.f)) return v.f;
+  var used=fixed.map(function(s){return s.f;}), k;
+  for(k=0;k<CANDS.length;k++){ if(used.indexOf(CANDS[k])<0&&ok(CANDS[k])) return CANDS[k]; }
+  for(k=0;k<CANDS.length;k++){ if(ok(CANDS[k])) return CANDS[k]; }
+  return null;
+}
+function stLevel(s,pairs){
+  var m=0; pairs.forEach(function(p){ if((p.a===s||p.b===s)&&p.lvl>m) m=p.lvl; }); return m;
+}
+
+function labelSvg(x,y,txt,fs,anc,color){
+  var w=tw(txt,fs), h=fs+8, x0= anc==='end'? x-w : (anc==='middle'? x-w/2 : x);
+  return '<rect x="'+x0.toFixed(1)+'" y="'+(y-fs-1).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+h+'" rx="5" fill="#fff" fill-opacity=".88" stroke="'+color+'" stroke-width="1"/>'+
+         '<text x="'+(x0+5).toFixed(1)+'" y="'+(y+2).toFixed(1)+'" font-size="'+fs+'" font-weight="700" fill="'+color+'">'+txt+'</text>';
+}
+
+function draw(){
+  var box=$('mapbox'), svg=$('map');
+  W=Math.max(280,box.clientWidth);
+  H=Math.round(W*((B.lat1-B.lat0)*KT)/((B.lon1-B.lon0)*KL));
+  var fs=W>=700?16:14, k=kmpx(), s='', i, st;
+  svg.setAttribute('width',W); svg.setAttribute('height',H); svg.setAttribute('viewBox','0 0 '+W+' '+H);
+  s+='<rect width="'+W+'" height="'+H+'" fill="#f4f7fb"/>';
+  for(var x=0;x<W;x+=5*k) s+='<line x1="'+x.toFixed(1)+'" y1="0" x2="'+x.toFixed(1)+'" y2="'+H+'" stroke="#e1e8f1" stroke-width="1"/>';
+  for(var y=0;y<H;y+=5*k) s+='<line x1="0" y1="'+y.toFixed(1)+'" x2="'+W+'" y2="'+y.toFixed(1)+'" stroke="#e1e8f1" stroke-width="1"/>';
+  var rv=[[126.74,37.600],[126.80,37.592],[126.86,37.572],[126.90,37.545],[126.935,37.532],[126.98,37.525],[127.03,37.520],[127.08,37.525],[127.14,37.535]], d='';
+  for(i=0;i<rv.length;i++){var p=P(rv[i][0],rv[i][1]); d+=(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)+' ';}
+  s+='<path d="'+d+'" fill="none" stroke="#bcd7ee" stroke-width="'+Math.max(8,2.2*k).toFixed(1)+'" stroke-linecap="round" stroke-linejoin="round"/>';
+  var rl=P(126.775,37.572); s+='<text x="'+rl.x.toFixed(1)+'" y="'+rl.y.toFixed(1)+'" font-size="'+fs+'" fill="#4f7aa3" font-weight="500">한강(개략)</text>';
+  var A=active();
+  for(i=0;i<A.length;i++){
+    st=A[i]; var c=P(st.lon,st.lat);
+    s+='<circle cx="'+c.x.toFixed(1)+'" cy="'+c.y.toFixed(1)+'" r="'+(st.r*k).toFixed(1)+'" fill="'+st.color+'" fill-opacity=".10" stroke="'+st.color+'" stroke-width="2"'+(st.mobile?' stroke-dasharray="7 5"':'')+'/>';
+  }
+  if(showUV){
+    var l=get('lfc'), lc=P(l.lon,l.lat);
+    s+='<circle cx="'+lc.x.toFixed(1)+'" cy="'+lc.y.toFixed(1)+'" r="'+(uvR*k).toFixed(1)+'" fill="none" stroke="#5a6b7d" stroke-width="2" stroke-dasharray="3 6"/>';
+    s+=labelSvg(lc.x, Math.max(fs+8, lc.y-uvR*k-6), '436.140 UV 리피터(참고)', fs, 'middle', '#44566b');
+  }
+  var pairs=allPairs();
+  pairs.forEach(function(q){
+    if(!q.ov) return;
+    var a=P(q.a.lon,q.a.lat), b=P(q.b.lon,q.b.lat), col=q.lvl===2?'#b42318':(q.lvl===1?'#b7791f':'#2e8b57');
+    s+='<line x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'" stroke="'+col+'" stroke-width="'+(q.lvl?4:2)+'"'+(q.lvl?'':' stroke-dasharray="6 5"')+'/>';
+  });
+  for(i=0;i<A.length;i++){
+    st=A[i]; var m=P(st.lon,st.lat);
+    if(st.mobile){ s+='<rect x="'+(m.x-8).toFixed(1)+'" y="'+(m.y-8).toFixed(1)+'" width="16" height="16" rx="3" fill="'+st.color+'" stroke="#fff" stroke-width="2" transform="rotate(45 '+m.x.toFixed(1)+' '+m.y.toFixed(1)+')"/>'; }
+    else { s+='<circle cx="'+m.x.toFixed(1)+'" cy="'+m.y.toFixed(1)+'" r="8" fill="'+st.color+'" stroke="#fff" stroke-width="2"/>'; }
+    s+=labelSvg(m.x+st.dx, m.y+st.dy, st.short+' '+fmt(st.f), fs, st.anc, st.color);
+  }
+  pairs.forEach(function(q){
+    if(!q.ov||!q.lvl) return;
+    var a=P(q.a.lon,q.a.lat), b=P(q.b.lon,q.b.lat), col=q.lvl===2?'#8f1d14':'#6b4400';
+    s+=labelSvg((a.x+b.x)/2,(a.y+b.y)/2+fs+12, ICON[q.lvl]+' '+q.d.toFixed(1)+'km',fs,'middle',col);
+  });
+  var sb=5*k, x1=W-10, x0=x1-sb; s+='<line x1="'+x0.toFixed(1)+'" y1="'+(H-14)+'" x2="'+x1.toFixed(1)+'" y2="'+(H-14)+'" stroke="#44566b" stroke-width="3"/>';
+  s+='<text x="'+(x0-6).toFixed(1)+'" y="'+(H-9)+'" font-size="'+fs+'" fill="#44566b" text-anchor="end">5 km</text>';
+  svg.innerHTML=s;
+}
+
+function verdict(){
+  var pairs=allPairs(), cnt=[0,0,0];
+  pairs.forEach(function(p){cnt[p.lvl]++;});
+  var h='<h2>겹침 판정</h2><div class="chips"><span class="chip c2">✖ 충돌 '+cnt[2]+'</span><span class="chip c1">⚠ 주의 '+cnt[1]+'</span><span class="chip c0">✔ 정상 '+cnt[0]+'</span></div><ul class="pl">';
+  pairs.slice().sort(function(a,b){return b.lvl-a.lvl||a.d-b.d;}).forEach(function(p){
+    h+='<li class="l'+p.lvl+'"><b>'+ICON[p.lvl]+' '+LVT[p.lvl]+' · '+p.a.short+' ↔ '+p.b.short+'</b><div class="s">'+fmt(p.a.f)+' / '+fmt(p.b.f)+' MHz · 거리 '+p.d.toFixed(1)+'km · 반경 합 '+(p.a.r+p.b.r).toFixed(1)+'km</div><div>'+p.msg+'</div></li>';
+  });
+  h+='</ul>';
+  var vIss=pairs.filter(function(p){return p.lvl>0&&(p.a.mobile||p.b.mobile);}).length;
+  var fIss=pairs.filter(function(p){return p.lvl>0&&!p.a.mobile&&!p.b.mobile;}).length;
+  var adv=[];
+  if(vIss){
+    var rec=recommend();
+    if(rec!==null) adv.push('대응차 주파수를 <b>'+fmt(rec)+' MHz</b>로 바꾸면 이 위치에서 고정국과의 겹침이 해소됩니다. (아래 <b>추천 주파수 적용</b> 버튼)');
+    else adv.push('이 위치에서는 후보 주파수로도 해소되지 않습니다. 대응차 출력(반경)을 낮추거나 룸 연결 분리를 검토하세요.');
+  }
+  if(fIss) adv.push('고정국끼리 겹칩니다. 주파수를 다시 나누거나 반경이 맞는지 확인하세요.');
+  if(!vIss&&!fIss) adv.push('현재 설정에서는 겹침 문제가 없습니다.');
+  h+='<div class="advice" id="adv"><b>권장 조치</b><br>'+adv.join('<br>')+'</div>';
+  $('verdict').innerHTML=h;
+  ST.forEach(function(s){
+    var el=$('chip-'+s.id); if(!el) return;
+    var lv=(s.mobile&&!s.on)?0:stLevel(s,pairs);
+    el.className='chip c'+lv; el.textContent=ICON[lv]+' '+LVT[lv];
+  });
+}
+
+function refresh(){draw();verdict();}
+
+function buildCtrl(){
+  var h='';
+  ST.forEach(function(s){
+    h+='<div class="st"><div class="sh"><span class="dot" style="background:'+s.color+'"></span><b>'+s.name+'</b><span class="chip c0" id="chip-'+s.id+'">✔ 정상</span></div><div class="note">'+s.note+'</div>'+
+       '<div class="row"><label for="f-'+s.id+'">주파수(MHz)</label><input type="number" id="f-'+s.id+'" step="0.005" min="144" max="146" value="'+fmt(s.f)+'"></div>'+
+       '<div class="row"><label for="r-'+s.id+'">도달 반경</label><input type="range" id="r-'+s.id+'" min="1" max="15" step="0.5" value="'+s.r+'"><output id="o-'+s.id+'">'+s.r+' km</output></div>';
+    if(s.mobile) h+='<div class="row"><button type="button" class="btn pri" id="recBtn">추천 주파수 적용</button><span class="note" id="recTxt"></span></div>';
+    h+='</div>';
+  });
+  h+='<div class="st"><div class="sh"><span class="dot" style="background:#5a6b7d"></span><b>LFC UV 리피터 436.140</b></div><div class="note">참고 표시 · 145 MHz 판정에서 제외</div>'+
+     '<div class="row"><label for="r-uv">도달 반경</label><input type="range" id="r-uv" min="2" max="20" step="0.5" value="'+uvR+'"><output id="o-uv">'+uvR+' km</output></div></div>';
+  $('ctrl').innerHTML=h;
+  ST.forEach(function(s){
+    $('f-'+s.id).addEventListener('input',function(e){var v=parseFloat(e.target.value); if(!isNaN(v)){s.f=v; refresh();}});
+    $('r-'+s.id).addEventListener('input',function(e){s.r=parseFloat(e.target.value); $('o-'+s.id).textContent=s.r+' km'; refresh();});
+  });
+  $('r-uv').addEventListener('input',function(e){uvR=parseFloat(e.target.value); $('o-uv').textContent=uvR+' km'; draw();});
+  $('recBtn').addEventListener('click',function(){
+    var rec=recommend(), v=get('veh');
+    if(rec===null){ $('recTxt').textContent='해소되는 후보가 없습니다.'; return; }
+    if(Math.abs(rec-v.f)<0.0005){ $('recTxt').textContent='현재 주파수로 문제 없음'; refresh(); return; }
+    v.f=rec; $('f-veh').value=fmt(rec); $('recTxt').textContent=fmt(rec)+' MHz 적용'; refresh();
+  });
+}
+
+function buildPresets(){
+  var h='';
+  PRE.forEach(function(p,i){h+='<button type="button" class="btn" data-i="'+i+'">'+p.n+'</button>';});
+  $('presets').innerHTML=h;
+  $('presets').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    var p=PRE[+b.getAttribute('data-i')], v=get('veh'); v.lon=p.lon; v.lat=p.lat;
+    var bs=$('presets').querySelectorAll('button'); for(var i=0;i<bs.length;i++) bs[i].classList.toggle('on',bs[i]===b);
+    if($('recTxt')) $('recTxt').textContent='';
+    refresh();
+  });
+}
+
+function buildLegend(){
+  var h=''; ST.forEach(function(s){h+='<span><i style="background:'+s.color+'"></i>'+s.short+'</span>';});
+  h+='<span>✖ 충돌 · ⚠ 주의 (겹침 선)</span><span>원 = 도달 범위(가정)</span>';
+  $('legend').innerHTML=h;
+}
+
+function bindMap(){
+  var svg=$('map'), drag=false;
+  function setVeh(e){
+    var r=svg.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top;
+    x=Math.min(Math.max(x,0),W); y=Math.min(Math.max(y,0),H);
+    var p=INV(x,y), v=get('veh'); v.lon=p.lon; v.lat=p.lat;
+    var bs=$('presets').querySelectorAll('button'); for(var i=0;i<bs.length;i++) bs[i].classList.remove('on');
+    refresh();
+  }
+  svg.addEventListener('pointerdown',function(e){ if(!get('veh').on) return; drag=true; try{svg.setPointerCapture(e.pointerId);}catch(x){} setVeh(e); });
+  svg.addEventListener('pointermove',function(e){ if(drag) setVeh(e); });
+  svg.addEventListener('pointerup',function(){drag=false;});
+  svg.addEventListener('pointercancel',function(){drag=false;});
+  svg.addEventListener('keydown',function(e){
+    var v=get('veh'), step=0.5, dl=step/KL, dt=step/KT, used=true;
+    if(e.key==='ArrowLeft') v.lon-=dl; else if(e.key==='ArrowRight') v.lon+=dl;
+    else if(e.key==='ArrowUp') v.lat+=dt; else if(e.key==='ArrowDown') v.lat-=dt; else used=false;
+    if(used){ e.preventDefault(); v.lon=Math.min(Math.max(v.lon,B.lon0),B.lon1); v.lat=Math.min(Math.max(v.lat,B.lat0),B.lat1); refresh(); }
+  });
+}
+
+function bindMisc(){
+  $('uvOn').addEventListener('change',function(e){showUV=e.target.checked; draw();});
+  $('vehOn').addEventListener('change',function(e){get('veh').on=e.target.checked; refresh();});
+  $('minSp').addEventListener('input',function(e){var v=parseFloat(e.target.value); if(!isNaN(v)&&v>0){minSp=v; refresh();}});
+  $('bM').addEventListener('click',function(){document.body.className='m'; $('bM').classList.add('on'); $('bP').classList.remove('on'); refresh();});
+  $('bP').addEventListener('click',function(){document.body.className='p'; $('bP').classList.add('on'); $('bM').classList.remove('on'); refresh();});
+  var t; window.addEventListener('resize',function(){clearTimeout(t); t=setTimeout(draw,120);});
+}
+
+buildPresets(); buildCtrl(); buildLegend(); bindMap(); bindMisc();
+$('presets').querySelector('button').classList.add('on');
+refresh();
+})();
+</script>
+</body>
+</html>
