@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>HL2TLS FM 노드 설정 가이드 v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1f2937;--navy:#1e3a5f;--navy2:#2c5282;--line:#cbd5e1;--bg:#f1f5f9;--card:#fff;--soft:#e8eef7;--warn-bg:#fff4d6;--warn:#7a4b00;--ok-bg:#e3f4e8;--ok:#14532d;--bad-bg:#fde8e8;--bad:#7f1d1d;--hl:#ffe08a}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;font-family:'Noto Sans KR',sans-serif;font-size:.875rem;line-height:1.6;color:var(--ink);background:var(--bg);-webkit-text-size-adjust:100%}
+@media (min-width:768px){body{font-size:1rem}}
+.wrap{max-width:1100px;margin:0 auto;padding:0 8px}
+header.cover{background:var(--navy);color:#fff;margin:8px auto;max-width:1100px;border-radius:10px;padding:14px 12px}
+header.cover h1{margin:0 0 4px;font-size:1.35rem;font-weight:900;color:#fff}
+header.cover p{margin:0;color:#e2e8f0}
+.badge{display:inline-block;background:#fff;color:var(--navy);font-weight:700;border-radius:20px;padding:0 10px;margin-right:6px;font-size:.875rem}
+nav.nav{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
+.nav-inner{max-width:1100px;margin:0 auto;padding:6px 8px;display:flex;gap:6px;align-items:center;overflow-x:auto;white-space:nowrap}
+.nav-inner a{color:var(--navy);text-decoration:none;font-weight:500;padding:4px 10px;border-radius:16px;background:var(--soft);font-size:.875rem}
+.nav-inner a:hover,.nav-inner a:focus{background:var(--navy);color:#fff}
+.tog{margin-left:auto;border:1px solid var(--navy);background:#fff;color:var(--navy);border-radius:16px;padding:4px 12px;font:inherit;font-weight:700;cursor:pointer}
+section.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0}
+h2{margin:0 0 6px;font-size:1.15rem;color:var(--navy);font-weight:900;border-left:5px solid var(--navy2);padding-left:8px}
+h3{margin:10px 0 4px;font-size:1rem;color:var(--navy2);font-weight:700}
+p{margin:4px 0}
+ol,ul{margin:4px 0;padding-left:20px}
+li{margin:2px 0}
+table{border-collapse:collapse;width:100%;margin:6px 0}
+th,td{border:1px solid var(--line);padding:4px 8px;text-align:left;vertical-align:top}
+th{background:var(--soft);color:var(--navy);font-weight:700}
+.tbl{overflow-x:auto}
+.note,.warn,.ok,.bad{border-radius:8px;padding:6px 10px;margin:6px 0}
+.note{background:var(--soft);color:var(--navy)}
+.warn{background:var(--warn-bg);color:var(--warn)}
+.ok{background:var(--ok-bg);color:var(--ok)}
+.bad{background:var(--bad-bg);color:var(--bad)}
+.dlg{border:2px solid #64748b;border-radius:8px;background:#f8fafc;margin:8px 0;overflow:hidden;max-width:620px}
+.dlg .tb{background:#334155;color:#fff;padding:3px 10px;font-weight:700}
+.dlg .bd{padding:8px 10px}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:3px 6px;border-radius:6px;margin:2px 0}
+.row .k{min-width:150px;font-weight:500}
+.row .v{background:#fff;border:1px solid #94a3b8;border-radius:4px;padding:0 8px;min-width:140px}
+.row.sel{background:var(--hl);outline:2px solid #c98a00}
+.row.sel .k{font-weight:900}
+.mu{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.mu span{border:1px solid #94a3b8;background:#fff;border-radius:4px;padding:0 8px}
+.mu span.sel{background:var(--hl);outline:2px solid #c98a00;font-weight:700}
+.btns{display:flex;gap:6px;justify-content:flex-end;margin-top:6px}
+.btns span{border:1px solid #64748b;background:#e2e8f0;border-radius:4px;padding:0 14px}
+.btns span.sel{background:var(--hl);outline:2px solid #c98a00;font-weight:700}
+.step{display:inline-block;background:var(--navy);color:#fff;border-radius:50%;width:22px;height:22px;text-align:center;line-height:22px;font-weight:700;font-size:.875rem;margin-right:4px}
+code,.kbd{background:#e2e8f0;border-radius:4px;padding:0 5px;font-family:'Noto Sans KR',monospace;font-weight:500}
+.chk li{list-style:none;margin-left:-18px}
+.chk li::before{content:"☐ "}
+.fill{border-bottom:1px dashed #64748b;display:inline-block;min-width:120px}
+footer{text-align:center;color:#475569;padding:10px 8px 20px}
+body.pc .wrap{max-width:1100px}
+body.m .wrap{max-width:480px}
+body.m header.cover{max-width:464px}
+body.m .nav-inner{max-width:480px}
+@media print{nav.nav{display:none}}
+</style>
+</head>
+<body class="m">
+<header class="cover">
+  <h1>HL2TLS FM 노드 설정 가이드</h1>
+  <p><span class="badge">v1.0</span>WIRES-X · HRI-200 · FTM-510D / 메뉴별 상세 설정 · 대한적십자사 서울특별시지사 재난대응봉사회 RC-NET</p>
+</header>
+<nav class="nav"><div class="nav-inner">
+  <a href="#s0">0 준비</a><a href="#s1">1 설치</a><a href="#s2">2 실행·연결</a><a href="#s3">3 설정 진입</a>
+  <a href="#s4">4 ID Entry</a><a href="#s5">5 Transceiver</a><a href="#s6">6 HRI-200</a><a href="#s7">7 Call</a>
+  <a href="#s8">8 General</a><a href="#s9">9 오디오</a><a href="#s10">10 ONLINE</a><a href="#s11">11 문제해결</a><a href="#s12">12 체크</a>
+  <button class="tog" id="tog" type="button">PC 화면</button>
+</div></nav>
+<main class="wrap">
+
+<section class="card" id="s0">
+<h2>0. 준비물과 전제</h2>
+<div class="tbl"><table>
+<tr><th style="width:34%">항목</th><th>내용</th></tr>
+<tr><td>HRI-200</td><td>본체 뒷면 <b>S/N 스티커</b> 확인(등록 시 사용)</td></tr>
+<tr><td>케이블</td><td>CT-174(10핀) → RADIO 1 / USB 케이블 → PC</td></tr>
+<tr><td>무전기(전제)</td><td>FTM-510D (DS0ARC와 동일 구성 가정)</td></tr>
+<tr><td>승인 메일</td><td>YAESU에서 받은 <b>Node ID, Room ID</b> 메일</td></tr>
+<tr><td>배정 주파수</td><td>HL2TLS 노드용 FM 주파수 (<span class="fill">&nbsp;</span> MHz)</td></tr>
+<tr><td>PC</td><td>Windows 10/11, USB 포트 1개</td></tr>
+</table></div>
+<div class="warn"><b>Windows 11 주의:</b> 스마트 앱 컨트롤(Smart App Control)이 켜져 있으면 설치 중 “이 앱의 일부가 차단됨” 오류가 날 수 있습니다. 끄면 다시 켤 수 없으니 신중히 결정하세요.</div>
+<div class="note">이 문서의 Node ID·S/N은 <b>입력란</b>으로 비워 두었습니다. 본인 값은 12장 표에 적어 두세요.</div>
+</section>
+
+<section class="card" id="s1">
+<h2>1. 설치 순서</h2>
+<ol>
+<li><b>HRI-200 드라이버</b>를 먼저 설치합니다. (이 단계에서는 USB를 꽂지 않음)</li>
+<li><b>WIRES-X 소프트웨어</b>를 설치합니다.</li>
+<li>PC를 <b>재부팅</b>합니다.</li>
+<li>재부팅 후 HRI-200을 USB로 연결하고 CT-174로 무전기 RADIO 1에 연결합니다.</li>
+</ol>
+<div class="note">순서: <b>소프트웨어 먼저 → 무전기 나중</b>. 순서가 바뀌면 COM 포트가 잡히지 않을 수 있습니다.</div>
+</section>
+
+<section class="card" id="s2">
+<h2>2. 실행과 무전기 연결 확인</h2>
+<ol>
+<li>무전기 전원을 켤 때 <span class="kbd">GM</span> + <span class="kbd">DX</span> 키를 <b>2초</b> 누릅니다. 화면에 <b>HRI-200</b>이 표시되면 정상입니다.</li>
+<li>PC에서 WIRES-X를 실행합니다.</li>
+<li>COM 포트 선택 창이 나오면 HRI-200이 만든 포트를 선택합니다. (장치 관리자 → 포트(COM & LPT)에서 확인)</li>
+</ol>
+<div class="ok"><b>확인:</b> 무전기 화면 “HRI-200” 표시 + WIRES-X 창이 열림.</div>
+</section>
+
+<section class="card" id="s3">
+<h2>3. 설정 화면 들어가기 (공통 규칙)</h2>
+<div class="dlg"><div class="tb">WIRES-X</div><div class="bd">
+<div class="mu"><span class="sel">File</span><span>View</span><span>Help</span></div>
+<div class="row sel"><span class="k">File → Settings</span></div>
+</div></div>
+<p>왼쪽 메뉴에서 항목을 고르고 값을 입력한 뒤 <b>Apply → OK</b> 순서로 저장합니다. 항목마다 저장이 필요합니다.</p>
+<div class="note">설정 항목 순서: ID Entry → Transceiver → HRI-200 setup → Call settings → General settings</div>
+</section>
+
+<section class="card" id="s4">
+<h2>4. ID Entry (WIRES ID Activation)</h2>
+<div class="dlg"><div class="tb">Settings – ID Entry</div><div class="bd">
+<div class="row sel"><span class="k">Serial / Radio ID</span><span class="v">자동 표시</span></div>
+<div class="row sel"><span class="k">DTMF ID – Node</span><span class="v">5자리</span></div>
+<div class="row sel"><span class="k">DTMF ID – Room</span><span class="v">5자리</span></div>
+<div class="row sel"><span class="k">CallSign</span><span class="v">HL2TLS</span></div>
+<div class="row sel"><span class="k">User ID</span><span class="v">호출부호 등</span></div>
+<div class="row"><span class="k">Comment</span><span class="v">Korean Red Cross Seoul NDRT</span></div>
+<div class="row"><span class="k">City / State / Country</span><span class="v">등록 메일과 동일</span></div>
+<div class="row"><span class="k">Confidential ID</span><span class="v">☐ 체크 안 함</span></div>
+<div class="btns"><span class="sel">ID Entry</span><span>Cancel</span></div>
+</div></div>
+<div class="tbl"><table>
+<tr><th style="width:30%">필드</th><th>입력 방법</th></tr>
+<tr><td>Serial / Radio ID</td><td>HRI-200은 <b>S/N</b>이 자동 입력됩니다. 스티커와 같은지 확인</td></tr>
+<tr><td>DTMF ID Node</td><td>YAESU 승인 메일의 <b>Node ID</b> (5자리)</td></tr>
+<tr><td>DTMF ID Room</td><td>메일에 Room ID가 있으면 입력, 없으면 비움(노드만 운용)</td></tr>
+<tr><td>CallSign</td><td>HL2TLS</td></tr>
+<tr><td>Comment</td><td>Korean Red Cross Seoul NDRT</td></tr>
+<tr><td>City/State/Country</td><td>등록 메일에 쓴 설치 장소와 <b>동일하게</b></td></tr>
+<tr><td>Confidential ID</td><td>체크하지 않음 (체크하면 목록에 비공개)</td></tr>
+</table></div>
+<div class="bad"><b>“Serial number/Radio ID and DTMF ID do not match”</b> 오류 → ① S/N 오타·0과 O 혼동 확인 ② Node ID가 이 S/N으로 등록된 번호인지 메일 확인 ③ 다른 장비 번호 아닌지 확인 ④ 그래도 안 되면 YAESU에 등록 정보 확인 요청</div>
+<div class="note">입력 후 <b>ID Entry</b> 버튼 → 완료 메시지 → <b>Apply → OK</b>.</div>
+</section>
+
+<section class="card" id="s5">
+<h2>5. Transceiver</h2>
+<div class="dlg"><div class="tb">Settings – Transceiver</div><div class="bd">
+<div class="row"><span class="k">Transceiver</span><span class="v">FTM-510D</span></div>
+<div class="row sel"><span class="k">Modulation</span><span class="v">RX:FM – TX:FM</span></div>
+<div class="row sel"><span class="k">Frequency</span><span class="v">배정 주파수</span></div>
+<div class="row sel"><span class="k">Analog SQL</span><span class="v">NoTone</span></div>
+<div class="btns"><span class="sel">Apply</span><span>OK</span></div>
+</div></div>
+<ul>
+<li><b>Modulation:</b> HL2TLS는 아날로그 핸디 운용이므로 <b>RX:FM – TX:FM</b></li>
+<li><b>Frequency:</b> 현장 핸디와 맞출 배정 주파수. 다른 노드와 겹치지 않게 협의된 값</li>
+<li><b>Analog SQL:</b> NoTone (톤 스켈치 사용 안 함)</li>
+</ul>
+<div class="warn">ONLINE 상태에서는 <b>Modulation을 바꿀 수 없습니다.</b> OFFLINE → File → Exit → 무전기 전원 OFF → 재시작 후 변경하세요.</div>
+</section>
+
+<section class="card" id="s6">
+<h2>6. HRI-200 setup</h2>
+<div class="dlg"><div class="tb">Settings – HRI-200 setup</div><div class="bd">
+<div class="row sel"><span class="k">모든 항목</span><span class="v">기본값 그대로</span></div>
+<div class="btns"><span>Apply</span><span class="sel">OK</span></div>
+</div></div>
+<p>COM 포트 외에는 바꾸지 않습니다. 임의 변경 시 통신이 끊길 수 있습니다.</p>
+</section>
+
+<section class="card" id="s7">
+<h2>7. Call settings</h2>
+<div class="dlg"><div class="tb">Settings – Call settings</div><div class="bd">
+<div class="row sel"><span class="k">Round QSO Room connection</span><span class="v">☑</span></div>
+<div class="row sel"><span class="k">Return to Room</span><span class="v">☑ Room ID: 48182</span></div>
+<div class="row sel"><span class="k">DTMF #55555</span><span class="v">☑</span></div>
+<div class="btns"><span class="sel">Apply</span><span>OK</span></div>
+</div></div>
+<div class="tbl"><table>
+<tr><th style="width:34%">항목</th><th>의미</th></tr>
+<tr><td>Return to Room</td><td>노드를 켜면 지정한 룸(RCNet-Disaster, 48182)에 자동 접속</td></tr>
+<tr><td>DTMF #55555</td><td>핸디에서 #55555 송신 시 Return to Room 룸으로 다시 접속</td></tr>
+</table></div>
+<div class="note">룸은 DS0ARC가 개설합니다. HL2TLS는 룸을 새로 만들지 않고 <b>접속만</b> 합니다.</div>
+</section>
+
+<section class="card" id="s8">
+<h2>8. General settings</h2>
+<div class="dlg"><div class="tb">Settings – General settings</div><div class="bd">
+<div class="row sel"><span class="k">DTMF #66666</span><span class="v">상태 확인(응답 음성)</span></div>
+<div class="row sel"><span class="k">DTMF *</span><span class="v">Disconnect as needed</span></div>
+<div class="btns"><span class="sel">Apply</span><span>OK</span></div>
+</div></div>
+<div class="tbl"><table>
+<tr><th style="width:30%">DTMF</th><th>동작</th></tr>
+<tr><td>#55555</td><td>룸 접속</td></tr>
+<tr><td>#66666</td><td>현재 상태 확인</td></tr>
+<tr><td>* 또는 #99999</td><td>접속 해제</td></tr>
+</table></div>
+<div class="note">DTMF는 <b>아날로그 운용</b>에서만 동작합니다. 핸디의 DTMF 송신 기능이 켜져 있어야 합니다.</div>
+</section>
+
+<section class="card" id="s9">
+<h2>9. 오디오 조정 (View → Audio adjustment)</h2>
+<div class="warn">접속(ONLINE) 전에만 조정할 수 있습니다.</div>
+<ol>
+<li>Windows <b>소리 설정 → 녹음</b>에서 HRI-200 마이크 속성을 엽니다. 음소거가 꺼져 있어야 합니다.</li>
+<li>WIRES-X <b>View → Audio adjustment</b>를 엽니다.</li>
+<li>핸디에서 <b>DTMF “1”</b>을 송신하며 레벨 막대를 봅니다.</li>
+<li>막대가 <b>점선을 넘지 않도록</b> 마이크 레벨을 낮춥니다. 넘으면 소리가 깨집니다.</li>
+<li>스피커 쪽 소리가 너무 작거나 크면 믹서에서 조절합니다.</li>
+</ol>
+<div class="ok"><b>확인:</b> 말할 때 막대가 점선 아래에서 움직이고, 소리가 깨지지 않음.</div>
+</section>
+
+<section class="card" id="s10">
+<h2>10. ONLINE 전환과 첫 교신 시험</h2>
+<ol>
+<li>WIRES-X에서 <b>OFFLINE → ONLINE</b>으로 전환합니다.</li>
+<li>핸디(FM, 톤 없음, 배정 주파수)에서 PTT를 누르고 <b>#55555</b>를 보냅니다.</li>
+<li>약 <b>10초</b> 기다리면 룸에 접속됩니다.</li>
+<li>접속 후에는 <b>PTT만 눌러</b> 말합니다. DTMF를 다시 보내지 않습니다.</li>
+<li>끝낼 때 <b>#99999</b> 또는 <b>*</b>로 해제합니다.</li>
+</ol>
+<div class="note">처음에는 DS0ARC 운용자와 시간을 맞춰 시험하세요.</div>
+</section>
+
+<section class="card" id="s11">
+<h2>11. 문제 해결</h2>
+<div class="tbl"><table>
+<tr><th style="width:28%">증상</th><th>원인 → 조치</th></tr>
+<tr><td>ID와 DTMF ID 불일치</td><td>S/N 오타, Node ID 불일치 → 4장 오류 해결 순서</td></tr>
+<tr><td>설치 중 DLL/차단 오류</td><td>Windows 11 스마트 앱 컨트롤 → 0장 주의 확인</td></tr>
+<tr><td>무전기에 HRI-200 안 뜸</td><td>GM+DX 2초 다시, CT-174 결선 확인, 소프트웨어 설치 순서 확인</td></tr>
+<tr><td>소리가 깨짐</td><td>9장 마이크 레벨 낮춤</td></tr>
+<tr><td>Modulation 변경 불가</td><td>5장: OFFLINE → Exit → 무전기 OFF → 재시작</td></tr>
+<tr><td>룸 접속 안 됨</td><td>인터넷 연결, Return to Room ID(48182), DTMF 송신 설정, 룸 개설 여부(DS0ARC)</td></tr>
+</table></div>
+</section>
+
+<section class="card" id="s12">
+<h2>12. 완료 체크와 내 값</h2>
+<ul class="chk">
+<li>드라이버 → 소프트웨어 → 재부팅 순서로 설치</li>
+<li>무전기 화면에 HRI-200 표시</li>
+<li>ID Entry 완료 (오류 없음)</li>
+<li>Transceiver: FM / 배정 주파수 / NoTone</li>
+<li>Call settings: Return to Room 48182, #55555</li>
+<li>General settings: #66666, * 해제</li>
+<li>오디오 레벨 점선 이내</li>
+<li>핸디로 룸 접속·해제 시험 성공</li>
+</ul>
+<div class="tbl"><table>
+<tr><th style="width:34%">내 값</th><th>기록</th></tr>
+<tr><td>HRI-200 S/N</td><td>&nbsp;</td></tr>
+<tr><td>Node ID</td><td>&nbsp;</td></tr>
+<tr><td>배정 주파수</td><td>&nbsp;</td></tr>
+<tr><td>설치 장소(City/State)</td><td>&nbsp;</td></tr>
+</table></div>
+<p>참고 링크:
+<a href="https://www.yaesu.com/jp/en/wires-x/" target="_blank" rel="noopener">YAESU WIRES-X</a> ·
+<a href="https://www.yaesu.com/jp/en/wires-x/contact/pdf/HRI-200_Manual_ENG_2304-N.pdf" target="_blank" rel="noopener">HRI-200 매뉴얼(영문)</a></p>
+</section>
+</main>
+<footer>HL2TLS FM 노드 설정 가이드 · <span id="ver">v1.0</span> · 대한적십자사 서울특별시지사 재난대응봉사회 기술팀</footer>
+<script>
+(function(){
+  var VER='v1.0';
+  var b=document.body,t=document.getElementById('tog');
+  document.getElementById('ver').textContent=VER;
+  function set(m){b.className=m;t.textContent=(m==='m')?'PC 화면':'모바일 화면';try{localStorage.setItem('hl2tls_view',m)}catch(e){}}
+  var s='m';try{s=localStorage.getItem('hl2tls_view')||'m'}catch(e){}
+  if(s!=='m'&&s!=='pc')s='m';
+  set(s);
+  t.addEventListener('click',function(){set(b.className==='m'?'pc':'m')});
+})();
+</script>
+</body>
+</html>
