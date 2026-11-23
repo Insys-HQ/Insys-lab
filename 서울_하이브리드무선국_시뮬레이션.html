@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>서울 하이브리드 무선국 시뮬레이션 v1.2</title>
+<title>서울 하이브리드 무선국 시뮬레이션 v1.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -70,12 +70,18 @@ td:first-child{white-space:nowrap}
 th{background:#e6edf6;color:var(--navy)}
 .warn{background:#fff7e6;border:1px solid #e5c37a;border-radius:8px;padding:8px 10px}
 ol,ul.t{margin:4px 0 0 1.2rem;padding:0}
+input[type=text]{font:inherit;width:100%;max-width:22rem;padding:4px 8px;border:1px solid #8ea3bb;border-radius:6px;color:var(--ink)}
+.mode{display:flex;gap:8px;align-items:flex-start;padding:6px 10px;border:1px solid var(--line);border-radius:8px;margin:4px 0;background:#fbfcfe;cursor:pointer}
+.mode.on{border-color:var(--navy);background:#eaf1fa}
+.mode input{margin-top:4px;width:18px;height:18px;flex:none}
+.mode b{color:var(--navy)}
+h3{font-size:1rem;margin:8px 0 4px;color:var(--navy);font-weight:700}
 footer{text-align:center;color:var(--sub);font-size:1rem;padding:4px 0 12px}
 </style>
 </head>
 <body class="m">
 <header class="nav"><div class="nav-inner">
-  <div class="brand">서울 하이브리드 무선국 <span class="app-version">v1.2</span></div>
+  <div class="brand">서울 하이브리드 무선국 <span class="app-version">v1.3</span></div>
   <div class="tg"><button id="bM" class="on" type="button">모바일</button><button id="bP" type="button">PC</button></div>
 </div></header>
 <main class="wrap">
@@ -100,6 +106,17 @@ footer{text-align:center;color:var(--sub);font-size:1rem;padding:4px 0 12px}
   <h2>국별 설정</h2>
   <div class="grid" id="ctrl"></div>
   <div class="row" style="margin-top:8px"><label for="minSp">최소 채널 간격</label><input type="number" id="minSp" value="20" min="5" max="50" step="5"> <span>kHz (이 값보다 가까우면 인접 채널 주의)</span></div>
+</section>
+
+<section class="card" id="prefCard">
+  <h2>선호 주파수와 운영방법</h2>
+  <p class="sub">국마다 쓸 수 있는 주파수를 여러 개 적고(쉼표로 구분, <b>맨 앞이 1순위</b>), 상황에 맞는 운영방법을 고르면 전체 주파수 배정안을 계산합니다.</p>
+  <div class="grid" id="prefIn"></div>
+  <h3>운영방법 선택</h3>
+  <div id="prefModes"></div>
+  <h3>배정안 미리보기</h3>
+  <div id="prefOut"></div>
+  <div class="row"><button type="button" class="btn pri" id="prefApply">배정안 적용</button><span class="note" id="prefTxt"></span></div>
 </section>
 
 <section class="card">
@@ -129,18 +146,19 @@ footer{text-align:center;color:var(--sub);font-size:1rem;padding:4px 0 12px}
   <ul class="t">
     <li>FRC 주파수는 정해지지 않아 145.620으로 가정했습니다.</li>
     <li>6K2JPO는 청계천 상가 옥상의 휩안테나로 가정해 청계6가 부근에 두었고, 주파수는 미정이라 145.600, 도달 반경은 5 km로 가정했습니다. 옥상 안테나는 높이 때문에 실제 도달이 더 멀 수 있으니 반경을 조절해 보세요.</li>
+    <li>선호 주파수 목록의 처음 값은 예시 가정입니다. 이 화면에서 자유롭게 바꿀 수 있고, 새로고침하면 처음 값으로 돌아갑니다. 배정안은 직선거리와 도달 반경 기준의 판정으로 계산합니다.</li>
     <li>도달 반경은 가정값이며 최대 30 km까지 조절할 수 있습니다. 지형·안테나·출력에 따라 달라지므로 현장 측정으로 조정하세요.</li>
     <li>위치는 구·동 수준의 개략 좌표이고 거리는 직선거리 근사입니다. 서울 경계와 한강도 개략 표시이며 실제 주소가 아닙니다.</li>
     <li>채널 간격 기준 20 kHz는 가정값입니다. 허가 사항은 제외하고 기술적 간섭만 판정합니다.</li>
   </ul>
 </section>
-<footer>서울 하이브리드 무선국 시뮬레이션 <span class="app-version">v1.2</span> · <span id="appdate"></span></footer>
+<footer>서울 하이브리드 무선국 시뮬레이션 <span class="app-version">v1.3</span> · <span id="appdate"></span></footer>
 </main>
 
 <script>
 (function(){
 'use strict';
-var APP_VER='v1.2', APP_DATE='2026-11-24';
+var APP_VER='v1.3', APP_DATE='2026-11-24';
 var vs=document.querySelectorAll('.app-version'); for(var i=0;i<vs.length;i++) vs[i].textContent=APP_VER;
 document.getElementById('appdate').textContent=APP_DATE;
 
@@ -294,7 +312,7 @@ function verdict(){
   });
 }
 
-function refresh(){draw();verdict();}
+function refresh(){draw();verdict();renderPref();}
 
 function buildCtrl(){
   var h='';
@@ -370,7 +388,89 @@ function bindMisc(){
   var t; window.addEventListener('resize',function(){clearTimeout(t); t=setTimeout(draw,120);});
 }
 
-buildPresets(); buildCtrl(); buildLegend(); bindMap(); bindMisc();
+
+var PREF={arc:[145.640,145.660],lfc:[145.620,145.600],frc:[145.620,145.580],jpo:[145.600,145.680],veh:[145.620,145.580,145.660,145.560]};
+var MODES=[
+ {id:'keep',n:'현재 유지',d:'지금 입력된 주파수를 그대로 두고 판정만 봅니다.'},
+ {id:'first',n:'평시: 1순위 일괄',d:'모든 국이 각자의 1순위(맨 앞) 선호 주파수를 씁니다.'},
+ {id:'veh',n:'현장 출동: 대응차만 선택',d:'고정국은 지금 값을 유지하고, 대응차만 선호 주파수 중 겹침이 가장 적은 것을 고릅니다.'},
+ {id:'all',n:'비상: 전체 최적 배정',d:'모든 국이 선호 목록 안에서 서로 겹침이 가장 적은 조합을 찾습니다.'}
+];
+var curMode='keep';
+function parsePref(t){
+  var a=String(t).split(/[\s,;]+/), out=[], i, v;
+  for(i=0;i<a.length;i++){ v=parseFloat(a[i]); if(isNaN(v)||v<144||v>146) continue; v=Math.round(v*1000)/1000; if(out.indexOf(v)<0) out.push(v); }
+  return out.slice(0,8);
+}
+function scoreOf(items,idx){
+  var T=items.map(function(it,i){return {lon:it.st.lon,lat:it.st.lat,r:it.st.r,f:it.c[idx[i]]};}), c1=0,c2=0,rk=0,i,j,q;
+  for(i=0;i<T.length;i++){ rk+=idx[i]; for(j=i+1;j<T.length;j++){ q=pairStatus(T[i],T[j]).lvl; if(q===2) c2++; else if(q===1) c1++; } }
+  return {c1:c1,c2:c2,sc:c2*1000+c1*100+rk};
+}
+function plan(mode){
+  var A=active(), items;
+  if(mode==='keep') items=A.map(function(s){return {st:s,c:[s.f]};});
+  else if(mode==='first') items=A.map(function(s){return {st:s,c:[PREF[s.id].length?PREF[s.id][0]:s.f]};});
+  else if(mode==='veh') items=A.map(function(s){return s.mobile?{st:s,c:PREF[s.id].length?PREF[s.id]:[s.f]}:{st:s,c:[s.f]};});
+  else items=A.map(function(s){return {st:s,c:PREF[s.id].length?PREF[s.id]:[s.f]};});
+  var n=items.length, idx=[], best=null, bi=null, cnt=0, i;
+  for(i=0;i<n;i++) idx.push(0);
+  (function rec(k){
+    if(cnt>200000) return;
+    if(k===n){ cnt++; var r=scoreOf(items,idx); if(best===null||r.sc<best.sc){best=r; bi=idx.slice();} return; }
+    for(var x=0;x<items[k].c.length;x++){ idx[k]=x; rec(k+1); }
+  })(0);
+  return {items:items,idx:bi||idx,res:best||scoreOf(items,idx)};
+}
+function buildPrefs(){
+  var h='', m='';
+  ST.forEach(function(s){
+    h+='<div class="st"><div class="sh"><span class="dot" style="background:'+s.color+'"></span><b>'+s.short+'</b></div>'+
+       '<label for="pf-'+s.id+'" class="note">선호 주파수 (최대 8개)</label>'+
+       '<input type="text" id="pf-'+s.id+'" value="'+PREF[s.id].map(fmt).join(', ')+'" inputmode="decimal" autocomplete="off">'+
+       '<div class="note" id="pn-'+s.id+'"></div></div>';
+  });
+  $('prefIn').innerHTML=h;
+  ST.forEach(function(s){
+    function upd(){ PREF[s.id]=parsePref($('pf-'+s.id).value); $('pn-'+s.id).textContent=PREF[s.id].length?('인식: '+PREF[s.id].map(fmt).join(' › ')):'인식된 주파수 없음 (현재 값 사용)'; renderPref(); }
+    $('pf-'+s.id).addEventListener('input',upd);
+    $('pn-'+s.id).textContent='인식: '+PREF[s.id].map(fmt).join(' › ');
+  });
+  MODES.forEach(function(o){
+    m+='<label class="mode" id="md-'+o.id+'"><input type="radio" name="pmode" value="'+o.id+'"'+(o.id===curMode?' checked':'')+'><span><b>'+o.n+'</b><br><span class="sub">'+o.d+'</span></span></label>';
+  });
+  $('prefModes').innerHTML=m;
+  $('prefModes').addEventListener('change',function(e){ if(e.target.name==='pmode'){ curMode=e.target.value; $('prefTxt').textContent=''; renderPref(); } });
+  $('prefApply').addEventListener('click',function(){
+    var pl=plan(curMode), n=0;
+    pl.items.forEach(function(it,i){ var f=it.c[pl.idx[i]]; if(Math.abs(f-it.st.f)>0.0005){ it.st.f=f; $('f-'+it.st.id).value=fmt(f); n++; } });
+    $('prefTxt').textContent=n?(n+'개 국의 주파수를 적용했습니다.'):'바뀐 국이 없습니다.';
+    if($('recTxt')) $('recTxt').textContent='';
+    refresh();
+  });
+}
+function renderPref(){
+  var out=$('prefOut'); if(!out) return;
+  MODES.forEach(function(o){ var el=$('md-'+o.id); if(el) el.classList.toggle('on',o.id===curMode); });
+  var cur=plan('keep'), pl=plan(curMode), h, diff=0;
+  h='<div class="chips"><span class="chip c0">현재 ✖ '+cur.res.c2+' · ⚠ '+cur.res.c1+'</span><span class="chip '+(pl.res.c2?'c2':(pl.res.c1?'c1':'c0'))+'">제안 ✖ '+pl.res.c2+' · ⚠ '+pl.res.c1+'</span></div>';
+  h+='<table><tr><th>국</th><th>현재</th><th>제안</th><th>순위</th></tr>';
+  pl.items.forEach(function(it,i){
+    var f=it.c[pl.idx[i]], ch=Math.abs(f-it.st.f)>0.0005, k=PREF[it.st.id].indexOf(f);
+    if(ch) diff++;
+    h+='<tr><td>'+it.st.short+'</td><td>'+fmt(it.st.f)+'</td><td>'+(ch?'<b>'+fmt(f)+'</b>':fmt(f)+' (유지)')+'</td><td>'+(k>=0?(k+1)+'순위':'목록 밖')+'</td></tr>';
+  });
+  h+='</table>';
+  var msg;
+  if(curMode==='veh'&&!get('veh').on) msg='대응차가 꺼져 있어 바꿀 국이 없습니다. 위의 “대응차 노드 켜기”를 확인하세요.';
+  else if(pl.res.c2||pl.res.c1) msg='이 운영방법으로도 겹침이 남습니다. 선호 주파수를 더 추가하거나 도달 반경을 조정해 보세요.';
+  else msg='이 운영방법이면 겹침 없이 배정할 수 있습니다.';
+  h+='<div class="advice">'+msg+'</div>';
+  out.innerHTML=h;
+  $('prefApply').disabled=(curMode==='keep'||!diff);
+}
+
+buildPresets(); buildCtrl(); buildPrefs(); buildLegend(); bindMap(); bindMisc();
 $('presets').querySelector('button').classList.add('on');
 refresh();
 })();
