@@ -6,13 +6,13 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>ERP AI 에이전트 도입 가이드 v1.1 — 인시스 AI혁신 연구개발실</title>
+<title>ERP AI 에이전트 도입 가이드 v2.2 — 인시스 AI혁신 연구개발실</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 <style>
-/* APP_VERSION v1.1 */
+/* APP_VERSION v2.2 */
 :root{
   --navy:#1e3a5f; --ink:#24303f; --sub:#4a5a6e; --line:#d6dde6;
   --bg:#f4f6f9; --card:#ffffff; --pale:#eaf1f8; --pale2:#eef6f0; --warn:#fff4e5; --warnink:#7a4a00;
@@ -105,7 +105,7 @@ footer .nav-inner{color:var(--sub);font-size:.85rem}
 
 <header>
   <div class="nav-inner">
-    <div class="brand">ERP AI 에이전트 도입 가이드 <span class="ver" style="color:#fff">v1.1</span>
+    <div class="brand">ERP AI 에이전트 도입 가이드 <span class="ver" style="color:#fff">v2.2</span>
       <small>인시스 AI혁신 연구개발실 · 2026-11-24</small></div>
     <div class="viewtog" role="group" aria-label="화면 선택">
       <button type="button" id="vMobile" class="on">모바일</button>
@@ -117,13 +117,12 @@ footer .nav-inner{color:var(--sub);font-size:.85rem}
 <nav class="tabs">
   <div class="nav-inner" id="tabbar">
     <button type="button" data-tab="sum" class="on">요약</button>
-    <button type="button" data-tab="arch">구조</button>
-    <button type="button" data-tab="conn">AWS·MS365 연결</button>
-    <button type="button" data-tab="dev">개발 요구사항</button>
-    <button type="button" data-tab="issue">오류 리포트</button>
+    <button type="button" data-tab="diag">현황 진단</button>
+    <button type="button" data-tab="track">추진 전략</button>
     <button type="button" data-tab="org">조직·결재선</button>
-    <button type="button" data-tab="role">역할별 가이드</button>
-    <button type="button" data-tab="plan">비용·로드맵</button>
+    <button type="button" data-tab="plan">도입·비용·진행</button>
+    <button type="button" data-tab="issue">오류 양식</button>
+    <button type="button" data-tab="role">역할별</button>
     <button type="button" data-tab="qs">직원 질문지</button>
     <button type="button" data-tab="qd">개발자 질문지</button>
   </div>
@@ -135,229 +134,191 @@ footer .nav-inner{color:var(--sub);font-size:.85rem}
 <!-- 요약 -->
 <section class="panel on" id="p-sum">
   <div class="card">
-    <h1>직원이 ERP를 배우는 대신, AI가 ERP를 대신 다룬다</h1>
-    <p class="lead">직원은 말·사진·엑셀로 요청만 → AI 에이전트가 계열사·양식에 맞춰 임시저장 → 직원 확인 → 등록. 오류는 개발 AI에게 자동 리포트.</p>
+    <h1>ERP에 이미 있는 AI 비서를 채우고, 엔진을 올리고, 손을 단다</h1>
+    <p class="lead">직원이 자연어로 지시하면 AI가 ERP 절차를 직접 진행(조회 → 입력안 → 직원 확인 → 입력 → 결재선 확인 → 직원 확인 → 상신)하는 것이 목표입니다.</p>
   </div>
   <div class="card">
-    <h2>한눈에 보기</h2>
+    <h2>v1.1 대비 바뀐 점</h2>
     <div class="tblwrap"><table class="tbl">
-      <tr><th>항목</th><th>내용</th></tr>
-      <tr><td>문제</td><td>영상 90개·퀘스트가 이중 업무가 됨. 챗봇은 자기 기능도 설명 못함</td></tr>
-      <tr><td>방향</td><td>교육 중심 → <b>대행 중심</b>. 에이전트가 입력, 직원은 확인</td></tr>
-      <tr><td>엔진</td><td>ERP가 AWS에 있으므로 <b>Amazon Bedrock(서울 리전) Claude</b> 1순위</td></tr>
-      <tr><td>계정</td><td>MS365(Entra ID) 통합 로그인 → 요청자 정확히 식별</td></tr>
-      <tr><td>품질 순환</td><td>오류 → 이슈 리포트 → 개발 AI 수정 → 공지·지식 자동 갱신</td></tr>
-      <tr><td>선행 과제</td><td>27개 계열사 조직·결재선 단순화(직무 템플릿 + 담당자 매트릭스)</td></tr>
-      <tr><td>예상 비용</td><td>월 약 50만 원 내외(50명·1일 1,000건 가정, 시범 후 확정)</td></tr>
+      <tr><th>항목</th><th>이전</th><th>현재 (v2.2)</th></tr>
+      <tr><td>기본 방향</td><td>에이전트 새로 구축</td><td><b>기존 AI 비서(봇·도구·지식·피드백) 보강 + 모델 상향</b></td></tr>
+      <tr><td>MS365</td><td>ERP 로그인 통합</td><td><b>메일 연동용</b> (ERP 로그인은 별도 계정)</td></tr>
+      <tr><td>AI 도입</td><td>전사 동시</td><td><b>소수 시범 → 경영지원실 → 전 부서</b></td></tr>
+      <tr><td>결재선 문제</td><td>원인 추정</td><td><b>원인 확인</b>: 부서장·상위 부서 미지정</td></tr>
+      <tr><td>모델</td><td>Bedrock 신규 연결</td><td>gpt-4o-mini → <b>상향을 개발자에게 요청</b></td></tr>
+      <tr><td>첨부파일</td><td>—</td><td><b>업로드 시 자동 MD 변환</b> 요청 추가</td></tr>
     </table></div>
+  </div>
+  <div class="card">
+    <h2>목표 모습</h2>
+    <ol>
+      <li>비서가 <b>정확한 메뉴 경로와 절차</b>를 답한다</li>
+      <li>영수증·엑셀을 주면 비서가 <b>입력안을 제안</b>하고 직원은 확인만 한다</li>
+      <li>결재는 <b>정해진 결재선대로</b> 간다</li>
+      <li>비서가 못 한 일은 <b>개선요청으로 자동 정리</b>되어 개발자에게 간다</li>
+      <li>영상·퀘스트는 필수가 아니라 <b>필요할 때 비서가 안내</b>한다</li>
+    </ol>
   </div>
   <div class="card">
     <h2>직원이 체감하는 모습</h2>
-    <div class="chat"><b>직원:</b> (영수증 사진 3장) "어제 창원 거래처 미팅 식대야"<br>
-    <b>에이전트:</b> "사업자번호로 보아 (주)○○ 법인카드 건입니다. 계정과목 '접대비', 참석자를 알려주세요."<br>
-    <b>직원:</b> "김OO 부장, 거래처 이OO 과장"<br>
-    <b>에이전트:</b> (미리보기 표) "이대로 임시저장할까요?" → [확인] → 결재선 자동 지정 확인</div>
-    <p class="status" style="margin-top:6px">오류가 나면: "결재선 미지정 오류로 개발팀에 리포트 #142 접수했습니다. 처리되면 알려드릴게요."</p>
-  </div>
-  <div class="card">
-    <h2>현재 문제 진단</h2>
-    <div class="tblwrap"><table class="tbl">
-      <tr><th>증상</th><th>근본 원인</th></tr>
-      <tr><td>챗봇이 엉뚱한 답</td><td>낮은 성능 모델 + ERP 기능 지식 없음 + 현재 화면·권한 정보 없음</td></tr>
-      <tr><td>영상·퀘스트 볼 시간 없음</td><td>교육이 업무와 분리 → 이중 업무</td></tr>
-      <tr><td>결재가 엉뚱한 관리자에게</td><td>27개 법인 × 직무 × 사람을 사람별 설정 → 누락 시 기본 결재선 우회</td></tr>
-      <tr><td>개선 요청이 느림</td><td>말로 전달, 재현 정보 부족</td></tr>
-    </table></div>
+    <div class="chat"><b>직원:</b> "이번 달 내 카드 경비 처리해줘"<br>
+    <b>에이전트:</b> 미처리 12건 조회 → 가맹점·금액 기준 <b>용도·계정 안을 표로 제시</b><br>
+    <b>직원:</b> 표 확인·수정 후 "좋아"<br>
+    <b>에이전트:</b> 12건 입력 → 결재선 판정 → <b>"상신할까요?"</b> → 확인 후 상신·결과 보고</div>
   </div>
 </section>
 
-<!-- 구조 -->
-<section class="panel" id="p-arch">
+<!-- 현황 진단 -->
+<section class="panel" id="p-diag">
   <div class="card">
-    <h2>전체 구조</h2>
-<pre>[직원] MS365 계정으로 ERP 로그인(Entra ID SSO)
-   │  ERP 화면 우측 챗봇 창
-   │  질문 + 현재 화면 + 사용자ID·권한·담당법인 자동 첨부
-   ▼
-[에이전트 서버]  ← AWS 안의 ERP 백엔드에 추가
-   ├ 시스템 프롬프트 : 역할·규칙·안전장치
-   ├ 지식 : 영상 90개 자막 / 위키 / 공지 / 메뉴 카탈로그
-   ├ 도구 : ERP 조회·임시저장 (API 또는 MCP 서버)
-   └ 로그 : 대화·도구 실행·오류 (감사로그)
-   ▼
-[LLM] Amazon Bedrock(서울) Claude  ← 1순위
-      (대안: Claude Platform on AWS / OpenAI API)
-   ▼
-[알림] Outlook 메일 · Teams
-   ▼
-[오류 시] 이슈 리포트 → 개발 AI 수정 → 배포
-          → 공지 자동 작성 → 에이전트 지식 갱신</pre>
+    <h2>AI 비서: 갖춰져 있으나 속이 비어 있음</h2>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>구성</th><th>현재 상태</th><th>평가</th></tr>
+      <tr><td>봇</td><td>비서(도구 19)·회계(8)·인사(8)·ERP 셋업(0)·WMS(3)</td><td>구조 양호</td></tr>
+      <tr><td>도구</td><td>테이블 조회, 매뉴얼·게시판·위키 검색, 신청서·할일 제안, 엑셀 가져오기 제안 등</td><td>쓰기는 「제안」 방식</td></tr>
+      <tr><td><b>모델</b></td><td><b>gpt-4o-mini</b> (소형·저가), Claude 선택지 없음</td><td><b>가장 큰 약점</b></td></tr>
+      <tr><td><b>시스템 프롬프트</b></td><td><b>205자 일반 문구</b></td><td>약함</td></tr>
+      <tr><td><b>지식 문서</b></td><td><b>2건</b>(전결 규정, 셋업 가이드)</td><td>매우 부족</td></tr>
+      <tr><td>피드백</td><td>👍👎, 근거 표시, 지식 공백 리포트</td><td>양호, 활용 안 됨</td></tr>
+      <tr><td>비용</td><td>2026-11 호출 538건, $2.84</td><td>상향 여력 큼</td></tr>
+    </table></div>
   </div>
   <div class="card">
-    <h2>에이전트 3종</h2>
+    <h2>시험 결과 (2026-11-24)</h2>
     <div class="tblwrap"><table class="tbl">
-      <tr><th>역할</th><th>하는 일</th></tr>
-      <tr><td>① 안내</td><td>영상 자막·위키·공지 기반 답변, 필요 시 영상 해당 구간 제시</td></tr>
-      <tr><td>② 입력 대행</td><td>증빙에서 계열사 판별 → 양식 작성 → 직원 확인 → 임시저장</td></tr>
-      <tr><td>③ 오류 리포트</td><td>실패·이상 감지 시 개발 AI용 이슈 자동 작성</td></tr>
+      <tr><th>비교</th><th>ERP 비서 (gpt-4o-mini)</th><th>Claude 프로젝트 (Sonnet 5.5 + 지식문서)</th></tr>
+      <tr><td>경로</td><td>❌ 할일 › 양식 › 법인카드 사용 신청</td><td>✅ 회계 › 경비 › 내 카드 경비</td></tr>
+      <tr><td>절차</td><td>일반적 3단계</td><td>탭·버튼 이름까지 6단계</td></tr>
+      <tr><td>모르는 부분</td><td>일반론으로 채움</td><td>"확인 필요" 표시</td></tr>
     </table></div>
-    <p class="note" style="margin-top:6px">에이전트는 <b>임시저장까지만</b>. 결재 상신·승인·삭제는 사람이 버튼으로 수행. 권한은 요청한 직원의 권한을 그대로 따름.</p>
-  </div>
-</section>
-
-<!-- 연결 -->
-<section class="panel" id="p-conn">
-  <div class="card">
-    <h2>비즈니스 계정 ≠ API</h2>
-    <div class="tblwrap"><table class="tbl">
-      <tr><th>구분</th><th>용도</th><th>과금</th><th>ERP 연결</th></tr>
-      <tr><td>Claude Team·Enterprise / ChatGPT Business</td><td>직원이 웹 화면에서 직접 사용</td><td>1인당 월정액</td><td>불가</td></tr>
-      <tr><td><b>API</b> (Bedrock, Claude API, OpenAI API)</td><td>우리 시스템에 AI 내장</td><td>사용량</td><td><b>필요</b></td></tr>
-    </table></div>
-    <p class="status" style="margin-top:4px">Anthropic은 기업용(API) 입력·출력을 기본적으로 모델 학습에 쓰지 않음. OpenAI는 계약 전 별도 확인.</p>
+    <p class="note" style="margin-top:6px">모델 + 지식 문서만 바꿔도 답이 달라진다는 근거입니다.</p>
   </div>
   <div class="card">
-    <h2>AWS에서 Claude 쓰는 3가지 경로</h2>
-    <div class="tblwrap"><table class="tbl">
-      <tr><th>경로</th><th>특징</th><th>적합도</th></tr>
-      <tr><td><b>① Amazon Bedrock</b></td><td>AWS 운영, 서울 리전 안에서만 처리 가능, AWS 요금 합산</td><td>1순위</td></tr>
-      <tr><td>② Claude Platform on AWS</td><td>Anthropic 운영·AWS 결제, 최신 기능 빠름(Managed Agents)</td><td>고급 기능 필요 시</td></tr>
-      <tr><td>③ Claude API 직접</td><td>별도 계약·API 키 관리</td><td>시범 테스트</td></tr>
-    </table></div>
-    <h3>모델 선택(Bedrock 서울)</h3>
+    <h2>결재선이 엉뚱하게 가는 원인</h2>
     <ul>
-      <li>개인정보 포함 가능 업무(경비·인사): <b>서울 리전 내 처리 Claude Sonnet 5</b></li>
-      <li>개인정보 없는 업무(사용법 안내): 최신 <b>Claude Sonnet 5.5</b>(글로벌 처리) 또는 Haiku</li>
-    </ul>
-  </div>
-  <div class="card">
-    <h2>연결 절차 (AWS 관리자 + 개발자)</h2>
-    <ol>
-      <li><a href="https://console.aws.amazon.com/bedrock/" target="_blank" rel="noopener">AWS Bedrock 콘솔</a> → 우측 상단 리전을 <b>아시아 태평양(서울)</b>으로 선택</li>
-      <li>왼쪽 메뉴 <b>모델 액세스(Model access)</b> → Anthropic Claude 사용 신청</li>
-      <li><b>IAM 역할</b> 생성: ERP 서버에 <code>bedrock:InvokeModel</code> 권한만 부여 (API 키 없음 → 유출 위험 없음)</li>
-      <li><b>AWS Budgets</b>로 월 예산 알림(초기 50만 원, 80% 도달 시 메일)</li>
-      <li>개발자가 ERP 백엔드에 에이전트 서버 모듈 추가</li>
-      <li>(선택) OpenAI 비교 테스트 시 키는 AWS Secrets Manager에만 저장</li>
-    </ol>
-  </div>
-  <div class="card">
-    <h2>MS365 연동</h2>
-    <div class="tblwrap"><table class="tbl">
-      <tr><th>연동</th><th>내용</th></tr>
-      <tr><td>통합 로그인(Entra ID)</td><td>ERP를 MS365 계정으로 로그인. 퇴사자 일괄 차단, 요청자 식별</td></tr>
-      <tr><td>Outlook</td><td>결과·오류·결재 대기 알림. 영수증을 지정 메일함으로 보내면 에이전트가 임시저장</td></tr>
-      <tr><td>Teams</td><td>Teams 채팅에서 ERP 에이전트 호출(2단계 이후)</td></tr>
-      <tr><td>조직 동기화</td><td>Entra ID 부서·직책과 담당자 매트릭스 대조 → 권한 정리 누락 방지</td></tr>
-    </table></div>
-  </div>
-</section>
-
-<!-- 개발 요구사항 -->
-<section class="panel" id="p-dev">
-  <div class="card">
-    <h2>에이전트 서버</h2>
-    <ul>
-      <li>ERP 백엔드에 <code>/agent/chat</code> 엔드포인트(스트리밍)</li>
-      <li>자동 첨부: <code>user_id, role, companies, current_menu, locale</code></li>
-      <li>환경변수: <code>LLM_PROVIDER=bedrock|anthropic-aws|anthropic|openai</code>, <code>LLM_MODEL</code>, <code>AWS_REGION=ap-northeast-2</code></li>
-      <li>Bedrock 호출은 IAM 역할 인증, 장기 키 금지 / 사용자 식별은 Entra ID 토큰 기준</li>
-      <li>지식은 시스템 프롬프트 + 프롬프트 캐싱, 커지면 검색형(RAG) 전환</li>
-    </ul>
-  </div>
-  <div class="card">
-    <h2>도구(Tool) 1차 목록</h2>
-    <div class="tblwrap"><table class="tbl">
-      <tr><th>도구명</th><th>기능</th><th>유형</th></tr>
-      <tr><td>search_guide</td><td>가이드·영상 자막·위키 검색</td><td>조회</td></tr>
-      <tr><td>get_my_context</td><td>내 권한·담당 법인·결재선</td><td>조회</td></tr>
-      <tr><td>find_company</td><td>사업자번호·상호로 계열사 판별</td><td>조회</td></tr>
-      <tr><td>get_form_schema</td><td>메뉴별 입력 항목·필수값</td><td>조회</td></tr>
-      <tr><td>create_draft_expense</td><td>법인카드 경비 임시저장</td><td>쓰기(임시)</td></tr>
-      <tr><td>create_draft_asset</td><td>자산 등록 임시저장</td><td>쓰기(임시)</td></tr>
-      <tr><td>check_approval_line</td><td>결재선 정상 여부 점검</td><td>조회</td></tr>
-      <tr><td>report_issue</td><td>오류 이슈 리포트 생성</td><td>쓰기</td></tr>
-    </table></div>
-    <p class="status" style="margin-top:4px">가능하면 MCP 서버로 묶어 공개 → Claude·OpenAI 어느 쪽이든 그대로 연결.</p>
-  </div>
-  <div class="card">
-    <h2>필수 안전장치</h2>
-    <ol>
-      <li>임시저장까지만, 결재·삭제·금액 확정은 사람</li>
-      <li>쓰기 전 미리보기 + 사용자 확인</li>
-      <li>감사로그(누가·언제·요청·도구·결과)</li>
-      <li>급여·평가·주민번호 조회 제외 또는 마스킹</li>
-      <li>업로드 문서·이미지 속 "지시문"은 실행하지 않음</li>
-      <li>1회 처리 건수·금액 한도</li>
-    </ol>
-  </div>
-  <div class="card">
-    <h2>지식 자동화</h2>
-    <ul>
-      <li>영상 90개 → 자막 추출 → 메뉴별 가이드 문서</li>
-      <li>공지(업데이트) 등록 시 지식 자동 반영</li>
-      <li>답 못한 질문 주간 리포트 → 가이드 보강</li>
+      <li>결재선 정책 68건 대부분의 첫 단계 = <b>직속 상사(보고선)</b></li>
+      <li><b>부서 53개 중 부서장 미지정 28개, 상위 부서 미지정 46개</b></li>
+      <li>등록 회사 27곳 중 <b>부서가 있는 회사 15곳</b>, 직원 0명 회사 11곳</li>
+      <li>조건 불일치 시 기본 결재선 5단계(보고선 → 회계 확인 → 회계 부서장 → CFO → 대표)</li>
     </ul>
   </div>
 </section>
 
-<!-- 오류 리포트 -->
-<section class="panel" id="p-issue">
+<!-- 추진 전략 -->
+<section class="panel" id="p-track">
   <div class="card">
-    <h2>자동 작성 조건</h2>
+    <h2>트랙 A. 인시스가 직접 (즉시, 비용 없음)</h2>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>할 일</th><th>위치</th><th>담당</th></tr>
+      <tr><td>A1. 지식 문서 등록: 메뉴 지도·결재선·주요 절차·권한</td><td>사이트 설정 › AI 설정 › 지식 문서</td><td>연구개발실</td></tr>
+      <tr><td>A2. 봇 시스템 프롬프트 강화 (비서·회계·인사)</td><td>AI 설정 › 봇 카탈로그 › 봇 편집</td><td>연구개발실</td></tr>
+      <tr><td>A3. 「지식 반영 테스트」로 대표 질문 검증</td><td>AI 설정 › 지식 문서</td><td>연구개발실</td></tr>
+      <tr><td>A4. 지식 공백 리포트 주 1회 검토 → 문서 보강</td><td>AI 설정 › 모델·사용량</td><td>연구개발실</td></tr>
+      <tr><td>A5. 조직 정비 (조직·결재선 탭)</td><td>인사 › 부서, 인사 설정</td><td>인사 담당 + 연구개발실</td></tr>
+    </table></div>
+  </div>
+  <div class="card">
+    <h2>트랙 B. 개발자에게 요청 (개선요청서 송부 완료)</h2>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>요청</th><th>이유</th></tr>
+      <tr><td>B1. 모델 상향: gpt-4o-mini → GPT-5 또는 Claude Sonnet 추가</td><td>답변 품질의 핵심, 개발자만 변경 가능</td></tr>
+      <tr><td>B2. 고객사별 모델 선택 허용</td><td>현재 모든 고객사 공통</td></tr>
+      <tr><td>B3. 결재선 판정(이 거래는 누구에게?)을 비서 도구로</td><td>상신 전 결재선 확인</td></tr>
+      <tr><td>B4. 카드 경비 용도 일괄 입력 도구</td><td>가장 반복 많은 입력</td></tr>
+      <tr><td>B5. 비서 접근 모듈 확대(급여·현장관리·관리회계)</td><td>권한 상속 전제</td></tr>
+      <tr><td>B6. 오류 시 개선요청 초안 자동 작성</td><td>개발 AI가 바로 처리</td></tr>
+      <tr><td><b>B7. 첨부파일(엑셀·워드·PDF·PPT·HWP) 자동 MD 변환·저장</b></td><td>AI가 첨부를 정확히 읽고 입력안·지식 문서로 활용</td></tr>
+      <tr><td><b>ERP MCP 서버</b> (ChatGPT·Claude 연결용)</td><td>외부 AI에서 자연어로 ERP 업무 실행</td></tr>
+    </table></div>
+  </div>
+  <div class="card">
+    <h2>트랙 C. 개인용 AI 시범</h2>
     <ul>
-      <li>도구 호출 실패(서버·필수값·권한 오류)</li>
-      <li>결재선 미지정·이상 결재선 감지</li>
-      <li>직원이 👎 또는 "이거 안 돼요"라고 말한 경우</li>
+      <li>ChatGPT Business <b>5석</b> 가입 완료 → 경영지원실 핵심 인원 시범</li>
+      <li>ERP MCP 서버가 오면 인시스 IT담당자가 ChatGPT 개발자 모드에서 테스트 후 워크스페이스 배포</li>
+      <li>같은 MCP 서버를 Claude에도 연결해 비교 가능</li>
+      <li>Claude 프로젝트 「ERP AI 에이전트」에 지식문서·가이드·요청서 탑재 완료</li>
     </ul>
-  </div>
-  <div class="card">
-    <h2>리포트 양식 (개발 AI가 바로 읽는 형식)</h2>
-<pre>[ERP-이슈] 법인카드 경비 임시저장 시 결재선 미지정
-- 발생일시/ID : 2026-11-24 10:32 / #142
-- 모듈·메뉴  : 경비관리 > 법인카드 > 사용내역 등록
-- 사용자 맥락 : 직무=회계담당, 담당법인=(주)A,(주)B
-- 재현 절차  : 1) … 2) … 3) …
-- 기대 결과  : 담당 → 실장 → 대표 결재선 자동 지정
-- 실제 결과  : 결재선 공란, 기본 관리자로 상신
-- 오류 로그  : (API 응답 원문)
-- 영향 범위  : 동일 조건 직원 n명 추정
-- 제안 방향  : 직무 템플릿 기반 결재선 조회 로직 점검
-- 우선순위   : 높음 / 중간 / 낮음</pre>
-  </div>
-  <div class="card">
-    <h2>처리 흐름</h2>
-    <ol>
-      <li>에이전트 리포트 → 관리자 검토함(중복·개인정보 확인)</li>
-      <li>관리자 승인 → GitHub Issue 등 개발 AI 작업 큐</li>
-      <li>개발 AI 수정 → 개발자 검토 → 배포</li>
-      <li>업데이트 공지 자동 작성 → 지식 갱신 → 직원에게 "해결됨" 알림</li>
-    </ol>
   </div>
 </section>
 
 <!-- 조직 -->
 <section class="panel" id="p-org">
   <div class="card">
-    <p class="lead">에이전트는 권한·결재선 데이터를 그대로 따르므로, 이 데이터가 정리돼야 에이전트도 정확합니다.</p>
-    <h2 style="margin-top:8px">3개 축 분리</h2>
+    <p class="lead">에이전트는 직원의 권한·결재선 데이터를 그대로 따르므로, 이 데이터가 정리돼야 에이전트도 정확합니다.</p>
+    <h2 style="margin-top:8px">정비 순서</h2>
     <div class="tblwrap"><table class="tbl">
-      <tr><th>축</th><th>의미</th><th>관리</th></tr>
-      <tr><td>법적 소속</td><td>급여·4대보험 기준 법인</td><td>인사 마스터</td></tr>
-      <tr><td>업무 담당</td><td>실제 처리하는 법인들</td><td><b>담당자 매트릭스</b></td></tr>
-      <tr><td>직무(역할)</td><td>회계·인사·총무·채용 등</td><td><b>직무 템플릿</b></td></tr>
+      <tr><th>순서</th><th>작업</th><th>화면</th><th>완료 기준</th></tr>
+      <tr><td>1</td><td>실제 운영 회사 확정 (27곳 중)</td><td>사이트 설정 › 초기 설정 점검</td><td>운영 회사 목록 확정</td></tr>
+      <tr><td>2</td><td>운영 회사별 부서 생성 (현재 15곳)</td><td>인사 › 부서</td><td>모두 부서 1개 이상</td></tr>
+      <tr><td>3</td><td><b>부서장 지정</b> (미지정 28개)</td><td>인사 › 부서</td><td>미지정 0</td></tr>
+      <tr><td>4</td><td><b>상위 부서 연결</b> (미지정 46개)</td><td>인사 › 부서</td><td>계층도 완성</td></tr>
+      <tr><td>5</td><td>부서와 근무지(사업장) 구분 정리</td><td>인사 › 부서 / 사업장 관리</td><td>혼재 해소</td></tr>
+      <tr><td>6</td><td>「보고선이 없으면 부서장에게 결재」 확인</td><td>인사 › 인사 설정</td><td>설정 확인</td></tr>
+      <tr><td>7</td><td>대표 거래 10건 결재선 판정</td><td>회계 › 결재선 정책 › 이 거래는 누구에게?</td><td>10건 의도대로</td></tr>
     </table></div>
+    <p class="status" style="margin-top:4px">원칙: 경영지원실·전략기획실은 공유서비스 조직으로 보고, 실제 처리 법인은 담당자 역할과 회사 데이터 범위로 관리</p>
+  </div>
+</section>
+
+<!-- 단계별 도입 -->
+<section class="panel" id="p-plan">
+  <div class="card">
+    <h2>단계별 도입</h2>
+    <div class="tblwrap"><table class="tbl">
+      <tr><th>단계</th><th>대상</th><th>기간</th><th>내용</th><th>확대 기준</th></tr>
+      <tr><td>0</td><td>연구개발실</td><td>1~2주</td><td>트랙 A1~A3, 조직 정비 1~4, 개선요청 제출</td><td>테스트 30문항 정답률 80%</td></tr>
+      <tr><td>1</td><td>시범 3~5명</td><td>2~4주</td><td>비서 실사용 + 지식 공백 주간 보강, ChatGPT 시범</td><td>정답률 90%, 👍 70%</td></tr>
+      <tr><td>2</td><td>경영지원실</td><td>1~2개월</td><td>카드 경비·전표·인사 입력에 비서 활용</td><td>입력 시간 30% 단축, 결재선 오류 0</td></tr>
+      <tr><td>3</td><td>전 부서</td><td>이후</td><td>모듈별 확대</td><td>부서별 동일 기준</td></tr>
+    </table></div>
+    <p class="status" style="margin-top:4px">퀘스트는 선택으로 전환 권장 (경영지원실 부담 완화)</p>
   </div>
   <div class="card">
-    <h2>원칙</h2>
+    <h2>비용</h2>
+    <ul>
+      <li>현재: gpt-4o-mini, 월 $2.84 (호출 538건, 토큰 약 1,800만)</li>
+      <li>같은 사용량 상위 모델 추정: GPT-5 월 약 $25~40 / Claude Sonnet 5.5 월 약 $40~50</li>
+      <li>ERP 월 예산·1인 상한·80% 알림으로 통제</li>
+      <li>개인용 비즈니스 계정은 시범 인원 × 월 구독료 별도</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>진행 현황 · 이번 주 할 일</h2>
     <ol>
-      <li>경영지원실·전략기획실은 조직도상 <b>공유서비스 조직 1개</b>로 표시</li>
-      <li>권한은 사람별이 아니라 <b>직무 템플릿</b>으로 부여</li>
-      <li>결재선은 <b>직무 × 법인 규칙</b>, 표준 3단계: 담당 → 실장 → 대표</li>
-      <li>결재선 미지정 시 임의 관리자로 보내지 않고 <b>"결재선 오류"로 멈춤 + 관리자 알림</b></li>
-      <li>담당자 매트릭스 1장(사람 × 법인 × 직무)을 원본으로 ERP에 일괄 반영</li>
-      <li>에이전트가 매주 매트릭스와 ERP 설정 불일치 점검</li>
+      <li>✅ 개발자에게 개선요청서(R1~R6) 송부</li>
+      <li>✅ ChatGPT Business 5석 가입</li>
+      <li>✅ Claude 프로젝트 「ERP AI 에이전트」 구성</li>
+      <li>⬜ ERP 비서 프롬프트 강화 + 지식 문서 4건 등록 (원고 완료)</li>
+      <li>⬜ 인사 담당과 부서장·상위 부서 지정 착수</li>
+      <li>⬜ 시범 사용자 5명 확정, 퀘스트 선택 전환 공지 검토</li>
     </ol>
+  </div>
+</section>
+
+<!-- 오류 리포트 -->
+<section class="panel" id="p-issue">
+  <div class="card">
+    <h2>오류·개선요청 양식 (개발 AI가 바로 읽는 형식)</h2>
+<pre>[ERP-이슈] 제목
+- 발생일시 :
+- 클라이언트 : ChatGPT / Claude / ERP 비서
+- 모듈·메뉴 / 경로 : 예) 회계 › 경비 › 내 카드 경비 (/m/accounting/card/my)
+- 사용자 맥락 : 역할, 회사, 부서
+- 재현 절차 : 1) … 2) … 3) …
+- 기대 결과 :
+- 실제 결과 / 오류 코드 :
+- 영향 범위 :
+- 우선순위 : 높음 / 중간 / 낮음</pre>
+  </div>
+  <div class="card">
+    <h2>안전 원칙</h2>
+    <ul>
+      <li>직원 <b>본인 권한으로만</b> 동작</li>
+      <li><b>상신·결재·삭제·금액 확정 전 사람 확인</b>, 결재 승인·반려는 사람만</li>
+      <li>모든 처리 감사 로그, 개인정보 최소화(카드번호 뒤 4자리 등)</li>
+      <li>첨부·조회 결과 안의 지시문은 실행하지 않음</li>
+    </ul>
   </div>
 </section>
 
@@ -365,57 +326,22 @@ footer .nav-inner{color:var(--sub);font-size:.85rem}
 <section class="panel" id="p-role">
   <div class="grid2">
     <div class="card"><h2>대표이사</h2><ul>
-      <li>비전: "말하면 ERP에 들어가는 회사"</li>
-      <li>결정: API 예산 승인, 퀘스트 선택 전환, 결재선 표준 3단계</li></ul></div>
-    <div class="card"><h2>직원</h2><ul>
-      <li>메뉴를 외우지 말고 챗봇에 말하거나 사진 업로드</li>
-      <li>미리보기는 반드시 확인 후 저장</li>
-      <li>이상하면 "이거 이상해" → 리포트 자동 접수</li>
-      <li>영상·퀘스트는 선택</li></ul></div>
-    <div class="card"><h2>관리자(연구개발실)</h2><ul>
-      <li>담당자 매트릭스·직무 템플릿 관리</li>
-      <li>주 1회: 이슈 검토, 답 못한 질문 보강, 비용 확인</li>
-      <li>에이전트 규칙 버전 관리</li></ul></div>
-    <div class="card"><h2>개발자(개발 AI)</h2><ul>
-      <li>개발 요구사항 구현, 이슈 양식 수용</li>
-      <li>배포마다 변경 내역을 공지 형식으로 기록</li></ul></div>
-  </div>
-</section>
-
-<!-- 비용·로드맵 -->
-<section class="panel" id="p-plan">
-  <div class="card">
-    <h2>비용 추정 (가정치)</h2>
-    <p class="status">50명 · 1일 1,000건 · 월 22일 = 22,000건 / Sonnet 5.5 / 건당 캐시 지식 3만 + 신규 입력 3천 + 출력 800 토큰</p>
-    <div class="tblwrap"><table class="tbl">
-      <tr><th>항목</th><th>계산</th><th>월(USD)</th></tr>
-      <tr><td>캐시 지식 읽기</td><td>660M × $0.10/M</td><td>약 $66</td></tr>
-      <tr><td>신규 입력</td><td>66M × $2/M</td><td>약 $132</td></tr>
-      <tr><td>출력</td><td>17.6M × $10/M</td><td>약 $176</td></tr>
-      <tr><td><b>합계</b></td><td></td><td><b>약 $374 (약 50만 원)</b></td></tr>
-    </table></div>
-    <p class="status" style="margin-top:4px">Bedrock 단가는 AWS 요금표 기준으로 차이 가능 → 시범 1개월 실측으로 확정. 출처: <a href="https://platform.claude.com/docs/en/about-claude/pricing" target="_blank" rel="noopener">Claude 가격표</a></p>
-  </div>
-  <div class="card">
-    <h2>로드맵</h2>
-    <div class="tblwrap"><table class="tbl">
-      <tr><th>단계</th><th>기간</th><th>내용</th><th>완료 기준</th></tr>
-      <tr><td>0</td><td>1~2주</td><td>매트릭스·직무 템플릿·결재선 정비, Bedrock 신청</td><td>결재선 오류 0건</td></tr>
-      <tr><td>1</td><td>2주</td><td>안내 에이전트(엔진 교체 + 지식화)</td><td>테스트 50문항 정답률 90%</td></tr>
-      <tr><td>2</td><td>3~4주</td><td>입력 대행 시범: 법인카드 경비</td><td>입력 시간 50% 단축</td></tr>
-      <tr><td>3</td><td>2주</td><td>오류 리포트 ↔ 개발 AI 연결</td><td>리포트→배포 평균 3일</td></tr>
-      <tr><td>4</td><td>지속</td><td>자산·문서관리·근태 확장</td><td>모듈별 동일 기준</td></tr>
-    </table></div>
-  </div>
-  <div class="card">
-    <h2>이번 주 할 일</h2>
-    <ol>
-      <li>퀘스트 필수 → 선택 전환 공지</li>
-      <li>AWS Bedrock(서울) Claude 액세스 신청 + 예산 알림</li>
-      <li>개발자에게 MS365 통합 로그인 적용 가능 여부 확인</li>
-      <li>직원·개발자 질문지 회수 (이 페이지 질문지 탭)</li>
-      <li>담당자 매트릭스 초안 작성</li>
-    </ol>
+      <li>모델 상향 비용 승인 (상향 후에도 월 수만 원 예상)</li>
+      <li>퀘스트 선택 전환, 조직 정비 지시</li></ul></div>
+    <div class="card"><h2>경영지원실</h2><ul>
+      <li>메뉴를 외우지 말고 비서에게 질문·지시</li>
+      <li>제안 카드는 확인 후 실행, 틀린 답은 👎 + 한 줄 사유</li></ul></div>
+    <div class="card"><h2>인사 담당</h2><ul>
+      <li>부서장·상위 부서 지정 (조직·결재선 탭)</li></ul></div>
+    <div class="card"><h2>인시스 IT담당자 · 연구개발실</h2><ul>
+      <li>지식 문서·프롬프트 관리, 지식 공백 주간 검토</li>
+      <li>ChatGPT 개발자 모드 테스트·배포, 개선요청 정리</li></ul></div>
+    <div class="card"><h2>개발자</h2><ul>
+      <li>개선요청서 R1~R6 검토·회신</li>
+      <li>MCP 서버·첨부 MD 변환 구현</li></ul></div>
+    <div class="card"><h2>MS365</h2><ul>
+      <li>ERP 메일 연동용 (ERP 로그인은 별도)</li>
+      <li>비서의 「메일·채팅으로 연락」 도구로 확인 요청·독촉 위임 가능</li></ul></div>
   </div>
 </section>
 
@@ -455,14 +381,14 @@ footer .nav-inner{color:var(--sub);font-size:.85rem}
 <footer>
   <div class="nav-inner">
     <span>인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr</span>
-    <span class="ver" id="verLabel">v1.1</span>
+    <span class="ver" id="verLabel">v2.2</span>
   </div>
 </footer>
 
 <div id="pdfStage"></div>
 
 <script>
-const APP_VERSION = 'v1.1';
+const APP_VERSION = 'v2.2';
 document.getElementById('verLabel').textContent = APP_VERSION;
 
 /* ---------- 질문 정의 ---------- */
