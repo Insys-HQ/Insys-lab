@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>서울 하이브리드 무선국 시뮬레이션 v1.3</title>
+<title>서울 하이브리드 무선국 시뮬레이션 v1.4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -81,7 +81,7 @@ footer{text-align:center;color:var(--sub);font-size:1rem;padding:4px 0 12px}
 </head>
 <body class="m">
 <header class="nav"><div class="nav-inner">
-  <div class="brand">서울 하이브리드 무선국 <span class="app-version">v1.3</span></div>
+  <div class="brand">서울 하이브리드 무선국 <span class="app-version">v1.4</span></div>
   <div class="tg"><button id="bM" class="on" type="button">모바일</button><button id="bP" type="button">PC</button></div>
 </div></header>
 <main class="wrap">
@@ -125,7 +125,7 @@ footer{text-align:center;color:var(--sub);font-size:1rem;padding:4px 0 12px}
     <tr><th>국 (위치)</th><th>주파수</th><th>비고</th></tr>
     <tr><td>ARC (신월동)</td><td>145.640</td><td>HRI-200 FM 노드</td></tr>
     <tr><td>LFC (여의도)</td><td>145.620 (WIRES-X 송신)<br>436.140 (UV 리피터)</td><td>리피터는 별도 대역 장치로 보고 145 MHz 판정에서 제외, 참고 표시</td></tr>
-    <tr><td>FRC (마장동)</td><td>미정 → 145.620 가정</td><td>HL0FRC. 정해지면 위에서 바꿔 보세요</td></tr>
+    <tr><td>FRC (마장동)</td><td>미정 → 145.580 가정</td><td>HL0FRC. 상시 운용이라 LFC(145.620)와 겹치지 않게 가정. 정해지면 위에서 바꿔 보세요</td></tr>
     <tr><td>JPO 6K2JPO (동대문·청계천)</td><td>미정 → 145.600 가정</td><td>상가 옥상 휩안테나 가정. 정해지면 위에서 바꿔 보세요</td></tr>
     <tr><td>대응차 (이동)</td><td>그때그때 변경</td><td>DS0ARC/M. 추천 주파수로 선택</td></tr>
   </table>
@@ -144,7 +144,7 @@ footer{text-align:center;color:var(--sub);font-size:1rem;padding:4px 0 12px}
 <section class="card warn">
   <h2>가정 및 한계</h2>
   <ul class="t">
-    <li>FRC 주파수는 정해지지 않아 145.620으로 가정했습니다.</li>
+    <li>FRC 주파수는 정해지지 않았습니다. FRC가 상시 운용이라 LFC와 같은 145.620이면 겹치므로 145.580으로 가정했습니다.</li>
     <li>6K2JPO는 청계천 상가 옥상의 휩안테나로 가정해 청계6가 부근에 두었고, 주파수는 미정이라 145.600, 도달 반경은 5 km로 가정했습니다. 옥상 안테나는 높이 때문에 실제 도달이 더 멀 수 있으니 반경을 조절해 보세요.</li>
     <li>선호 주파수 목록의 처음 값은 예시 가정입니다. 이 화면에서 자유롭게 바꿀 수 있고, 새로고침하면 처음 값으로 돌아갑니다. 배정안은 직선거리와 도달 반경 기준의 판정으로 계산합니다.</li>
     <li>도달 반경은 가정값이며 최대 30 km까지 조절할 수 있습니다. 지형·안테나·출력에 따라 달라지므로 현장 측정으로 조정하세요.</li>
@@ -152,13 +152,13 @@ footer{text-align:center;color:var(--sub);font-size:1rem;padding:4px 0 12px}
     <li>채널 간격 기준 20 kHz는 가정값입니다. 허가 사항은 제외하고 기술적 간섭만 판정합니다.</li>
   </ul>
 </section>
-<footer>서울 하이브리드 무선국 시뮬레이션 <span class="app-version">v1.3</span> · <span id="appdate"></span></footer>
+<footer>서울 하이브리드 무선국 시뮬레이션 <span class="app-version">v1.4</span> · <span id="appdate"></span></footer>
 </main>
 
 <script>
 (function(){
 'use strict';
-var APP_VER='v1.3', APP_DATE='2026-11-24';
+var APP_VER='v1.4', APP_DATE='2026-11-24';
 var vs=document.querySelectorAll('.app-version'); for(var i=0;i<vs.length;i++) vs[i].textContent=APP_VER;
 document.getElementById('appdate').textContent=APP_DATE;
 
@@ -166,7 +166,7 @@ var B={lon0:126.76,lon1:127.19,lat0:37.41,lat1:37.72}, KL=88.4, KT=111;
 var ST=[
  {id:'arc',name:'ARC 신월동',short:'ARC',lon:126.83,lat:37.525,f:145.640,r:5,color:'#1f4e8c',note:'HRI-200 FM 노드 (DS0ARC)',dx:0,dy:-14,anc:'middle'},
  {id:'lfc',name:'LFC 여의도',short:'LFC',lon:126.93,lat:37.525,f:145.620,r:5,color:'#0f766e',note:'WIRES-X 노드 · 436.140 UV 리피터 병설',dx:0,dy:-14,anc:'middle'},
- {id:'frc',name:'FRC 마장동',short:'FRC',lon:127.04,lat:37.565,f:145.620,r:5,color:'#6b46a3',note:'HL0FRC · 주파수 미정(145.620 가정)',dx:0,dy:-14,anc:'middle'},
+ {id:'frc',name:'FRC 마장동',short:'FRC',lon:127.04,lat:37.565,f:145.580,r:5,color:'#6b46a3',note:'HL0FRC · 상시 운용 · 주파수 미정(145.580 가정)',dx:0,dy:-14,anc:'middle'},
  {id:'jpo',name:'JPO 동대문(청계천)',short:'JPO',lon:127.012,lat:37.569,f:145.600,r:5,color:'#9d2b5b',note:'6K2JPO · 청계천 상가 옥상 휩안테나(가정) · 주파수 미정(145.600 가정)',dx:0,dy:44,anc:'middle'},
  {id:'veh',name:'대응차 DS0ARC/M',short:'대응차',lon:126.845,lat:37.528,f:145.620,r:3,color:'#c2570c',note:'이동 · 주파수 가변 (지도에서 끌어 옮기기)',dx:0,dy:50,anc:'middle',mobile:true,on:true}
 ];
@@ -389,7 +389,7 @@ function bindMisc(){
 }
 
 
-var PREF={arc:[145.640,145.660],lfc:[145.620,145.600],frc:[145.620,145.580],jpo:[145.600,145.680],veh:[145.620,145.580,145.660,145.560]};
+var PREF={arc:[145.640,145.660],lfc:[145.620,145.600],frc:[145.580,145.560],jpo:[145.600,145.680],veh:[145.620,145.580,145.660,145.560]};
 var MODES=[
  {id:'keep',n:'현재 유지',d:'지금 입력된 주파수를 그대로 두고 판정만 봅니다.'},
  {id:'first',n:'평시: 1순위 일괄',d:'모든 국이 각자의 1순위(맨 앞) 선호 주파수를 씁니다.'},
