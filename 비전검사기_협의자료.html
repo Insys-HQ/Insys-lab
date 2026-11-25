@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>비전검사기 제작사양 협의 자료</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1F3864; --navy2:#2E4D82; --line:#B8C4D9; --head:#DCE6F1;
+  --soft:#EEF2F8; --zebra:#F7F9FC; --warn:#FDF3E7; --warnb:#B5651D; --warnt:#6B3A10;
+  --ink:#333; --sub:#555; --field:#FFFDF5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Noto Sans KR',sans-serif; font-size:14px; line-height:1.5;
+  color:var(--ink); background:#F0F2F5; -webkit-text-size-adjust:100%;
+}
+/* ===== NAV ===== */
+.nav{background:var(--navy);width:100%;position:sticky;top:0;z-index:50;box-shadow:0 1px 6px rgba(0,0,0,.18)}
+.nav-inner{max-width:1100px;margin:0 auto;padding:8px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nav h1{color:#fff;font-size:15px;font-weight:700;flex:1 1 auto;min-width:0}
+.ver{background:rgba(255,255,255,.17);color:#fff;font-size:11px;font-weight:500;padding:2px 7px;border-radius:9px;white-space:nowrap}
+.seg{display:flex;border:1px solid rgba(255,255,255,.4);border-radius:5px;overflow:hidden}
+.seg button{background:transparent;color:#fff;border:0;font-family:inherit;font-size:11px;padding:4px 9px;cursor:pointer}
+.seg button.on{background:#fff;color:var(--navy);font-weight:700}
+.stat{font-size:11px;color:#CFE0F5;white-space:nowrap}
+/* ===== LAYOUT ===== */
+.wrap{max-width:720px;margin:0 auto;padding:8px 12px 56px;transition:max-width .18s}
+body.pc .wrap{max-width:1100px}
+.card{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:8px}
+h2{font-size:14px;font-weight:700;color:#fff;background:var(--navy);padding:5px 9px;border-radius:4px;margin-bottom:6px}
+h3{font-size:13px;font-weight:700;color:var(--navy);border-left:3px solid var(--navy2);padding-left:6px;margin:8px 0 4px}
+p{margin-bottom:5px}
+.lead{background:var(--soft);border-left:3px solid var(--navy);padding:7px 9px;border-radius:0 4px 4px 0;color:var(--navy);margin-bottom:8px;font-size:13px}
+.conf{display:inline-block;background:#FBE9E7;color:#A33;border:1px solid #E6B3AC;font-size:11px;font-weight:700;padding:2px 7px;border-radius:9px;margin-bottom:6px}
+.note{font-size:12px;color:var(--sub)}
+b.em{color:var(--navy)}
+/* ===== TABLE ===== */
+table{width:100%;border-collapse:collapse;font-size:13px;margin:4px 0 6px}
+th{background:var(--head);color:var(--navy);font-weight:700;border:1px solid #9FB3D1;padding:5px 6px;text-align:left}
+td{border:1px solid var(--line);padding:5px 6px;vertical-align:top}
+tbody tr:nth-child(even) td{background:var(--zebra)}
+.k{width:30%;font-weight:500;color:var(--navy)}
+.no{width:34px;text-align:center;font-weight:700;color:var(--navy)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tw table{min-width:520px}
+.tw2{overflow-x:visible}
+.tw2 table{min-width:0}
+/* ===== FORM ===== */
+input[type=text],textarea{
+  width:100%;font-family:inherit;font-size:13px;color:var(--ink);
+  background:var(--field);border:1px solid var(--line);border-radius:4px;padding:5px 7px;
+}
+textarea{resize:vertical;min-height:46px;line-height:1.45}
+input:focus,textarea:focus{outline:0;border-color:var(--navy2);box-shadow:0 0 0 2px rgba(46,77,130,.14)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 6px}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:3px 5px 3px 10px;font-size:13px;color:var(--navy)}
+.chip button{background:#C9D4E6;color:var(--navy);border:0;border-radius:50%;width:17px;height:17px;font-size:12px;line-height:1;cursor:pointer;font-family:inherit}
+.chip button:hover{background:#A33;color:#fff}
+.chip.base{background:#fff}
+.row{display:flex;gap:6px;align-items:center}
+.row input{flex:1}
+button.btn{
+  font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;
+  background:var(--navy);color:#fff;border:0;border-radius:4px;padding:6px 13px;white-space:nowrap;
+}
+button.btn:hover{background:var(--navy2)}
+button.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--navy)}
+button.btn.ghost:hover{background:var(--soft)}
+button.btn:disabled{opacity:.5;cursor:default}
+.warn{background:var(--warn);border-left:3px solid var(--warnb);padding:7px 9px;border-radius:0 4px 4px 0;color:var(--warnt);font-size:13px;margin:5px 0}
+.warn b{color:#8A4A12}
+.xrow{border:1px solid var(--line);border-radius:5px;padding:8px;margin-bottom:6px;background:var(--zebra)}
+.xrow .xhead{display:flex;gap:6px;align-items:center;margin-bottom:5px}
+.xrow .xhead input{flex:1}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:7px 12px;display:flex;gap:8px;align-items:center;justify-content:center;z-index:60;box-shadow:0 -1px 6px rgba(0,0,0,.08)}
+.bar .stat2{font-size:12px;color:var(--sub);flex:1;text-align:right;max-width:430px}
+.foot{text-align:center;font-size:12px;color:var(--sub);padding:8px 0 4px}
+@media (min-width:768px){
+  body{font-size:16px}
+  .nav h1{font-size:17px}
+  table{font-size:14px}
+  input[type=text],textarea{font-size:14px}
+  .lead,.warn,.chip{font-size:14px}
+  .note{font-size:13px}
+  .wrap{padding:10px 16px 56px}
+  .card{padding:12px 14px}
+  h2{font-size:15px}
+  h3{font-size:14px}
+}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-inner">
+    <h1>비전검사기 제작사양 협의 자료</h1>
+    <span class="ver" id="verTag">v3.0</span>
+    <div class="seg" role="group" aria-label="화면 보기 전환">
+      <button type="button" id="btnMo" class="on">모바일</button>
+      <button type="button" id="btnPc">PC</button>
+    </div>
+    <span class="stat" id="netStat">연결 확인 중</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="card">
+    <span class="conf">대외비</span>
+    <div class="lead">
+      사전 의견서 기준으로 설계 진행 중. 상세 제안서 작성에 앞서 <b>확정 사항</b>, <b>협의 필요 사항 3건</b>, <b>회신 요청 항목</b> 정리.
+      입력 내용은 자동 저장.
+    </div>
+    <table>
+      <tr><td class="k">수신</td><td>위너콤</td></tr>
+      <tr><td class="k">발신</td><td>인시스 AI혁신 연구개발실</td></tr>
+      <tr><td class="k">일자</td><td>2026-11-25</td></tr>
+      <tr><td class="k">대상</td><td>AI 기반 PCB 검사 자동화 검사기 (RADIO 기종)</td></tr>
+    </table>
+  </div>
+
+  <!-- Ⅰ 확정 사항 -->
+  <div class="card">
+    <h2>Ⅰ. 확정 사항</h2>
+    <div class="tw tw2">
+    <table>
+      <tr><th style="width:30%">항목</th><th>내용</th></tr>
+      <tr><td class="k">설치 형태</td><td>유형 B · 작업대 사이 삽입형</td></tr>
+      <tr><td class="k">설비 외형</td><td>폭 300 × 깊이 600 × 높이 약 1,300 mm · 설비 내 테이블 높이 약 800 mm<br><span class="note">작업대 높이 780 mm 기준 / 의견서 허용 치수 300 × 800 × 800 이내</span></td></tr>
+      <tr><td class="k">구성</td><td>로봇 미적용 고정식 4스테이션 인덱스 방식</td></tr>
+      <tr><td class="k">검사 대상</td><td>RADIO 기종 · 현재 4종 → 1년 내 3종 추가 (총 7종)</td></tr>
+      <tr><td class="k">안착지그</td><td>기종별 전용 제작</td></tr>
+      <tr><td class="k">바코드 스캐너</td><td>검사기 내부 설치 · 검사기용 PC 연결</td></tr>
+      <tr><td class="k">배출 방식</td><td>작업자 수거 — 현 검사기 구조 유지. 자동 배출은 추후 개선 과제로 검토</td></tr>
+      <tr><td class="k">운영 방식</td><td>검사 전담 작업자 미배치 — 이전 공정 작업자가 지그 안착, 다음 공정 작업자가 수거<br>주간 1교대 · 검사 설비 운용 담당 생산기술팀 1명</td></tr>
+      <tr><td class="k">안전 · 조작부</td><td>비상정지 버튼 검사기 설치 · 제어반에 시작 / 정지 버튼 구성<br>운전 화면은 PC + 모니터로 검사 프로그램에서 운용</td></tr>
+      <tr><td class="k">전원 / 네트워크</td><td>단상 220 V · 유선 LAN</td></tr>
+      <tr><td class="k">압축공기</td><td>공급 가능</td></tr>
+      <tr><td class="k">설치 환경</td><td>실내 형광등(일정) · 진동 / 충격원 없음 · 바닥 허용 하중 2,000 kg</td></tr>
+      <tr><td class="k">데이터</td><td>전수 이미지 저장 · 보관 1년 · MES 연동 (기존 프로토콜 준수)</td></tr>
+      <tr><td class="k">과검 이미지 · 현물</td><td>계약 체결 후 제공 (기협의)</td></tr>
+      <tr><td class="k">도입 시기</td><td>2027년 1월 목표 — 설계 사양 확정에 따라 조정 필요</td></tr>
+    </table>
+    </div>
+
+    <h3>검출 대상 불량</h3>
+    <p class="note">기본 4종. 미팅에서 추가되는 항목은 아래에 입력.</p>
+    <div class="chips" id="defChips"></div>
+    <div class="row">
+      <input type="text" id="defInput" placeholder="추가할 검출 대상 불량 입력" aria-label="검출 대상 불량 추가">
+      <button type="button" class="btn" id="defAdd">추가</button>
+    </div>
+  </div>
+
+  <!-- Ⅱ 협의 필요 사항 -->
+  <div class="card">
+    <h2>Ⅱ. 협의 필요 사항</h2>
+
+    <h3>1. 검사 처리 속도 (택트)</h3>
+    <p>의견서 목표 택트 10초 적용 시, 일 3,500개 기준 소요 시간 비교.</p>
+    <div class="tw">
+    <table>
+      <tr><th>구분</th><th>택트</th><th>시간당</th><th>3,500개 소요</th><th>비고</th></tr>
+      <tr><td>의견서 목표</td><td>10.0초</td><td>360개</td><td>약 9.7시간</td><td>현재 수준과 동일한 처리 능력</td></tr>
+      <tr><td>의견서 허용 한계</td><td>12.0초</td><td>300개</td><td>약 11.7시간</td><td>–</td></tr>
+      <tr><td><b class="em">설계 목표</b></td><td><b class="em">6초</b></td><td><b class="em">600개</b></td><td><b class="em">약 5.8시간</b></td><td>증산 여력 약 45% 확보</td></tr>
+      <tr><td><b class="em">보증 한계</b></td><td><b class="em">7초</b></td><td>514개</td><td>약 6.8시간</td><td>정규 근무시간 내 완료</td></tr>
+    </table>
+    </div>
+    <p><b class="em">설계 목표 6~7초로 설정.</b></p>
+    <p class="note">설비 사이클 약 3.7초 (인덱스 회전 3.0 + 정정 0.2 + 촬영 0.3 + 판정 0.2) · 실제 택트는 작업자 투입 속도에 따라 결정 · 6초 기준 주간 처리 한계 약 24,000개</p>
+
+    <h3>2. 과검율 목표 — 단계적 적용</h3>
+    <div class="tw">
+    <table>
+      <tr><th>단계</th><th>시점</th><th>과검율</th><th>불량 검출율</th><th>일 재검(참고)</th></tr>
+      <tr><td>1단계 — 설비 인수</td><td>설치 완료</td><td>10% 이하</td><td>99.0% 이상</td><td>약 350건</td></tr>
+      <tr><td>2단계 — 초기 학습</td><td>운용 3개월</td><td>5% 이하</td><td>99.5% 이상</td><td>약 175건</td></tr>
+      <tr><td>3단계 — 안정화</td><td>운용 6개월</td><td>2% 이하</td><td>99.5% 이상</td><td>약 70건</td></tr>
+      <tr><td><b class="em">최종 목표</b></td><td>운용 12개월</td><td><b class="em">0.5% 이하</b></td><td><b class="em">99.9% 이상</b></td><td>약 18건</td></tr>
+    </table>
+    </div>
+    <p class="note">과검율과 불량 검출율 병행 관리 · 단계 달성에는 재판정 결과 데이터와 후공정 판정 결과의 학습 반영 필요 · 기종 추가 시 해당 기종 단계 재적용 방안 병행 검토</p>
+
+    <h3>3. 검사면 방향 — 카메라 배치</h3>
+    <p>기존 검사기에서 카메라를 상부 설치 후 하부로 변경한 것으로 확인. <b class="em">변경 경위 공유 요청 — 설계 반영 예정.</b></p>
+    <div class="tw">
+    <table>
+      <tr><th style="width:16%">배치</th><th style="width:40%">유리한 점</th><th>검토 필요</th></tr>
+      <tr><td><b class="em">상부 설치</b><br>(검사면 위)</td>
+        <td>재판정 시 화면과 실물 방향 일치<br>렌즈 오염(이물 · 플럭스 잔사) 영향 적음<br>상판 관통부 불필요<br>검사 광원이 작업자 시야에 노출되지 않음</td>
+        <td><b>검사기 상부 카메라 지지 구조 필요</b><br>부품면이 지그에 접촉 → 기종별 부품 회피 포켓 필요</td></tr>
+      <tr><td><b class="em">하부 설치</b><br>(검사면 아래)</td>
+        <td>부품면이 위를 향해 지그 구조 단순<br>현재 적용 중인 방식</td>
+        <td><b>검사 광원이 작업자 시야에 노출</b><br>렌즈 상부 이물 유입 관리 필요<br>재판정 시 실물 확인 방향이 화면과 반대<br>상판 · 지그 · 원판 관통부 필요</td></tr>
+    </table>
+    </div>
+    <div class="warn"><b>양 방식 모두 장단 존재. 작업자 · 관리자의 사용 편의를 기준으로 결정.</b></div>
+    <h3>협의 결과</h3>
+    <textarea id="camDecision" placeholder="카메라 배치 결정 내용 및 사유 입력" aria-label="카메라 배치 협의 결과"></textarea>
+  </div>
+
+  <!-- Ⅲ 회신 요청 -->
+  <div class="card">
+    <h2>Ⅲ. 회신 요청 항목</h2>
+    <div id="reqList"></div>
+  </div>
+
+  <!-- Ⅳ 현장 확인 -->
+  <div class="card">
+    <h2>Ⅳ. 현장 확인 협조 요청</h2>
+    <p>아래 항목은 당사 상주 인력을 통해 확인 예정. 협조 요청.</p>
+    <div class="tw">
+    <table>
+      <tr><th class="no">No</th><th style="width:44%">확인 내용</th><th>목적</th></tr>
+      <tr><td class="no">1</td><td>작업 공정 구간별 소요 시간</td><td>택트 설계 기준 수립</td></tr>
+      <tr><td class="no">2</td><td>케이블 솔더링부 형상 — 케이블 길이 · 방향 · 고정 상태</td><td>지그의 케이블 유도 구조 설계</td></tr>
+      <tr><td class="no">3</td><td>NG 제품 처리 동선 · 재검 작업 공간</td><td>재판정 구조 설계</td></tr>
+      <tr><td class="no">4</td><td>이전 · 다음 공정과의 제품 인계 동선</td><td>투입 · 배출부 배치 설계</td></tr>
+    </table>
+    </div>
+  </div>
+
+  <!-- Ⅴ 설계 반영 예정 -->
+  <div class="card">
+    <h2>Ⅴ. 설계 반영 예정 사항 — 참고</h2>
+    <div class="tw tw2">
+    <table>
+      <tr><th style="width:26%">항목</th><th>내용</th></tr>
+      <tr><td class="k">재판정 방식</td><td>촬영된 이미지를 화면에 확대 표시하여 재판정. 설비 정지 없이 처리되어 택트 영향 최소화. 재판정 이력이 데이터로 축적되어 학습에 활용</td></tr>
+      <tr><td class="k">재판정 권한</td><td>판정 신뢰도에 따른 등급 구분 후 경계 영역 재판정 구조 검토 중. 재판정 시 사유 코드 기록 시 과검 원인(모델 / 조명 / 지그) 구분 가능</td></tr>
+      <tr><td class="k">재검 운용</td><td>화면 재판정으로 판단이 어려운 건은 라인 외부에서 실물 확인. S/N 스캔으로 해당 검사 이미지 즉시 호출 — 대상 제품 별도 추적 작업 불필요</td></tr>
+      <tr><td class="k">이미지 저장</td><td>전수 저장 1년 기준 약 1.3 TB (일 3,500개 × 연 250일 × 약 1.5 MB) → 4 TB 이상 RAID 구성을 비전 PC 사양에 포함 예정</td></tr>
+    </table>
+    </div>
+  </div>
+
+  <!-- Ⅵ 미팅 추가 언급 -->
+  <div class="card">
+    <h2>Ⅵ. 미팅 추가 언급 사항</h2>
+    <p class="note">미팅 중 새로 나온 항목과 내용을 입력. 행은 필요한 만큼 추가.</p>
+    <div id="extraList"></div>
+    <button type="button" class="btn ghost" id="extraAdd">＋ 항목 추가</button>
+  </div>
+
+  <div class="foot">인시스 AI혁신 연구개발실 &nbsp;|&nbsp; 이사 김양섭 &nbsp;|&nbsp; ys.kim@in-sys.co.kr</div>
+</div>
+
+<div class="bar">
+  <button type="button" class="btn" id="btnSave">저장</button>
+  <button type="button" class="btn ghost" id="btnReload">다시 불러오기</button>
+  <span class="stat2" id="saveStat">—</span>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const VERSION = 'v3.0';
+const firebaseConfig = {
+  apiKey: "AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",
+  authDomain: "insys-work.firebaseapp.com",
+  projectId: "insys-work",
+  storageBucket: "insys-work.firebasestorage.app",
+  messagingSenderId: "225275784859",
+  appId: "1:225275784859:web:bd12815c6dc47c0c49e03e"
+};
+const COL = 'winnercom_vision', DOCID = 'spec_meeting_20261125';
+
+let db = null, ready = false;
+const $ = id => document.getElementById(id);
+const netStat = $('netStat'), saveStat = $('saveStat');
+
+try {
+  const app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  ready = true;
+  netStat.textContent = 'Firebase 연결됨';
+} catch (e) {
+  netStat.textContent = '오프라인 모드';
+}
+
+/* ---------- 기본 데이터 ---------- */
+const BASE_DEFECTS = ['미납', '과납', '냉납', '극성 오삽'];
+const REQ_ITEMS = [
+  { n:1,  t:'추가 3종 기종별 요구 물량', s:'검사기 처리 능력을 해당 기준에 맞추어 설계' },
+  { n:2,  t:'일 기종 전환 횟수', s:'기종별 전용 지그 적용 — 전환 방식(체결 / 퀵체인지) 결정에 필요' },
+  { n:3,  t:'과검율 산정 기준 — 측정 기간 · 모수 · 산정 방법', s:'' },
+  { n:4,  t:'과검이 주로 발생하는 불량 항목 및 기종', s:'' },
+  { n:5,  t:'검사 항목별 판정 기준 — 냉납 · 미납 판정 기준', s:'' },
+  { n:6,  t:'NG 발생 시 재판정 수행 주체', s:'검사 전담 작업자 미배치 구조 — 재판정 담당 및 위치 확인 필요' },
+  { n:7,  t:'InspectionID / LineCode / TestType 값', s:'MES 프로토콜 저장 프로시저 필수 인자. 당 검사기용 값 발급 필요 (문서 예시값 CapsEOL / NLINE3 / HM300 은 기존 EOL 검사기 기준)' },
+  { n:8,  t:'MES 서버 접속 절차 — IP 할당 · 방화벽 · 보안 승인', s:'' },
+  { n:9,  t:'후공정 불량 S/N 목록 제공 가능 여부', s:'비전 검사에서 양품 통과 후 EOL에서 불량 확인된 건의 S/N 목록. 해당 이미지를 불량으로 재학습하여 검출 성능 유지에 활용. 월 1회 목록 형태로 충분' },
+  { n:10, t:'PLC 선호 기종 유무', s:'별도 지정 없을 경우 당사 선정' }
+];
+
+let state = { defects: [], replies: {}, camDecision: '', extras: [] };
+
+/* ---------- 렌더 ---------- */
+function renderDefects(){
+  const box = $('defChips');
+  box.innerHTML = '';
+  BASE_DEFECTS.forEach(d => {
+    const s = document.createElement('span');
+    s.className = 'chip base';
+    s.textContent = d;
+    box.appendChild(s);
+  });
+  state.defects.forEach((d, i) => {
+    const s = document.createElement('span');
+    s.className = 'chip';
+    s.appendChild(document.createTextNode(d));
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = '×'; b.title = '삭제';
+    b.addEventListener('click', () => { state.defects.splice(i,1); renderDefects(); queueSave(); });
+    s.appendChild(b);
+    box.appendChild(s);
+  });
+}
+
+function renderReq(){
+  const box = $('reqList');
+  box.innerHTML = '';
+  REQ_ITEMS.forEach(it => {
+    const d = document.createElement('div');
+    d.className = 'xrow';
+    const h = document.createElement('div');
+    h.innerHTML = '<b class="em">' + it.n + '. ' + it.t + '</b>' +
+      (it.s ? '<div class="note">' + it.s + '</div>' : '');
+    d.appendChild(h);
+    const ta = document.createElement('textarea');
+    ta.placeholder = '회신 내용 입력';
+    ta.setAttribute('aria-label', it.n + '번 회신');
+    ta.value = state.replies[it.n] || '';
+    ta.style.marginTop = '5px';
+    ta.addEventListener('input', () => { state.replies[it.n] = ta.value; queueSave(); });
+    d.appendChild(ta);
+    box.appendChild(d);
+  });
+}
+
+function renderExtras(){
+  const box = $('extraList');
+  box.innerHTML = '';
+  state.extras.forEach((row, i) => {
+    const d = document.createElement('div');
+    d.className = 'xrow';
+    const head = document.createElement('div');
+    head.className = 'xhead';
+    const ti = document.createElement('input');
+    ti.type = 'text'; ti.placeholder = '항목'; ti.value = row.item || '';
+    ti.setAttribute('aria-label', '추가 항목 ' + (i+1));
+    ti.addEventListener('input', () => { state.extras[i].item = ti.value; queueSave(); });
+    const del = document.createElement('button');
+    del.type = 'button'; del.className = 'btn ghost'; del.textContent = '삭제';
+    del.addEventListener('click', () => { state.extras.splice(i,1); renderExtras(); queueSave(); });
+    head.appendChild(ti); head.appendChild(del);
+    d.appendChild(head);
+    const ta = document.createElement('textarea');
+    ta.placeholder = '미팅 내용'; ta.value = row.note || '';
+    ta.setAttribute('aria-label', '추가 내용 ' + (i+1));
+    ta.addEventListener('input', () => { state.extras[i].note = ta.value; queueSave(); });
+    d.appendChild(ta);
+    box.appendChild(d);
+  });
+  if (!state.extras.length){
+    const p = document.createElement('p');
+    p.className = 'note';
+    p.textContent = '등록된 항목 없음.';
+    box.appendChild(p);
+  }
+}
+
+function renderAll(){
+  renderDefects(); renderReq(); renderExtras();
+  $('camDecision').value = state.camDecision || '';
+}
+
+/* ---------- 저장 / 불러오기 ---------- */
+let timer = null;
+function queueSave(){
+  saveStat.textContent = '변경됨 — 저장 대기';
+  clearTimeout(timer);
+  timer = setTimeout(save, 1200);
+}
+
+async function save(){
+  state.camDecision = $('camDecision').value;
+  const payload = JSON.parse(JSON.stringify(state));
+  try { localStorage.setItem('wnc_vision_spec', JSON.stringify(payload)); } catch(e){}
+  if (!ready){ saveStat.textContent = '로컬 저장됨 (' + nowStr() + ')'; return; }
+  try {
+    await setDoc(doc(db, COL, DOCID), Object.assign({}, payload, {
+      version: VERSION, updatedAt: serverTimestamp()
+    }), { merge: true });
+    saveStat.textContent = '저장 완료 ' + nowStr();
+  } catch (e) {
+    saveStat.textContent = '저장 실패 — 로컬 보관 (' + (e.code || e.message) + ')';
+  }
+}
+
+async function load(){
+  saveStat.textContent = '불러오는 중…';
+  let got = false;
+  if (ready){
+    try {
+      const snap = await getDoc(doc(db, COL, DOCID));
+      if (snap.exists()){
+        const d = snap.data();
+        state.defects  = Array.isArray(d.defects) ? d.defects : [];
+        state.replies  = (d.replies && typeof d.replies === 'object') ? d.replies : {};
+        state.camDecision = d.camDecision || '';
+        state.extras   = Array.isArray(d.extras) ? d.extras : [];
+        got = true;
+        saveStat.textContent = '불러오기 완료 ' + nowStr();
+      } else {
+        saveStat.textContent = '저장된 내용 없음 — 새로 작성';
+      }
+    } catch (e) {
+      saveStat.textContent = '불러오기 실패 — 로컬 사용';
+    }
+  }
+  if (!got){
+    try {
+      const raw = localStorage.getItem('wnc_vision_spec');
+      if (raw){
+        const d = JSON.parse(raw);
+        state.defects = d.defects || []; state.replies = d.replies || {};
+        state.camDecision = d.camDecision || ''; state.extras = d.extras || [];
+      }
+    } catch(e){}
+  }
+  renderAll();
+}
+
+function nowStr(){
+  const d = new Date(), p = n => String(n).padStart(2,'0');
+  return p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+}
+
+/* ---------- 이벤트 ---------- */
+function addDefect(){
+  const v = $('defInput').value.trim();
+  if (!v) return;
+  if (BASE_DEFECTS.includes(v) || state.defects.includes(v)){ $('defInput').value=''; return; }
+  state.defects.push(v); $('defInput').value = '';
+  renderDefects(); queueSave();
+}
+$('defAdd').addEventListener('click', addDefect);
+$('defInput').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); addDefect(); } });
+$('extraAdd').addEventListener('click', () => { state.extras.push({item:'', note:''}); renderExtras(); queueSave(); });
+$('camDecision').addEventListener('input', queueSave);
+$('btnSave').addEventListener('click', save);
+$('btnReload').addEventListener('click', load);
+$('btnMo').addEventListener('click', () => { document.body.classList.remove('pc'); $('btnMo').classList.add('on'); $('btnPc').classList.remove('on'); });
+$('btnPc').addEventListener('click', () => { document.body.classList.add('pc'); $('btnPc').classList.add('on'); $('btnMo').classList.remove('on'); });
+$('verTag').textContent = VERSION;
+
+load();
+</script>
+</body>
+</html>
