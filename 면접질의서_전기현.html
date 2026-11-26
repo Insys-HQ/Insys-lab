@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="robots" content="noindex, nofollow">
+<title>면접 평가서 v1.0 | 인시스 AI혁신 연구개발실</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;}
+@media (min-width:768px){html{font-size:16px;}}
+body{font-family:'Noto Sans KR',sans-serif;background:#eef1f5;color:#1f2d3d;line-height:1.5;font-size:1rem;}
+button,input,select,textarea{font-family:inherit;font-size:1rem;color:#1f2d3d;}
+a{color:#1a3a6a;}
+.nav{width:100%;background:#1a2a4a;position:sticky;top:0;z-index:50;}
+.nav-inner{max-width:1100px;margin:0 auto;padding:6px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.nav-logo{color:#fff;font-weight:700;font-size:1rem;}
+.nav-logo span{color:#b9d3ee;font-weight:300;}
+.nav-right{display:flex;align-items:center;gap:8px;}
+.ver{color:#dbe8f6;font-size:1rem;font-weight:500;}
+.vt{display:flex;border:1px solid #9db8d6;border-radius:6px;overflow:hidden;}
+.vt button{background:transparent;color:#dbe8f6;border:none;padding:3px 10px;cursor:pointer;font-size:1rem;}
+.vt button.on{background:#dbe8f6;color:#1a2a4a;font-weight:700;}
+.wrap{max-width:1100px;margin:0 auto;padding:8px 12px 40px;}
+.wrap.mobile{max-width:430px;}
+.card{background:#fff;border:1px solid #d5dce6;border-radius:8px;padding:12px;margin-bottom:8px;}
+.card h2{font-size:1.1rem;color:#14284b;font-weight:700;margin-bottom:6px;}
+.notice{background:#e8f0fa;border-color:#b8cde6;}
+.notice p{font-size:1rem;color:#1f2d3d;}
+.grid{display:grid;grid-template-columns:1fr;gap:6px;}
+.wrap:not(.mobile) .grid{grid-template-columns:repeat(4,1fr);}
+.fld label{display:block;font-size:1rem;color:#34495e;font-weight:500;}
+.fld input,.fld select{width:100%;padding:6px 8px;border:1px solid #b9c5d4;border-radius:6px;background:#fff;}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:1rem;margin-top:6px;}
+.chk input{margin-top:3px;width:18px;height:18px;flex:none;}
+.tags{display:flex;flex-wrap:wrap;gap:6px;}
+.tag{background:#e8f0fa;color:#14284b;border-radius:12px;padding:2px 10px;font-size:1rem;}
+ul.pts{padding-left:18px;font-size:1rem;}
+ul.pts li{margin-bottom:2px;}
+.sec-h{display:flex;justify-content:space-between;align-items:center;background:#dfe8f4;color:#14284b;border-radius:6px;padding:6px 10px;margin:8px 0 6px;font-weight:700;}
+.sec-h small{font-weight:500;font-size:1rem;}
+.q{border:1px solid #d5dce6;border-radius:8px;background:#fff;padding:8px 10px;margin-bottom:6px;}
+.q-t{font-weight:500;}
+.q-t b{color:#14284b;margin-right:4px;}
+.q-p{font-size:1rem;color:#4a5b70;margin:2px 0 6px;}
+.q-row{display:flex;flex-direction:column;gap:6px;}
+.wrap:not(.mobile) .q-row{flex-direction:row;align-items:flex-start;}
+.sc{display:flex;gap:4px;flex:none;}
+.sc button{width:40px;height:36px;border:1px solid #b9c5d4;border-radius:6px;cursor:pointer;font-weight:500;}
+.sc button[data-v="1"]{background:#f8d7da;}
+.sc button[data-v="2"]{background:#fde5cc;}
+.sc button[data-v="3"]{background:#fff3c4;}
+.sc button[data-v="4"]{background:#d8efd0;}
+.sc button[data-v="5"]{background:#bfe5c0;}
+.sc button.sel{outline:3px solid #1a2a4a;font-weight:900;}
+.memo{flex:1;width:100%;min-height:36px;padding:6px 8px;border:1px solid #b9c5d4;border-radius:6px;resize:vertical;}
+.bar{background:#e3e8ef;border-radius:6px;height:12px;overflow:hidden;}
+.bar i{display:block;height:100%;background:#2a5a9a;width:0;transition:width .2s;}
+.res-row{display:grid;grid-template-columns:1fr;gap:2px;margin-bottom:6px;font-size:1rem;}
+.total{display:flex;justify-content:space-between;align-items:center;background:#dfe8f4;border-radius:8px;padding:8px 12px;margin:6px 0;}
+.total b{font-size:1.4rem;color:#14284b;}
+.grade{font-size:1.4rem;font-weight:900;color:#14284b;}
+textarea.ta{width:100%;min-height:64px;padding:6px 8px;border:1px solid #b9c5d4;border-radius:6px;resize:vertical;margin-bottom:6px;}
+.lb{font-size:1rem;font-weight:700;color:#34495e;}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.btn{border:1px solid #1a2a4a;background:#1a2a4a;color:#fff;border-radius:6px;padding:7px 12px;cursor:pointer;font-weight:500;}
+.btn.sub{background:#e8f0fa;color:#14284b;}
+.status{font-size:1rem;color:#34495e;margin-top:6px;}
+.footer{text-align:center;font-size:1rem;color:#4a5b70;padding:8px;}
+/* gate */
+#gate{position:fixed;inset:0;background:#1a2a4a;z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
+.gate-box{background:#fff;border-radius:10px;padding:16px;width:100%;max-width:340px;color:#1f2d3d;}
+.gate-box h1{font-size:1.1rem;color:#14284b;margin-bottom:4px;}
+.gate-box p{font-size:1rem;margin-bottom:8px;}
+.gate-box input{width:100%;padding:8px;border:1px solid #b9c5d4;border-radius:6px;margin-bottom:6px;}
+.err{color:#9b1c1c;font-size:1rem;min-height:1.2em;}
+/* cert */
+#certWrap{display:none;position:fixed;inset:0;background:rgba(20,30,50,.6);z-index:150;overflow:auto;padding:12px;}
+.cert-panel{max-width:760px;margin:0 auto;}
+.cert-ctl{background:#fff;border-radius:8px;padding:10px;margin-bottom:8px;}
+.cert-paper{background:#fff;color:#1f2d3d;padding:28px 24px;border:1px solid #b9c5d4;}
+.cert-paper h1{text-align:center;font-size:1.6rem;letter-spacing:6px;color:#14284b;margin-bottom:16px;}
+.cert-paper table{width:100%;border-collapse:collapse;margin-bottom:14px;}
+.cert-paper th,.cert-paper td{border:1px solid #8497ad;padding:6px 8px;text-align:left;}
+.cert-paper th{background:#e8f0fa;width:28%;color:#14284b;}
+.cert-paper p{margin-bottom:8px;}
+.cert-sign{text-align:center;margin-top:18px;}
+.cert-sign b{font-size:1.15rem;}
+@media print{
+  .nav,.noprint,#gate{display:none !important;}
+  body{background:#fff;}
+  .card,.q{break-inside:avoid;}
+  body.print-cert #app{display:none !important;}
+  body.print-cert #certWrap{display:block !important;position:static;background:#fff;padding:0;}
+  body.print-cert .cert-ctl{display:none !important;}
+  body:not(.print-cert) #certWrap{display:none !important;}
+}
+.card.danger{border-color:#c9a3a3;background:#fbf0f0;}
+.btn.del{background:#8f1d1d;border-color:#8f1d1d;color:#fff;}
+.vr{display:grid;grid-template-columns:1fr;gap:2px;border-bottom:1px solid #e3e8ef;padding:6px 0;}
+.vl{font-weight:700;color:#14284b;font-size:1rem;}
+.vv{font-size:1rem;}
+.vv.ok{color:#1d5c2e;font-weight:500;}
+.vv.bad{color:#9b1c1c;font-weight:700;}
+.vv.wait{color:#34495e;}
+[hidden]{display:none !important;}
+
+.pr-box{margin:2px 0 6px;}
+.pr{display:flex;gap:8px;align-items:flex-start;font-size:1rem;margin:3px 0;cursor:pointer;}
+.pr input{width:20px;height:20px;margin-top:2px;flex:none;}
+.howto{background:#f4f7fb;font-size:1rem;}
+.q-t{font-size:1rem;}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-box">
+    <h1>인시스 면접 평가서</h1>
+    <p>채용 관계자 전용 문서입니다. 접속번호를 입력하세요.</p>
+    <input type="password" id="gateIn" autocomplete="off" placeholder="접속번호">
+    <div class="err" id="gateErr"></div>
+    <button class="btn" id="gateBtn" type="button" style="width:100%">확인</button>
+  </div>
+</div>
+
+<div id="app" hidden>
+  <div class="nav">
+    <div class="nav-inner">
+      <div class="nav-logo">면접 평가서 <span>| 인시스 AI혁신 연구개발실</span></div>
+      <div class="nav-right">
+        <span class="ver" id="verTxt"></span>
+        <div class="vt" role="group" aria-label="화면 선택">
+          <button id="vtM" class="on" type="button">모바일</button>
+          <button id="vtP" type="button">PC</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap mobile" id="wrap">
+
+    <div class="card" id="stCard"><div class="status" id="boot">Firebase 연결 중...</div></div>
+
+    <!-- 삭제 확인 화면 (#verify) -->
+    <div class="card" id="verifyCard" hidden>
+      <h2>데이터 삭제 확인</h2>
+      <div id="verRows"></div>
+      <div class="btns noprint">
+        <button class="btn" id="btnReVerify" type="button">다시 확인</button>
+        <a class="btn sub" style="text-decoration:none" id="lnkForm" href="#">질의서 화면으로</a>
+        <a class="btn sub" style="text-decoration:none" id="lnkGh" target="_blank" rel="noopener noreferrer" href="#">GitHub 파일 보기</a>
+      </div>
+    </div>
+
+    <div id="formBox" hidden>
+    <div class="card notice">
+      <h2>개인정보 수집·이용 및 보관/파기 안내 (대외비)</h2>
+      <p><b>수집 항목</b>: 성명, 지원 직무, 면접 일자, 면접 평가 내용(점수·메모) / <b>목적</b>: 채용 전형 평가 및 면접확인서 발급</p>
+      <p><b>보관</b>: 채용 절차 종료 후 3개월 보관 / <b>파기</b>: 보관기간 경과 즉시, 또는 아래 [해당자 데이터 삭제] 버튼으로 복구 불가능하게 파기</p>
+      <p><b>열람</b>: 대외비, 인사·채용 담당자 및 면접관 외 열람 금지. 접속번호 없이는 열람할 수 없습니다.</p>
+      <label class="chk"><input type="checkbox" id="consent"><span>지원자에게 위 내용을 안내하고 동의를 받았음을 확인합니다. (저장 시 필수)</span></label>
+    </div>
+
+    <div class="card">
+      <h2>면접 기본 정보</h2>
+      <div class="grid">
+        <div class="fld"><label>지원자</label><input id="fName" readonly></div>
+        <div class="fld"><label>지원 직무</label><input id="fPos" readonly></div>
+        <div class="fld"><label>면접 일자</label><input type="date" id="fDate"></div>
+        <div class="fld"><label>면접관</label><input id="fIv" placeholder="면접관 성명"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>서류 분석 (면접관 내부 참고)</h2>
+      <div class="tags" style="margin-bottom:6px" id="caseTags"></div>
+      <div class="lb">강점 후보</div>
+      <ul class="pts" id="caseStr"></ul>
+      <div class="lb" style="margin-top:6px">면접 확인 포인트</div>
+      <ul class="pts" id="caseChk"></ul>
+      <div class="btns" id="caseLinks"></div>
+    </div>
+
+    <div class="card howto">
+      <b>진행 방법</b>: 대화 흐름대로 위에서 아래로 진행합니다. 블록마다 <b>질문 1개 + 세부 확인 항목</b>이 묶여 있어, 답변 중 나온 내용은 해당 블록의 <b>메모 한 곳</b>에 적고 확인한 항목만 체크한 뒤 <b>점수 1~5점을 한 번</b> 매깁니다.
+    </div>
+
+    <div id="qBox"></div>
+
+    <div class="card" id="resCard">
+      <h2>종합 결과</h2>
+      <div id="resRows"></div>
+      <div class="total"><div>총점 (100점 환산) <span id="answered" class="lb"></span></div><div><b id="totalV">0</b> <span class="grade" id="gradeV">-</span></div></div>
+      <div class="btns noprint"><button class="btn" id="btnAnalyze" type="button">종합 분석 생성</button></div>
+      <div style="margin-top:8px">
+        <div class="lb">강점</div><textarea class="ta" id="sStr"></textarea>
+        <div class="lb">보완점</div><textarea class="ta" id="sWeak"></textarea>
+        <div class="lb">총평</div><textarea class="ta" id="sSum"></textarea>
+        <div class="lb">최종 판정</div>
+        <select id="sDec" style="width:100%;padding:6px 8px;border:1px solid #b9c5d4;border-radius:6px;margin-bottom:6px">
+          <option value="">선택</option><option>채용 추천</option><option>보류(추가 검토)</option><option>비추천</option>
+        </select>
+      </div>
+      <div class="btns noprint">
+        <button class="btn" id="btnSave" type="button">저장</button>
+        <button class="btn sub" id="btnLoad" type="button">저장본 불러오기</button>
+        <button class="btn sub" id="btnPdf" type="button">PDF 저장(인쇄)</button>
+        <button class="btn sub" id="btnCert" type="button">면접확인서 발급</button>
+        <button class="btn sub" id="btnReset" type="button">초기화</button>
+      </div>
+      <div class="status" id="status"></div>
+    </div>
+
+    <div class="card danger noprint">
+      <h2>해당자 데이터 삭제 (입사·미입사 공통)</h2>
+      <p class="q-p">Firebase에 저장된 평가 기록(점수·메모·판정)과 이 기기의 임시 저장본을 완전히 삭제합니다. GitHub의 질의서 파일(서류 분석 포함)은 이 버튼으로 지울 수 없으므로 삭제를 요청해 주세요. 삭제 후 아래 링크로 확인할 수 있습니다.</p>
+      <div class="btns">
+        <button class="btn del" id="btnDel" type="button">해당자 데이터 삭제</button>
+        <a class="btn sub" style="text-decoration:none" id="lnkVerify" href="#verify">삭제 여부 확인</a>
+      </div>
+    </div>
+    </div>
+
+    <div class="footer" id="footTxt"></div>
+  </div>
+</div>
+
+<div id="certWrap">
+  <div class="cert-panel">
+    <div class="cert-ctl noprint">
+      <div class="grid" style="grid-template-columns:1fr 1fr;">
+        <div class="fld"><label>생년월일 (발급 시 입력, 저장 안 함)</label><input id="cBirth" type="date"></div>
+        <div class="fld"><label>연락처 (발급 시 입력, 저장 안 함)</label><input id="cTel" placeholder="010-0000-0000"></div>
+      </div>
+      <div class="btns">
+        <button class="btn" id="cPrint" type="button">PDF 저장(인쇄)</button>
+        <button class="btn sub" id="cClose" type="button">닫기</button>
+      </div>
+    </div>
+    <div class="cert-paper" id="certPaper">
+      <h1>면 접 확 인 서</h1>
+      <table>
+        <tr><th>성명</th><td id="ctName"></td></tr>
+        <tr><th>생년월일</th><td id="ctBirth">&nbsp;</td></tr>
+        <tr><th>연락처</th><td id="ctTel">&nbsp;</td></tr>
+        <tr><th>지원 직무</th><td id="ctPos"></td></tr>
+        <tr><th>면접 일자</th><td id="ctDate"></td></tr>
+        <tr><th>면접 장소</th><td>주식회사 인시스 (창원시 의창구 원이대로 271 1301호)</td></tr>
+      </table>
+      <p>위 사람은 위 일자에 주식회사 인시스 채용 면접에 참석하였음을 확인합니다.</p>
+      <div class="cert-sign">
+        <p id="ctIssue"></p>
+        <p><b>주식회사 인시스</b> (인)</p>
+        <p>담당자: 황혜선 / 전화: 1677-6788</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+'use strict';
+var VERSION='v1.0';
+var GATE_HASH='c8fee275c283170bbac1048791c5d751fcbb1e06c48a7ba574232e0702095e3a';
+var CASE_ID='c2611-jgh';
+var COL='interview_records';
+var PAGE_FILE='면접질의서_전기현.html';
+var GH_REPO='Insys-HQ/Insys-lab';
+var DRAFT_KEY='iv_'+CASE_ID+'_draft';
+var FIREBASE_CONFIG={
+  apiKey:'AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es',
+  authDomain:'insys-work.firebaseapp.com',
+  projectId:'insys-work',
+  storageBucket:'insys-work.firebasestorage.app',
+  messagingSenderId:'225275784859',
+  appId:'1:225275784859:web:bd12815c6dc47c0c49e03e'
+};
+
+/* 지원자 자료(서류 분석): 이 파일에 포함 / Firebase에는 평가 입력값만 저장 */
+var CASE={
+ name:'전기현',
+ position:'AI·소프트웨어 연구원 (신입)',
+ tags:[
+  '동의대 컴퓨터공학 졸업(2026.02) · 신입(경력 없음)',
+  '평생교육원 AI 기반 부산여행 스마트 매니저 플랫폼 개발 과정 수료(2025.12~2026.06)',
+  'Python/Java 중, Word·Excel·PPT·영어 하 (자가평가)',
+  '1종 보통 운전면허'
+ ],
+ strengths:[
+  '스마트 건조대(2025.09~12, 팀장): ESP32·라즈베리파이·MQTT·Firebase·안드로이드 앱을 연동하고, 하드웨어 조립·센서 배치와 XGBoost 건조 시간 예측을 담당. 센서 측정 편향을 발견해 센서 배치와 예측 범위를 조정한 경험',
+  'HRMS 인사급여(2026.04, Java·JSP·MySQL): 직원·근태·급여 DB 설계, 페이지 권한, 로컬 LLM(Ollama·Qwen) Text-to-SQL 구현. 지원 동기의 "ERP 데이터 조회 자동화"와 직접 연결',
+  '모의투자(2026.01~03): 업비트 API 실시간 시세 수집·MySQL 저장·백테스팅, 일부 캔들 누락 원인을 수집→저장 흐름으로 추적해 해결',
+  '그래픽카드 가격 예측(2025.03~06): 크롤링 데이터 정제·라벨링. 정제 부족으로 학습이 안 된 실패와 단점(처음부터 완벽 추구)을 솔직하게 기재',
+  '설계 우선 습관(데이터 흐름·ERD를 먼저 정리)과 한계(비전·이미지 AI 경험 없음)를 자소서에 스스로 밝힘'
+ ],
+ checks:[
+  '신입(경력 없음): 프로젝트별 본인 직접 구현 범위와 팀 규모. 특히 HRMS(20일)와 프롬프트 코딩테스트(저장소 소유자 Seong102, 담당: 채점 결과·마이페이지 DB 연동·UI·중복 엔티티 통합)',
+  '스마트 건조대 상관 히트맵에서 의류 습도·습도 추세·건조 시간 간 상관이 매우 높게 보임(해상도상 판독 필요) → 피처 중복·누수 가능성, 학습/검증 분리, 평가 지표',
+  '그래픽카드 GRU: 정제가 덜 된 데이터로 학습했다고 기재, 기술서 그래프만으로는 실제 대비 정확도 판단이 어려움 → 정량 지표와 이후 개선 여부',
+  'Text-to-SQL: 생성 SQL 실행 시 읽기 전용·SELECT 제한, 급여 등 민감 데이터 권한 통제, 정확도 평가 방법',
+  '지원서는 비전검사 AI·수요 예측 기대, 실제 업무는 ERP 운영·업무자동화·검사기/로봇 개발 지원 비중 → 직무 범위 이해·동의 여부',
+  '자가평가 Word·Excel·PowerPoint·영어 "하" → 사내 문서·엑셀 업무 가능 수준',
+  '지원서 기재 거주지(경남 통영)에서 창원 통근 방법·시간, 수료(2026.06) 이후 활동, 입사 가능 시기',
+  '연구전담요원 자격(학위·전공) 증빙 서류는 인사 담당 확인'
+ ],
+ links:[
+  {label:'GitHub(mancron)',url:'https://github.com/mancron'},
+  {label:'스마트 건조대',url:'https://github.com/mancron/drying_rack'},
+  {label:'HRMS',url:'https://github.com/mancron/hr_erp'},
+  {label:'모의투자',url:'https://github.com/mancron/coin_simulator'},
+  {label:'프롬프트 코딩테스트(팀 저장소)',url:'https://github.com/Seong102/how_prom'}
+ ]
+};
+
+/* 질문 블록: 유사 질문을 한 흐름으로 통합 (블록당 질문 1개 + 세부 확인 + 메모 1개 + 점수 1개) */
+var OPEN={id:'O1',name:'도입 · 근무 조건',
+ q:'회사(창원)까지 출퇴근 방법과 편도 소요 시간, 입사 가능 시기를 말씀해 주세요. 과정 수료(2026.06) 이후 지금까지는 어떻게 지내셨나요?',
+ pt:'통근 가능성, 입사 시기 확정 여부, 제약 사항',
+ probes:[
+  '지원서 기재 거주지(경남 통영) 기준 통근 방법·편도 시간, 거주지 이전 계획',
+  '입사 가능 시기, 다른 전형 진행 여부',
+  '수료 이후 활동(학습·프로젝트·구직)'
+ ]};
+var BLOCKS=[
+ {id:'Q1',name:'대표 프로젝트 · 역할 · 협업',w:20,
+  q:'가장 자신 있는 프로젝트 하나를 골라 맡은 역할, 직접 구현한 범위, 결과물을 설명해 주세요. 팀 의견이 달랐거나 일정이 촉박했던 일이 있었다면 함께 말씀해 주세요.',
+  pt:'본인 역할·직접 구현 범위, 팀 조율, 우선순위 판단',
+  probes:[
+   '스마트 건조대(팀장): 하드웨어 조립·센서 배치·XGBoost 예측 중 직접 한 것과 팀원 담당, 팀 규모',
+   '의견 충돌·일정 압박 시 조율 방법과 우선순위 기준 (캡스톤에서 데이터 흐름을 먼저 정리해 공유한 방식 포함)',
+   'HRMS(20일): 팀 인원과 본인 담당(DB 설계·권한·Text-to-SQL·직원/근태/급여 기능)',
+   '프롬프트 코딩테스트(저장소 소유자 Seong102): 본인 담당과 실제 기여(커밋·화면)'
+  ]},
+ {id:'Q2',name:'데이터·모델 문제 해결 · 검증',w:20,
+  q:'AI·데이터 작업에서 결과가 기대와 달랐던 경험 하나를 골라, 원인을 찾은 과정과 해결, 결과를 어떻게 검증했는지 말씀해 주세요.',
+  pt:'원인 분석 순서, 검증 방법(지표·분리), 재발 방지',
+  probes:[
+   '스마트 건조대: 센서가 닿은 부분만 마른 것으로 측정된 문제 → 센서 재배치·예측 범위 축소 후 정확도 변화와 지표',
+   '건조대 상관 히트맵 해석: 습도·습도 추세와 건조 시간의 높은 상관 → 피처 중복·누수 가능성, 학습/검증 분리 방식',
+   '그래픽카드 가격 예측: 결측·이상치 기준 때문에 정제가 덜 된 채 학습한 뒤 어떻게 개선했는지, 평가 지표(RMSE 등)',
+   '모의투자: 캔들 누락을 수집→저장 순서로 어떻게 확인했고 재발을 어떻게 막았는지'
+  ]},
+ {id:'Q3',name:'LLM · DB 활용',w:15,
+  q:'HRMS에서 로컬 LLM으로 자연어 질문을 SQL로 바꾼 방식과, 생성된 SQL을 안전하고 정확하게 실행하기 위해 한 일을 설명해 주세요.',
+  pt:'LLM 활용 깊이, 안전장치, DB 설계·권한 이해',
+  probes:[
+   '모델 선택(Ollama·Qwen), 프롬프트에 스키마를 넣는 방식, 정확도 평가 방법과 실패 사례',
+   '안전장치: SELECT만 허용·읽기 전용 계정, 급여 등 민감 컬럼의 권한별 접근 통제, SQL 오류 처리',
+   '프롬프트 코딩테스트: LLM 채점 결과의 일관성·오판 대응 (본인 담당 범위)',
+   'DB 설계 경험(MySQL·Oracle 트리거): 인사·근태·급여 테이블 관계와 권한 설계 이유'
+  ]},
+ {id:'Q4',name:'직무 범위 이해 · 현장·ERP 적합성',w:20,
+  q:'이 직무는 AI 모델 개발만이 아니라 사내 업무자동화, ERP 운영·유지관리(메뉴 구성 등 자체 처리 가능한 범위), 검사기·로봇 개발 지원을 함께 하고, ERP 기능 개선 개발은 개발자가 맡습니다. 이 범위를 어떻게 이해하시나요? 현업의 반복 업무 요청이 오면 어떻게 정리하고 처리하시겠습니까?',
+  pt:'직무 범위 이해·동의, 요구사항 정리, 현장 협업 의지, 학습 계획',
+  probes:[
+   '지원서의 비전검사 AI·수요 예측 기대와 실제 업무(운영·자동화 비중)의 차이 인식, 낯설거나 부담되는 부분',
+   '비전·이미지 AI 경험 없음 → CNN 이미지 분류부터 공부하겠다는 계획의 구체성, 하드웨어·로봇 관심(건조대 조립·PC 분해·수리)',
+   '현업 요청 정리 기준: 메뉴 구성 등으로 직접 처리할 것과 개발자에게 넘길 것의 구분',
+   '제조 현장(창원공장·사내 외주 라인) 방문·협업 의지, 현장 이동 가능 여부',
+   'Word·Excel·PowerPoint 자가평가 "하" → 사내 문서·엑셀 업무 가능 수준과 보완 계획'
+  ]},
+ {id:'Q5',name:'자기 인식 · 학습 태도',w:10,
+  q:'본인의 장점과 보완할 점, 동료가 본인을 어떻게 평가할지 말씀해 주세요. 최근 새로 배운 것과 학습 방법도 말씀해 주세요.',
+  pt:'자기 인식의 구체성·객관성, 자기주도 학습, 피드백 수용',
+  probes:[
+   '자소서 단점(처음부터 완벽 추구)을 "핵심부터 처리해 공유"하는 방식으로 바꾼 구체 사례',
+   '컴퓨터공학 전과와 게임 개발 → AI 방향으로 관심이 바뀐 계기',
+   '최근 학습 주제와 실제 적용 사례'
+  ]},
+ {id:'Q6',name:'지원 동기 · 성장 · 질문',w:15,
+  q:'지원 동기와 입사 후 3개월, 3~5년 뒤 모습을 말씀해 주세요. 회사나 업무에 대해 궁금한 점도 말씀해 주세요.',
+  pt:'회사·직무 이해, 현실적 계획, 근속 의지, 질문의 질',
+  probes:[
+   '인시스를 어떻게 알게 되었는지(자소서: 베어링 제조·3자검사·생산직 도급) 회사 이해 깊이',
+   '입사 후 3개월: 사내 ERP·현장 업무 파악 우선순위, "ERP 데이터 조회 자동화"를 현업 요구 파악부터 어떻게 시작할지',
+   '3~5년 뒤 맡고 싶은 역할과 근속 의지',
+   '지원자가 하는 질문의 내용'
+  ]}
+];
+
+var fdb=null;
+var scores={},memos={},checks={};
+var $=function(id){return document.getElementById(id);};
+
+function todayStr(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function fmtDate(s){if(!s)return '';var p=s.split('-');return p[0]+'년 '+Number(p[1])+'월 '+Number(p[2])+'일';}
+function fmtTs(t){try{var d=t.toDate();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}catch(e){return '';}}
+function setStatus(t){$('status').textContent=t;}
+function setBoot(t){$('boot').textContent=t;$('stCard').hidden=false;}
+
+/* ---------- 질문 렌더 ---------- */
+function probesHtml(b){
+  return '<div class="pr-box">'+b.probes.map(function(p,i){
+    var k=b.id+'p'+i;
+    return '<label class="pr"><input type="checkbox" data-p="'+esc(k)+'"><span>'+esc(p)+'</span></label>';
+  }).join('')+'</div>';
+}
+function blockHtml(b,scored){
+  var btns='';
+  if(scored){for(var v=1;v<=5;v++){btns+='<button type="button" data-q="'+esc(b.id)+'" data-v="'+v+'">'+v+'</button>';}}
+  return '<div class="q"><div class="q-t"><b>'+esc(b.id)+'</b>'+esc(b.q)+'</div>'+
+    '<div class="q-p">'+(scored?'평가 포인트: ':'확인 포인트: ')+esc(b.pt)+'</div>'+
+    probesHtml(b)+
+    '<div class="q-row">'+(scored?'<div class="sc" id="sc_'+esc(b.id)+'">'+btns+'</div>':'')+
+    '<textarea class="memo" id="m_'+esc(b.id)+'" data-m="'+esc(b.id)+'" placeholder="메모 (이 블록의 답변을 여기에 한 번에 기록)" rows="2"></textarea></div></div>';
+}
+function renderQ(){
+  var h='<div class="sec-h"><span>0. '+esc(OPEN.name)+'</span><small>채점 제외 / 메모</small></div>'+blockHtml(OPEN,false);
+  BLOCKS.forEach(function(b,i){
+    h+='<div class="sec-h"><span>'+(i+1)+'. '+esc(b.name)+'</span><small>'+b.w+'점</small></div>'+blockHtml(b,true);
+  });
+  $('qBox').innerHTML=h;
+  var rr='';
+  BLOCKS.forEach(function(b){rr+='<div class="res-row"><div>'+esc(b.name)+' <b id="rv_'+b.id+'">0</b> / '+b.w+'</div><div class="bar"><i id="rb_'+b.id+'"></i></div></div>';});
+  $('resRows').innerHTML=rr;
+}
+
+/* ---------- 채점 ---------- */
+function calc(){
+  var total=0,ans=0,res={};
+  BLOCKS.forEach(function(b){
+    var v=scores[b.id];
+    var pts=v?Math.round(v/5*b.w*10)/10:0;
+    if(v){ans++;}
+    res[b.id]={pts:pts,v:v||0};
+    total+=pts;
+  });
+  total=Math.round(total*10)/10;
+  return {total:total,ans:ans,all:BLOCKS.length,res:res};
+}
+function gradeOf(t){return t>=85?'A':t>=70?'B':t>=55?'C':'D';}
+function refresh(){
+  var r=calc();
+  BLOCKS.forEach(function(b){
+    var rv=$('rv_'+b.id),rb=$('rb_'+b.id);if(!rv||!rb)return;
+    rv.textContent=r.res[b.id].pts;
+    rb.style.width=Math.round(r.res[b.id].v/5*100)+'%';
+  });
+  $('totalV').textContent=r.total;
+  $('answered').textContent='(채점 '+r.ans+'/'+r.all+')';
+  $('gradeV').textContent=r.ans?gradeOf(r.total):'-';
+  document.querySelectorAll('.sc button').forEach(function(b){
+    b.classList.toggle('sel',scores[b.getAttribute('data-q')]===Number(b.getAttribute('data-v')));
+  });
+}
+function analyze(){
+  var r=calc();
+  if(!r.ans){setStatus('채점된 블록이 없습니다. 점수를 먼저 입력하세요.');return;}
+  var strong=[],weak=[];
+  BLOCKS.forEach(function(b){
+    var v=scores[b.id];if(!v)return;
+    if(v>=4)strong.push(b.name+' ('+v+'점)');
+    if(v<=2)weak.push(b.name+' ('+v+'점)');
+  });
+  var g=gradeOf(r.total);
+  $('sStr').value=strong.length?strong.join(', ')+' 영역에서 우수한 평가.':'뚜렷하게 높은 영역 없음.';
+  $('sWeak').value=weak.length?weak.join(', ')+' 영역 추가 확인 필요.':'낮게 평가된 영역 없음.';
+  $('sSum').value='총점 '+r.total+'점(등급 '+g+'), 채점 '+r.ans+'/'+r.all+'블록 기준. 블록별 메모를 함께 검토하여 최종 판단 바랍니다.';
+  $('sDec').value=g==='A'?'채용 추천':(g==='B'||g==='C')?'보류(추가 검토)':'비추천';
+  setStatus('종합 분석을 생성했습니다. 내용은 수정할 수 있습니다.');saveDraft();
+}
+
+/* ---------- 저장 데이터 ---------- */
+function collect(){
+  var r=calc();
+  return {date:$('fDate').value,interviewer:$('fIv').value,
+    scores:scores,memos:memos,checks:checks,total:r.total,grade:r.ans?gradeOf(r.total):'',
+    strengths:$('sStr').value,weaknesses:$('sWeak').value,summary:$('sSum').value,decision:$('sDec').value,
+    consent:$('consent').checked,version:VERSION,savedAt:new Date().toISOString()};
+}
+function apply(d){
+  d=d||{};
+  $('fDate').value=d.date||todayStr();$('fIv').value=d.interviewer||'';
+  scores=d.scores||{};memos=d.memos||{};checks=d.checks||{};
+  document.querySelectorAll('.memo').forEach(function(t){t.value=memos[t.getAttribute('data-m')]||'';});
+  document.querySelectorAll('input[data-p]').forEach(function(c){c.checked=!!checks[c.getAttribute('data-p')];});
+  $('sStr').value=d.strengths||'';$('sWeak').value=d.weaknesses||'';$('sSum').value=d.summary||'';$('sDec').value=d.decision||'';
+  $('consent').checked=!!d.consent;
+  refresh();
+}
+function saveDraft(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify(collect()));}catch(e){}}
+function getDraft(){try{return JSON.parse(localStorage.getItem(DRAFT_KEY)||'null');}catch(e){return null;}}
+function clearLocal(){try{localStorage.removeItem(DRAFT_KEY);}catch(e){}try{sessionStorage.clear();}catch(e){}}
+
+function save(){
+  if(!fdb){setStatus('Firebase에 연결되지 않았습니다.');return;}
+  if(!$('consent').checked){setStatus('개인정보 수집·이용 동의 확인에 체크해야 저장할 수 있습니다.');return;}
+  var d=collect();
+  saveDraft();
+  fdb.collection(COL).doc(CASE_ID).set({eval:d,evalVersion:VERSION,savedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})
+    .then(function(){setStatus('저장 완료 (Firebase) '+VERSION);})
+    .catch(function(e){setStatus('Firebase 저장 실패: '+(e&&e.code?e.code:e.message)+' (이 기기에는 임시 저장됨)');});
+}
+function loadSaved(){
+  if(!fdb){setStatus('Firebase에 연결되지 않았습니다.');return;}
+  fdb.collection(COL).doc(CASE_ID).get().then(function(s){
+    if(!s.exists){setStatus('저장된 자료가 없습니다.');return;}
+    var ev=s.data().eval;
+    if(!ev){setStatus('저장된 평가 기록이 없습니다.');return;}
+    apply(ev);setStatus('Firebase 저장본을 불러왔습니다.');
+  }).catch(function(e){setStatus('불러오기 실패: '+(e&&e.code?e.code:e.message));});
+}
+function resetAll(){
+  if(!confirm('입력한 점수·메모·체크를 모두 초기화할까요? (Firebase 저장본은 유지됩니다)'))return;
+  scores={};memos={};checks={};
+  document.querySelectorAll('.memo').forEach(function(t){t.value='';});
+  document.querySelectorAll('input[data-p]').forEach(function(c){c.checked=false;});
+  ['sStr','sWeak','sSum'].forEach(function(i){$(i).value='';});$('sDec').value='';
+  refresh();saveDraft();setStatus('초기화했습니다.');
+}
+
+/* ---------- 삭제 ---------- */
+var formCleared=false;
+function clearForm(){
+  formCleared=true;scores={};memos={};checks={};
+  ['fName','fPos','fIv','sStr','sWeak','sSum'].forEach(function(i){$(i).value='';});
+  $('sDec').value='';$('consent').checked=false;
+  $('caseTags').innerHTML='';$('caseStr').innerHTML='';$('caseChk').innerHTML='';$('caseLinks').innerHTML='';
+  $('qBox').innerHTML='';$('resRows').innerHTML='';$('cBirth').value='';$('cTel').value='';
+  $('ctName').textContent='';$('ctPos').textContent='';$('ctDate').textContent='';
+}
+function deleteAll(){
+  if(!fdb||formCleared){setStatus('삭제할 자료가 없거나 Firebase에 연결되지 않았습니다.');return;}
+  if(!confirm('이 지원자의 평가 기록을 Firebase에서 삭제합니다.\n삭제 후에는 복구할 수 없습니다. 계속할까요?'))return;
+  if(!confirm('마지막 확인입니다. 정말 삭제할까요?'))return;
+  setStatus('삭제 중...');
+  fdb.collection(COL).doc(CASE_ID).delete().then(function(){
+    var o={};o['del_'+CASE_ID]=firebase.firestore.FieldValue.serverTimestamp();
+    return fdb.collection(COL).doc('_log').set(o,{merge:true});
+  }).then(function(){
+    clearLocal();clearForm();
+    location.hash='#verify';
+    if(location.hash==='#verify'){showVerify();}
+  }).catch(function(e){setStatus('삭제 실패: '+(e&&e.code?e.code:e.message)+' (보안 규칙·로그인 확인)');});
+}
+
+/* ---------- 삭제 확인 ---------- */
+function vRow(label,ok,text){
+  return '<div class="vr"><div class="vl">'+esc(label)+'</div><div class="vv '+(ok===true?'ok':ok===false?'bad':'wait')+'">'+esc(text)+'</div></div>';
+}
+function showVerify(){
+  $('formBox').hidden=true;$('verifyCard').hidden=false;$('stCard').hidden=true;
+  $('lnkGh').href='https://github.com/'+GH_REPO+'/blob/main/'+encodeURI(PAGE_FILE);
+  runVerify();
+}
+function runVerify(){
+  var box=$('verRows');
+  box.innerHTML=vRow('확인 중','','Firebase·GitHub 조회 중...');
+  var fbRow='',logRow='',ghRow='';
+  fdb.collection(COL).doc(CASE_ID).get().then(function(s){
+    fbRow=s.exists?vRow('Firebase 평가 데이터',false,'존재함 — 아직 삭제되지 않았습니다.'):vRow('Firebase 평가 데이터',true,'없음 — 삭제 완료(또는 저장 전)');
+    return fdb.collection(COL).doc('_log').get();
+  }).then(function(l){
+    var t=l.exists?l.data()['del_'+CASE_ID]:null;
+    logRow=t?vRow('삭제 처리 기록',true,fmtTs(t)+' 에 삭제됨'):vRow('삭제 처리 기록',null,'삭제 기록 없음 (삭제 전이거나 등록 전)');
+    return fetch('https://api.github.com/repos/'+GH_REPO+'/contents/'+encodeURI(PAGE_FILE),{cache:'no-store'}).then(function(r){
+      if(r.status===404){ghRow=vRow('GitHub 질의서 파일',true,'파일 없음 (삭제됨)');return;}
+      if(!r.ok){throw new Error('GitHub '+r.status);}
+      return r.json().then(function(j){ghRow=vRow('GitHub 질의서 파일',false,'존재함 ('+j.size+' bytes) — 지원자 서류 분석 포함. 전형 종료 후 삭제 필요 (삭제 요청 시 즉시 처리)');});
+    }).catch(function(){ghRow=vRow('GitHub 질의서 파일',null,'조회 실패 — 아래 [GitHub 파일 보기]로 직접 확인');});
+  }).then(function(){
+    box.innerHTML=fbRow+logRow+ghRow+'<div class="q-p">확인 시각: '+esc(new Date().toLocaleString('ko-KR'))+'</div>';
+  }).catch(function(e){
+    box.innerHTML=vRow('Firebase 조회',false,'실패: '+(e&&e.code?e.code:e.message));
+  });
+}
+
+/* ---------- 면접확인서 ---------- */
+function openCert(){
+  $('ctName').textContent=$('fName').value;
+  $('ctPos').textContent=$('fPos').value;
+  $('ctDate').textContent=fmtDate($('fDate').value);
+  $('ctIssue').textContent='발급일: '+fmtDate(todayStr());
+  $('certWrap').style.display='block';
+  updCert();
+}
+function updCert(){
+  $('ctBirth').textContent=$('cBirth').value?fmtDate($('cBirth').value):' ';
+  $('ctTel').textContent=$('cTel').value||' ';
+}
+function printMain(){document.body.classList.remove('print-cert');window.print();}
+function printCert(){updCert();document.body.classList.add('print-cert');window.print();setTimeout(function(){document.body.classList.remove('print-cert');},300);}
+
+/* ---------- 지원자 자료 표시 ---------- */
+function liHtml(arr){return (arr||[]).map(function(t){return '<li>'+esc(t)+'</li>';}).join('');}
+function renderCase(evalData){
+  var c=CASE;
+  formCleared=false;
+  $('fName').value=c.name||'';$('fPos').value=c.position||'';
+  $('caseTags').innerHTML=(c.tags||[]).map(function(t){return '<span class="tag">'+esc(t)+'</span>';}).join('');
+  $('caseStr').innerHTML=liHtml(c.strengths);
+  $('caseChk').innerHTML=liHtml(c.checks);
+  $('caseLinks').innerHTML=(c.links||[]).filter(function(l){return l&&/^https:\/\//.test(l.url||'');}).map(function(l){
+    return '<a class="btn sub" style="text-decoration:none" href="'+esc(l.url)+'" target="_blank" rel="noopener noreferrer">'+esc(l.label||'링크')+'</a>';}).join('');
+  renderQ();
+  apply(evalData||getDraft());
+}
+function showForm(){
+  $('verifyCard').hidden=true;$('formBox').hidden=false;$('stCard').hidden=true;
+}
+function loadCase(){
+  setBoot('저장된 평가 기록을 확인하는 중...');
+  fdb.collection(COL).doc(CASE_ID).get().then(function(s){
+    var ev=(s.exists&&s.data().eval)||null;
+    renderCase(ev);showForm();
+    if(ev){setStatus('저장된 평가 기록을 불러왔습니다.');}
+  }).catch(function(e){setBoot('기록 조회 실패: '+(e&&e.code?e.code:e.message)+' (Firestore 보안 규칙·로그인 확인 필요)');});
+}
+
+/* ---------- 로그인·Firebase ---------- */
+function sha256(s){
+  if(!(window.crypto&&window.crypto.subtle)){return Promise.reject(new Error('nocrypto'));}
+  return window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)).then(function(b){
+    return Array.prototype.map.call(new Uint8Array(b),function(x){return ('0'+x.toString(16)).slice(-2);}).join('');
+  });
+}
+function loadScript(src){
+  return new Promise(function(res,rej){var s=document.createElement('script');s.src=src;s.onload=res;s.onerror=function(){rej(new Error('script load: '+src));};document.head.appendChild(s);});
+}
+function boot(){
+  setBoot('Firebase 연결 중...');
+  var base='https://www.gstatic.com/firebasejs/10.12.0/';
+  loadScript(base+'firebase-app-compat.js').then(function(){
+    return loadScript(base+'firebase-auth-compat.js');
+  }).then(function(){
+    return loadScript(base+'firebase-firestore-compat.js');
+  }).then(function(){
+    if(!firebase.apps.length){firebase.initializeApp(FIREBASE_CONFIG);}
+    fdb=firebase.firestore();
+    return firebase.auth().signInAnonymously();
+  }).then(function(){
+    route();
+  }).catch(function(e){
+    var code=e&&e.code?e.code:e.message;
+    var hint=(code==='auth/operation-not-allowed'||code==='auth/admin-restricted-operation')?' — Firebase 콘솔 > Authentication > 로그인 방법에서 "익명"을 사용 설정해야 합니다.':'';
+    setBoot('Firebase 연결 실패: '+code+hint);
+  });
+}
+function route(){
+  if(location.hash==='#verify'){showVerify();}
+  else{loadCase();}
+}
+function enter(){$('gate').style.display='none';$('app').hidden=false;boot();}
+function tryGate(){
+  sha256($('gateIn').value).then(function(h){
+    if(h===GATE_HASH){$('gateErr').textContent='';enter();}
+    else{$('gateErr').textContent='접속번호가 올바르지 않습니다.';}
+  }).catch(function(){$('gateErr').textContent='이 브라우저에서는 로그인을 처리할 수 없습니다. (HTTPS 접속 필요)';});
+}
+
+function setView(m){
+  $('wrap').classList.toggle('mobile',m);
+  $('vtM').classList.toggle('on',m);$('vtP').classList.toggle('on',!m);
+}
+
+function init(){
+  document.title='면접 평가서 '+VERSION+' | 인시스 AI혁신 연구개발실';
+  $('verTxt').textContent=VERSION;
+  $('footTxt').textContent='인시스 AI혁신 연구개발실 · 면접 평가서 '+VERSION+' · 대외비';
+  $('fDate').value=todayStr();
+  $('lnkForm').setAttribute('href','#');
+  $('qBox').addEventListener('click',function(e){
+    var b=e.target.closest('button[data-q]');if(!b)return;
+    var id=b.getAttribute('data-q'),v=Number(b.getAttribute('data-v'));
+    if(scores[id]===v){delete scores[id];}else{scores[id]=v;}
+    refresh();saveDraft();
+  });
+  $('qBox').addEventListener('input',function(e){
+    var t=e.target;if(t.getAttribute&&t.getAttribute('data-m')){memos[t.getAttribute('data-m')]=t.value;saveDraft();}
+  });
+  $('qBox').addEventListener('change',function(e){
+    var t=e.target;if(t.getAttribute&&t.getAttribute('data-p')){
+      if(t.checked){checks[t.getAttribute('data-p')]=true;}else{delete checks[t.getAttribute('data-p')];}
+      saveDraft();
+    }
+  });
+  ['fDate','fIv','sStr','sWeak','sSum','sDec','consent'].forEach(function(i){$(i).addEventListener('input',saveDraft);$(i).addEventListener('change',saveDraft);});
+  $('btnAnalyze').addEventListener('click',analyze);
+  $('btnSave').addEventListener('click',save);
+  $('btnLoad').addEventListener('click',loadSaved);
+  $('btnPdf').addEventListener('click',printMain);
+  $('btnCert').addEventListener('click',openCert);
+  $('btnReset').addEventListener('click',resetAll);
+  $('btnDel').addEventListener('click',deleteAll);
+  $('btnReVerify').addEventListener('click',runVerify);
+  $('cPrint').addEventListener('click',printCert);
+  $('cClose').addEventListener('click',function(){$('certWrap').style.display='none';});
+  $('cBirth').addEventListener('input',updCert);$('cTel').addEventListener('input',updCert);
+  $('vtM').addEventListener('click',function(){setView(true);});
+  $('vtP').addEventListener('click',function(){setView(false);});
+  $('gateBtn').addEventListener('click',tryGate);
+  $('gateIn').addEventListener('keydown',function(e){if(e.key==='Enter')tryGate();});
+  window.addEventListener('hashchange',function(){if(fdb)route();});
+}
+init();
+})();
+</script>
+</body>
+</html>
