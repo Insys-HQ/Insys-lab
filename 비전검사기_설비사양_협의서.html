@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>PCB 비전검사기 설비 사양 협의서 v1.2</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1f3864; --navy2:#2f5597; --line:#a9b6c8; --soft:#dde6f3; --soft2:#eef3f9;
+  --ink:#2b3440; --ink2:#5a6676; --bg:#f3f5f8; --card:#ffffff;
+  --ok:#1f6b3c; --wa:#9c5b00; --hl:#fff6e0; --sel:#e6f2e9; --cc:#fdf8ee; --ccb:#c49a4a;
+  --wrap:430px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Noto Sans KR',-apple-system,sans-serif;font-size:14px;line-height:1.5;color:var(--ink);background:var(--bg)}
+
+/* nav : 배경 full width / 내부는 컨테이너 폭 */
+.nav{position:sticky;top:0;z-index:50;background:var(--navy);box-shadow:0 1px 6px rgba(0,0,0,.18)}
+.nav-inner{max-width:var(--wrap);margin:0 auto;padding:8px 14px;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.nav h1{font-size:14px;font-weight:900;color:#fff;letter-spacing:-.3px;flex:1 1 auto;min-width:140px}
+.ver{font-size:12px;font-weight:700;color:#fff;background:rgba(255,255,255,.18);padding:2px 8px;border-radius:10px;white-space:nowrap}
+.seg{display:flex;border:1px solid rgba(255,255,255,.45);border-radius:6px;overflow:hidden}
+.seg button{font-family:inherit;font-size:12px;font-weight:700;padding:3px 10px;border:0;background:transparent;color:#fff;cursor:pointer}
+.seg button.on{background:#fff;color:var(--navy)}
+.st{font-size:12px;font-weight:500;color:#d7e2f2;white-space:nowrap}
+
+.wrap{max-width:var(--wrap);margin:0 auto;padding:8px 14px 28px}
+body.pc{--wrap:1100px}
+
+/* 커버 */
+.cover{background:var(--card);border:1px solid var(--navy);border-left:4px solid var(--navy);border-radius:3px;padding:10px 12px;margin-bottom:8px}
+.cover h2{font-size:17px;font-weight:900;color:var(--navy);letter-spacing:-.6px;line-height:1.25}
+.cover .s{font-size:13px;font-weight:500;color:var(--navy2);margin-top:3px}
+.cmeta{display:flex;flex-wrap:wrap;gap:3px 12px;margin-top:7px;font-size:12px;color:var(--ink2)}
+.cmeta b{color:var(--navy);font-weight:700}
+
+section{background:var(--card);border:1px solid var(--line);border-radius:3px;margin-bottom:8px;overflow:hidden}
+h3.sh{font-size:14px;font-weight:900;color:#fff;background:var(--navy);padding:6px 12px;letter-spacing:-.3px}
+.body{padding:10px 12px}
+h4{font-size:13px;font-weight:700;color:var(--navy);margin:8px 0 4px;padding-left:6px;border-left:3px solid #8faadc}
+h4:first-child{margin-top:0}
+
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:4px 0}
+.tw table{min-width:520px}
+.tw.n table{min-width:0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border:1px solid var(--line);padding:5px 7px;vertical-align:middle;line-height:1.42}
+th{background:var(--soft);color:var(--navy);font-weight:700;text-align:center}
+td.c{text-align:center}
+td.l{background:var(--soft2);font-weight:700;color:var(--navy)}
+.num{text-align:center;font-weight:700}
+.q{color:var(--navy);font-weight:700}
+.ok{color:var(--ok);font-weight:700}
+.wa{color:var(--wa);font-weight:700}
+tr.hl td{background:var(--hl)}
+td.sel{background:var(--sel)}
+
+.note{font-size:12px;color:var(--ink2);margin:4px 0 2px}
+.box{border:1px solid #8faadc;background:var(--soft2);padding:8px 10px;margin:6px 0;border-radius:3px;font-size:13px}
+.box b{color:var(--navy)}
+.ccbox{border:1px solid var(--ccb);background:var(--cc);padding:8px 10px;margin:6px 0;border-radius:3px}
+.ccbox>.t{font-size:13px;font-weight:700;color:#8a5f00;margin-bottom:3px}
+.ccbox>.d{font-size:12px;color:var(--ink2);margin-bottom:5px}
+
+/* 입력 행 */
+.qa{display:grid;grid-template-columns:1fr;gap:2px;padding:6px 0;border-bottom:1px dashed #c6d2e2}
+.qa:last-child{border-bottom:0}
+.qk{font-size:13px;font-weight:500;color:var(--ink)}
+.qk .no{display:inline-block;min-width:18px;font-weight:700;color:var(--navy2)}
+.qk .who{font-size:11px;font-weight:700;color:#fff;background:var(--navy2);padding:1px 6px;border-radius:8px;margin-left:5px;white-space:nowrap}
+textarea,input[type=text]{font-family:inherit;font-size:14px;color:var(--ink);width:100%;border:1px solid var(--line);border-radius:3px;padding:5px 7px;background:#fdfdfe;resize:vertical}
+textarea{min-height:34px}
+textarea:focus,input[type=text]:focus{outline:0;border-color:var(--navy2);background:#fff;box-shadow:0 0 0 2px rgba(47,85,151,.12)}
+
+.pick{display:flex;flex-wrap:wrap;gap:6px;margin:5px 0}
+.pick label{font-size:13px;font-weight:700;color:var(--navy);border:1px solid #8faadc;background:#fff;padding:5px 10px;border-radius:14px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.pick input{accent-color:var(--navy2)}
+.pick label:has(input:checked){background:var(--sel);border-color:var(--ok);color:var(--ok)}
+
+.mt{display:grid;grid-template-columns:1fr;gap:4px;padding:6px 0;border-bottom:1px dashed #c6d2e2}
+.mt:last-child{border-bottom:0}
+
+.bar{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px}
+.bar button{font-family:inherit;font-size:13px;font-weight:700;padding:8px 14px;border:1px solid var(--navy);border-radius:4px;background:var(--navy);color:#fff;cursor:pointer}
+.bar button.g{background:#fff;color:var(--navy)}
+.bar button:active{transform:translateY(1px)}
+.ft{font-size:12px;color:var(--ink2);text-align:center;padding:8px 0 0;line-height:1.6}
+
+@media (min-width:768px){
+  body{font-size:16px}
+  .nav h1{font-size:16px}
+  .ver,.st,.seg button{font-size:13px}
+  .cover h2{font-size:21px}
+  .cover .s,.box{font-size:14px}
+  .cmeta,.note,.ccbox>.d,.ft{font-size:13px}
+  h3.sh{font-size:16px}
+  h4,table,.qk,.ccbox>.t,.pick label{font-size:14px}
+  textarea,input[type=text],.bar button{font-size:15px}
+  .qa{grid-template-columns:34% 1fr;gap:8px;align-items:start}
+  .qk{padding-top:5px}
+  .mt{grid-template-columns:28% 1fr;gap:8px;align-items:start}
+}
+</style>
+</head>
+<body class="mo">
+
+<div class="nav"><div class="nav-inner">
+  <h1>PCB 비전검사기 설비 사양 협의서</h1>
+  <span class="ver" id="vb">v1.2</span>
+  <div class="seg">
+    <button id="bmo" class="on" type="button">모바일</button>
+    <button id="bpc" type="button">PC</button>
+  </div>
+  <span class="st" id="st">준비 중…</span>
+</div></div>
+
+<div class="wrap">
+
+<div class="cover">
+  <h2>PCB 비전검사기 설비 사양 협의서</h2>
+  <div class="s">위너콤 납품용 · 인덱스 회전 방식 (90° 4위치 / 120° 3위치)</div>
+  <div class="cmeta">
+    <span><b>문서번호</b> INS-VI-SPEC-001</span>
+    <span><b>버전</b> v1.2</span>
+    <span><b>작성일</b> 2026-11-26</span>
+    <span><b>작성</b> 인시스 AI혁신 연구개발실</span>
+    <span><b>협의대상</b> 코그넥스 · 설비제작업체</span>
+  </div>
+</div>
+
+<!-- Ⅰ -->
+<section>
+<h3 class="sh">Ⅰ. 협의 목적 및 기본 조건</h3>
+<div class="body">
+<div class="tw n"><table>
+<tr><td class="l">목적</td><td>고객사 요구 수준 충족을 위한 비전 사양·기구 방식·제어 구성 확정</td></tr>
+<tr><td class="l">검사 대상</td><td>주요 4종 (현재) + 향후 1년 내 추가 3종 — 기종별 안착지그 개별 제작</td></tr>
+<tr><td class="l">PCB 실측</td><td>101.8 × 78.8 × 1.2 mm (기존 기종) / 추가 기종 지그 접선폭 최대 약 145 mm 전제</td></tr>
+<tr><td class="l">검사 항목</td><td>솔더 불량 — 미납 · 과납 · 냉납 · 극성 오삽 (명칭 최종 확인 중)</td></tr>
+<tr><td class="l">검사 시간</td><td>현재 개당 약 20초 → <b class="q">설계목표 6초 이내, 허용 상한 10초</b></td></tr>
+<tr><td class="l">일 처리량</td><td>일 3,500개 · 월 70,000개 수준 (참고치)</td></tr>
+<tr><td class="l">도입 목표</td><td>2027년 1월 — 설계 사양 반영에 따라 조정 가능</td></tr>
+<tr><td class="l">운영 형태</td><td>전담 작업자 없음. 전공정 작업자 안착 → 검사 → 후공정 작업자 수거</td></tr>
+<tr><td class="l">설치 조건</td><td>작업대 높이 780 mm · 안착부 높이 약 800 mm · 전원 AC220V 단상 · 에어 불요</td></tr>
+</table></div>
+<div class="qa"><div class="qk">추가 검사 항목 (협의 중 추가분 기입)</div><div><textarea data-k="add_defect" placeholder="예) 브리지, 미삽, 들뜸 …"></textarea></div></div>
+</div>
+</section>
+
+<!-- Ⅱ -->
+<section>
+<h3 class="sh">Ⅱ. 11/25 고객사 협의 반영 변경 사항</h3>
+<div class="body">
+<div class="tw"><table>
+<tr><th style="width:20%">항목</th><th style="width:26%">종전 사양</th><th>변경 사양</th></tr>
+<tr><td class="l">검사 시간</td><td class="c">개당 10초</td><td>설계목표 6초 이내 / 허용 상한 10초</td></tr>
+<tr><td class="l">카메라 위치</td><td class="c">하부 설치</td><td><b class="q">상부 설치</b> — 하부 광원이 작업자 시야에 직접 노출되는 불편 해소</td></tr>
+<tr><td class="l">설비 폭</td><td class="c">300 mm 고정</td><td>허용 폭 재검토 요청 → 고객사 회신 대기</td></tr>
+<tr><td class="l">기구 방식</td><td class="c">인덱스 단일안</td><td><b class="q">90° 4위치 / 120° 3위치 중 택 1</b> (Ⅲ항 비교)</td></tr>
+<tr><td class="l">2장 구성 기종</td><td class="c">미반영</td><td>PCB 2장 동시 안착 기종 존재 — 한 손 안착 불가, 양손 작업 공간 확보 필요</td></tr>
+<tr><td class="l">상부 프레임</td><td class="c">제약 없음</td><td>작업자 시야·접근성 확보를 위해 상부 구조물 최소화</td></tr>
+<tr><td class="l">QR 스캔</td><td class="c">거치대 수동 스캔</td><td>검사기 내부 고정 설치 · 검사기용 PC 직결</td></tr>
+<tr><td class="l">배출 방식</td><td class="c">자동 배출 검토</td><td>작업자 수거 유지 — 자동화는 추후 개선 과제</td></tr>
+<tr><td class="l">NG 재판정</td><td class="c">공급사 원격 변경</td><td><b class="q">도어 개방 후 현물 직접 확인 → 양품 시 현장 OK 처리</b> + 촬영 이미지 NG 포인트 확대 확인</td></tr>
+</table></div>
+</div>
+</section>
+
+<!-- Ⅲ -->
+<section>
+<h3 class="sh">Ⅲ. 기구 방식 비교 — 90° 4위치 vs 120° 3위치</h3>
+<div class="body">
+
+<h4>1) 구성 개요</h4>
+<div class="tw"><table>
+<tr><th style="width:18%">구분</th><th style="width:41%">90° 4위치</th><th>120° 3위치</th></tr>
+<tr><td class="l">스테이션</td><td>투입 → 검사 → 배출 → 대기 (4)</td><td>투입 → 검사 → 배출 (3)</td></tr>
+<tr><td class="l">1사이클 회전</td><td class="c">90°</td><td class="c">120°</td></tr>
+<tr><td class="l">지그 수</td><td class="c">4조</td><td class="c">3조</td></tr>
+<tr><td class="l">투입·배출 배치</td><td>180° 대향 — 동선 2R</td><td>120° — 동선 1.73R (약 13% 근접)</td></tr>
+</table></div>
+
+<h4>2) 기하 비교 — 지그 접선폭 145 mm, 인접 간극 20 mm</h4>
+<div class="tw"><table>
+<tr><th style="width:26%">항목</th><th style="width:18%">90° 4위치</th><th style="width:18%">120° 3위치</th><th>비교</th></tr>
+<tr><td class="l">최소 배치반경 R</td><td class="num">105.0 mm</td><td class="num sel">78.8 mm</td><td>3위치가 26.2 mm 작음 (−25%)</td></tr>
+<tr><td class="l">선회반경</td><td class="num">152 mm</td><td class="num sel">126 mm</td><td>지그 깊이 94 mm 반영</td></tr>
+<tr><td class="l">선회직경 (소요 폭)</td><td class="num">304 mm</td><td class="num sel">252 mm</td><td>3위치가 52 mm 여유</td></tr>
+<tr class="hl"><td class="l">R=105 시 수용 지그 접선폭</td><td class="num">144.9 mm</td><td class="num">199.9 mm</td><td><b class="q">3위치가 38% 큰 지그 수용</b></td></tr>
+</table></div>
+<div class="note">산출식 : 인접 지그 비간섭 조건 R ≥ N·(W+g) / 2π — N 스테이션 수, W 지그 접선폭, g 간극</div>
+
+<h4>3) 구동 비교 — 회전부 관성 실측값 기준</h4>
+<div class="tw"><table>
+<tr><th style="width:22%">항목</th><th style="width:18%">90° 4위치</th><th style="width:18%">120° 3위치</th><th>비교</th></tr>
+<tr><td class="l">회전부 관성 J</td><td class="num">0.0382 kg·m²</td><td class="num">0.0298 kg·m²</td><td>3위치 22% 감소</td></tr>
+<tr><td class="l">각가속도 (3.0s)</td><td class="num">0.70 rad/s²</td><td class="num">0.93 rad/s²</td><td>3위치 33% 증가</td></tr>
+<tr class="hl"><td class="l">가속 토크</td><td class="num">0.0267 N·m</td><td class="num">0.0277 N·m</td><td><b class="q">사실상 동일</b> — 관성 감소와 각도 증가 상쇄</td></tr>
+<tr><td class="l">테이블 최고 회전수</td><td class="num">10.0 rpm</td><td class="num">13.3 rpm</td><td>양안 모두 감속기 허용 범위 내</td></tr>
+<tr><td class="l">인덱싱 2.5s 단축 시</td><td class="num">0.0384 N·m</td><td class="num">0.0399 N·m</td><td>양안 모두 여유 확보</td></tr>
+</table></div>
+<div class="note">관성값은 STEP 3D 모델 실측 기준 (지그·회전판 알루미늄, 케이스 PC 5t, PCB·부품 포함)</div>
+
+<h4>4) 정성 비교</h4>
+<div class="tw"><table>
+<tr><th style="width:20%">관점</th><th style="width:34%">90° 4위치</th><th>120° 3위치</th></tr>
+<tr><td class="l">지그 확장성</td><td>지그 확대 시 배치반경 동반 증가</td><td class="sel">동일 반경에서 지그 확대 수용 — 2장 기종 대응 유리</td></tr>
+<tr><td class="l">작업자 동선</td><td>투입·배출 180° 대향 — 1인 취급 시 이동 발생</td><td class="sel">투입·배출 120° — 1인 운용 유리</td></tr>
+<tr><td class="l">대기 스테이션</td><td class="sel">1개소 확보 — QR 스캔·향후 자동배출 증설 여유</td><td>미확보 — 기능 추가 시 별도 구조 필요</td></tr>
+<tr><td class="l">설비 폭</td><td>304 mm 이상 필요</td><td class="sel">252 mm — 폭 제약 유지 시 유리</td></tr>
+<tr><td class="l">인덱싱 정밀도</td><td class="sel">회전각 작아 정지 안정화 짧음</td><td>회전각 큼 — 안정화 시간 소폭 증가</td></tr>
+</table></div>
+
+<div class="box">
+<b>인시스 검토 의견</b><br>
+· 토크·소요 서보 사양은 양안 동등 → 구동부가 선정 기준이 되지 않음<br>
+· 지그 확대 여력(동일 반경 +38%)과 1인 운용 동선에서 <b>120° 3위치가 우위</b><br>
+· 대기 스테이션 활용 계획이 확정되면 <b>90° 4위치</b> 재검토<br>
+· <b>고객사 허용 폭 회신 후 최종 확정</b> — 300 mm 유지 시 120° 3위치로 단일안 수렴
+</div>
+
+<h4>5) 미팅 결정</h4>
+<div class="pick">
+  <label><input type="radio" name="mech" value="90-4" data-k="mech"> 90° 4위치</label>
+  <label><input type="radio" name="mech" value="120-3" data-k="mech"> 120° 3위치</label>
+  <label><input type="radio" name="mech" value="hold" data-k="mech"> 보류 (폭 회신 후)</label>
+</div>
+<div class="qa"><div class="qk">결정 사유 · 조건</div><div><textarea data-k="mech_why"></textarea></div></div>
+</div>
+</section>
+
+<!-- Ⅳ -->
+<section>
+<h3 class="sh">Ⅳ. 택타임 설계 — 목표 6초 / 상한 10초</h3>
+<div class="body">
+<div class="tw"><table>
+<tr><th style="width:28%">구간</th><th>6초안</th><th>8초안</th><th>10초안</th><th style="width:22%">비고</th></tr>
+<tr><td class="l">인덱스 회전·정지</td><td class="num">2.5 s</td><td class="num">3.0 s</td><td class="num">3.5 s</td><td>가감속 포함</td></tr>
+<tr><td class="l">정지 안정화</td><td class="num">0.3 s</td><td class="num">0.3 s</td><td class="num">0.5 s</td><td>진동 수렴</td></tr>
+<tr><td class="l">촬영</td><td class="num">0.4 s</td><td class="num">0.6 s</td><td class="num">0.8 s</td><td>조명 안정 + 노출</td></tr>
+<tr><td class="l">영상 처리·판정</td><td class="num">1.5 s</td><td class="num">2.5 s</td><td class="num">3.5 s</td><td><b class="q">코그넥스 확인</b></td></tr>
+<tr><td class="l">결과 표시·MES 전송</td><td class="num">0.3 s</td><td class="num">0.4 s</td><td class="num">0.5 s</td><td>비동기 시 제외 가능</td></tr>
+<tr><td class="l">여유</td><td class="num">1.0 s</td><td class="num">1.2 s</td><td class="num">1.2 s</td><td>—</td></tr>
+<tr class="hl"><td class="l">합계</td><td class="num">6.0 s</td><td class="num">8.0 s</td><td class="num">10.0 s</td><td>안착은 병렬 진행</td></tr>
+</table></div>
+<div class="note">· 작업자 안착 시간이 택타임을 상회하면 설비 성능과 무관하게 처리량 제한 — 투입부 접근성·양손 작업 공간 확보 전제<br>
+· 영상 처리·판정 시간이 택타임 결정 변수 → ROI 수·해상도·알고리즘 조합별 실측치 제시 요청</div>
+<div class="qa"><div class="qk">택타임 합의값</div><div><textarea data-k="tact_agree" placeholder="예) 7초 합의 — 처리 2.0s 전제"></textarea></div></div>
+</div>
+</section>
+
+<!-- Ⅴ -->
+<section>
+<h3 class="sh">Ⅴ. 코그넥스 확인 요청 사항</h3>
+<div class="body">
+
+<div class="ccbox">
+<div class="t">① 피사계 심도 (DOF)</div>
+<div class="d">PCB 고정 방식에 따라 기종·안착 편차 발생. 초점 재조정 없이 허용되는 Z축 변위량 확인 필요.</div>
+<div class="qa"><div class="qk">선정 기종 기준 DOF (mm)</div><div><textarea data-k="c1_1"></textarea></div></div>
+<div class="qa"><div class="qk">DOF 확보를 위한 조리개·조명 조건</div><div><textarea data-k="c1_2"></textarea></div></div>
+<div class="qa"><div class="qk">지그 안착 편차 허용 목표 (±mm)</div><div><textarea data-k="c1_3"></textarea></div></div>
+<div class="note">인시스 요구 수준 — 기종 전환·지그 교체 후 초점 재조정 없이 운용 (±2 mm 이상 희망)</div>
+</div>
+
+<div class="ccbox">
+<div class="t">② 초점거리 · 화각 · 분해능</div>
+<div class="d">카메라 상부 설치 전환에 따른 작동거리(WD)·FOV 재확인. 상부 프레임 최소화 요구와 WD 상충 여부 검토.</div>
+<div class="qa"><div class="qk">제안 기종 (3800 계열 등)</div><div><textarea data-k="c2_1"></textarea></div></div>
+<div class="qa"><div class="qk">렌즈 초점거리 / 작동거리 WD</div><div><textarea data-k="c2_2"></textarea></div></div>
+<div class="qa"><div class="qk">확보 FOV (mm × mm)</div><div><textarea data-k="c2_3"></textarea></div></div>
+<div class="qa"><div class="qk">분해능 (mm/pixel)</div><div><textarea data-k="c2_4"></textarea></div></div>
+<div class="qa"><div class="qk">최대 기종 전면 1회 촬영 가능 여부</div><div><textarea data-k="c2_5"></textarea></div></div>
+<div class="note">전제 — 최대 지그 접선폭 약 145 mm, 상부 설치 시 설비 높이 약 1,300 mm 내 수용</div>
+</div>
+
+<div class="ccbox">
+<div class="t">③ 기종별 검사 범위 지정 + 단일 알고리즘 적용</div>
+<div class="d">기종마다 검사 포인트 판정 기준이 개별 설정되어 운용 부담 발생. 개선 방안 확인 필요.</div>
+<div class="qa"><div class="qk">기종별 ROI 지정 + 판정 알고리즘 공통화 가능 여부</div><div><textarea data-k="c3_1"></textarea></div></div>
+<div class="qa"><div class="qk">기종 추가 시 ROI 등록 소요 시간·필요 인력</div><div><textarea data-k="c3_2"></textarea></div></div>
+<div class="qa"><div class="qk">판정 임계값 공통 관리 / 기종별 오버라이드 구조</div><div><textarea data-k="c3_3"></textarea></div></div>
+<div class="qa"><div class="qk">기종 전환 방식 (QR 자동 인식 / 수동 선택)</div><div><textarea data-k="c3_4"></textarea></div></div>
+<div class="note">인시스 요구 수준 — 기종 추가 시 ROI 좌표 등록만으로 운용 개시, 판정 로직 재작성 불요</div>
+</div>
+
+<div class="ccbox">
+<div class="t">④ NG 재판정 · 학습 반영 구조</div>
+<div class="d">현재 NG 판정분은 검사원 재검 후 공급사 원격 변경에 의존. 현장 자체 처리 구조로의 전환 필요.</div>
+<div class="tw"><table>
+<tr><th style="width:12%">순서</th><th style="width:44%">요구 운영 흐름</th><th>조건</th></tr>
+<tr><td class="c l">1</td><td>NG 판정 발생 → 화면에 NG 포인트 표시 · 사이클 정지</td><td>해당 PCB 배출 위치 유지</td></tr>
+<tr><td class="c l">2</td><td><b class="q">촬영 이미지에서 NG 포인트 선택 → 화면 확대 확인</b></td><td>포인트 클릭·터치 시 영역 확대</td></tr>
+<tr><td class="c l">3</td><td><b class="q">도어 개방 후 현물 직접 확인</b></td><td>도어 인터록 — 개방 중 구동 정지</td></tr>
+<tr><td class="c l">4</td><td>양품 판단 시 화면 OK 처리 / 불량 확정 시 NG 유지</td><td>재판정 권한 계정 분리</td></tr>
+<tr><td class="c l">5</td><td>재판정 결과 학습 데이터 자동 반영</td><td>공급사 원격 개입 불요</td></tr>
+<tr><td class="c l">6</td><td>도어 폐쇄 → 사이클 재개</td><td>MES 전송은 최종 판정값 기준</td></tr>
+</table></div>
+<h4>화면 요구 기능</h4>
+<div class="qa"><div class="qk">NG 포인트 선택 시 확대 표시 (배율·팬 조작)</div><div><textarea data-k="c4_a"></textarea></div></div>
+<div class="qa"><div class="qk">NG 포인트별 판정 근거 표시 (항목명·측정값·임계값)</div><div><textarea data-k="c4_b"></textarea></div></div>
+<div class="qa"><div class="qk">포인트 단위 개별 OK / 전체 OK 처리 선택</div><div><textarea data-k="c4_c"></textarea></div></div>
+<div class="qa"><div class="qk">원본 이미지 · 판정 오버레이 전환 표시</div><div><textarea data-k="c4_d"></textarea></div></div>
+<div class="qa"><div class="qk">직전 검사 이력 조회 (QR 기준 이미지 재호출)</div><div><textarea data-k="c4_e"></textarea></div></div>
+<h4>확인 항목</h4>
+<div class="qa"><div class="qk">현장 화면 NG → OK 재판정 가능 여부 (권한 분리)</div><div><textarea data-k="c4_1"></textarea></div></div>
+<div class="qa"><div class="qk">재판정 결과 학습 데이터 자동 반영 가능 여부</div><div><textarea data-k="c4_2"></textarea></div></div>
+<div class="qa"><div class="qk">재학습 주기·소요 시간·수동 승인 절차</div><div><textarea data-k="c4_3"></textarea></div></div>
+<div class="qa"><div class="qk">재판정 이력 저장·추적 (검사자·시각·사유)</div><div><textarea data-k="c4_4"></textarea></div></div>
+<div class="qa"><div class="qk">판정 등급 3단계 지원 (확정NG / 보류 / 검사불가)</div><div><textarea data-k="c4_5"></textarea></div></div>
+<div class="qa"><div class="qk">도어 개방 중 판정 화면 유지 · 재판정 입력 가능 여부</div><div><textarea data-k="c4_6"></textarea></div></div>
+<div class="note">인시스 요구 수준 — 재검 결과를 현장에서 즉시 반영하고 학습 대기열에 자동 누적, 공급사 원격 개입 불요<br>
+운영 조건 — 도어 개방 재판정은 사이클 정지를 수반하므로, 과검 발생률이 처리량에 직접 영향. 성능 목표 단계안(⑤)과 연계 관리 필요</div>
+</div>
+
+<h4>⑤ 성능 목표 단계안</h4>
+<div class="tw"><table>
+<tr><th style="width:14%">단계</th><th style="width:20%">과검율</th><th style="width:22%">불량 검출율</th><th>적용 시점</th></tr>
+<tr><td class="l c">1단계</td><td class="c">10% 이하</td><td class="c">99.0% 이상</td><td>설치·초기 셋업 완료</td></tr>
+<tr><td class="l c">2단계</td><td class="c">5% 이하</td><td class="c">99.5% 이상</td><td>학습 데이터 누적 후</td></tr>
+<tr><td class="l c">3단계</td><td class="c">2% 이하</td><td class="c">99.7% 이상</td><td>안정화 운용 단계</td></tr>
+<tr class="hl"><td class="l c">최종</td><td class="c">0.5% 이하</td><td class="c">99.9% 이상</td><td>고객사 요구 수준</td></tr>
+</table></div>
+<div class="note">과검율과 불량 검출율은 한 쌍으로 관리 — 과검 억제만 추구하면 미검 증가</div>
+<div class="qa"><div class="qk">단계안 수용 여부 · 조정 내용</div><div><textarea data-k="c5_1"></textarea></div></div>
+</div>
+</section>
+
+<!-- Ⅵ -->
+<section>
+<h3 class="sh">Ⅵ. 현재 설계 반영 부품 및 설비제작업체 확인 사항</h3>
+<div class="body">
+
+<h4>1) 구동부 — 현재 설계 반영</h4>
+<div class="tw"><table>
+<tr><th style="width:22%">품목</th><th style="width:18%">적용 모델</th><th>주요 사양</th><th style="width:14%">상태</th></tr>
+<tr><td class="l">중공 로터리 감속기</td><td class="c"><b class="q">DG085-F-10</b></td><td>외경 φ85 · 감속비 1:10 · 워엄 구동 · 크로스롤러 베어링 내장 · 중공 관통</td><td class="c ok">설계 반영</td></tr>
+<tr><td class="l">AC 서보모터</td><td class="c">100 W 급</td><td>플랜지 40각 · 축경 φ8 · 파일럿 φ30 (국제표준 체결)</td><td class="c wa">선정 중</td></tr>
+<tr><td class="l">서보 드라이브</td><td class="c">모터 동급</td><td>펄스 지령 또는 EtherCAT — PLC 연동 방식에 따라 확정</td><td class="c wa">선정 중</td></tr>
+<tr><td class="l">원점 센서</td><td class="c">포토센서</td><td>절대 원점 1점 + 모듈로 무한회전 제어</td><td class="c ok">설계 반영</td></tr>
+</table></div>
+<div class="note">감속비 1:10 적용 시 서보축 환산 관성 J/i² = 0.00038 kg·m² — 100 W 급 관성비 20:1 이내 (오토튜닝 가능 범위)</div>
+<div class="qa"><div class="qk">서보모터·드라이브 확정 모델명</div><div><textarea data-k="d_servo"></textarea></div></div>
+
+<h4>2) 회전 기구부 — 현재 설계 반영</h4>
+<div class="tw"><table>
+<tr><th style="width:22%">품목</th><th style="width:16%">수량</th><th>사양</th><th style="width:18%">비고</th></tr>
+<tr><td class="l">회전 상판</td><td class="c">1</td><td>AL · 300 × 600 × t10</td><td>STEP 실측</td></tr>
+<tr><td class="l">지그 안착대</td><td class="c">4 (3위치 시 3)</td><td>AL 가공품</td><td>지그 고정 기구물</td></tr>
+<tr><td class="l">PCB 안착지그</td><td class="c">기종별</td><td>기존 기종 1종 설계 완료 / 추가 기종 미설계</td><td>기종별 개별 제작</td></tr>
+<tr><td class="l">토글 클램프</td><td class="c">4</td><td>PCB 압착 고정 — 수동 조작</td><td>모델 확인 필요</td></tr>
+<tr><td class="l">투명 케이스</td><td class="c">4</td><td>PC t5 · 1개 약 102 g</td><td>STEP 실측</td></tr>
+<tr><td class="l">프레임</td><td class="c">1식</td><td>AL 프로파일 3030</td><td>간섭 여유 확인 필요</td></tr>
+<tr><td class="l">QR 스캐너</td><td class="c">1</td><td>고정형 소형 — 검사기 내부 설치 · 검사기용 PC 직결</td><td class="wa">선정 중</td></tr>
+</table></div>
+<div class="note">현장 기존 스캐너는 거치대 수동 스캔 방식 — 내부 고정 설치용 소형 기종으로 별도 선정</div>
+<div class="qa"><div class="qk">토글클램프 · QR 스캐너 확정 모델명</div><div><textarea data-k="d_parts"></textarea></div></div>
+
+<h4>3) 회전부 실측값 (STEP 3D 모델)</h4>
+<div class="tw"><table>
+<tr><th style="width:24%">항목</th><th style="width:20%">실측값</th><th>내용</th></tr>
+<tr><td class="l">회전부 중량</td><td class="num">2.70 kg</td><td>상판·지그·안착대·케이스·클램프·PCB 포함</td></tr>
+<tr><td class="l">회전 관성 J</td><td class="num">0.0382 kg·m²</td><td>지그·회전판 25.6 / 케이스 9.1 / 클램프 0.9 / PCB·부품 1.2 (g·m²)</td></tr>
+<tr><td class="l">현 설계 선회반경</td><td class="num">202.4 mm</td><td>메시 노드 실측 — 기하 최소 요구 152 mm 대비 여유 설계</td></tr>
+<tr class="hl"><td class="l">최근접 간섭 여유</td><td class="num">13.9 mm</td><td><b class="q">3030 프레임 기둥까지 — 여유 과소, 기둥 배치 재검토 필요</b></td></tr>
+<tr><td class="l">회전 편심</td><td class="num">0.01 mm</td><td>균형 양호 — 별도 밸런싱 불요</td></tr>
+</table></div>
+<div class="note">120° 3위치 전환 시 선회반경 축소로 간섭 여유 확보 가능 — Ⅲ항 비교와 연계 판단</div>
+
+<h4>4) 프레임 · 구조</h4>
+<div class="qa"><div class="qk">외형 300 × 600 × 약 1,300 mm (허용 폭 회신 후 확정)</div><div><textarea data-k="f4_1"></textarea></div></div>
+<div class="qa"><div class="qk">인덱스 테이블 높이 약 800 mm (작업대 780 mm 대비 상향)</div><div><textarea data-k="f4_2"></textarea></div></div>
+<div class="qa"><div class="qk">카메라 상부 설치 구조 — 상부 구조물 최소화</div><div><textarea data-k="f4_3"></textarea></div></div>
+<div class="qa"><div class="qk">투입 스테이션 프레임 외부 노출 — 양손 안착 공간</div><div><textarea data-k="f4_4"></textarea></div></div>
+<div class="qa"><div class="qk">차광 구조 — 외광 차단 + 광원 노출 억제</div><div><textarea data-k="f4_5"></textarea></div></div>
+<div class="qa"><div class="qk">재판정 도어 — 검사 위치 PCB 접근 가능 · 인터록 연동</div><div><textarea data-k="f4_6"></textarea></div></div>
+
+<h4>5) 구동부 사양 확인</h4>
+<div class="qa"><div class="qk">인덱스 구동 — 중공 로터리 + AC 서보 (1:10)</div><div><textarea data-k="f5_1"></textarea></div></div>
+<div class="qa"><div class="qk">회전부 관성 0.0298~0.0382 kg·m² (방식별)</div><div><textarea data-k="f5_2"></textarea></div></div>
+<div class="qa"><div class="qk">인덱싱 시간 2.5~3.0 s</div><div><textarea data-k="f5_3"></textarea></div></div>
+<div class="qa"><div class="qk">정지 반복 정밀도 ±0.05° 이내 목표</div><div><textarea data-k="f5_4"></textarea></div></div>
+<div class="qa"><div class="qk">회전부 배선 — 슬립링 또는 왕복 회전 중 택</div><div><textarea data-k="f5_5"></textarea></div></div>
+
+<h4>6) 제어 · 안전</h4>
+<div class="qa"><div class="qk">제어 구성 — PLC 구동 · Ethernet 비전 PC 연동</div><div><textarea data-k="f6_1"></textarea></div></div>
+<div class="qa"><div class="qk">PLC 기종 — 인시스 선정 / 고객사 선호 기종 반영</div><div><textarea data-k="f6_2"></textarea></div></div>
+<div class="qa"><div class="qk">조작반 — 시작 / 정지 + 비상정지</div><div><textarea data-k="f6_3"></textarea></div></div>
+<div class="qa"><div class="qk">센서 — 원점 · 안착 · 배출 · 도어 개폐 감지</div><div><textarea data-k="f6_4"></textarea></div></div>
+<div class="qa"><div class="qk">도어 인터록 — 개방 시 구동 정지 · 폐쇄 후 재개</div><div><textarea data-k="f6_5"></textarea></div></div>
+<div class="qa"><div class="qk">QR 스캐너 — 내부 고정형 · 검사기용 PC 직결</div><div><textarea data-k="f6_6"></textarea></div></div>
+<div class="qa"><div class="qk">표시 장치 — PC + 모니터</div><div><textarea data-k="f6_7"></textarea></div></div>
+<div class="qa"><div class="qk">MES 연동 — 기존 프로토콜 준수</div><div><textarea data-k="f6_8"></textarea></div></div>
+<div class="qa"><div class="qk">전원 — AC 220V 단상 · 에어 불요</div><div><textarea data-k="f6_9"></textarea></div></div>
+
+<h4>7) 동작 시퀀스</h4>
+<div class="tw"><table>
+<tr><th style="width:12%">순서</th><th style="width:32%">동작</th><th>신호 · 조건</th></tr>
+<tr><td class="c l">1</td><td>원점 복귀 · 대기</td><td>원점 센서 검출 → 시작 버튼 대기</td></tr>
+<tr><td class="c l">2</td><td>PCB 안착 감지</td><td>안착 센서 ON → QR 스캔 → MES 검사 개시 통보</td></tr>
+<tr><td class="c l">3</td><td>인덱스 회전</td><td>CCW 지정 각도 회전 → 정지 → 안정화 대기</td></tr>
+<tr><td class="c l">4</td><td>촬영 · 판정</td><td>PLC → 비전 PC 트리거 → OK/NG 수신 → 화면 표시</td></tr>
+<tr><td class="c l">5</td><td>배출 위치 이송</td><td>차기 PCB 안착 감지와 병행</td></tr>
+<tr><td class="c l">6</td><td>배출 확인 · 반복</td><td>배출 감지 → 2단계 복귀 / 정지 버튼 시 사이클 종료</td></tr>
+</table></div>
+</div>
+</section>
+
+<!-- Ⅶ -->
+<section>
+<h3 class="sh">Ⅶ. 미결 사항 및 회신 요청</h3>
+<div class="body">
+<div class="qa"><div class="qk"><span class="no">1</span> 설비 허용 폭 (300 mm 유지 여부)<span class="who">고객사</span></div><div><textarea data-k="r1"></textarea></div></div>
+<div class="qa"><div class="qk"><span class="no">2</span> 기구 방식 확정 — 90° 4위치 / 120° 3위치<span class="who">인시스·고객사</span></div><div><textarea data-k="r2"></textarea></div></div>
+<div class="qa"><div class="qk"><span class="no">3</span> 솔더 불량 4종 명칭 최종 확인<span class="who">고객사</span></div><div><textarea data-k="r3"></textarea></div></div>
+<div class="qa"><div class="qk"><span class="no">4</span> PCB 2장 구성 기종 안착 방식<span class="who">인시스</span></div><div><textarea data-k="r4"></textarea></div></div>
+<div class="qa"><div class="qk"><span class="no">5</span> 피사계 심도 · 초점거리 · FOV 실측치<span class="who">코그넥스</span></div><div><textarea data-k="r5"></textarea></div></div>
+<div class="qa"><div class="qk"><span class="no">6</span> 영상 처리·판정 시간 실측치<span class="who">코그넥스</span></div><div><textarea data-k="r6"></textarea></div></div>
+<div class="qa"><div class="qk"><span class="no">7</span> 기종별 ROI + 단일 알고리즘 적용 가능 여부<span class="who">코그넥스</span></div><div><textarea data-k="r7"></textarea></div></div>
+<div class="qa"><div class="qk"><span class="no">8</span> 현장 NG 재판정 · 자동 학습 반영 가능 여부<span class="who">코그넥스</span></div><div><textarea data-k="r8"></textarea></div></div>
+<div class="qa"><div class="qk"><span class="no">9</span> 성능 목표 단계안 수용 여부<span class="who">고객사·코그넥스</span></div><div><textarea data-k="r9"></textarea></div></div>
+<div class="qa"><div class="qk"><span class="no">10</span> 추가 3종 기종별 요구 물량<span class="who">고객사</span></div><div><textarea data-k="r10"></textarea></div></div>
+<div class="qa"><div class="qk"><span class="no">11</span> PLC 선호 기종<span class="who">고객사</span></div><div><textarea data-k="r11"></textarea></div></div>
+<div class="qa"><div class="qk"><span class="no">12</span> 회전부 배선 처리 방식 (슬립링 / 왕복)<span class="who">설비제작업체</span></div><div><textarea data-k="r12"></textarea></div></div>
+<div class="qa"><div class="qk"><span class="no">13</span> NG 포인트 선택 확대 확인 기능 구현 가능 여부<span class="who">코그넥스</span></div><div><textarea data-k="r13"></textarea></div></div>
+<div class="qa"><div class="qk"><span class="no">14</span> 재판정 도어 위치·개방 방식<span class="who">설비제작업체</span></div><div><textarea data-k="r14"></textarea></div></div>
+</div>
+</section>
+
+<!-- 추가 협의 -->
+<section>
+<h3 class="sh">Ⅷ. 미팅 추가 협의 내용</h3>
+<div class="body" id="mtbox">
+  <div class="mt"><div><input type="text" data-k="m1k" placeholder="항목"></div><div><textarea data-k="m1v" placeholder="협의 내용"></textarea></div></div>
+  <div class="mt"><div><input type="text" data-k="m2k" placeholder="항목"></div><div><textarea data-k="m2v" placeholder="협의 내용"></textarea></div></div>
+  <div class="mt"><div><input type="text" data-k="m3k" placeholder="항목"></div><div><textarea data-k="m3v" placeholder="협의 내용"></textarea></div></div>
+  <div class="mt"><div><input type="text" data-k="m4k" placeholder="항목"></div><div><textarea data-k="m4v" placeholder="협의 내용"></textarea></div></div>
+  <div class="mt"><div><input type="text" data-k="m5k" placeholder="항목"></div><div><textarea data-k="m5v" placeholder="협의 내용"></textarea></div></div>
+  <div class="mt"><div><input type="text" data-k="m6k" placeholder="항목"></div><div><textarea data-k="m6v" placeholder="협의 내용"></textarea></div></div>
+</div>
+</section>
+
+<!-- 작성자 -->
+<section>
+<h3 class="sh">작성 정보</h3>
+<div class="body">
+  <div class="qa"><div class="qk">기록자</div><div><input type="text" data-k="writer" placeholder="예) 김양섭"></div></div>
+  <div class="qa"><div class="qk">미팅 일시</div><div><input type="text" data-k="mdate" placeholder="예) 2026-11-26 14:00"></div></div>
+  <div class="qa"><div class="qk">참석자</div><div><textarea data-k="attend" placeholder="소속 · 이름"></textarea></div></div>
+</div>
+</section>
+
+<div class="bar">
+  <button id="bsave" type="button">저장</button>
+  <button id="bload" class="g" type="button">불러오기</button>
+  <button id="bprint" class="g" type="button">인쇄 · PDF</button>
+  <button id="bclear" class="g" type="button">입력 초기화</button>
+</div>
+
+<div class="ft">
+  인시스 AI혁신 연구개발실 · ys.kim@in-sys.co.kr<br>
+  INS-VI-SPEC-001 · <b id="vf">v1.2</b> · 2026-11-26 · 자동 저장 적용
+</div>
+
+</div>
+
+<script type="module">
+const VERSION = 'v1.2';
+const firebaseConfig = {
+  apiKey: "AIzaSyBYqd2uRr1ZvFLDCWuS15h9qFkT-Dvg5Es",
+  authDomain: "insys-work.firebaseapp.com",
+  projectId: "insys-work",
+  storageBucket: "insys-work.firebasestorage.app",
+  messagingSenderId: "225275784859",
+  appId: "1:225275784859:web:bd12815c6dc47c0c49e03e"
+};
+const COL = 'winnercom_vision';
+const DOCID = 'spec_meeting_20261126';
+const LKEY = 'insys_vi_spec_' + DOCID;
+
+const $ = s => document.querySelector(s);
+const st = $('#st');
+const setSt = (t) => { st.textContent = t; };
+$('#vb').textContent = VERSION; $('#vf').textContent = VERSION;
+
+/* ---------- 뷰 전환 ---------- */
+const bmo = $('#bmo'), bpc = $('#bpc');
+function setView(v){
+  document.body.classList.toggle('pc', v === 'pc');
+  document.body.classList.toggle('mo', v !== 'pc');
+  bpc.classList.toggle('on', v === 'pc');
+  bmo.classList.toggle('on', v !== 'pc');
+  try { localStorage.setItem(LKEY + '_view', v); } catch(e) {}
+}
+bmo.addEventListener('click', () => setView('mo'));
+bpc.addEventListener('click', () => setView('pc'));
+try { if (localStorage.getItem(LKEY + '_view') === 'pc') setView('pc'); } catch(e) {}
+
+/* ---------- 필드 수집 ---------- */
+const fields = () => Array.from(document.querySelectorAll('[data-k]'));
+function collect(){
+  const o = { _version: VERSION, _savedAt: new Date().toISOString() };
+  fields().forEach(el => {
+    const k = el.dataset.k;
+    if (el.type === 'radio') { if (el.checked) o[k] = el.value; }
+    else o[k] = el.value;
+  });
+  return o;
+}
+function apply(d){
+  if (!d) return;
+  fields().forEach(el => {
+    const k = el.dataset.k;
+    if (!(k in d)) return;
+    if (el.type === 'radio') el.checked = (el.value === d[k]);
+    else el.value = d[k] ?? '';
+  });
+}
+
+/* ---------- Firebase (실패 시 로컬 저장) ---------- */
+let db = null, FS = null;
+async function initFB(){
+  try {
+    const A = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+    const F = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    db = F.getFirestore(A.initializeApp(firebaseConfig));
+    FS = F;
+    return true;
+  } catch (e) {
+    console.warn('Firebase 미연결 — 로컬 저장으로 동작합니다.');
+    return false;
+  }
+}
+
+function saveLocal(d){ try { localStorage.setItem(LKEY, JSON.stringify(d)); return true; } catch(e){ return false; } }
+function loadLocal(){ try { const s = localStorage.getItem(LKEY); return s ? JSON.parse(s) : null; } catch(e){ return null; } }
+
+async function save(manual){
+  const d = collect();
+  saveLocal(d);
+  if (!db) { setSt(manual ? '로컬 저장 완료' : '로컬 자동저장'); return; }
+  try {
+    await FS.setDoc(FS.doc(db, COL, DOCID), d, { merge: true });
+    setSt('저장 완료 ' + new Date().toLocaleTimeString('ko-KR'));
+  } catch (e) {
+    console.warn('Firestore 저장 실패 — 로컬 보관', e && e.code);
+    setSt('로컬 보관 (서버 저장 실패)');
+  }
+}
+async function load(manual){
+  if (db) {
+    try {
+      const s = await FS.getDoc(FS.doc(db, COL, DOCID));
+      if (s.exists()) { apply(s.data()); setSt('서버 불러오기 완료'); return; }
+    } catch (e) { console.warn('Firestore 읽기 실패', e && e.code); }
+  }
+  const l = loadLocal();
+  if (l) { apply(l); setSt('로컬 불러오기 완료'); }
+  else setSt(manual ? '저장된 내용 없음' : '신규 작성');
+}
+
+/* ---------- 자동 저장 ---------- */
+let t = null;
+document.addEventListener('input', (e) => {
+  if (!e.target.dataset || !e.target.dataset.k) return;
+  setSt('입력 중…');
+  clearTimeout(t);
+  t = setTimeout(() => save(false), 1200);
+});
+document.addEventListener('change', (e) => {
+  if (!e.target.dataset || !e.target.dataset.k) return;
+  clearTimeout(t);
+  t = setTimeout(() => save(false), 300);
+});
+
+/* ---------- 버튼 ---------- */
+$('#bsave').addEventListener('click', () => save(true));
+$('#bload').addEventListener('click', () => load(true));
+$('#bprint').addEventListener('click', () => window.print());
+$('#bclear').addEventListener('click', () => {
+  if (!confirm('입력한 내용을 모두 비웁니다. 진행할까요?')) return;
+  fields().forEach(el => { if (el.type === 'radio') el.checked = false; else el.value = ''; });
+  setSt('초기화 — 저장 버튼을 누르면 반영됩니다');
+});
+
+/* ---------- 시작 ---------- */
+(async () => {
+  const ok = await initFB();
+  setSt(ok ? 'Firebase 연결' : '로컬 모드');
+  await load(false);
+})();
+</script>
+</body>
+</html>
