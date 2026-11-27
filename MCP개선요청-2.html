@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>ERP MCP 개선요청-2 — 현장·라인·배치·근무지 쓰기 도구 v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap">
+<style>
+:root{--navy:#1f3a5f;--ink:#2b3340;--sub:#4a5565;--line:#d9dee6;--head:#e8eef6;--soft:#f5f7fa;--ok:#e6f2ea;--okT:#1d5a34;--no:#f8e9e9;--noT:#7a2424;--warn:#fff6e0;--warnT:#6b4a00}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:#eef1f5;line-height:1.55}
+.nav{background:var(--navy);color:#fff;width:100%;position:sticky;top:0;z-index:10}
+.nav-inner{max-width:1100px;margin:0 auto;padding:8px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.nav-inner .t{font-weight:700;font-size:1rem}
+.nav-inner .ver{font-size:.85rem;background:#fff;color:var(--navy);border-radius:10px;padding:1px 8px;font-weight:700;margin-left:6px}
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font-family:inherit;font-size:.9rem;border:1px solid #c9d3e0;background:#fff;color:var(--navy);border-radius:6px;padding:5px 10px;cursor:pointer;font-weight:500}
+.btn.on{background:#dbe6f3;border-color:#8fa8c8;font-weight:700}
+.btn.dl{background:#fff;color:var(--navy);border-color:#fff}
+.wrap{max-width:1100px;margin:0 auto;padding:8px 12px;transition:max-width .2s}
+body.mobile .wrap,body.mobile .nav-inner{max-width:420px}
+.cover{background:#fff;border:1px solid var(--line);border-left:5px solid var(--navy);border-radius:8px;padding:12px;margin-bottom:8px}
+.cover h1{font-size:1.3rem;color:var(--navy);font-weight:900;line-height:1.35}
+.meta{margin-top:6px;color:var(--sub);font-size:.9rem;display:flex;flex-wrap:wrap;gap:4px 14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:8px}
+.card h2{font-size:1.1rem;color:var(--navy);font-weight:700;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.card h3{font-size:1rem;color:var(--navy);font-weight:700;margin:8px 0 4px}
+.concl{background:#e8eef6;border:1px solid #b9c9de;border-radius:8px;padding:10px 12px;margin-bottom:8px;color:var(--navy);font-weight:500}
+.tbl{width:100%;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{border:1px solid var(--line);padding:4px 8px;text-align:left;vertical-align:top}
+th{background:var(--head);color:var(--navy);font-weight:700;white-space:nowrap}
+td.c{text-align:center;white-space:nowrap}
+.y{background:var(--ok);color:var(--okT);font-weight:700}
+.n{background:var(--no);color:var(--noT);font-weight:700}
+code{font-family:Consolas,monospace;background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:0 4px;font-size:.88em;color:var(--navy)}
+ol,ul{padding-left:20px}
+li{margin:2px 0}
+pre{background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:8px 10px;white-space:pre-wrap;word-break:break-word;font-family:Consolas,'Noto Sans KR',monospace;font-size:.88rem;color:var(--ink)}
+.warn{background:var(--warn);color:var(--warnT);border:1px solid #ecd9a6;border-radius:6px;padding:6px 10px;margin-top:6px}
+.cp{float:right;font-size:.8rem;padding:2px 8px}
+.foot{text-align:center;color:var(--sub);font-size:.85rem;padding:8px 0 12px}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:6px 14px;border-radius:6px;font-size:.9rem;display:none;z-index:20}
+@media (min-width:768px){html{font-size:16px}}
+.tbl table th{white-space:nowrap}
+td code{word-break:break-all}
+td{min-width:72px}
+</style>
+</head>
+<body class="mobile">
+<div class="nav"><div class="nav-inner">
+  <div class="t">ERP MCP 개선요청-2<span class="ver" id="verBadge">v1.0</span></div>
+  <div class="tools">
+    <button class="btn on" id="bMobile" type="button">📱 모바일</button>
+    <button class="btn" id="bPc" type="button">🖥 PC</button>
+    <button class="btn dl" id="bMd" type="button">⬇ MD 다운로드</button>
+  </div>
+</div></div>
+<div class="wrap">
+  <div class="cover">
+    <h1>ERP MCP 개선요청-2 — 현장·라인·배치·근무지 쓰기 도구</h1>
+    <div class="meta">
+      <span>버전 <b>v1.0</b></span><span>작성일 2026-11-27</span>
+      <span>인시스 AI혁신 연구개발실</span><span>ys.kim@in-sys.co.kr</span>
+    </div>
+    <div class="meta"><span>관련: 「ERP MCP 개선요청 — 역할·담당자 배정 도구 (R10) v1.0」(개선요청-1)에 이어지는 건 · 개인정보: 직원 이름 미기재</span></div>
+  </div>
+  <div class="concl"><b>결론:</b> 2026-11-26~27 「셰플러 창원3공장 현장 분리·GPS 출퇴근 확대」 건의 쓰기 작업은 ERP MCP가 아니라 <strong>브라우저 화면 조작(Claude in Chrome)</strong> 으로 처리됐습니다. 해결 방법은 <strong>현장관리 표에 직접 쓰기 권한을 주는 것이 아니라, 전용 도구(propose → confirm)를 추가하는 것</strong>입니다. 함께 ERP 본체의 「현장 소속 회사 자동 지정」 문제도 수정해야 합니다.</div>
+<div class="card">
+<h2>1. 발생 건 (2026-11-26~27)</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>요청</td>
+<td>셰플러 창원3공장을 1공장(SITE-064, (주)파인 창원본사)에서 분리해 별도 현장으로 만들고, 근로자 21명을 옮긴 뒤 GPS 출퇴근 적용</td>
+</tr>
+<tr>
+<td>실행 권한</td>
+<td>요청자(테넌트 관리자)의 Chrome 로그인 세션</td>
+</tr>
+<tr>
+<td>실행 클라이언트</td>
+<td>Claude (ERP MCP 연결 + Claude in Chrome)</td>
+</tr>
+</tbody>
+</table></div>
+<h3>작업별 처리 수단과 결과</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>작업</th>
+<th>처리 수단</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>현장·직원·배치 조회, 시범 운영 실적 집계</td>
+<td><strong>ERP MCP</strong> (<code>query_table</code>, <code>aggregate_table</code>, <code>get_field_attendance_settings</code>)</td>
+<td>정상</td>
+</tr>
+<tr>
+<td>매뉴얼·화면 위치 찾기</td>
+<td><strong>ERP MCP</strong> (<code>search_manual</code>, <code>find_erp_screen</code>, <code>get_manual_page</code>)</td>
+<td>정상</td>
+</tr>
+<tr>
+<td>SITE-082 휴지통 이동</td>
+<td>브라우저 화면 클릭</td>
+<td>완료</td>
+</tr>
+<tr>
+<td>SITE-083 신규 등록 (주소, 현장관리자, 맡는 사업장, 라인 4개)</td>
+<td>브라우저 화면 입력</td>
+<td>완료. <strong>소속 회사가 (주)인시스로 자동 지정됨</strong></td>
+</tr>
+<tr>
+<td>SITE-083 소속 회사 수정</td>
+<td>브라우저 표 인라인 수정</td>
+<td><strong>실패</strong>. 「회사」 칸이 보이지만 저장되지 않음</td>
+</tr>
+<tr>
+<td>근로자 21명 배치 이동 (SITE-064 → SITE-083)</td>
+<td>브라우저 (배치 현황판, 「다른 라인으로 옮기기」, 현장 선택 창)</td>
+<td><strong>실패</strong>. 회사가 다른 현장은 선택 목록에 나오지 않음</td>
+</tr>
+<tr>
+<td>현장 목록 「회사」 열 표시</td>
+<td>브라우저 (요청자 개인 보기 설정)</td>
+<td>변경됨</td>
+</tr>
+<tr>
+<td>전 계열사 인력명단(600명) 일괄 추출</td>
+<td>브라우저 JavaScript로 로그인 토큰을 읽어 ERP API 직접 호출</td>
+<td><strong>보안 정책에 막혀 실패</strong> (정상 동작). 이 방식은 앞으로 쓰지 않음</td>
+</tr>
+</tbody>
+</table></div>
+<h3>브라우저로 처리된 이유</h3>
+<ol>
+<li><strong>쓰기 도구 없음</strong>: MCP 쓰기는 <code>propose_*</code> 8종(메일, 일정, 할일, 위키, 지출결의서 초안, 카드 계정, 세금계산서 분류, 입금 맞추기)뿐입니다. 현장·라인·배치·근무지 도구가 없습니다.</li>
+<li><strong>조회 칸 부족</strong>: <code>list_tables('staffing_site')</code>의 거를 수 있는 칸에 <strong>소속 회사(company) 칸이 없습니다.</strong> 그래서 회사가 잘못 지정된 현장을 MCP로 찾거나 검증할 수 없었습니다.</li>
+<li><strong>대량 조회 도구 없음</strong>: 600명 명단을 만들려면 <code>query_table</code>을 20건씩 약 60번 불러야 해서 브라우저 경로를 시도했습니다.</li>
+<li>Claude가 도구가 없다는 사실을 먼저 알리지 않고 브라우저로 진행했습니다. 이 부분은 인시스 지침으로 보완합니다(5장).</li>
+</ol>
+<h3>브라우저 처리의 문제점</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>문제</th>
+<th>영향</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MCP 감사 로그(요청문·도구·입력·결과)에 남지 않음</td>
+<td>화면에서는 요청자 본인이 직접 수정한 것으로만 기록되어 AI 작업을 구분할 수 없음</td>
+</tr>
+<tr>
+<td>서버 쪽 미리보기·확인 단계 없음</td>
+<td>좌표 클릭 오류가 나면 다른 현장·직원에 잘못 반영될 수 있음</td>
+</tr>
+<tr>
+<td>하루 실행 횟수 제한 미적용</td>
+<td>대량 배치 이동을 통제할 수 없음</td>
+</tr>
+<tr>
+<td>요청자 PC의 Chrome 세션 필요</td>
+<td>다른 직원, 모바일, ChatGPT에서는 같은 처리를 할 수 없음</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="card">
+<h2>2. ERP 본체 결함 (MCP와 별개, 우선 수정)</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>No</th>
+<th>결함</th>
+<th>재현</th>
+<th>요청</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>B1</td>
+<td><strong>현장 등록 시 소속 회사가 등록자의 회사로 자동 지정됨</strong></td>
+<td>관리자(소속 (주)인시스) 계정으로 왼쪽 위 회사를 (주)파인 창원본사로 바꾼 뒤 현장을 등록해도, 소속 회사가 (주)인시스로 저장됨 (SITE-082, SITE-083 두 번 재현)</td>
+<td>등록·수정 화면에 「소속 회사」 칸을 열기. 최소한 테넌트 관리자는 수정할 수 있게 하기. 기본값은 화면에서 고른 회사로 하기</td>
+</tr>
+<tr>
+<td>B2</td>
+<td>현장 목록 표 수정 기능의 「회사」 칸이 입력되는 것처럼 보이지만 저장되지 않음</td>
+<td>현장 목록 ▸ 표 수정 ▸ 회사 칸 변경 ▸ 저장 → 값이 그대로</td>
+<td>저장되지 않는 칸은 읽기 전용으로 표시</td>
+</tr>
+<tr>
+<td>B3</td>
+<td>회사가 다른 현장으로 배치를 옮길 때 안내가 없음</td>
+<td>배치 상세 ▸ 현장 선택 창에 다른 회사 현장이 보이지 않음</td>
+<td>「소속 회사가 달라 이동할 수 없음」 안내 표시</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>긴급 데이터 수정 요청</strong>: SITE-083 「셰플러 창원3공장(파인)」의 소속 회사를 <strong>(주)파인 창원본사</strong>로 바꿔 주세요(DB 또는 Studio). 수정되면 21명 배치 이동과 GPS 출퇴근 설정을 진행합니다.</p>
+</div>
+<div class="card">
+<h2>3. 결론: 「테이블 쓰기 권한」이 아니라 「전용 도구 추가」</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>방안</th>
+<th>판단</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A. staffing_site·staffing_placement 표에 AI 직접 쓰기 권한 부여</td>
+<td class="c n">비추천</td>
+<td>화면 저장 시 하는 후처리(근무지 자동 생성, 담당자 자동 지정, 배치 기간 분할, 변경 이력)를 건너뛸 수 있음</td>
+</tr>
+<tr>
+<td>B. <strong>전용 도구 추가 (propose → confirm)</strong></td>
+<td class="c y">추천</td>
+<td>기존 MCP 쓰기와 같은 방식. 미리보기·확인·횟수 제한·감사 로그가 자동으로 적용됨</td>
+</tr>
+<tr>
+<td>C. 조회 칸 보강 (company 칸 노출, 대량 내보내기)</td>
+<td class="c y">B와 함께</td>
+<td>처리 전후 검증과 데이터 점검에 필요</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="card">
+<h2>4. 요청 도구 정의</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>우선</th>
+<th>도구명</th>
+<th>대상</th>
+<th>기능</th>
+<th>주요 입력</th>
+<th>미리보기·출력</th>
+<th>쓰기</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>★1</td>
+<td><code>propose_site_upsert</code></td>
+<td>현장(staffing_site)</td>
+<td>현장 등록·수정</td>
+<td>현장 ID(수정 시), <strong>소속 회사</strong>, 고객사, 현장명, 주소, 현장관리자, 맡는 사업장, 현장유형</td>
+<td>변경 전·후 값, 경고, action_id</td>
+<td>예(제안)</td>
+</tr>
+<tr>
+<td>★1</td>
+<td><code>propose_line_upsert</code> / <code>propose_line_delete</code></td>
+<td>라인·구역</td>
+<td>라인 등록·이름 변경·삭제</td>
+<td>현장 ID, 라인명 목록</td>
+<td>라인 목록 변경 전·후, 배치 인원이 있는 라인 삭제 경고</td>
+<td>예(제안)</td>
+</tr>
+<tr>
+<td>★1</td>
+<td><code>propose_placement_move</code></td>
+<td>배치(staffing_placement)</td>
+<td>여러 명 배치 이동</td>
+<td>직원 목록, 대상 현장·라인, 적용일(기본: 기존 배치 시작일 유지)</td>
+<td>직원별 전·후 현장·라인, 기간 분할 여부, 회사 불일치 경고</td>
+<td>예(제안)</td>
+</tr>
+<tr>
+<td>★2</td>
+<td><code>propose_field_attendance_setup</code></td>
+<td>현장 출퇴근 근무지·정책</td>
+<td>출퇴근 켜기, 반경, 근무·휴게 시각, 담당자 권한</td>
+<td>현장 ID, 반경(m), 근무 시각, 담당자</td>
+<td>설정 전·후 값</td>
+<td>예(제안)</td>
+</tr>
+<tr>
+<td>★2</td>
+<td><code>propose_record_trash</code> / <code>propose_record_restore</code></td>
+<td>현장·라인 공통</td>
+<td>휴지통 이동·복구 (영구 삭제 제외)</td>
+<td>표 이름, 레코드 ID</td>
+<td>연결된 배치·근무지 수</td>
+<td>예(제안)</td>
+</tr>
+<tr>
+<td>★3</td>
+<td><code>export_table</code></td>
+<td>hr_employee, staffing_placement 등</td>
+<td>권한 범위 안에서 전체 목록 내려받기 (CSV/XLSX)</td>
+<td>표 이름, 칸 목록, 필터</td>
+<td>파일 링크, 행 수. 민감 칸은 칸 목록에 넣은 경우만</td>
+<td>아니오</td>
+</tr>
+<tr>
+<td>★3</td>
+<td><code>propose_send_attendance_link</code></td>
+<td>현장 근로자</td>
+<td>개인 출퇴근 링크 문자 발송</td>
+<td>현장 ID, 직원 목록</td>
+<td>발송 대상 수, 문자 미리보기</td>
+<td>예(제안)</td>
+</tr>
+<tr>
+<td>-</td>
+<td><code>confirm_proposal</code> (기존)</td>
+<td>공통</td>
+<td>제안 실행</td>
+<td>action_id</td>
+<td>화면 저장과 같은 후처리로 반영</td>
+<td>예(확정)</td>
+</tr>
+</tbody>
+</table></div>
+<h3>조회 보강</h3>
+<ol>
+<li><code>list_tables</code> / <code>query_table</code>: staffing_site에 <strong>company_id(소속 회사)</strong> 칸 노출. staffing_line, 현장 출퇴근 근무지 표도 조회 대상에 넣기</li>
+<li>휴지통 레코드 조회 옵션 (<code>include_trashed</code>)</li>
+</ol>
+<h3>미리보기에 꼭 넣을 경고</h3>
+<ol>
+<li><strong>현장 소속 회사 ≠ 근로자 소속 회사</strong> (이번 건 사례)</li>
+<li>같은 고객사·주소에 이미 현장이 있음 (중복 등록 의심)</li>
+<li>삭제하려는 라인·현장에 배치 인원이나 근태 기록이 있음</li>
+<li>배치 이동으로 기존 배치 기간이 나뉨, 또는 월 근태 확정 기간과 겹침</li>
+<li>변경 인원이 많음 (예: 30명 이상)</li>
+</ol>
+</div>
+<div class="card">
+<h2>5. 권한·안전 규칙</h2>
+<ol>
+<li><strong>권한 상속</strong>: 연결한 직원의 ERP 역할 권한을 그대로 따릅니다. 현장관리 권한이 없으면 forbidden</li>
+<li><strong>1차 공개 범위</strong>: 현장, 라인, 배치, 현장 출퇴근 근무지·정책만. 급여, 4대보험, 주민번호 등 민감 칸은 제외</li>
+<li><strong>영구 삭제는 제공하지 않음</strong>. 휴지통 이동·복구만</li>
+<li>하루 AI 실행 횟수 상한 (예: 제안 20건, 배치 이동 1회 50명 이하)</li>
+<li>감사 로그: 사용자, 시각, 클라이언트(Claude / ChatGPT / ERP 비서), user_request, 변경 전·후 값, 승인자</li>
+<li>화면 처리와 같은 알림·후처리 적용 (근무지 자동 생성, 담당자 자동 지정 등)</li>
+</ol>
+<h3>인시스 측 지침 보완 (Claude 공통 지침에 추가)</h3>
+<button class="btn cp" type="button" data-copy="cp1">복사</button><pre id="cp1">- ERP 쓰기 요청은 ERP 도구(propose_* → confirm_proposal)로 먼저 처리한다.
+- 맞는 ERP 도구가 없으면 브라우저로 바로 진행하지 말고
+  &quot;ERP 도구에 이 기능이 없음 → 브라우저 화면 조작으로 처리 가능&quot;을 먼저 알리고 확인을 받는다.
+- 브라우저의 로그인 토큰을 읽어 ERP API를 직접 호출하지 않는다.
+- 브라우저로 처리한 쓰기는 경로·변경 전후·시각을 답변에 남긴다.
+</pre>
+</div>
+<div class="card">
+<h2>6. 개발사 전달용 이슈</h2>
+<button class="btn cp" type="button" data-copy="cp2">복사</button><pre id="cp2">[ERP-이슈] MCP에 현장·라인·배치·근무지 쓰기 도구 없음 + 현장 소속 회사 자동 지정 결함
+- 발생일시 : 2026-11-26 ~ 11-27
+- 클라이언트 : Claude (ERP MCP 연결 + 브라우저)
+- 모듈·메뉴 / 경로 : 현장관리 › 현장 (/table/staffing_site), 배치, 현장 출퇴근 설정
+- 사용자 맥락 : 테넌트 관리자, 소속 (주)인시스
+- 재현 절차 : 1) 왼쪽 위 회사를 (주)파인 창원본사로 선택
+              2) 현장 신규 등록 → 저장 → 소속 회사가 (주)인시스로 저장됨
+              3) 표 수정에서 회사 칸 변경 → 저장되지 않음
+              4) 배치 이동 시 해당 현장이 선택 목록에 나오지 않음
+              5) MCP에는 현장·배치 쓰기 도구가 없고, staffing_site 조회에 company 칸이 없음
+- 기대 결과 : 소속 회사 지정·수정 가능
+              propose_site_upsert / propose_placement_move 미리보기 → confirm_proposal 실행, 감사 로그 기록
+- 실제 결과 : 화면에서 회사 수정 불가, MCP로 조회·변경 모두 불가
+- 영향 범위 : 계열사별 현장 신설·분리, 배치 이동, GPS 출퇴근 확대 전체
+- 우선순위 : 높음 (B1 결함 + SITE-083 데이터 수정은 GPS 출퇴근 확대 일정에 직접 영향)
+</pre>
+<h3>회신 요청</h3>
+<ol>
+<li>SITE-083 소속 회사 수정 가능 일정 (긴급)</li>
+<li>2장 B1~B3 결함 수정 일정</li>
+<li>4장 도구 제공 가능 여부·일정, 우선순위 ★1부터 순서 진행 가능 여부</li>
+<li>현장 저장 시 후처리 목록 (근무지 자동 생성, 담당자 지정, 배치 기간 분할 등). 도구가 같은 처리를 하도록 확인 필요</li>
+</ol>
+<p><em>v1.0 — 2026-11-27 최초 작성</em></p>
+</div>
+  <div class="foot">인시스 AI혁신 연구개발실 · MCP개선요청-2 · <span id="verFoot">v1.0</span></div>
+</div>
+<div class="toast" id="toast"></div>
+<script type="text/markdown" id="mdSrc">
+# ERP MCP 개선요청-2 — 현장·라인·배치·근무지 쓰기 도구 v1.0
+
+- 작성: 인시스 AI혁신 연구개발실 (ys.kim@in-sys.co.kr)
+- 작성일: 2026-11-27
+- 관련: 「ERP MCP 개선요청 — 역할·담당자 배정 도구 (R10) v1.0」(개선요청-1)에 이어지는 건
+- 개인정보: 직원 이름 미기재, 현장코드와 건수만 기재
+
+> **결론**: 2026-11-26~27 「셰플러 창원3공장 현장 분리·GPS 출퇴근 확대」 건의 쓰기 작업은 ERP MCP가 아니라 **브라우저 화면 조작(Claude in Chrome)** 으로 처리됐습니다. 해결 방법은 **현장관리 표에 직접 쓰기 권한을 주는 것이 아니라, 전용 도구(propose → confirm)를 추가하는 것**입니다. 함께 ERP 본체의 「현장 소속 회사 자동 지정」 문제도 수정해야 합니다.
+
+---
+
+## 1. 발생 건 (2026-11-26~27)
+
+| 항목 | 내용 |
+|---|---|
+| 요청 | 셰플러 창원3공장을 1공장(SITE-064, (주)파인 창원본사)에서 분리해 별도 현장으로 만들고, 근로자 21명을 옮긴 뒤 GPS 출퇴근 적용 |
+| 실행 권한 | 요청자(테넌트 관리자)의 Chrome 로그인 세션 |
+| 실행 클라이언트 | Claude (ERP MCP 연결 + Claude in Chrome) |
+
+### 작업별 처리 수단과 결과
+
+| 작업 | 처리 수단 | 결과 |
+|---|---|---|
+| 현장·직원·배치 조회, 시범 운영 실적 집계 | **ERP MCP** (`query_table`, `aggregate_table`, `get_field_attendance_settings`) | 정상 |
+| 매뉴얼·화면 위치 찾기 | **ERP MCP** (`search_manual`, `find_erp_screen`, `get_manual_page`) | 정상 |
+| SITE-082 휴지통 이동 | 브라우저 화면 클릭 | 완료 |
+| SITE-083 신규 등록 (주소, 현장관리자, 맡는 사업장, 라인 4개) | 브라우저 화면 입력 | 완료. **소속 회사가 (주)인시스로 자동 지정됨** |
+| SITE-083 소속 회사 수정 | 브라우저 표 인라인 수정 | **실패**. 「회사」 칸이 보이지만 저장되지 않음 |
+| 근로자 21명 배치 이동 (SITE-064 → SITE-083) | 브라우저 (배치 현황판, 「다른 라인으로 옮기기」, 현장 선택 창) | **실패**. 회사가 다른 현장은 선택 목록에 나오지 않음 |
+| 현장 목록 「회사」 열 표시 | 브라우저 (요청자 개인 보기 설정) | 변경됨 |
+| 전 계열사 인력명단(600명) 일괄 추출 | 브라우저 JavaScript로 로그인 토큰을 읽어 ERP API 직접 호출 | **보안 정책에 막혀 실패** (정상 동작). 이 방식은 앞으로 쓰지 않음 |
+
+### 브라우저로 처리된 이유
+1. **쓰기 도구 없음**: MCP 쓰기는 `propose_*` 8종(메일, 일정, 할일, 위키, 지출결의서 초안, 카드 계정, 세금계산서 분류, 입금 맞추기)뿐입니다. 현장·라인·배치·근무지 도구가 없습니다.
+2. **조회 칸 부족**: `list_tables('staffing_site')`의 거를 수 있는 칸에 **소속 회사(company) 칸이 없습니다.** 그래서 회사가 잘못 지정된 현장을 MCP로 찾거나 검증할 수 없었습니다.
+3. **대량 조회 도구 없음**: 600명 명단을 만들려면 `query_table`을 20건씩 약 60번 불러야 해서 브라우저 경로를 시도했습니다.
+4. Claude가 도구가 없다는 사실을 먼저 알리지 않고 브라우저로 진행했습니다. 이 부분은 인시스 지침으로 보완합니다(5장).
+
+### 브라우저 처리의 문제점
+
+| 문제 | 영향 |
+|---|---|
+| MCP 감사 로그(요청문·도구·입력·결과)에 남지 않음 | 화면에서는 요청자 본인이 직접 수정한 것으로만 기록되어 AI 작업을 구분할 수 없음 |
+| 서버 쪽 미리보기·확인 단계 없음 | 좌표 클릭 오류가 나면 다른 현장·직원에 잘못 반영될 수 있음 |
+| 하루 실행 횟수 제한 미적용 | 대량 배치 이동을 통제할 수 없음 |
+| 요청자 PC의 Chrome 세션 필요 | 다른 직원, 모바일, ChatGPT에서는 같은 처리를 할 수 없음 |
+
+---
+
+## 2. ERP 본체 결함 (MCP와 별개, 우선 수정)
+
+| No | 결함 | 재현 | 요청 |
+|---|---|---|---|
+| B1 | **현장 등록 시 소속 회사가 등록자의 회사로 자동 지정됨** | 관리자(소속 (주)인시스) 계정으로 왼쪽 위 회사를 (주)파인 창원본사로 바꾼 뒤 현장을 등록해도, 소속 회사가 (주)인시스로 저장됨 (SITE-082, SITE-083 두 번 재현) | 등록·수정 화면에 「소속 회사」 칸을 열기. 최소한 테넌트 관리자는 수정할 수 있게 하기. 기본값은 화면에서 고른 회사로 하기 |
+| B2 | 현장 목록 표 수정 기능의 「회사」 칸이 입력되는 것처럼 보이지만 저장되지 않음 | 현장 목록 ▸ 표 수정 ▸ 회사 칸 변경 ▸ 저장 → 값이 그대로 | 저장되지 않는 칸은 읽기 전용으로 표시 |
+| B3 | 회사가 다른 현장으로 배치를 옮길 때 안내가 없음 | 배치 상세 ▸ 현장 선택 창에 다른 회사 현장이 보이지 않음 | 「소속 회사가 달라 이동할 수 없음」 안내 표시 |
+
+**긴급 데이터 수정 요청**: SITE-083 「셰플러 창원3공장(파인)」의 소속 회사를 **(주)파인 창원본사**로 바꿔 주세요(DB 또는 Studio). 수정되면 21명 배치 이동과 GPS 출퇴근 설정을 진행합니다.
+
+---
+
+## 3. 결론: 「테이블 쓰기 권한」이 아니라 「전용 도구 추가」
+
+| 방안 | 판단 | 이유 |
+|---|---|---|
+| A. staffing_site·staffing_placement 표에 AI 직접 쓰기 권한 부여 | ❌ 비추천 | 화면 저장 시 하는 후처리(근무지 자동 생성, 담당자 자동 지정, 배치 기간 분할, 변경 이력)를 건너뛸 수 있음 |
+| B. **전용 도구 추가 (propose → confirm)** | ✅ 추천 | 기존 MCP 쓰기와 같은 방식. 미리보기·확인·횟수 제한·감사 로그가 자동으로 적용됨 |
+| C. 조회 칸 보강 (company 칸 노출, 대량 내보내기) | ✅ B와 함께 | 처리 전후 검증과 데이터 점검에 필요 |
+
+---
+
+## 4. 요청 도구 정의
+
+| 우선 | 도구명 | 대상 | 기능 | 주요 입력 | 미리보기·출력 | 쓰기 |
+|---|---|---|---|---|---|---|
+| ★1 | `propose_site_upsert` | 현장(staffing_site) | 현장 등록·수정 | 현장 ID(수정 시), **소속 회사**, 고객사, 현장명, 주소, 현장관리자, 맡는 사업장, 현장유형 | 변경 전·후 값, 경고, action_id | 예(제안) |
+| ★1 | `propose_line_upsert` / `propose_line_delete` | 라인·구역 | 라인 등록·이름 변경·삭제 | 현장 ID, 라인명 목록 | 라인 목록 변경 전·후, 배치 인원이 있는 라인 삭제 경고 | 예(제안) |
+| ★1 | `propose_placement_move` | 배치(staffing_placement) | 여러 명 배치 이동 | 직원 목록, 대상 현장·라인, 적용일(기본: 기존 배치 시작일 유지) | 직원별 전·후 현장·라인, 기간 분할 여부, 회사 불일치 경고 | 예(제안) |
+| ★2 | `propose_field_attendance_setup` | 현장 출퇴근 근무지·정책 | 출퇴근 켜기, 반경, 근무·휴게 시각, 담당자 권한 | 현장 ID, 반경(m), 근무 시각, 담당자 | 설정 전·후 값 | 예(제안) |
+| ★2 | `propose_record_trash` / `propose_record_restore` | 현장·라인 공통 | 휴지통 이동·복구 (영구 삭제 제외) | 표 이름, 레코드 ID | 연결된 배치·근무지 수 | 예(제안) |
+| ★3 | `export_table` | hr_employee, staffing_placement 등 | 권한 범위 안에서 전체 목록 내려받기 (CSV/XLSX) | 표 이름, 칸 목록, 필터 | 파일 링크, 행 수. 민감 칸은 칸 목록에 넣은 경우만 | 아니오 |
+| ★3 | `propose_send_attendance_link` | 현장 근로자 | 개인 출퇴근 링크 문자 발송 | 현장 ID, 직원 목록 | 발송 대상 수, 문자 미리보기 | 예(제안) |
+| - | `confirm_proposal` (기존) | 공통 | 제안 실행 | action_id | 화면 저장과 같은 후처리로 반영 | 예(확정) |
+
+### 조회 보강
+1. `list_tables` / `query_table`: staffing_site에 **company_id(소속 회사)** 칸 노출. staffing_line, 현장 출퇴근 근무지 표도 조회 대상에 넣기
+2. 휴지통 레코드 조회 옵션 (`include_trashed`)
+
+### 미리보기에 꼭 넣을 경고
+1. **현장 소속 회사 ≠ 근로자 소속 회사** (이번 건 사례)
+2. 같은 고객사·주소에 이미 현장이 있음 (중복 등록 의심)
+3. 삭제하려는 라인·현장에 배치 인원이나 근태 기록이 있음
+4. 배치 이동으로 기존 배치 기간이 나뉨, 또는 월 근태 확정 기간과 겹침
+5. 변경 인원이 많음 (예: 30명 이상)
+
+---
+
+## 5. 권한·안전 규칙
+
+1. **권한 상속**: 연결한 직원의 ERP 역할 권한을 그대로 따릅니다. 현장관리 권한이 없으면 forbidden
+2. **1차 공개 범위**: 현장, 라인, 배치, 현장 출퇴근 근무지·정책만. 급여, 4대보험, 주민번호 등 민감 칸은 제외
+3. **영구 삭제는 제공하지 않음**. 휴지통 이동·복구만
+4. 하루 AI 실행 횟수 상한 (예: 제안 20건, 배치 이동 1회 50명 이하)
+5. 감사 로그: 사용자, 시각, 클라이언트(Claude / ChatGPT / ERP 비서), user_request, 변경 전·후 값, 승인자
+6. 화면 처리와 같은 알림·후처리 적용 (근무지 자동 생성, 담당자 자동 지정 등)
+
+### 인시스 측 지침 보완 (Claude 공통 지침에 추가)
+```
+- ERP 쓰기 요청은 ERP 도구(propose_* → confirm_proposal)로 먼저 처리한다.
+- 맞는 ERP 도구가 없으면 브라우저로 바로 진행하지 말고
+  "ERP 도구에 이 기능이 없음 → 브라우저 화면 조작으로 처리 가능"을 먼저 알리고 확인을 받는다.
+- 브라우저의 로그인 토큰을 읽어 ERP API를 직접 호출하지 않는다.
+- 브라우저로 처리한 쓰기는 경로·변경 전후·시각을 답변에 남긴다.
+```
+
+---
+
+## 6. 개발사 전달용 이슈
+
+```
+[ERP-이슈] MCP에 현장·라인·배치·근무지 쓰기 도구 없음 + 현장 소속 회사 자동 지정 결함
+- 발생일시 : 2026-11-26 ~ 11-27
+- 클라이언트 : Claude (ERP MCP 연결 + 브라우저)
+- 모듈·메뉴 / 경로 : 현장관리 › 현장 (/table/staffing_site), 배치, 현장 출퇴근 설정
+- 사용자 맥락 : 테넌트 관리자, 소속 (주)인시스
+- 재현 절차 : 1) 왼쪽 위 회사를 (주)파인 창원본사로 선택
+              2) 현장 신규 등록 → 저장 → 소속 회사가 (주)인시스로 저장됨
+              3) 표 수정에서 회사 칸 변경 → 저장되지 않음
+              4) 배치 이동 시 해당 현장이 선택 목록에 나오지 않음
+              5) MCP에는 현장·배치 쓰기 도구가 없고, staffing_site 조회에 company 칸이 없음
+- 기대 결과 : 소속 회사 지정·수정 가능
+              propose_site_upsert / propose_placement_move 미리보기 → confirm_proposal 실행, 감사 로그 기록
+- 실제 결과 : 화면에서 회사 수정 불가, MCP로 조회·변경 모두 불가
+- 영향 범위 : 계열사별 현장 신설·분리, 배치 이동, GPS 출퇴근 확대 전체
+- 우선순위 : 높음 (B1 결함 + SITE-083 데이터 수정은 GPS 출퇴근 확대 일정에 직접 영향)
+```
+
+### 회신 요청
+1. SITE-083 소속 회사 수정 가능 일정 (긴급)
+2. 2장 B1~B3 결함 수정 일정
+3. 4장 도구 제공 가능 여부·일정, 우선순위 ★1부터 순서 진행 가능 여부
+4. 현장 저장 시 후처리 목록 (근무지 자동 생성, 담당자 지정, 배치 기간 분할 등). 도구가 같은 처리를 하도록 확인 필요
+
+*v1.0 — 2026-11-27 최초 작성*
+
+</script>
+<script>
+(function(){
+  var VERSION='v1.0';
+  document.getElementById('verBadge').textContent=VERSION;
+  document.getElementById('verFoot').textContent=VERSION;
+  var body=document.body,bM=document.getElementById('bMobile'),bP=document.getElementById('bPc');
+  function toast(m){var t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(function(){t.style.display='none';},1600);}
+  function setMode(m){body.classList.toggle('mobile',m==='mobile');bM.classList.toggle('on',m==='mobile');bP.classList.toggle('on',m==='pc');}
+  bM.addEventListener('click',function(){setMode('mobile');});
+  bP.addEventListener('click',function(){setMode('pc');});
+  setMode('mobile');
+  var dlNs=null;
+  try{ if(window.claude&&window.claude.use){ window.claude.use('downloads').then(function(n){dlNs=n;},function(){}); } }catch(e){}
+  document.getElementById('bMd').addEventListener('click',function(){
+    var md=document.getElementById('mdSrc').textContent.replace(/^\n/,'');
+    var fname='MCP개선요청-2.md';
+    if(dlNs){
+      dlNs.save({filename:fname,data:md}).then(function(){toast('MD 파일을 내려받았습니다');},function(){toast('다운로드가 취소되었습니다');});
+      return;
+    }
+    var blob=new Blob(['﻿'+md],{type:'text/markdown;charset=utf-8'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=fname;
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+    toast('MD 파일을 내려받았습니다');
+  });
+  function copyText(s){
+    if(navigator.clipboard&&window.isSecureContext){return navigator.clipboard.writeText(s);}
+    return new Promise(function(res,rej){var ta=document.createElement('textarea');ta.value=s;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');res();}catch(e){rej(e);}ta.remove();});
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'),function(b){
+    b.addEventListener('click',function(){
+      copyText(document.getElementById(b.getAttribute('data-copy')).textContent)
+        .then(function(){toast('복사했습니다');},function(){toast('복사 실패 — 직접 선택해 복사하세요');});
+    });
+  });
+})();
+</script>
+</body>
+</html>
