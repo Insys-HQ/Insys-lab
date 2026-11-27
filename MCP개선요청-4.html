@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>ERP MCP 개선요청-4 — 개발사 요청 통합본 v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap">
+<style>
+:root{--navy:#1f3a5f;--ink:#2b3340;--sub:#4a5565;--line:#d9dee6;--head:#e8eef6;--soft:#f5f7fa;--ok:#e6f2ea;--okT:#1d5a34;--no:#f8e9e9;--noT:#7a2424;--warn:#fff6e0;--warnT:#6b4a00}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:#eef1f5;line-height:1.55}
+.nav{background:var(--navy);color:#fff;width:100%;position:sticky;top:0;z-index:10}
+.nav-inner{max-width:1100px;margin:0 auto;padding:8px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.nav-inner .t{font-weight:700;font-size:1rem}
+.nav-inner .ver{font-size:.85rem;background:#fff;color:var(--navy);border-radius:10px;padding:1px 8px;font-weight:700;margin-left:6px}
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font-family:inherit;font-size:.9rem;border:1px solid #c9d3e0;background:#fff;color:var(--navy);border-radius:6px;padding:5px 10px;cursor:pointer;font-weight:500}
+.btn.on{background:#dbe6f3;border-color:#8fa8c8;font-weight:700}
+.btn.dl{background:#fff;color:var(--navy);border-color:#fff}
+.wrap{max-width:1100px;margin:0 auto;padding:8px 12px;transition:max-width .2s}
+body.mobile .wrap,body.mobile .nav-inner{max-width:420px}
+.cover{background:#fff;border:1px solid var(--line);border-left:5px solid var(--navy);border-radius:8px;padding:12px;margin-bottom:8px}
+.cover h1{font-size:1.3rem;color:var(--navy);font-weight:900;line-height:1.35}
+.meta{margin-top:6px;color:var(--sub);font-size:.9rem;display:flex;flex-wrap:wrap;gap:4px 14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:8px}
+.card h2{font-size:1.1rem;color:var(--navy);font-weight:700;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.card h3{font-size:1rem;color:var(--navy);font-weight:700;margin:8px 0 4px}
+.concl{background:#e8eef6;border:1px solid #b9c9de;border-radius:8px;padding:10px 12px;margin-bottom:8px;color:var(--navy);font-weight:500}
+.tbl{width:100%;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{border:1px solid var(--line);padding:4px 8px;text-align:left;vertical-align:top}
+th{background:var(--head);color:var(--navy);font-weight:700;white-space:nowrap}
+td.c{text-align:center;white-space:nowrap}
+.y{background:var(--ok);color:var(--okT);font-weight:700}
+.n{background:var(--no);color:var(--noT);font-weight:700}
+code{font-family:Consolas,monospace;background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:0 4px;font-size:.88em;color:var(--navy)}
+ol,ul{padding-left:20px}
+li{margin:2px 0}
+pre{background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:8px 10px;white-space:pre-wrap;word-break:break-word;font-family:Consolas,'Noto Sans KR',monospace;font-size:.88rem;color:var(--ink)}
+.warn{background:var(--warn);color:var(--warnT);border:1px solid #ecd9a6;border-radius:6px;padding:6px 10px;margin-top:6px}
+.cp{float:right;font-size:.8rem;padding:2px 8px}
+.foot{text-align:center;color:var(--sub);font-size:.85rem;padding:8px 0 12px}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:6px 14px;border-radius:6px;font-size:.9rem;display:none;z-index:20}
+@media (min-width:768px){html{font-size:16px}}
+.tbl table th{white-space:nowrap}
+td code{word-break:break-all}
+td{min-width:72px}
+td.no,th.no{min-width:0;width:34px;text-align:center;font-weight:700;color:var(--navy)}
+</style>
+</head>
+<body class="mobile">
+<div class="nav"><div class="nav-inner">
+  <div class="t">ERP MCP 개선요청-4<span class="ver" id="verBadge">v1.0</span></div>
+  <div class="tools">
+    <button class="btn on" id="bMobile" type="button">📱 모바일</button>
+    <button class="btn" id="bPc" type="button">🖥 PC</button>
+    <button class="btn dl" id="bMd" type="button">⬇ MD 다운로드</button>
+  </div>
+</div></div>
+<div class="wrap">
+  <div class="cover">
+    <h1>ERP MCP 개선요청-4 — 개발사 요청 통합본</h1>
+    <div class="meta"><span>버전 <b>v1.0</b></span><span>작성일 2026-11-27</span><span>인시스 AI혁신 연구개발실</span><span>ys.kim@in-sys.co.kr</span></div>
+    <div class="meta"><span>참고: <a href="https://insys-hq.github.io/Insys-lab/ERP_MCP_%EA%B0%9C%EC%84%A0%EC%9A%94%EC%B2%AD_%EA%B6%8C%ED%95%9C%EB%B0%B0%EC%A0%95_v1.0.html" target="_blank">개선요청-1</a> · <a href="https://insys-hq.github.io/Insys-lab/MCP%EA%B0%9C%EC%84%A0%EC%9A%94%EC%B2%AD-2.html" target="_blank">개선요청-2</a> · <a href="https://insys-hq.github.io/Insys-lab/MCP%EA%B0%9C%EC%84%A0%EC%9A%94%EC%B2%AD-3.html" target="_blank">개선요청-3</a></span></div>
+  </div>
+  <div class="concl"><b>요약:</b> ERP 작업이 MCP가 아니라 브라우저로 처리되는 원인은 <strong>쓰기 도구가 없기 때문</strong>입니다. 긴급 데이터·결함 4건, MCP 쓰기 도구 12종, 조회 보강 3건, 운영·보안 5건을 한 번에 요청합니다. 모든 쓰기는 기존과 같은 <strong>propose → confirm</strong> 방식으로 요청합니다.</div>
+<div class="card">
+<h2>1. 긴급 (데이터·결함)</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>No</th>
+<th>요청</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>U1</td>
+<td><strong>SITE-083 소속 회사 수정</strong></td>
+<td>「셰플러 창원3공장(파인)」 소속 회사 (주)인시스 → <strong>(주)파인 창원본사</strong> (DB/Studio). GPS 출퇴근 확대 일정에 직접 영향</td>
+</tr>
+<tr>
+<td>U2</td>
+<td>현장 등록 시 회사 자동 지정 결함</td>
+<td>등록자 소속 회사로 강제 저장됨. 등록·수정 화면에 「소속 회사」 칸 제공</td>
+</tr>
+<tr>
+<td>U3</td>
+<td>표 수정의 「회사」 칸</td>
+<td>입력되는 것처럼 보이지만 저장 안 됨 → 읽기 전용 표시</td>
+</tr>
+<tr>
+<td>U4</td>
+<td>다른 회사 현장으로 배치 이동</td>
+<td>선택 목록에서 사라지기만 함 → 「소속 회사가 달라 이동 불가」 안내</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="card">
+<h2>2. MCP 쓰기 도구 추가 (모두 propose → confirm 방식)</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>우선</th>
+<th>도구</th>
+<th>대상</th>
+<th>근거 문서</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>★1</td>
+<td><code>propose_site_upsert</code></td>
+<td>현장 등록·수정(소속 회사 포함)</td>
+<td>개선요청-2</td>
+</tr>
+<tr>
+<td>★1</td>
+<td><code>propose_line_upsert</code> / <code>propose_line_delete</code></td>
+<td>라인·구역</td>
+<td>개선요청-2</td>
+</tr>
+<tr>
+<td>★1</td>
+<td><code>propose_placement_move</code></td>
+<td>배치 이동(여러 명, 시작일 유지)</td>
+<td>개선요청-2</td>
+</tr>
+<tr>
+<td>★1</td>
+<td><code>propose_work_request</code> · <code>propose_request_comment</code></td>
+<td>부서 간 업무 요청·댓글</td>
+<td>개선요청-3</td>
+</tr>
+<tr>
+<td>★1</td>
+<td><code>list_requests_for_me</code> / <code>list_requests_by_me</code></td>
+<td>받은·보낸 요청 조회</td>
+<td>개선요청-3</td>
+</tr>
+<tr>
+<td>★1</td>
+<td><strong><code>propose_board_post</code></strong> (신규)</td>
+<td>게시판 글 등록(게시판 선택, 제목·본문, 중요 표시)</td>
+<td>이번 요청</td>
+</tr>
+<tr>
+<td>★2</td>
+<td><code>propose_field_attendance_setup</code></td>
+<td>출퇴근 켜기, 반경, 근무시간, 담당자</td>
+<td>개선요청-2</td>
+</tr>
+<tr>
+<td>★2</td>
+<td><code>propose_request_status</code> · <code>propose_request_assign</code></td>
+<td>요청 상태·담당자 변경</td>
+<td>개선요청-3</td>
+</tr>
+<tr>
+<td>★2</td>
+<td><code>propose_role_assignment</code> + 조회 2종</td>
+<td>기능 카탈로그 담당자·회사 범위 배정</td>
+<td>개선요청-1</td>
+</tr>
+<tr>
+<td>★2</td>
+<td><code>propose_record_trash</code> / <code>propose_record_restore</code></td>
+<td>휴지통 이동·복구(영구 삭제 제외)</td>
+<td>개선요청-2</td>
+</tr>
+<tr>
+<td>★3</td>
+<td><code>export_table</code></td>
+<td>대량 목록 CSV/XLSX 내려받기(권한 범위 안)</td>
+<td>개선요청-2</td>
+</tr>
+<tr>
+<td>★3</td>
+<td><code>propose_send_attendance_link</code></td>
+<td>현장 근로자 출퇴근 링크 문자</td>
+<td>개선요청-2</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>미리보기 경고 공통:</strong> 소속 회사 불일치, 중복 등록 의심, 배치·근태 기록이 있는 항목 삭제, 대량 변경(30명 이상), 민감정보 포함</p>
+<h3><code>propose_board_post</code> 상세 (신규)</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>입력</td>
+<td>게시판(이름 또는 코드), 제목, 본문(마크다운 또는 HTML), 중요 표시 여부, 첨부 링크</td>
+</tr>
+<tr>
+<td>미리보기</td>
+<td>게시판 이름, 제목, 본문 렌더링, 공개 범위(볼 수 있는 사람), 중요 표시 여부</td>
+</tr>
+<tr>
+<td>권한</td>
+<td>연결한 직원이 화면에서 글을 쓸 수 있는 게시판만</td>
+</tr>
+<tr>
+<td>처리</td>
+<td>confirm 시 화면 등록과 같은 알림·후처리. 수정·삭제는 1차 범위 제외</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="card">
+<h2>3. MCP 조회 보강</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>No</th>
+<th>요청</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q1</td>
+<td><code>staffing_site</code>에 <strong>company_id(소속 회사)</strong> 칸 노출, <code>staffing_line</code>·근무지 표 조회 허용</td>
+</tr>
+<tr>
+<td>Q2</td>
+<td>휴지통 레코드 조회 옵션 (<code>include_trashed</code>)</td>
+</tr>
+<tr>
+<td>Q3</td>
+<td>역할 배정·기능 카탈로그 표 조회 허용</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="card">
+<h2>4. 운영·보안</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>No</th>
+<th>요청</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S1</td>
+<td>감사 로그에 <strong>클라이언트 구분</strong>(Claude / ChatGPT / ERP 비서)과 user_request·변경 전후 값 기록</td>
+</tr>
+<tr>
+<td>S2</td>
+<td>새 쓰기 도구의 <strong>AI 허용 설정 위치</strong> 안내 (Studio ▸ AI 정책 등)와 표별 on/off</td>
+</tr>
+<tr>
+<td>S3</td>
+<td>하루 실행 상한(예: 제안 20건, 배치 50명/회) 테넌트 설정</td>
+</tr>
+<tr>
+<td>S4</td>
+<td><strong>조회 전용 「그룹 지출 조회」 역할 템플릿</strong> 제공 가능 여부 (전 계열사 카드·전표·통장·세금계산서·지출결의서 읽기 전용 → 기능 카탈로그에서 배정)</td>
+</tr>
+<tr>
+<td>S5</td>
+<td>도구 배포 시 공지 → ChatGPT 플러그인 재게시·Claude 재연결 시점 안내</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="card">
+<h2>5. 회신 요청</h2>
+<ol>
+<li>U1 처리 일정 (긴급)</li>
+<li>U2~U4 결함 수정 일정</li>
+<li>2장 ★1 도구 제공 가능 여부·일정, 기존 도구(<code>list_my_requests</code>·<code>propose_todo_plan</code> 등) 확장으로 대신할 수 있는 항목</li>
+<li>S2 AI 쓰기 허용 설정 위치, S4 조회 전용 역할 가능 여부</li>
+</ol>
+<p><em>v1.0 — 2026-11-27 최초 작성</em></p>
+</div>
+  <div class="foot">인시스 AI혁신 연구개발실 · ERP MCP 개선요청-4 · <span id="verFoot">v1.0</span></div>
+</div>
+<div class="toast" id="toast"></div>
+<script type="text/markdown" id="mdSrc">
+# ERP MCP 개선요청-4 — 개발사 요청 통합본 v1.0
+
+- 작성: 인시스 AI혁신 연구개발실 (ys.kim@in-sys.co.kr)
+- 작성일: 2026-11-27
+- 참고 문서: [개선요청-1 권한배정](https://insys-hq.github.io/Insys-lab/ERP_MCP_%EA%B0%9C%EC%84%A0%EC%9A%94%EC%B2%AD_%EA%B6%8C%ED%95%9C%EB%B0%B0%EC%A0%95_v1.0.html) · [개선요청-2 현장·배치](https://insys-hq.github.io/Insys-lab/MCP%EA%B0%9C%EC%84%A0%EC%9A%94%EC%B2%AD-2.html) · [개선요청-3 부서 간 연계](https://insys-hq.github.io/Insys-lab/MCP%EA%B0%9C%EC%84%A0%EC%9A%94%EC%B2%AD-3.html)
+
+> **요약**: ERP 작업이 MCP가 아니라 브라우저로 처리되는 원인은 **쓰기 도구가 없기 때문**입니다. 긴급 데이터·결함 4건, MCP 쓰기 도구 12종, 조회 보강 3건, 운영·보안 5건을 한 번에 요청합니다. 모든 쓰기는 기존과 같은 **propose → confirm** 방식으로 요청합니다.
+
+---
+
+## 1. 긴급 (데이터·결함)
+
+| No | 요청 | 내용 |
+|---|---|---|
+| U1 | **SITE-083 소속 회사 수정** | 「셰플러 창원3공장(파인)」 소속 회사 (주)인시스 → **(주)파인 창원본사** (DB/Studio). GPS 출퇴근 확대 일정에 직접 영향 |
+| U2 | 현장 등록 시 회사 자동 지정 결함 | 등록자 소속 회사로 강제 저장됨. 등록·수정 화면에 「소속 회사」 칸 제공 |
+| U3 | 표 수정의 「회사」 칸 | 입력되는 것처럼 보이지만 저장 안 됨 → 읽기 전용 표시 |
+| U4 | 다른 회사 현장으로 배치 이동 | 선택 목록에서 사라지기만 함 → 「소속 회사가 달라 이동 불가」 안내 |
+
+## 2. MCP 쓰기 도구 추가 (모두 propose → confirm 방식)
+
+| 우선 | 도구 | 대상 | 근거 문서 |
+|---|---|---|---|
+| ★1 | `propose_site_upsert` | 현장 등록·수정(소속 회사 포함) | 개선요청-2 |
+| ★1 | `propose_line_upsert` / `propose_line_delete` | 라인·구역 | 개선요청-2 |
+| ★1 | `propose_placement_move` | 배치 이동(여러 명, 시작일 유지) | 개선요청-2 |
+| ★1 | `propose_work_request` · `propose_request_comment` | 부서 간 업무 요청·댓글 | 개선요청-3 |
+| ★1 | `list_requests_for_me` / `list_requests_by_me` | 받은·보낸 요청 조회 | 개선요청-3 |
+| ★1 | **`propose_board_post`** (신규) | 게시판 글 등록(게시판 선택, 제목·본문, 중요 표시) | 이번 요청 |
+| ★2 | `propose_field_attendance_setup` | 출퇴근 켜기, 반경, 근무시간, 담당자 | 개선요청-2 |
+| ★2 | `propose_request_status` · `propose_request_assign` | 요청 상태·담당자 변경 | 개선요청-3 |
+| ★2 | `propose_role_assignment` + 조회 2종 | 기능 카탈로그 담당자·회사 범위 배정 | 개선요청-1 |
+| ★2 | `propose_record_trash` / `propose_record_restore` | 휴지통 이동·복구(영구 삭제 제외) | 개선요청-2 |
+| ★3 | `export_table` | 대량 목록 CSV/XLSX 내려받기(권한 범위 안) | 개선요청-2 |
+| ★3 | `propose_send_attendance_link` | 현장 근로자 출퇴근 링크 문자 | 개선요청-2 |
+
+**미리보기 경고 공통:** 소속 회사 불일치, 중복 등록 의심, 배치·근태 기록이 있는 항목 삭제, 대량 변경(30명 이상), 민감정보 포함
+
+### `propose_board_post` 상세 (신규)
+
+| 항목 | 내용 |
+|---|---|
+| 입력 | 게시판(이름 또는 코드), 제목, 본문(마크다운 또는 HTML), 중요 표시 여부, 첨부 링크 |
+| 미리보기 | 게시판 이름, 제목, 본문 렌더링, 공개 범위(볼 수 있는 사람), 중요 표시 여부 |
+| 권한 | 연결한 직원이 화면에서 글을 쓸 수 있는 게시판만 |
+| 처리 | confirm 시 화면 등록과 같은 알림·후처리. 수정·삭제는 1차 범위 제외 |
+
+## 3. MCP 조회 보강
+
+| No | 요청 |
+|---|---|
+| Q1 | `staffing_site`에 **company_id(소속 회사)** 칸 노출, `staffing_line`·근무지 표 조회 허용 |
+| Q2 | 휴지통 레코드 조회 옵션 (`include_trashed`) |
+| Q3 | 역할 배정·기능 카탈로그 표 조회 허용 |
+
+## 4. 운영·보안
+
+| No | 요청 |
+|---|---|
+| S1 | 감사 로그에 **클라이언트 구분**(Claude / ChatGPT / ERP 비서)과 user_request·변경 전후 값 기록 |
+| S2 | 새 쓰기 도구의 **AI 허용 설정 위치** 안내 (Studio ▸ AI 정책 등)와 표별 on/off |
+| S3 | 하루 실행 상한(예: 제안 20건, 배치 50명/회) 테넌트 설정 |
+| S4 | **조회 전용 「그룹 지출 조회」 역할 템플릿** 제공 가능 여부 (전 계열사 카드·전표·통장·세금계산서·지출결의서 읽기 전용 → 기능 카탈로그에서 배정) |
+| S5 | 도구 배포 시 공지 → ChatGPT 플러그인 재게시·Claude 재연결 시점 안내 |
+
+## 5. 회신 요청
+
+1. U1 처리 일정 (긴급)
+2. U2~U4 결함 수정 일정
+3. 2장 ★1 도구 제공 가능 여부·일정, 기존 도구(`list_my_requests`·`propose_todo_plan` 등) 확장으로 대신할 수 있는 항목
+4. S2 AI 쓰기 허용 설정 위치, S4 조회 전용 역할 가능 여부
+
+*v1.0 — 2026-11-27 최초 작성*
+
+</script>
+<script>
+(function(){
+  var VERSION='v1.0';
+  document.getElementById('verBadge').textContent=VERSION;
+  document.getElementById('verFoot').textContent=VERSION;
+  var body=document.body,bM=document.getElementById('bMobile'),bP=document.getElementById('bPc');
+  function toast(m){var t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(function(){t.style.display='none';},1600);}
+  function setMode(m){body.classList.toggle('mobile',m==='mobile');bM.classList.toggle('on',m==='mobile');bP.classList.toggle('on',m==='pc');}
+  bM.addEventListener('click',function(){setMode('mobile');});
+  bP.addEventListener('click',function(){setMode('pc');});
+  setMode('mobile');
+  var dlNs=null;
+  try{ if(window.claude&&window.claude.use){ window.claude.use('downloads').then(function(n){dlNs=n;},function(){}); } }catch(e){}
+  document.getElementById('bMd').addEventListener('click',function(){
+    var md=document.getElementById('mdSrc').textContent.replace(/^\n/,'');
+    var fname='MCP개선요청-4.md';
+    if(dlNs){
+      dlNs.save({filename:fname,data:md}).then(function(){toast('MD 파일을 내려받았습니다');},function(){toast('다운로드가 취소되었습니다');});
+      return;
+    }
+    var blob=new Blob(['﻿'+md],{type:'text/markdown;charset=utf-8'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=fname;
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+    toast('MD 파일을 내려받았습니다');
+  });
+  function copyText(s){
+    function legacy(){return new Promise(function(res,rej){var ta=document.createElement('textarea');ta.value=s;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}ta.remove();ok?res():rej();});}
+    if(navigator.clipboard&&window.isSecureContext){return navigator.clipboard.writeText(s).catch(legacy);}
+    return legacy();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'),function(b){
+    b.addEventListener('click',function(){
+      copyText(document.getElementById(b.getAttribute('data-copy')).textContent)
+        .then(function(){toast('복사했습니다');},function(){toast('복사 실패 — 직접 선택해 복사하세요');});
+    });
+  });
+})();
+</script>
+</body>
+</html>
