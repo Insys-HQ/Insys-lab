@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>ERP MCP 개선요청-3 — Claude·ChatGPT 부서 간 업무 연계 도구 v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap">
+<style>
+:root{--navy:#1f3a5f;--ink:#2b3340;--sub:#4a5565;--line:#d9dee6;--head:#e8eef6;--soft:#f5f7fa;--ok:#e6f2ea;--okT:#1d5a34;--no:#f8e9e9;--noT:#7a2424;--warn:#fff6e0;--warnT:#6b4a00}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:#eef1f5;line-height:1.55}
+.nav{background:var(--navy);color:#fff;width:100%;position:sticky;top:0;z-index:10}
+.nav-inner{max-width:1100px;margin:0 auto;padding:8px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.nav-inner .t{font-weight:700;font-size:1rem}
+.nav-inner .ver{font-size:.85rem;background:#fff;color:var(--navy);border-radius:10px;padding:1px 8px;font-weight:700;margin-left:6px}
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+.btn{font-family:inherit;font-size:.9rem;border:1px solid #c9d3e0;background:#fff;color:var(--navy);border-radius:6px;padding:5px 10px;cursor:pointer;font-weight:500}
+.btn.on{background:#dbe6f3;border-color:#8fa8c8;font-weight:700}
+.btn.dl{background:#fff;color:var(--navy);border-color:#fff}
+.wrap{max-width:1100px;margin:0 auto;padding:8px 12px;transition:max-width .2s}
+body.mobile .wrap,body.mobile .nav-inner{max-width:420px}
+.cover{background:#fff;border:1px solid var(--line);border-left:5px solid var(--navy);border-radius:8px;padding:12px;margin-bottom:8px}
+.cover h1{font-size:1.3rem;color:var(--navy);font-weight:900;line-height:1.35}
+.meta{margin-top:6px;color:var(--sub);font-size:.9rem;display:flex;flex-wrap:wrap;gap:4px 14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:8px}
+.card h2{font-size:1.1rem;color:var(--navy);font-weight:700;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.card h3{font-size:1rem;color:var(--navy);font-weight:700;margin:8px 0 4px}
+.concl{background:#e8eef6;border:1px solid #b9c9de;border-radius:8px;padding:10px 12px;margin-bottom:8px;color:var(--navy);font-weight:500}
+.tbl{width:100%;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{border:1px solid var(--line);padding:4px 8px;text-align:left;vertical-align:top}
+th{background:var(--head);color:var(--navy);font-weight:700;white-space:nowrap}
+td.c{text-align:center;white-space:nowrap}
+.y{background:var(--ok);color:var(--okT);font-weight:700}
+.n{background:var(--no);color:var(--noT);font-weight:700}
+code{font-family:Consolas,monospace;background:var(--soft);border:1px solid var(--line);border-radius:4px;padding:0 4px;font-size:.88em;color:var(--navy)}
+ol,ul{padding-left:20px}
+li{margin:2px 0}
+pre{background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:8px 10px;white-space:pre-wrap;word-break:break-word;font-family:Consolas,'Noto Sans KR',monospace;font-size:.88rem;color:var(--ink)}
+.warn{background:var(--warn);color:var(--warnT);border:1px solid #ecd9a6;border-radius:6px;padding:6px 10px;margin-top:6px}
+.cp{float:right;font-size:.8rem;padding:2px 8px}
+.foot{text-align:center;color:var(--sub);font-size:.85rem;padding:8px 0 12px}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:6px 14px;border-radius:6px;font-size:.9rem;display:none;z-index:20}
+@media (min-width:768px){html{font-size:16px}}
+.tbl table th{white-space:nowrap}
+td code{word-break:break-all}
+td{min-width:72px}
+</style>
+</head>
+<body class="mobile">
+<div class="nav"><div class="nav-inner">
+  <div class="t">ERP MCP 개선요청-3<span class="ver" id="verBadge">v1.0</span></div>
+  <div class="tools">
+    <button class="btn on" id="bMobile" type="button">📱 모바일</button>
+    <button class="btn" id="bPc" type="button">🖥 PC</button>
+    <button class="btn dl" id="bMd" type="button">⬇ MD 다운로드</button>
+  </div>
+</div></div>
+<div class="wrap">
+  <div class="cover">
+    <h1>ERP MCP 개선요청-3 — Claude·ChatGPT 부서 간 업무 연계 도구</h1>
+    <div class="meta">
+      <span>버전 <b>v1.0</b></span><span>작성일 2026-11-27</span>
+      <span>인시스 AI혁신 연구개발실</span><span>ys.kim@in-sys.co.kr</span>
+    </div>
+    <div class="meta"><span>관련: 「MCP개선요청-2 — 현장·라인·배치·근무지 쓰기 도구」에 이어지는 건 · 개인정보: 직원 이름 미기재</span></div>
+  </div>
+  <div class="concl"><b>결론:</b> 부서마다 다른 AI(경영지원실 ChatGPT Business, 다른 부서 Claude)를 쓰더라도 같은 업무를 이어서 처리하려면 <strong>AI끼리 직접 연결하지 않고 ERP를 공용 작업장(허브)으로 씁니다.</strong> 두 AI는 이미 같은 ERP MCP에 연결돼 있습니다. 다만 부서 간 <strong>업무 요청 등록, 댓글, 상태 변경 도구</strong>가 없어서 보강이 필요합니다.</div>
+<div class="card">
+<h2>1. 배경</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>항목</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>현재 사용</td>
+<td>경영지원실은 ChatGPT Business, 그 밖의 부서는 Claude로 ERP MCP에 연결 (2026-11 기준)</td>
+</tr>
+<tr>
+<td>문제</td>
+<td>AI 대화 기록은 각 개인 계정에만 남습니다. 다른 부서 담당자나 다른 AI가 그 업무를 이어받을 수 없습니다</td>
+</tr>
+<tr>
+<td>요구</td>
+<td>쓰는 AI가 달라도, 한 부서가 요청한 업무를 다른 부서가 받아 처리하고, 결과를 다시 요청한 쪽이 이어서 쓸 수 있어야 합니다</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="card">
+<h2>2. 연결 방식 검토</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>방법</th>
+<th>방식</th>
+<th>장점</th>
+<th>단점</th>
+<th>판단</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A. <strong>ERP를 허브로</strong></td>
+<td>두 AI가 같은 ERP의 업무 요청·할 일·댓글·위키를 읽고 씀</td>
+<td>이미 연결돼 있음. 기록·권한·감사 로그가 ERP에 남음</td>
+<td>지금은 쓰기 도구가 일부뿐이라 보강 필요</td>
+<td class="c y">추천</td>
+</tr>
+<tr>
+<td>B. 공용 문서 저장소</td>
+<td>M365(SharePoint·OneDrive)를 두 AI에 각각 연결해 같은 파일을 봄</td>
+<td>엑셀·보고서 공유가 쉬움</td>
+<td>진행 상태와 담당자를 관리할 수 없음</td>
+<td class="c y">보조</td>
+</tr>
+<tr>
+<td>C. AI끼리 직접 연결</td>
+<td>Claude API를 감싼 MCP 서버를 ChatGPT에 연결(또는 반대)</td>
+<td>한쪽 AI에서 다른 AI를 호출 가능</td>
+<td>API 비용 추가. 권한·로그가 ERP 밖으로 나감. 개인정보가 두 회사 서버를 오감</td>
+<td class="c n">비추천</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>연결 구조</strong>: 경영지원실(ChatGPT) ⇄ ERP MCP ⇄ <strong>ERP(공용 기록)</strong> ⇄ ERP MCP ⇄ 다른 부서(Claude)</p>
+</div>
+<div class="card">
+<h2>3. 목표 업무 흐름 (예시)</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>요청 부서 (ChatGPT)</th>
+<th>처리 부서 (Claude)</th>
+<th>사용할 도구</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 요청</td>
+<td>"SITE-083 근로자 4대보험 가입 확인을 현장관리팀에 요청해줘"</td>
+<td></td>
+<td><code>propose_work_request</code> → <code>confirm_proposal</code></td>
+</tr>
+<tr>
+<td>② 확인</td>
+<td></td>
+<td>"나한테 온 요청 보여줘"</td>
+<td><code>list_requests_for_me</code></td>
+</tr>
+<tr>
+<td>③ 처리</td>
+<td></td>
+<td>ERP 조회 후 처리 결과를 댓글로 등록, 상태를 「완료」로 변경</td>
+<td><code>propose_request_comment</code>, <code>propose_request_status</code></td>
+</tr>
+<tr>
+<td>④ 이어받기</td>
+<td>"그 요청 처리 결과 알려줘" → 댓글을 읽고 다음 작업 진행</td>
+<td></td>
+<td><code>list_requests_by_me</code>, <code>get_request_comments</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>AI가 바뀌어도 맥락은 <strong>ERP 요청 번호</strong> 하나로 이어집니다. 대화 기록 대신 ERP 기록이 기준이 됩니다.</p>
+</div>
+<div class="card">
+<h2>4. 요청 도구 정의</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>우선</th>
+<th>도구명</th>
+<th>기능</th>
+<th>주요 입력</th>
+<th>미리보기·출력</th>
+<th>쓰기</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>★1</td>
+<td><code>propose_work_request</code></td>
+<td>다른 부서·담당자에게 업무 요청 등록</td>
+<td>받는 부서 또는 담당자, 제목, 내용, 기한, 관련 레코드(현장·직원 등 ID), 첨부 링크</td>
+<td>받는 사람, 내용, 기한, action_id</td>
+<td>예(제안)</td>
+</tr>
+<tr>
+<td>★1</td>
+<td><code>list_requests_for_me</code></td>
+<td>내가(또는 우리 부서가) 받은 요청 조회</td>
+<td>상태, 기간, 보낸 부서</td>
+<td>요청 번호, 제목, 보낸 사람, 기한, 상태, 화면 링크</td>
+<td>아니오</td>
+</tr>
+<tr>
+<td>★1</td>
+<td><code>list_requests_by_me</code></td>
+<td>내가 보낸 요청과 처리 상태 조회</td>
+<td>상태, 기간</td>
+<td>요청 번호, 처리자, 상태, 최근 댓글</td>
+<td>아니오</td>
+</tr>
+<tr>
+<td>★1</td>
+<td><code>propose_request_comment</code></td>
+<td>요청에 처리 결과·질문 댓글 등록</td>
+<td>요청 번호, 내용, 첨부 링크</td>
+<td>댓글 미리보기</td>
+<td>예(제안)</td>
+</tr>
+<tr>
+<td>★2</td>
+<td><code>propose_request_status</code></td>
+<td>요청 상태 변경 (접수 → 처리중 → 완료 / 반려)</td>
+<td>요청 번호, 상태, 사유</td>
+<td>변경 전·후 상태</td>
+<td>예(제안)</td>
+</tr>
+<tr>
+<td>★2</td>
+<td><code>propose_request_assign</code></td>
+<td>받은 요청의 담당자 지정·재지정</td>
+<td>요청 번호, 담당자</td>
+<td>변경 전·후 담당자</td>
+<td>예(제안)</td>
+</tr>
+<tr>
+<td>★3</td>
+<td>첨부 연결</td>
+<td>요청·댓글에 ERP 파일 또는 SharePoint/OneDrive 링크 연결</td>
+<td>요청 번호, 링크 또는 파일</td>
+<td>첨부 목록</td>
+<td>예(제안)</td>
+</tr>
+<tr>
+<td>-</td>
+<td><code>get_request_comments</code> (기존)</td>
+<td>요청 댓글 조회</td>
+<td>요청 번호</td>
+<td>댓글 목록</td>
+<td>아니오</td>
+</tr>
+<tr>
+<td>-</td>
+<td><code>confirm_proposal</code> (기존)</td>
+<td>제안 실행</td>
+<td>action_id</td>
+<td>화면 등록과 같은 알림·후처리로 반영</td>
+<td>예(확정)</td>
+</tr>
+</tbody>
+</table></div>
+<h3>기존 도구와의 관계 (확인 요청)</h3>
+<ul>
+<li><code>list_my_requests</code>, <code>list_support_requests</code>, <code>list_my_todos</code>, <code>propose_todo_plan</code>이 이미 있습니다. 이 도구들을 넓혀서 부서 간 요청을 처리할 수 있으면 새 도구 대신 확장해도 됩니다.</li>
+<li>ERP 화면에 <strong>부서 간 업무 요청 기능이 이미 있는지</strong>, 있다면 어떤 표·화면인지 알려 주세요.</li>
+</ul>
+</div>
+<div class="card">
+<h2>5. 권한·안전 규칙</h2>
+<ol>
+<li><strong>권한 상속</strong>: 연결한 직원의 ERP 권한을 그대로 따릅니다. 받는 부서가 볼 수 없는 레코드는 요청 내용에 넣을 수 없게 경고합니다.</li>
+<li><strong>개인정보</strong>: 요청·댓글 본문에 주민번호, 계좌번호, 급여 금액이 들어가면 경고하고 막습니다. 원본은 ERP 화면 링크로 연결합니다.</li>
+<li><strong>감사 로그</strong>: 사용자, 시각, <strong>클라이언트 구분(Claude / ChatGPT / ERP 비서)</strong>, user_request, 등록·변경 내용을 기록합니다.</li>
+<li><strong>알림</strong>: 화면에서 등록할 때와 똑같이 받는 사람에게 ERP 알림을 보냅니다.</li>
+<li><strong>횟수 상한</strong>: 하루 AI 요청 등록 상한을 둡니다(예: 1인 20건).</li>
+<li><strong>삭제 미제공</strong>: 요청 삭제는 화면에서만 합니다. AI는 「반려·취소」 상태 변경만 할 수 있습니다.</li>
+</ol>
+<h3>인시스 측 운영 규칙</h3>
+<button class="btn cp" type="button" data-copy="cp1">복사</button><pre id="cp1">- 업무 결과는 AI 대화창이 아니라 ERP 요청·댓글에 남긴다.
+- 개인정보는 요약·건수만 댓글로 남기고 원본은 ERP 화면 링크로 연결한다.
+- AI는 부서별로 달라도 되지만 회사 계정(ChatGPT Business / Claude Team)만 사용한다.
+</pre>
+</div>
+<div class="card">
+<h2>6. 개발사 전달용 이슈</h2>
+<button class="btn cp" type="button" data-copy="cp2">복사</button><pre id="cp2">[ERP-이슈] MCP에 부서 간 업무 요청·댓글·상태 변경 도구 없음 (Claude·ChatGPT 연계)
+- 발생일시 : 2026-11-27
+- 클라이언트 : Claude, ChatGPT Business (둘 다 ERP MCP 연결)
+- 모듈·메뉴 / 경로 : 업무 요청 / 지원 요청 / 할 일 (해당 화면 확인 필요)
+- 사용자 맥락 : 경영지원실(ChatGPT)과 기타 부서(Claude)가 같은 업무를 이어서 처리
+- 재현 절차 : 1) ChatGPT에서 &quot;현장관리팀에 ○○ 확인 요청 등록해줘&quot; 요청
+              2) MCP에 다른 부서·담당자에게 요청을 등록하는 도구가 없음
+              3) Claude 쪽에서 받은 요청에 결과 댓글·상태 변경을 할 도구도 없음
+- 기대 결과 : propose_work_request → confirm_proposal 로 요청 등록
+              받은 쪽은 list_requests_for_me 로 조회, propose_request_comment / propose_request_status 로 처리
+              요청 쪽은 list_requests_by_me 로 결과 확인. 모든 단계 감사 로그(클라이언트 구분 포함)
+- 실제 결과 : 업무 요청 조회 일부만 가능, 등록·댓글·상태 변경 불가
+- 영향 범위 : 부서 간 협업 업무 전체 (경영지원실 ↔ 전략기획실·현장관리·연구개발실 등)
+- 우선순위 : 중간 (ERP 본격 도입·전사 AI 계정 전환 일정과 연계)
+</pre>
+<h3>회신 요청</h3>
+<ol>
+<li>ERP 화면의 부서 간 업무 요청 기능 유무와 해당 표 이름</li>
+<li>기존 도구(<code>list_my_requests</code>, <code>list_support_requests</code>, <code>propose_todo_plan</code>)를 확장할지, 4장 도구를 새로 만들지</li>
+<li>감사 로그에 클라이언트(Claude / ChatGPT / ERP 비서)를 구분해 기록할 수 있는지</li>
+<li>4장 ★1 도구의 제공 가능 일정</li>
+</ol>
+<p><em>v1.0 — 2026-11-27 최초 작성</em></p>
+</div>
+  <div class="foot">인시스 AI혁신 연구개발실 · MCP개선요청-3 · <span id="verFoot">v1.0</span></div>
+</div>
+<div class="toast" id="toast"></div>
+<script type="text/markdown" id="mdSrc">
+# ERP MCP 개선요청-3 — Claude·ChatGPT 부서 간 업무 연계 도구 v1.0
+
+- 작성: 인시스 AI혁신 연구개발실 (ys.kim@in-sys.co.kr)
+- 작성일: 2026-11-27
+- 관련: 「MCP개선요청-2 — 현장·라인·배치·근무지 쓰기 도구」에 이어지는 건
+- 개인정보: 직원 이름 미기재
+
+> **결론**: 부서마다 다른 AI(경영지원실 ChatGPT Business, 다른 부서 Claude)를 쓰더라도 같은 업무를 이어서 처리하려면 **AI끼리 직접 연결하지 않고 ERP를 공용 작업장(허브)으로 씁니다.** 두 AI는 이미 같은 ERP MCP에 연결돼 있습니다. 다만 부서 간 **업무 요청 등록, 댓글, 상태 변경 도구**가 없어서 보강이 필요합니다.
+
+---
+
+## 1. 배경
+
+| 항목 | 내용 |
+|---|---|
+| 현재 사용 | 경영지원실은 ChatGPT Business, 그 밖의 부서는 Claude로 ERP MCP에 연결 (2026-11 기준) |
+| 문제 | AI 대화 기록은 각 개인 계정에만 남습니다. 다른 부서 담당자나 다른 AI가 그 업무를 이어받을 수 없습니다 |
+| 요구 | 쓰는 AI가 달라도, 한 부서가 요청한 업무를 다른 부서가 받아 처리하고, 결과를 다시 요청한 쪽이 이어서 쓸 수 있어야 합니다 |
+
+---
+
+## 2. 연결 방식 검토
+
+| 방법 | 방식 | 장점 | 단점 | 판단 |
+|---|---|---|---|---|
+| A. **ERP를 허브로** | 두 AI가 같은 ERP의 업무 요청·할 일·댓글·위키를 읽고 씀 | 이미 연결돼 있음. 기록·권한·감사 로그가 ERP에 남음 | 지금은 쓰기 도구가 일부뿐이라 보강 필요 | ✅ 추천 |
+| B. 공용 문서 저장소 | M365(SharePoint·OneDrive)를 두 AI에 각각 연결해 같은 파일을 봄 | 엑셀·보고서 공유가 쉬움 | 진행 상태와 담당자를 관리할 수 없음 | ✅ 보조 |
+| C. AI끼리 직접 연결 | Claude API를 감싼 MCP 서버를 ChatGPT에 연결(또는 반대) | 한쪽 AI에서 다른 AI를 호출 가능 | API 비용 추가. 권한·로그가 ERP 밖으로 나감. 개인정보가 두 회사 서버를 오감 | ❌ 비추천 |
+
+**연결 구조**: 경영지원실(ChatGPT) ⇄ ERP MCP ⇄ **ERP(공용 기록)** ⇄ ERP MCP ⇄ 다른 부서(Claude)
+
+---
+
+## 3. 목표 업무 흐름 (예시)
+
+| 단계 | 요청 부서 (ChatGPT) | 처리 부서 (Claude) | 사용할 도구 |
+|---|---|---|---|
+| ① 요청 | "SITE-083 근로자 4대보험 가입 확인을 현장관리팀에 요청해줘" | | `propose_work_request` → `confirm_proposal` |
+| ② 확인 | | "나한테 온 요청 보여줘" | `list_requests_for_me` |
+| ③ 처리 | | ERP 조회 후 처리 결과를 댓글로 등록, 상태를 「완료」로 변경 | `propose_request_comment`, `propose_request_status` |
+| ④ 이어받기 | "그 요청 처리 결과 알려줘" → 댓글을 읽고 다음 작업 진행 | | `list_requests_by_me`, `get_request_comments` |
+
+AI가 바뀌어도 맥락은 **ERP 요청 번호** 하나로 이어집니다. 대화 기록 대신 ERP 기록이 기준이 됩니다.
+
+---
+
+## 4. 요청 도구 정의
+
+| 우선 | 도구명 | 기능 | 주요 입력 | 미리보기·출력 | 쓰기 |
+|---|---|---|---|---|---|
+| ★1 | `propose_work_request` | 다른 부서·담당자에게 업무 요청 등록 | 받는 부서 또는 담당자, 제목, 내용, 기한, 관련 레코드(현장·직원 등 ID), 첨부 링크 | 받는 사람, 내용, 기한, action_id | 예(제안) |
+| ★1 | `list_requests_for_me` | 내가(또는 우리 부서가) 받은 요청 조회 | 상태, 기간, 보낸 부서 | 요청 번호, 제목, 보낸 사람, 기한, 상태, 화면 링크 | 아니오 |
+| ★1 | `list_requests_by_me` | 내가 보낸 요청과 처리 상태 조회 | 상태, 기간 | 요청 번호, 처리자, 상태, 최근 댓글 | 아니오 |
+| ★1 | `propose_request_comment` | 요청에 처리 결과·질문 댓글 등록 | 요청 번호, 내용, 첨부 링크 | 댓글 미리보기 | 예(제안) |
+| ★2 | `propose_request_status` | 요청 상태 변경 (접수 → 처리중 → 완료 / 반려) | 요청 번호, 상태, 사유 | 변경 전·후 상태 | 예(제안) |
+| ★2 | `propose_request_assign` | 받은 요청의 담당자 지정·재지정 | 요청 번호, 담당자 | 변경 전·후 담당자 | 예(제안) |
+| ★3 | 첨부 연결 | 요청·댓글에 ERP 파일 또는 SharePoint/OneDrive 링크 연결 | 요청 번호, 링크 또는 파일 | 첨부 목록 | 예(제안) |
+| - | `get_request_comments` (기존) | 요청 댓글 조회 | 요청 번호 | 댓글 목록 | 아니오 |
+| - | `confirm_proposal` (기존) | 제안 실행 | action_id | 화면 등록과 같은 알림·후처리로 반영 | 예(확정) |
+
+### 기존 도구와의 관계 (확인 요청)
+- `list_my_requests`, `list_support_requests`, `list_my_todos`, `propose_todo_plan`이 이미 있습니다. 이 도구들을 넓혀서 부서 간 요청을 처리할 수 있으면 새 도구 대신 확장해도 됩니다.
+- ERP 화면에 **부서 간 업무 요청 기능이 이미 있는지**, 있다면 어떤 표·화면인지 알려 주세요.
+
+---
+
+## 5. 권한·안전 규칙
+
+1. **권한 상속**: 연결한 직원의 ERP 권한을 그대로 따릅니다. 받는 부서가 볼 수 없는 레코드는 요청 내용에 넣을 수 없게 경고합니다.
+2. **개인정보**: 요청·댓글 본문에 주민번호, 계좌번호, 급여 금액이 들어가면 경고하고 막습니다. 원본은 ERP 화면 링크로 연결합니다.
+3. **감사 로그**: 사용자, 시각, **클라이언트 구분(Claude / ChatGPT / ERP 비서)**, user_request, 등록·변경 내용을 기록합니다.
+4. **알림**: 화면에서 등록할 때와 똑같이 받는 사람에게 ERP 알림을 보냅니다.
+5. **횟수 상한**: 하루 AI 요청 등록 상한을 둡니다(예: 1인 20건).
+6. **삭제 미제공**: 요청 삭제는 화면에서만 합니다. AI는 「반려·취소」 상태 변경만 할 수 있습니다.
+
+### 인시스 측 운영 규칙
+```
+- 업무 결과는 AI 대화창이 아니라 ERP 요청·댓글에 남긴다.
+- 개인정보는 요약·건수만 댓글로 남기고 원본은 ERP 화면 링크로 연결한다.
+- AI는 부서별로 달라도 되지만 회사 계정(ChatGPT Business / Claude Team)만 사용한다.
+```
+
+---
+
+## 6. 개발사 전달용 이슈
+
+```
+[ERP-이슈] MCP에 부서 간 업무 요청·댓글·상태 변경 도구 없음 (Claude·ChatGPT 연계)
+- 발생일시 : 2026-11-27
+- 클라이언트 : Claude, ChatGPT Business (둘 다 ERP MCP 연결)
+- 모듈·메뉴 / 경로 : 업무 요청 / 지원 요청 / 할 일 (해당 화면 확인 필요)
+- 사용자 맥락 : 경영지원실(ChatGPT)과 기타 부서(Claude)가 같은 업무를 이어서 처리
+- 재현 절차 : 1) ChatGPT에서 "현장관리팀에 ○○ 확인 요청 등록해줘" 요청
+              2) MCP에 다른 부서·담당자에게 요청을 등록하는 도구가 없음
+              3) Claude 쪽에서 받은 요청에 결과 댓글·상태 변경을 할 도구도 없음
+- 기대 결과 : propose_work_request → confirm_proposal 로 요청 등록
+              받은 쪽은 list_requests_for_me 로 조회, propose_request_comment / propose_request_status 로 처리
+              요청 쪽은 list_requests_by_me 로 결과 확인. 모든 단계 감사 로그(클라이언트 구분 포함)
+- 실제 결과 : 업무 요청 조회 일부만 가능, 등록·댓글·상태 변경 불가
+- 영향 범위 : 부서 간 협업 업무 전체 (경영지원실 ↔ 전략기획실·현장관리·연구개발실 등)
+- 우선순위 : 중간 (ERP 본격 도입·전사 AI 계정 전환 일정과 연계)
+```
+
+### 회신 요청
+1. ERP 화면의 부서 간 업무 요청 기능 유무와 해당 표 이름
+2. 기존 도구(`list_my_requests`, `list_support_requests`, `propose_todo_plan`)를 확장할지, 4장 도구를 새로 만들지
+3. 감사 로그에 클라이언트(Claude / ChatGPT / ERP 비서)를 구분해 기록할 수 있는지
+4. 4장 ★1 도구의 제공 가능 일정
+
+*v1.0 — 2026-11-27 최초 작성*
+
+</script>
+<script>
+(function(){
+  var VERSION='v1.0';
+  document.getElementById('verBadge').textContent=VERSION;
+  document.getElementById('verFoot').textContent=VERSION;
+  var body=document.body,bM=document.getElementById('bMobile'),bP=document.getElementById('bPc');
+  function toast(m){var t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(function(){t.style.display='none';},1600);}
+  function setMode(m){body.classList.toggle('mobile',m==='mobile');bM.classList.toggle('on',m==='mobile');bP.classList.toggle('on',m==='pc');}
+  bM.addEventListener('click',function(){setMode('mobile');});
+  bP.addEventListener('click',function(){setMode('pc');});
+  setMode('mobile');
+  var dlNs=null;
+  try{ if(window.claude&&window.claude.use){ window.claude.use('downloads').then(function(n){dlNs=n;},function(){}); } }catch(e){}
+  document.getElementById('bMd').addEventListener('click',function(){
+    var md=document.getElementById('mdSrc').textContent.replace(/^\n/,'');
+    var fname='MCP개선요청-3.md';
+    if(dlNs){
+      dlNs.save({filename:fname,data:md}).then(function(){toast('MD 파일을 내려받았습니다');},function(){toast('다운로드가 취소되었습니다');});
+      return;
+    }
+    var blob=new Blob(['﻿'+md],{type:'text/markdown;charset=utf-8'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=fname;
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+    toast('MD 파일을 내려받았습니다');
+  });
+  function copyText(s){
+    function legacy(){return new Promise(function(res,rej){var ta=document.createElement('textarea');ta.value=s;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}ta.remove();ok?res():rej();});}
+    if(navigator.clipboard&&window.isSecureContext){return navigator.clipboard.writeText(s).catch(legacy);}
+    return legacy();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'),function(b){
+    b.addEventListener('click',function(){
+      copyText(document.getElementById(b.getAttribute('data-copy')).textContent)
+        .then(function(){toast('복사했습니다');},function(){toast('복사 실패 — 직접 선택해 복사하세요');});
+    });
+  });
+})();
+</script>
+</body>
+</html>
