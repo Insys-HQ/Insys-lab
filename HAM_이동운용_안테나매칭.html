@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>HAM 이동 운용 · 안테나 매칭 핵심 정리 v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  /* v1.0 — Mobile-First */
+  :root{
+    --navy:#1e3a5f; --blue:#1f4e8c; --text:#2b3440; --sub:#4a5563;
+    --line:#d8dee6; --bg:#f4f6f9; --card:#ffffff;
+    --pastel:#e8f0fa; --warn:#fff4e0; --warn-b:#e0a43a; --ok:#e7f5ec; --ok-t:#1d6b3a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{font-size:14px}
+  body{font-family:'Noto Sans KR',sans-serif;font-size:1rem;line-height:1.6;color:var(--text);background:var(--bg)}
+  header{background:var(--navy);color:#fff;width:100%}
+  .nav-inner{max-width:1100px;margin:0 auto;padding:10px 14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+  .nav-inner h1{font-size:1.05rem;font-weight:700;line-height:1.35}
+  .nav-inner h1 small{display:block;font-size:1rem;font-weight:400;color:#d6e2f2}
+  .toggle{display:flex;border:1px solid #8fa8c8;border-radius:6px;overflow:hidden}
+  .toggle button{font-family:inherit;font-size:1rem;background:transparent;color:#e6eef8;border:0;padding:5px 12px;cursor:pointer}
+  .toggle button.on{background:#fff;color:var(--navy);font-weight:700}
+  .wrap{max-width:1100px;margin:0 auto;padding:10px 14px}
+  body.mobile .wrap,body.mobile .nav-inner{max-width:420px}
+  .freq{background:var(--pastel);border:1px solid #c8d8ee;border-radius:8px;padding:8px 12px;margin-bottom:8px;color:var(--navy)}
+  .freq b{color:var(--blue)}
+  .tabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+  .tabs button{font-family:inherit;font-size:1rem;flex:1;min-width:120px;padding:8px 10px;border:1px solid var(--line);background:#fff;color:var(--sub);border-radius:8px;cursor:pointer;font-weight:500}
+  .tabs button.on{background:var(--pastel);color:var(--navy);border-color:#9bb6d8;font-weight:700}
+  .panel{display:none}
+  .panel.on{display:block}
+  .grid{display:grid;grid-template-columns:1fr;gap:8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .card h3{font-size:1rem;color:var(--navy);margin-bottom:6px;display:flex;gap:6px;align-items:flex-start}
+  .num{flex:none;background:var(--blue);color:#fff;border-radius:50%;width:22px;height:22px;font-size:1rem;display:inline-flex;align-items:center;justify-content:center;margin-top:1px}
+  .lbl{display:inline-block;font-size:1rem;font-weight:700;padding:1px 8px;border-radius:4px;margin:4px 0 3px}
+  .lbl.p{background:#fde8e8;color:#9b2c2c}
+  .lbl.s{background:var(--ok);color:var(--ok-t)}
+  .lbl.t{background:var(--pastel);color:var(--navy)}
+  ul{padding-left:18px}
+  li{margin:2px 0}
+  b,strong{color:var(--blue)}
+  .note{background:var(--warn);border-left:4px solid var(--warn-b);border-radius:6px;padding:8px 12px;margin-top:6px;color:#5a3d0a}
+  .note b{color:#7a4a00}
+  /* 안테나 표: 모바일 카드형 */
+  .ant{display:grid;grid-template-columns:1fr;gap:8px}
+  .ant .card dl{display:grid;grid-template-columns:88px 1fr;gap:3px 8px}
+  .ant dt{color:var(--sub);font-weight:500}
+  .ant dd{color:var(--text)}
+  .tag{display:inline-block;font-size:1rem;padding:0 7px;border-radius:4px;background:var(--ok);color:var(--ok-t);font-weight:700}
+  .tag.y{background:var(--pastel);color:var(--navy)}
+  table{display:none;width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line)}
+  th{background:var(--pastel);color:var(--navy);font-weight:700;padding:7px 8px;border:1px solid var(--line);text-align:left}
+  td{padding:6px 8px;border:1px solid var(--line);vertical-align:top}
+  td.c,th.c{text-align:center}
+  footer{max-width:1100px;margin:0 auto;padding:8px 14px 12px;display:flex;justify-content:space-between;color:var(--sub);font-size:1rem}
+  body.mobile footer{max-width:420px}
+  .ver{font-weight:700;color:var(--navy)}
+
+  /* PC 화면 (토글 PC 선택 시) */
+  body.pc .grid{grid-template-columns:repeat(3,1fr)}
+  body.pc .ant{display:none}
+  body.pc table{display:table}
+
+  @media (min-width:768px){
+    html{font-size:16px}
+    body{font-size:1rem}
+  }
+</style>
+</head>
+<body class="mobile">
+<header>
+  <div class="nav-inner">
+    <h1>아마추어무선(HAM) 이동 운용 · 안테나 매칭<small>핵심 정리 · VHF/UHF</small></h1>
+    <div class="toggle" role="group" aria-label="화면 선택">
+      <button id="btnM" class="on" type="button">모바일</button>
+      <button id="btnP" type="button">PC</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="freq">주 사용 주파수: <b>145.620MHz (VHF)</b> 및 <b>430MHz (UHF)</b> 기준</div>
+
+  <div class="tabs" role="tablist">
+    <button class="on" data-t="p1" type="button">① 접지·SWR 해결책</button>
+    <button data-t="p2" type="button">② 휴대용 안테나 추천</button>
+  </div>
+
+  <!-- 섹션 1 -->
+  <section id="p1" class="panel on">
+    <div class="grid">
+      <div class="card">
+        <h3><span class="num">1</span>이동용 박스(필드케이스) + 30cm 점퍼 + 패널 마운트</h3>
+        <span class="lbl p">문제점</span>
+        <p>비금속(플라스틱/나무) 박스나 좁은 케이스는 차체와 달리 접지(어스) 역할을 못 해 <b>SWR 상승</b>, RF가 리그로 역류할 수 있음.</p>
+        <span class="lbl s">해결책</span>
+        <ul>
+          <li><b>무어스(Non-radial) 휩 안테나</b> 사용 권장</li>
+          <li>일반 휩 사용 시, M커넥터(SO-239) 접지 너트에 <b>50cm 전선(145MHz 1/4λ 레디얼) 1~4가닥</b> 연결해 바닥·사방으로 늘어뜨림 (430MHz 겸용 시 <b>17cm 1가닥</b> 추가)</li>
+          <li>전원선·핸드마이크 선에 <b>페라이트 코어</b> → 근접 RF 유입(변조 웅웅거림·오동작) 차단</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="num">2</span>리그에 L커넥터 직결 + 일반 휩 안테나</h3>
+        <span class="lbl s">해결책</span>
+        <p>L커넥터 외곽 금속부(접지)에 <b>50cm 전선 3~4가닥</b>을 사방으로 연결하면 일반 휩도 정상 작동.</p>
+        <span class="lbl t">고정 팁</span>
+        <p>내경 16mm <b>링 터미널</b> 또는 스테인리스 <b>호스 클램프(반도)</b>로 납땜 없이 고정.</p>
+        <span class="lbl t">레디얼 세팅</span>
+        <ul>
+          <li>수평(90°)보다 <b>아래로 약 45°</b> 내릴 때 50Ω 매칭·SWR 가장 안정</li>
+          <li>끝단은 고주파 전압이 걸리므로 피복 유지, <b>절연 테이프·수축 튜브로 마감</b></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3><span class="num">3</span>아파트 베란다 3030 알루미늄 프로파일(1m) + 5m 동축</h3>
+        <span class="lbl s">전파·SWR 상태</span>
+        <p>144/430MHz는 1m 프로파일만으로 접지 길이 충분 → <b>SWR 1.5 이하</b> 정상, 리그 무리 없음.</p>
+        <p style="color:var(--sub)">※ 7MHz 등 HF는 접지 부족 → 베란다 철제 난간과 전선 본딩 필요</p>
+        <div class="note"><b>필수 주의:</b> 표면 <b>아노다이징(절연 피막)</b>으로 도통이 안 될 수 있음. 커넥터 체결 부위 코팅을 살짝 벗겨 전기적으로 도통시킬 것.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 섹션 2 -->
+  <section id="p2" class="panel">
+    <p style="margin-bottom:8px;color:var(--sub)">이동용 박스 외부로 동축(3~5m)을 빼서 간단히 세워 쓰기 좋은 무지향성 안테나 4종 (144/430MHz)</p>
+
+    <div class="ant">
+      <div class="card"><h3><span class="num">1</span>롤업 J-Pole (슬림 짐)</h3><dl>
+        <dt>특징</dt><dd>300Ω/450Ω 피더선 제작, 돌돌 말아 주머니 수납</dd>
+        <dt>레디얼</dt><dd><span class="tag">불필요</span> 자체 매칭</dd>
+        <dt>휴대성</dt><dd><b>최상</b></dd>
+        <dt>설치 환경</dt><dd>낚싯대(릴대)·나뭇가지·텐트 폴대에 걸어 쓸 때</dd></dl></div>
+      <div class="card"><h3><span class="num">2</span>자석 마운트 + 휩 안테나</h3><dl>
+        <dt>특징</dt><dd>실패 확률 최저, 직관적 구성 (예: SG-7500, NR-770)</dd>
+        <dt>레디얼</dt><dd><span class="tag">불필요</span> 차량 지붕 활용</dd>
+        <dt>휴대성</dt><dd><b>상</b></dd>
+        <dt>설치 환경</dt><dd>현장 옆에 차량·철제 구조물이 있을 때</dd></dl></div>
+      <div class="card"><h3><span class="num">3</span>휴대용 미니 GP</h3><dl>
+        <dt>특징</dt><dd>1~1.3m급 초소형 기지국 안테나 (예: Diamond X30)</dd>
+        <dt>레디얼</dt><dd><span class="tag y">기본 포함</span> 짧은 레디얼 3개</dd>
+        <dt>휴대성</dt><dd><b>중</b></dd>
+        <dt>설치 환경</dt><dd>카메라 삼각대·짧은 폴대에 세워 안정적 교신</dd></dl></div>
+      <div class="card"><h3><span class="num">4</span>플라워 팟 안테나</h3><dl>
+        <dt>특징</dt><dd>PVC 파이프 내장 일자 구조, 자체 초크 코일 내장</dd>
+        <dt>레디얼</dt><dd><span class="tag">불필요</span> 일자 파이프형</dd>
+        <dt>휴대성</dt><dd><b>중상</b></dd>
+        <dt>설치 환경</dt><dd>레디얼 걸림 없이 파라솔 거치대 등에 깔끔히</dd></dl></div>
+    </div>
+
+    <table>
+      <thead><tr><th>추천 안테나</th><th>특징 및 장점</th><th class="c">별도 어스(레디얼)</th><th class="c">휴대성</th><th>추천 설치 환경</th></tr></thead>
+      <tbody>
+        <tr><td><b>1. 롤업 J-Pole</b> (슬림 짐)</td><td>300Ω/450Ω 피더선 제작, 돌돌 말아 주머니 수납</td><td class="c"><span class="tag">불필요</span> 자체 매칭</td><td class="c"><b>최상</b></td><td>낚싯대(릴대)·나뭇가지·텐트 폴대에 걸어 쓸 때</td></tr>
+        <tr><td><b>2. 자석 마운트 + 휩</b></td><td>실패 확률 최저, 직관적 구성 (예: SG-7500, NR-770)</td><td class="c"><span class="tag">불필요</span> 차량 지붕</td><td class="c"><b>상</b></td><td>현장 옆에 차량·철제 구조물이 있을 때</td></tr>
+        <tr><td><b>3. 휴대용 미니 GP</b></td><td>1~1.3m급 초소형 기지국 안테나 (예: Diamond X30)</td><td class="c"><span class="tag y">기본 포함</span> 레디얼 3개</td><td class="c"><b>중</b></td><td>카메라 삼각대·짧은 폴대에 세워 안정적 교신</td></tr>
+        <tr><td><b>4. 플라워 팟</b></td><td>PVC 파이프 내장 일자 구조, 자체 초크 코일</td><td class="c"><span class="tag">불필요</span> 일자형</td><td class="c"><b>중상</b></td><td>레디얼 걸림 없이 파라솔 거치대 등에 깔끔히</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">💡 <b>J-Pole 설치 팁:</b> 레디얼 없이 땅바닥·마스트에 세울 수 있으나, 아래쪽 J자 매칭부(급전점 하단)는 지면이나 금속 파이프에서 <b>최소 30~50cm 이상</b> 띄워야 SWR이 틀어지지 않음.</div>
+  </section>
+</main>
+
+<footer>
+  <span>HL2TLS · 2026</span>
+  <span class="ver" id="ver"></span>
+</footer>
+
+<script>
+  const APP_VERSION = 'v1.0';
+  document.getElementById('ver').textContent = APP_VERSION;
+
+  const body = document.body;
+  const btnM = document.getElementById('btnM');
+  const btnP = document.getElementById('btnP');
+  function setView(v){
+    body.classList.toggle('mobile', v === 'mobile');
+    body.classList.toggle('pc', v === 'pc');
+    btnM.classList.toggle('on', v === 'mobile');
+    btnP.classList.toggle('on', v === 'pc');
+  }
+  btnM.addEventListener('click', () => setView('mobile'));
+  btnP.addEventListener('click', () => setView('pc'));
+  setView('mobile');
+
+  document.querySelectorAll('.tabs button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b));
+      document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === b.dataset.t));
+    });
+  });
+</script>
+</body>
+</html>
