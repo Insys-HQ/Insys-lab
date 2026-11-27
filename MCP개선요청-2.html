@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>ERP MCP 개선요청-2 — 현장·라인·배치·근무지 쓰기 도구 v1.0</title>
+<title>ERP MCP 개선요청-2 — 현장·라인·배치·근무지 쓰기 도구 v1.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap">
 <style>
@@ -54,7 +54,7 @@ td{min-width:72px}
 </head>
 <body class="mobile">
 <div class="nav"><div class="nav-inner">
-  <div class="t">ERP MCP 개선요청-2<span class="ver" id="verBadge">v1.0</span></div>
+  <div class="t">ERP MCP 개선요청-2<span class="ver" id="verBadge">v1.1</span></div>
   <div class="tools">
     <button class="btn on" id="bMobile" type="button">📱 모바일</button>
     <button class="btn" id="bPc" type="button">🖥 PC</button>
@@ -65,7 +65,7 @@ td{min-width:72px}
   <div class="cover">
     <h1>ERP MCP 개선요청-2 — 현장·라인·배치·근무지 쓰기 도구</h1>
     <div class="meta">
-      <span>버전 <b>v1.0</b></span><span>작성일 2026-11-27</span>
+      <span>버전 <b>v1.1</b></span><span>작성일 2026-11-27</span>
       <span>인시스 AI혁신 연구개발실</span><span>ys.kim@in-sys.co.kr</span>
     </div>
     <div class="meta"><span>관련: 「ERP MCP 개선요청 — 역할·담당자 배정 도구 (R10) v1.0」(개선요청-1)에 이어지는 건 · 개인정보: 직원 이름 미기재</span></div>
@@ -391,13 +391,13 @@ td{min-width:72px}
 <li>4장 도구 제공 가능 여부·일정, 우선순위 ★1부터 순서 진행 가능 여부</li>
 <li>현장 저장 시 후처리 목록 (근무지 자동 생성, 담당자 지정, 배치 기간 분할 등). 도구가 같은 처리를 하도록 확인 필요</li>
 </ol>
-<p><em>v1.0 — 2026-11-27 최초 작성</em></p>
+<p><em>v1.0 — 2026-11-27 최초 작성 · v1.1 — 2026-11-27 HTML 복사 버튼 보완</em></p>
 </div>
-  <div class="foot">인시스 AI혁신 연구개발실 · MCP개선요청-2 · <span id="verFoot">v1.0</span></div>
+  <div class="foot">인시스 AI혁신 연구개발실 · MCP개선요청-2 · <span id="verFoot">v1.1</span></div>
 </div>
 <div class="toast" id="toast"></div>
 <script type="text/markdown" id="mdSrc">
-# ERP MCP 개선요청-2 — 현장·라인·배치·근무지 쓰기 도구 v1.0
+# ERP MCP 개선요청-2 — 현장·라인·배치·근무지 쓰기 도구 v1.1
 
 - 작성: 인시스 AI혁신 연구개발실 (ys.kim@in-sys.co.kr)
 - 작성일: 2026-11-27
@@ -540,12 +540,12 @@ td{min-width:72px}
 3. 4장 도구 제공 가능 여부·일정, 우선순위 ★1부터 순서 진행 가능 여부
 4. 현장 저장 시 후처리 목록 (근무지 자동 생성, 담당자 지정, 배치 기간 분할 등). 도구가 같은 처리를 하도록 확인 필요
 
-*v1.0 — 2026-11-27 최초 작성*
+*v1.0 — 2026-11-27 최초 작성 · v1.1 — 2026-11-27 HTML 복사 버튼 보완*
 
 </script>
 <script>
 (function(){
-  var VERSION='v1.0';
+  var VERSION='v1.1';
   document.getElementById('verBadge').textContent=VERSION;
   document.getElementById('verFoot').textContent=VERSION;
   var body=document.body,bM=document.getElementById('bMobile'),bP=document.getElementById('bPc');
@@ -571,8 +571,9 @@ td{min-width:72px}
     toast('MD 파일을 내려받았습니다');
   });
   function copyText(s){
-    if(navigator.clipboard&&window.isSecureContext){return navigator.clipboard.writeText(s);}
-    return new Promise(function(res,rej){var ta=document.createElement('textarea');ta.value=s;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');res();}catch(e){rej(e);}ta.remove();});
+    function legacy(){return new Promise(function(res,rej){var ta=document.createElement('textarea');ta.value=s;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}ta.remove();ok?res():rej();});}
+    if(navigator.clipboard&&window.isSecureContext){return navigator.clipboard.writeText(s).catch(legacy);}
+    return legacy();
   }
   Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'),function(b){
     b.addEventListener('click',function(){
