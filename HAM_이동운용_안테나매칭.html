@@ -6,12 +6,12 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>HAM 이동 운용 · 안테나 매칭 핵심 정리 v1.0</title>
+<title>HAM 이동 운용 · 안테나 매칭 핵심 정리 v1.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-  /* v1.0 — Mobile-First */
+  /* v1.1 — Mobile-First */
   :root{
     --navy:#1e3a5f; --blue:#1f4e8c; --text:#2b3440; --sub:#4a5563;
     --line:#d8dee6; --bg:#f4f6f9; --card:#ffffff;
@@ -68,6 +68,7 @@
   body.pc .grid{grid-template-columns:repeat(3,1fr)}
   body.pc .ant{display:none}
   body.pc table{display:table}
+  body.pc .card.wide{grid-column:1/-1}
 
   @media (min-width:768px){
     html{font-size:16px}
@@ -129,6 +130,28 @@
         <p style="color:var(--sub)">※ 7MHz 등 HF는 접지 부족 → 베란다 철제 난간과 전선 본딩 필요</p>
         <div class="note"><b>필수 주의:</b> 표면 <b>아노다이징(절연 피막)</b>으로 도통이 안 될 수 있음. 커넥터 체결 부위 코팅을 살짝 벗겨 전기적으로 도통시킬 것.</div>
       </div>
+
+      <div class="card wide">
+        <h3><span class="num">4</span>아파트 옥상 엘리베이터 기계실 철제 사다리 + 파이프 거치</h3>
+        <span class="lbl s">이득·통달거리</span>
+        <p>단지 내 <b>최고 높이</b>라 VHF/UHF 가시거리 확보 → 통달거리 크게 향상. 철제 사다리는 건물 철근과 연결된 경우가 많아 <b>접지면 역할 충분</b>.</p>
+        <span class="lbl t">접지(도통) 확보</span>
+        <ul>
+          <li>일반 휩: 커넥터 외피 → 파이프 → 사다리가 <b>전기적으로 이어져야</b> 함</li>
+          <li>사다리 <b>페인트·녹은 절연막</b> → 클램프 접촉부를 사포로 벗기고 체결</li>
+          <li>도통 불확실 시 <b>50cm 레디얼 3~4가닥을 45°</b>로 추가 / <b>무어스(Non-radial) 휩</b>이면 걱정 없음</li>
+        </ul>
+        <span class="lbl t">방사부 위치</span>
+        <ul>
+          <li>방사부는 <b>사다리 꼭대기보다 최소 1m 이상</b> 위로 (145MHz 약 1/2λ)</li>
+          <li>철재에 가까우면 <b>SWR 틀어짐·전파 쏠림</b> / 사다리 옆면에 낮게 달면 건물에 가려 반대 방향 약화</li>
+        </ul>
+        <span class="lbl t">동축 손실</span>
+        <ul>
+          <li>옥상→실내는 보통 20~30m 이상. 5D-FB 20m 기준 손실 <b>145MHz 약 2dB / 430MHz 약 3.5dB</b></li>
+          <li>장거리 배선은 <b>8D-FB 또는 LMR-400급</b> 권장 → 높이 이득을 케이블에서 잃지 않게</li>
+        </ul>
+      </div>
     </div>
   </section>
 
@@ -179,7 +202,7 @@
 </footer>
 
 <script>
-  const APP_VERSION = 'v1.0';
+  const APP_VERSION = 'v1.1';
   document.getElementById('ver').textContent = APP_VERSION;
 
   const body = document.body;
